@@ -21,7 +21,9 @@ export async function getPortfolio() {
   return res.items.map((item: any) => ({
     id: item.sys.id,
     title: item.fields.title,
-    image: item.fields.image?.fields?.file?.url ? ('https:' + item.fields.image.fields.file.url) : '/og-image.png',
+    image: item.fields.image?.fields?.file?.url
+      ? 'https:' + item.fields.image.fields.file.url
+      : '/og-image.png',
     category: item.fields.category || 'print',
   }));
 }
