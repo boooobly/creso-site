@@ -10,8 +10,7 @@ import faq from '@/data/faq.json';
 import { type Locale } from '@/i18n';
 
 export default async function Home({ params: { locale } }: { params: { locale: Locale } }) {
-  // @ts-expect-error t из window.__t в рантайме; на сервере используем ru как дефолт
-  const t = (await import('@/i18n/ru')).messages;
+const t = (await import('@/i18n/ru')).messages as any;
   return (
     <div className="space-y-12">
       <Hero t={t} locale={locale} />
