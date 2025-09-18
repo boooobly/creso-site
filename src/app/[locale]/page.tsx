@@ -4,13 +4,31 @@ import ServiceCard from '@/components/ServiceCard';
 import PortfolioGrid from '@/components/PortfolioGrid';
 import FAQ from '@/components/FAQ';
 import LeadForm from '@/components/LeadForm';
-import services from '@/data/services.json';
-import portfolio from '@/data/portfolio.json';
-import faq from '@/data/faq.json';
+
+// локальные файлы как запасной вариант
+import servicesLocal from '@/data/services.json';
+import portfolioLocal from '@/data/portfolio.json';
+import faqLocal from '@/data/faq.json';
+
+// загрузчики из Contentful
+import { getServices, getPortfolio, getFaq } from '@/lib/contentful';
 import { type Locale } from '@/i18n';
 
 export default async function Home({ params: { locale } }: { params: { locale: Locale } }) {
-const t = (await import('@/i18n/ru')).messages as any;
+  const t = (await import('@/i18n/ru')).messages as any;
+
+  // 1) пробуем взять данные из CMS
+  const [sCMS, pCMS, fCMS] = await Promise.all([
+    getServices().catch(() => null),
+    getPortfolio().catch(() => null),
+    getFaq().catch(() => null),
+  ]);
+
+  // 2) если CMS недоступна — используем локальные JSON
+  const services = sCMS ?? servicesLocal;
+  const portfolio = pCMS ?? portfolioLocal;
+  const faq = fCMS ?? faqLocal;
+
   return (
     <div className="space-y-12">
       <Hero t={t} locale={locale} />
@@ -18,7 +36,7 @@ const t = (await import('@/i18n/ru')).messages as any;
       <Section className="container">
         <h2 className="text-2xl font-bold mb-4">Наши услуги</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          {services.map((s) => (
+          {services.map((s: any) => (
             <ServiceCard key={s.id} title={s.title} desc={s.description} href={`/${locale}/${s.slug}`} />
           ))}
         </div>
@@ -26,7 +44,7 @@ const t = (await import('@/i18n/ru')).messages as any;
 
       <Section className="container">
         <h2 className="text-2xl font-bold mb-4">Портфолио</h2>
-        <PortfolioGrid items={portfolio} />
+        <PortfolioGrid items={portfolio as any[]} />
       </Section>
 
       <Section className="container grid gap-6 md:grid-cols-2 items-start">
@@ -36,7 +54,7 @@ const t = (await import('@/i18n/ru')).messages as any;
         </div>
         <div>
           <h2 className="text-2xl font-bold mb-4">FAQ</h2>
-          <FAQ items={faq} />
+          <FAQ items={faq as any[]} />
         </div>
       </Section>
     </div>
