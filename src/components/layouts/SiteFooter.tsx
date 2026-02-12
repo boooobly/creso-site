@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { BRAND } from '@/lib/constants';
+import type { Locale } from '@/i18n';
 
-export default function SiteFooter() {
+export default function SiteFooter({ locale }: { locale: Locale }) {
+  const isEn = locale === 'en';
+
   return (
     <footer className="mt-16 border-t bg-white">
       <div className="container py-8 grid gap-6 md:grid-cols-3">
@@ -14,10 +17,14 @@ export default function SiteFooter() {
         <div className="text-sm">
           <p>Тел: {BRAND.phone}</p>
           <p>E-mail: {BRAND.email}</p>
-          <Link href={BRAND.yandexRoute} className="text-[var(--brand-red)] no-underline" target="_blank">Маршрут в Яндекс.Картах</Link>
+          <Link href={BRAND.yandexRoute} className="text-[var(--brand-red)] no-underline" target="_blank">
+            {isEn ? 'Route in Yandex Maps' : 'Маршрут в Яндекс.Картах'}
+          </Link>
         </div>
         <div className="text-sm">
-          <Link href="/ru/privacy" className="no-underline hover:underline">Политика конфиденциальности</Link>
+          <Link href={`/${locale}/privacy`} className="no-underline hover:underline">
+            {isEn ? 'Privacy Policy' : 'Политика конфиденциальности'}
+          </Link>
           <p className="text-neutral-500 mt-2">© {new Date().getFullYear()} {BRAND.name}</p>
         </div>
       </div>
