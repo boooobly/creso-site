@@ -1,8 +1,10 @@
 'use client';
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postJSON } from '@/lib/fetcher';
+import { messages as ruMessages } from '@/i18n/ru';
 
 const schema = z.object({
   name: z.string().min(2, 'Введите имя'),
@@ -14,18 +16,25 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function LeadForm({ t }: { t: any }) {
-  const { register, handleSubmit, formState: { errors, isSubmitSuccessful }, reset } = useForm<FormData>({ resolver: zodResolver(schema) });
+export default function LeadForm({ t }: { t: typeof ruMessages }) {
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { register, handleSubmit, formState: { errors, isSubmitSuccessful, isSubmitting }, reset } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    const res = await postJSON<{ ok: true }>(`/api/lead`, data);
-    if (res.ok) reset();
+    setSubmitError(null);
+    try {
+      const res = await postJSON<{ ok: true }>(`/api/lead`, data);
+      if (res.ok) reset();
+    } catch {
+      setSubmitError('Не удалось отправить заявку. Попробуйте ещё раз.');
+    }
   };
 
   if (isSubmitSuccessful) return <p className="text-green-700">{t.lead.success}</p>;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+      {submitError && <p className="text-sm text-red-600">{submitError}</p>}
       <div>
         <input className="w-full rounded-xl border p-3" placeholder="Имя" {...register('name')} />
         {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
@@ -54,7 +63,9 @@ export default function LeadForm({ t }: { t: any }) {
         {errors.service && <p className="text-sm text-red-600">{errors.service.message}</p>}
       </div>
       <textarea className="w-full rounded-xl border p-3" rows={4} placeholder="Краткое ТЗ" {...register('message')} />
-      <button type="submit" className="btn-primary">{t.lead.submit}</button>
+      <button type="submit" className="btn-primary" disabled={isSubmitting}>
+        {isSubmitting ? 'Отправка...' : t.lead.submit}
+      </button>
     </form>
   );
 }
