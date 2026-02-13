@@ -24,14 +24,14 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-neutral-800 dark:bg-neutral-950/80 dark:supports-[backdrop-filter]:bg-neutral-950/60">
-      <div className="container flex items-center justify-between py-3">
+      <div className="container flex h-16 items-center justify-between">
         <Link href={`/${locale}`} className="flex items-center gap-2 no-underline">
           <Image
             src="/images/logo-light.png"
             alt="Credomir logo"
             width={160}
             height={32}
-            className="h-8 w-auto block dark:hidden"
+            className="block h-10 w-auto shrink-0 object-contain dark:hidden"
             priority
           />
           <Image
@@ -39,7 +39,7 @@ export default function SiteHeader() {
             alt="Credomir logo"
             width={160}
             height={32}
-            className="h-8 w-auto hidden dark:block"
+            className="hidden h-10 w-auto shrink-0 object-contain dark:block"
             priority
           />
         </Link>
