@@ -29,6 +29,12 @@ export default async function Home({ params: { locale } }: { params: { locale: L
   const portfolio = pCMS ?? portfolioLocal;
   const faq = fCMS ?? faqLocal;
 
+  const resolveServiceHref = (service: any) => {
+    const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
+    if (isPrintService) return `/${locale}/print`;
+    return `/${locale}/${service.slug}`;
+  };
+
   return (
     <div className="space-y-12">
       <Hero t={t} locale={locale} />
@@ -37,7 +43,7 @@ export default async function Home({ params: { locale } }: { params: { locale: L
         <h2 className="text-2xl font-bold mb-4">{locale === 'en' ? 'Our services' : 'Наши услуги'}</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {services.map((s: any) => (
-            <ServiceCard key={s.id} title={s.title} desc={s.description} href={`/${locale}/${s.slug}`} />
+            <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} />
           ))}
         </div>
       </Section>

@@ -6,6 +6,12 @@ export default async function ServicesPage({ params: { locale } }: { params: { l
   const sCMS = await getServices().catch(() => null);
   const services = (sCMS ?? (servicesLocal as any[]));
 
+  const resolveServiceHref = (service: any) => {
+    const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
+    if (isPrintService) return `/${locale}/print`;
+    return `/${locale}/${service.slug}`;
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Список услуг</h1>
@@ -15,7 +21,7 @@ export default async function ServicesPage({ params: { locale } }: { params: { l
             key={s.id}
             title={s.title}
             desc={s.description}
-            href={`/${locale}/${s.slug}`}
+            href={resolveServiceHref(s)}
           />
         ))}
       </div>
