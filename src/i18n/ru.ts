@@ -2,7 +2,7 @@ export const messages = {
   nav: {
     baget: 'Багет',
     services: 'Услуги',
-    production: 'Наружная реклама',
+    production: 'Производство',
     portfolio: 'Портфолио',
     blog: 'Блог',
     contacts: 'Контакты',
