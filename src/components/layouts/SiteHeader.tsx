@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -24,24 +23,10 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-neutral-800 dark:bg-neutral-950/80 dark:supports-[backdrop-filter]:bg-neutral-950/60">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex items-center justify-between py-3">
         <Link href={`/${locale}`} className="flex items-center gap-2 no-underline">
-          <Image
-            src="/images/logo-light.png"
-            alt="Credomir logo"
-            width={160}
-            height={32}
-            className="block h-10 w-auto shrink-0 object-contain dark:hidden"
-            priority
-          />
-          <Image
-            src="/images/logo-dark.png"
-            alt="Credomir logo"
-            width={160}
-            height={32}
-            className="hidden h-10 w-auto shrink-0 object-contain dark:block"
-            priority
-          />
+          <img src="/images/logo-light.png" alt="Credomir logo" className="h-10 w-auto block dark:hidden" />
+          <img src="/images/logo-dark.png" alt="Credomir logo" className="h-10 w-auto hidden dark:block" />
         </Link>
         <nav className="hidden md:flex gap-5">
           {nav.map((n) => {
