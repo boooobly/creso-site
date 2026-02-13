@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -12,6 +13,9 @@ const schema = z.object({
   phone: z.string().min(6, 'Введите телефон'),
   service: z.string().min(2, 'Выберите услугу'),
   message: z.string().optional(),
+  consent: z.literal(true, {
+    errorMap: () => ({ message: 'Необходимо согласие с политикой обработки персональных данных' }),
+  }),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -63,6 +67,13 @@ export default function LeadForm({ t }: { t: typeof ruMessages }) {
         {errors.service && <p className="text-sm text-red-600">{errors.service.message}</p>}
       </div>
       <textarea className="w-full rounded-xl border p-3" rows={4} placeholder="Краткое ТЗ" {...register('message')} />
+      <label className="flex items-start gap-2 text-sm text-neutral-700">
+        <input type="checkbox" className="mt-1" required {...register('consent')} />
+        <span>
+          Я согласен с <Link href="/privacy" className="underline hover:no-underline">политикой обработки персональных данных</Link>
+        </span>
+      </label>
+      {errors.consent && <p className="text-sm text-red-600">{errors.consent.message}</p>}
       <button type="submit" className="btn-primary" disabled={isSubmitting}>
         {isSubmitting ? 'Отправка...' : t.lead.submit}
       </button>
