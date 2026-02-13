@@ -14,15 +14,15 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
             {BRAND.name}. {BRAND.city}. {BRAND.address}
           </p>
         </div>
-        <div className="text-sm space-y-1">
-          <p>Тел: {BRAND.phone}</p>
-          <p>E-mail: {BRAND.email}</p>
+        <div className="space-y-1 text-sm">
+          <p>ИП Кошелева Валентина Валерьевна</p>
+          <p>ИНН 263106597812</p>
+          <p>ОГРНИП 322265100113550</p>
+          <p>Тел: +7 988 731 74 04</p>
+          <p>Email: credomir26@mail.ru</p>
           <Link href={BRAND.yandexRoute} className="text-[var(--brand-red)] no-underline" target="_blank">
             {isEn ? 'Route in Yandex Maps' : 'Маршрут в Яндекс.Картах'}
           </Link>
-          <p className="pt-2">ИП [REPLACE_WITH_FULL_NAME]</p>
-          <p>ИНН 263106597812</p>
-          <p>ОГРНИП 322265100113550</p>
         </div>
         <div className="text-sm">
           <Link href={`/${locale}/privacy`} className="no-underline hover:underline">
