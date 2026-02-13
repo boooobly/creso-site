@@ -25,7 +25,7 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
           <p>ОГРНИП 322265100113550</p>
         </div>
         <div className="text-sm">
-          <Link href="/privacy" className="no-underline hover:underline">
+          <Link href={`/${locale}/privacy`} className="no-underline hover:underline">
             Политика конфиденциальности
           </Link>
           <p className="mt-2 text-neutral-500 dark:text-neutral-400">© {new Date().getFullYear()} {BRAND.name}</p>
