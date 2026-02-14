@@ -34,6 +34,8 @@ export default async function Home({ params: { locale } }: { params: { locale: L
     if (isPrintService) return `/${locale}/print`;
     const isMillingService = service?.id === 'cnc' || service?.title === 'Фрезеровка листовых материалов';
     if (isMillingService) return `/${locale}/milling`;
+    const isWideFormatService = service?.id === 'print' || service?.title === 'Широкоформатная печать';
+    if (isWideFormatService) return `/${locale}/wide-format-printing`;
     return `/${locale}/${service.slug}`;
   };
 
