@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 
-export default function WideFormatPrintingPage() {
+export default function WideFormatPrintingPage({ params: { locale } }: { params: { locale: string } }) {
   return (
     <div>
       <Section className="pb-8">
@@ -22,9 +22,9 @@ export default function WideFormatPrintingPage() {
         <div className="card p-6 md:p-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-2xl font-semibold">Нужна фигурная резка?</h2>
-            <p className="text-neutral-700 dark:text-neutral-300">Перейдите к услуге плоттерной резки (скоро).</p>
+            <p className="text-neutral-700 dark:text-neutral-300">Перейдите к услуге плоттерной резки.</p>
           </div>
-          <Link href="/plotter-cutting" className="btn-primary no-underline w-full md:w-auto text-center">
+          <Link href={`/${locale}/plotter-cutting`} className="btn-primary no-underline w-full md:w-auto text-center">
             Перейти к плоттерной резке
           </Link>
         </div>
