@@ -25,13 +25,39 @@ export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
+    let rafId: number | null = null;
+    let scrolledState = false;
+
+    const evaluateScroll = () => {
+      const scrollY = window.scrollY;
+      let nextState = scrolledState;
+
+      if (!scrolledState && scrollY > 30) {
+        nextState = true;
+      } else if (scrolledState && scrollY < 10) {
+        nextState = false;
+      }
+
+      if (nextState !== scrolledState) {
+        scrolledState = nextState;
+        setIsScrolled((prev) => (prev === nextState ? prev : nextState));
+      }
+
+      rafId = null;
+    };
+
     const onScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(evaluateScroll);
     };
 
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (
