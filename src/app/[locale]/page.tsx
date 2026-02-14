@@ -41,7 +41,7 @@ export default async function Home({ params: { locale } }: { params: { locale: L
     <div className="space-y-12">
       <Hero t={t} locale={locale} />
 
-      <Section className="container rounded-2xl bg-neutral-50 p-4 dark:bg-neutral-950">
+      <Section className="container rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-950">
         <h2 className="text-2xl font-bold mb-4">{locale === 'en' ? 'Our services' : 'Наши услуги'}</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {services.map((s: any) => (
