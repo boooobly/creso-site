@@ -1,13 +1,9 @@
-import '../styles.css';
+import './styles.css';
 import '@/styles/globals.css';
+import type { Metadata } from 'next';
 import { defaultMetadata } from '@/lib/seo';
 import SiteHeader from '@/components/layouts/SiteHeader';
 import SiteFooter from '@/components/layouts/SiteFooter';
-import { locales, type Locale } from '@/i18n';
-import type { Metadata } from 'next';
-
-export async function generateStaticParams() { return locales.map((l) => ({ locale: l })); }
-export const dynamicParams = false;
 
 export const metadata: Metadata = defaultMetadata;
 
@@ -20,17 +16,16 @@ const themeInitScript = `(() => {
   } catch (_) {}
 })();`;
 
-export default async function RootLayout({ params, children }: { params: { locale: Locale }, children: React.ReactNode }) {
-  const { locale } = params;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang="ru" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="bg-white dark:bg-neutral-950">
         <SiteHeader />
         <main className="container py-8">{children}</main>
-        <SiteFooter locale={locale} />
+        <SiteFooter />
       </body>
     </html>
   );

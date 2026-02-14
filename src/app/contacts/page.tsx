@@ -3,33 +3,13 @@ import { MessageCircle, Mail, Phone, Send } from 'lucide-react';
 import LeadForm from '@/components/LeadForm';
 import MapLeaflet from '@/components/MapLeaflet';
 import { BRAND } from '@/lib/constants';
-import { getMessages, type Locale } from '@/i18n';
+import { messages } from '@/lib/messages';
 
 const quickContacts = [
-  {
-    title: 'Позвонить',
-    value: '+7 988 731 74 04',
-    href: 'tel:+79887317404',
-    icon: Phone,
-  },
-  {
-    title: 'Telegram',
-    value: '@Credomir',
-    href: 'https://t.me/Credomir',
-    icon: Send,
-  },
-  {
-    title: 'Max Messenger',
-    value: '+7 988 731 74 04',
-    href: 'https://wa.me/79887317404',
-    icon: MessageCircle,
-  },
-  {
-    title: 'Email',
-    value: 'credomir26@mail.ru',
-    href: 'mailto:credomir26@mail.ru',
-    icon: Mail,
-  },
+  { title: 'Позвонить', value: '+7 988 731 74 04', href: 'tel:+79887317404', icon: Phone },
+  { title: 'Telegram', value: '@Credomir', href: 'https://t.me/Credomir', icon: Send },
+  { title: 'Max Messenger', value: '+7 988 731 74 04', href: 'https://wa.me/79887317404', icon: MessageCircle },
+  { title: 'Email', value: 'credomir26@mail.ru', href: 'mailto:credomir26@mail.ru', icon: Mail },
 ];
 
 const trustItems = [
@@ -40,16 +20,9 @@ const trustItems = [
   'Безналичная оплата',
 ];
 
-const processSteps = [
-  'Оставляете заявку',
-  'Рассчитываем стоимость',
-  'Согласуем макет',
-  'Изготавливаем и передаем',
-];
+const processSteps = ['Оставляете заявку', 'Рассчитываем стоимость', 'Согласуем макет', 'Изготавливаем и передаем'];
 
-export default async function ContactsPage({ params: { locale } }: { params: { locale: Locale } }) {
-  const t = await getMessages(locale);
-
+export default function ContactsPage() {
   return (
     <div className="space-y-10">
       <section className="space-y-4">
@@ -59,13 +32,7 @@ export default async function ContactsPage({ params: { locale } }: { params: { l
           {quickContacts.map((item) => {
             const Icon = item.icon;
             return (
-              <a
-                key={item.title}
-                href={item.href}
-                target={item.href.startsWith('http') ? '_blank' : undefined}
-                rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-                className="card flex h-full flex-col gap-3 rounded-xl p-5 no-underline transition hover:-translate-y-0.5 hover:shadow-md"
-              >
+              <a key={item.title} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined} className="card flex h-full flex-col gap-3 rounded-xl p-5 no-underline transition hover:-translate-y-0.5 hover:shadow-md">
                 <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon className="size-5" />
                 </div>
@@ -81,9 +48,7 @@ export default async function ContactsPage({ params: { locale } }: { params: { l
         <h2 className="text-xl font-semibold">Работаем официально</h2>
         <div className="flex flex-wrap gap-2">
           {trustItems.map((item) => (
-            <span key={item} className="rounded-full bg-neutral-100 px-3 py-1 text-sm dark:bg-neutral-800 dark:text-neutral-200">
-              {item}
-            </span>
+            <span key={item} className="rounded-full bg-neutral-100 px-3 py-1 text-sm dark:bg-neutral-800 dark:text-neutral-200">{item}</span>
           ))}
         </div>
       </section>
@@ -93,9 +58,7 @@ export default async function ContactsPage({ params: { locale } }: { params: { l
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {processSteps.map((step, index) => (
             <div key={step} className="card rounded-xl p-4">
-              <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand-red)]/10 font-semibold text-[var(--brand-red)]">
-                {index + 1}
-              </div>
+              <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand-red)]/10 font-semibold text-[var(--brand-red)]">{index + 1}</div>
               <p className="text-sm font-medium">{step}</p>
             </div>
           ))}
@@ -103,32 +66,26 @@ export default async function ContactsPage({ params: { locale } }: { params: { l
       </section>
 
       <section className="card rounded-xl p-6">
-        <h2 className="text-2xl font-bold mb-2">{t.lead.title}</h2>
+        <h2 className="mb-2 text-2xl font-bold">{messages.lead.title}</h2>
         <p className="mb-4 text-neutral-700 dark:text-neutral-300">Оставьте контакты и короткое описание задачи.</p>
-        <div id="contact-form">
-          <LeadForm t={t} />
-        </div>
+        <div id="contact-form"><LeadForm t={messages} /></div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2 items-start">
+      <section className="grid items-start gap-6 md:grid-cols-2">
         <div>
           <h2 className="text-2xl font-bold">Как нас найти</h2>
           <p className="mt-2 text-neutral-700 dark:text-neutral-300">Адрес: {BRAND.address}</p>
           <p className="text-neutral-700 dark:text-neutral-300">Тел: {BRAND.phone}</p>
           <p className="text-neutral-700 dark:text-neutral-300">E-mail: {BRAND.email}</p>
-          <a className="btn-secondary no-underline mt-4 inline-block" href={BRAND.yandexRoute} target="_blank" rel="noreferrer">
-            Маршрут в Яндекс.Картах
-          </a>
+          <a className="btn-secondary mt-4 inline-block no-underline" href={BRAND.yandexRoute} target="_blank" rel="noreferrer">Маршрут в Яндекс.Картах</a>
         </div>
         <MapLeaflet />
       </section>
 
-      <section className="rounded-2xl bg-[var(--brand-red)]/10 p-6 text-center space-y-3">
+      <section className="space-y-3 rounded-2xl bg-[var(--brand-red)]/10 p-6 text-center">
         <h2 className="text-2xl font-bold">Нужна консультация?</h2>
         <p className="text-neutral-700 dark:text-neutral-300">Ответим в течение 15 минут в рабочее время.</p>
-        <Link href={`/${locale}/contacts#contact-form`} className="btn-primary no-underline inline-flex">
-          Перезвоните мне
-        </Link>
+        <Link href="/contacts#contact-form" className="btn-primary inline-flex no-underline">Перезвоните мне</Link>
       </section>
     </div>
   );
