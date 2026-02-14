@@ -15,7 +15,7 @@ export default async function ServicesPage({ params: { locale } }: { params: { l
   };
 
   return (
-    <div className="space-y-6 rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-950">
+    <div className="space-y-6 bg-neutral-100 py-16 dark:bg-neutral-950">
       <h1 className="text-2xl font-bold">Список услуг</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {services.map((s: any) => (
