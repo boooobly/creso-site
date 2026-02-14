@@ -11,13 +11,15 @@ export default async function ServicesPage({ params: { locale } }: { params: { l
     if (isPrintService) return `/${locale}/print`;
     const isMillingService = service?.id === 'cnc' || service?.title === 'Фрезеровка листовых материалов';
     if (isMillingService) return `/${locale}/milling`;
+    const isWideFormatService = service?.id === 'print' || service?.title === 'Широкоформатная печать';
+    if (isWideFormatService) return `/${locale}/wide-format-printing`;
     return `/${locale}/${service.slug}`;
   };
 
   return (
     <div className="space-y-6 bg-neutral-100 py-16 dark:bg-neutral-950">
       <h1 className="text-2xl font-bold">Список услуг</h1>
-      <div className="bg-neutral-100 p-4">
+      <div className="p-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {services.map((s: any) => (
             <ServiceCard
