@@ -3,7 +3,10 @@ import Link from 'next/link';
 
 export default function ServiceCard({ title, desc, href }: { title: string; desc: string; href: string }) {
   return (
-    <Link href={href} className="card p-5 no-underline group hover:shadow-md transition">
+    <Link
+      href={href}
+      className="group rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm no-underline transition-all duration-200 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
+    >
       <h3 className="text-lg font-semibold group-hover:text-[var(--brand-red)]">{title}</h3>
       <p className="text-sm text-neutral-600 mt-2">{desc}</p>
       <div className="mt-4 inline-flex items-center gap-2 text-[var(--brand-red)]">

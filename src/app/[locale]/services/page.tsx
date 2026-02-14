@@ -17,15 +17,17 @@ export default async function ServicesPage({ params: { locale } }: { params: { l
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Список услуг</h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {services.map((s: any) => (
-          <ServiceCard
-            key={s.id}
-            title={s.title}
-            desc={s.description}
-            href={resolveServiceHref(s)}
-          />
-        ))}
+      <div className="rounded-2xl bg-neutral-50 p-4 dark:bg-neutral-950">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {services.map((s: any) => (
+            <ServiceCard
+              key={s.id}
+              title={s.title}
+              desc={s.description}
+              href={resolveServiceHref(s)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
