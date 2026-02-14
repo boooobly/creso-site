@@ -15,6 +15,8 @@ export default async function ServicesPage() {
     if (isWideFormatService) return '/wide-format-printing';
     const isPlotterService = service?.id === 'plotter' || service?.title === 'Плоттерная резка';
     if (isPlotterService) return '/plotter-cutting';
+    const isHeatTransferService = service?.id === 'thermo' || service?.title === 'Термоперенос на футболки и кружки';
+    if (isHeatTransferService) return '/heat-transfer';
     return `/${service.slug}`;
   };
 
