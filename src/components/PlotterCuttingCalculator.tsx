@@ -3,8 +3,8 @@
 import { useMemo, useState } from 'react';
 
 const MATERIAL_OPTIONS = [
-  { value: 'selfAdhesive', label: 'Самоклейка' },
-  { value: 'oracal', label: 'Оракал' },
+  { value: 'selfAdhesive', label: 'Самоклеящаяся плёнка' },
+  { value: 'oracal', label: 'Оракал (цветная плёнка)' },
 ] as const;
 
 const COMPLEXITY_OPTIONS = [
@@ -13,7 +13,20 @@ const COMPLEXITY_OPTIONS = [
   { value: 1.6, label: 'Сложная (1.6)' },
 ] as const;
 
+const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
+const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
+const ALLOWED_EXTENSIONS = [...VECTOR_EXTENSIONS, ...RASTER_EXTENSIONS];
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+const MAX_FILES = 5;
+
 type MaterialType = typeof MATERIAL_OPTIONS[number]['value'];
+
+type UploadedItem = {
+  name: string;
+  size: number;
+  ext: string;
+  isRaster: boolean;
+};
 
 export default function PlotterCuttingCalculator() {
   const [material, setMaterial] = useState<MaterialType>('selfAdhesive');
@@ -24,6 +37,25 @@ export default function PlotterCuttingCalculator() {
   const [mountingFilm, setMountingFilm] = useState(false);
   const [transfer, setTransfer] = useState(false);
   const [urgent, setUrgent] = useState(false);
+
+  const [files, setFiles] = useState<UploadedItem[]>([]);
+  const [fileError, setFileError] = useState('');
+  const [fileWarning, setFileWarning] = useState('');
+
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [comment, setComment] = useState('');
+  const [agree, setAgree] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [submitSuccess, setSubmitSuccess] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [touched, setTouched] = useState({
+    name: false,
+    phone: false,
+    agree: false,
+  });
 
   const cutLengthNum = Number(cutLength);
   const areaNum = Number(area);
@@ -43,8 +75,127 @@ export default function PlotterCuttingCalculator() {
   const minimumApplied = urgentTotal > 0 && urgentTotal < 400;
   const totalCost = minimumApplied ? 400 : urgentTotal;
 
+  const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
+  const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
+
+  const nameError = touched.name && !name.trim() ? 'Введите имя.' : '';
+  const phoneError = touched.phone && !phoneValid ? 'Введите телефон в формате +7XXXXXXXXXX или 8XXXXXXXXXX.' : '';
+  const agreeError = touched.agree && !agree ? 'Необходимо согласие с политикой.' : '';
+
+  const acceptedAttr = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(',');
+
+  const applyFiles = (incoming: FileList | File[]) => {
+    setFileError('');
+    setFileWarning('');
+
+    const selected = Array.from(incoming);
+    if (!selected.length) return;
+
+    const merged = [...files];
+    let hasRaster = false;
+
+    for (const file of selected) {
+      if (merged.length >= MAX_FILES) {
+        setFileError(`Можно загрузить не более ${MAX_FILES} файлов.`);
+        break;
+      }
+
+      if (file.size > MAX_FILE_SIZE) {
+        setFileError('Файл превышает 50 МБ. Свяжитесь с менеджером.');
+        continue;
+      }
+
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        setFileError('Недопустимый формат файла. Разрешены векторные и растровые форматы из списка.');
+        continue;
+      }
+
+      const isRaster = RASTER_EXTENSIONS.includes(ext);
+      if (isRaster) hasRaster = true;
+
+      if (!merged.some((item) => item.name === file.name && item.size === file.size)) {
+        merged.push({ name: file.name, size: file.size, ext, isRaster });
+      }
+    }
+
+    if (hasRaster || merged.some((item) => item.isRaster)) {
+      setFileWarning('Файл не является векторным. Возможно потребуется подготовка макета.');
+    }
+
+    setFiles(merged.slice(0, MAX_FILES));
+  };
+
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    applyFiles(e.dataTransfer.files);
+  };
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError('');
+    setSubmitSuccess('');
+
+    const nextTouched = { name: true, phone: true, agree: true };
+    setTouched(nextTouched);
+
+    if (!name.trim() || !phoneValid || !agree) {
+      setSubmitError('Заполните обязательные поля формы.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        calculator: {
+          material,
+          cutLength: cutLengthNum,
+          area: areaNum,
+          complexity,
+          extras: {
+            weeding,
+            mountingFilm,
+            transfer,
+            urgent,
+          },
+          baseCost,
+          extrasCost,
+          minimumApplied,
+          total: Math.round(totalCost),
+        },
+        files: files.map((f) => f.name),
+        contact: {
+          name: name.trim(),
+          phone: normalizedPhone,
+          email: email.trim(),
+          comment: comment.trim(),
+          agreed: agree,
+        },
+      };
+
+      const res = await fetch('/api/plotter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || 'Не удалось отправить заявку. Попробуйте позже.');
+      }
+
+      setSubmitSuccess('Заявка отправлена. Мы скоро свяжемся с вами.');
+      setComment('');
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Ошибка отправки заявки.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-2">
       <section className="card space-y-4 p-5 md:p-6">
         <h2 className="text-xl font-semibold">Параметры резки</h2>
 
@@ -111,18 +262,108 @@ export default function PlotterCuttingCalculator() {
 
         <div className="space-y-3">
           <CheckLine checked={weeding} onChange={setWeeding} label="Выборка (+15 ₽ / м)" />
-          <CheckLine checked={mountingFilm} onChange={setMountingFilm} label="Монтажная пленка (+100 ₽ / м²)" />
+          <CheckLine checked={mountingFilm} onChange={setMountingFilm} label="Монтажная плёнка (+100 ₽ / м²)" />
           <CheckLine checked={transfer} onChange={setTransfer} label="Перенос на деталь (+300 ₽)" />
           <CheckLine checked={urgent} onChange={setUrgent} label="Срочный заказ (+30%)" />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="layoutFile" className="text-sm font-medium">Макет файла</label>
-          <input
-            id="layoutFile"
-            type="file"
-            className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-3 file:py-2 file:text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:file:bg-neutral-800"
-          />
+          <label className="text-sm font-medium">Файлы макета</label>
+          <div
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={onDrop}
+            className="rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50 p-4 text-sm dark:border-neutral-700 dark:bg-neutral-900/50"
+          >
+            <p className="mb-3 text-neutral-600 dark:text-neutral-300">Перетащите файлы сюда или загрузите вручную.</p>
+            <label className="btn-primary inline-flex cursor-pointer">
+              Загрузить макет
+              <input
+                type="file"
+                multiple
+                accept={acceptedAttr}
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files) applyFiles(e.target.files);
+                  e.currentTarget.value = '';
+                }}
+              />
+            </label>
+            <p className="mt-2 text-xs text-neutral-500">До 5 файлов, не более 50 МБ каждый.</p>
+
+            {files.length > 0 && (
+              <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">
+                {files.map((file) => (
+                  <li key={`${file.name}-${file.size}`}>{file.name}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {fileWarning && <p className="text-sm text-amber-700 dark:text-amber-300">{fileWarning}</p>}
+          {fileError && <p className="text-sm text-red-600">{fileError}</p>}
+        </div>
+
+        <div className="card space-y-3 p-4">
+          <h3 className="text-lg font-semibold">Контакты</h3>
+
+          <div className="space-y-1">
+            <label htmlFor="name" className="text-sm font-medium">Имя *</label>
+            <input
+              id="name"
+              value={name}
+              onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+            />
+            {nameError && <p className="text-sm text-red-600">{nameError}</p>}
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
+            <input
+              id="phone"
+              value={phone}
+              onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+79991234567 или 89991234567"
+              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+            />
+            {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="email" className="text-sm font-medium">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="comment" className="text-sm font-medium">Комментарий</label>
+            <textarea
+              id="comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+            />
+          </div>
+
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={agree}
+              onBlur={() => setTouched((prev) => ({ ...prev, agree: true }))}
+              onChange={(e) => setAgree(e.target.checked)}
+              className="mt-1 h-4 w-4"
+            />
+            <span className="text-sm">Согласен(а) с политикой обработки персональных данных *</span>
+          </label>
+          {agreeError && <p className="text-sm text-red-600">{agreeError}</p>}
         </div>
       </section>
 
@@ -130,21 +371,28 @@ export default function PlotterCuttingCalculator() {
         <h2 className="text-xl font-semibold">Расчёт</h2>
         <div className="space-y-2 text-sm">
           <SummaryRow label="Длина реза" value={valuesValid ? `${cutLengthNum.toFixed(2)} м` : '—'} />
-          <SummaryRow label="Базовая резка" value={`${baseCost.toLocaleString('ru-RU')} ₽`} />
-          <SummaryRow label="Доп. услуги" value={`${extrasCost.toLocaleString('ru-RU')} ₽`} />
-          {minimumApplied && <SummaryRow label="Минимальный заказ" value="Применен (400 ₽)" />}
+          <SummaryRow label="Базовая резка" value={`${Math.round(baseCost).toLocaleString('ru-RU')} ₽`} />
+          <SummaryRow label="Доп. услуги" value={`${Math.round(extrasCost).toLocaleString('ru-RU')} ₽`} />
+          {minimumApplied && <SummaryRow label="Минимальный заказ применён" value="400 ₽" />}
         </div>
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
           <p className="mt-1 text-4xl font-extrabold md:text-5xl">{Math.round(totalCost).toLocaleString('ru-RU')} ₽</p>
           {minimumApplied && (
-            <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">Применена минимальная стоимость заказа — 400 ₽.</p>
+            <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">Минимальный заказ применён — 400 ₽</p>
           )}
-          <Button variant="primary" className="mt-4 w-full">Отправить заявку</Button>
+
+          <Button variant="primary" className="mt-4 w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
+          </Button>
+          <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Менеджер свяжется с вами для уточнения деталей.</p>
+
+          {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}
+          {submitSuccess && <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
         </div>
       </aside>
-    </div>
+    </form>
   );
 }
 
@@ -192,14 +440,16 @@ function Button({
   children,
   variant,
   className = '',
+  disabled = false,
 }: {
   children: React.ReactNode;
   variant: 'primary';
   className?: string;
+  disabled?: boolean;
 }) {
   if (variant === 'primary') {
     return (
-      <button type="button" className={`btn-primary ${className}`.trim()}>
+      <button type="submit" disabled={disabled} className={`btn-primary ${className} disabled:opacity-60`.trim()}>
         {children}
       </button>
     );

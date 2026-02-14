@@ -36,6 +36,8 @@ export default async function Home({ params: { locale } }: { params: { locale: L
     if (isMillingService) return `/${locale}/milling`;
     const isWideFormatService = service?.id === 'print' || service?.title === 'Широкоформатная печать';
     if (isWideFormatService) return `/${locale}/wide-format-printing`;
+    const isPlotterService = service?.id === 'plotter' || service?.title === 'Плоттерная резка';
+    if (isPlotterService) return `/${locale}/plotter-cutting`;
     return `/${locale}/${service.slug}`;
   };
 
