@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Section from '@/components/Section';
 import PlotterCuttingCalculator from '@/components/PlotterCuttingCalculator';
 
-export default function PlotterCuttingPage({ params: { locale } }: { params: { locale: string } }) {
+export default function PlotterCuttingPage() {
   return (
     <div>
       <Section className="pb-8">
@@ -22,9 +22,7 @@ export default function PlotterCuttingPage({ params: { locale } }: { params: { l
             <h2 className="text-2xl font-semibold">Нужна печать перед резкой?</h2>
             <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем аккуратно вырежем по контуру.</p>
           </div>
-          <Link href={`/${locale}/wide-format-printing`} className="btn-primary w-full text-center no-underline md:w-auto">
-            Перейти к широкоформатной печати
-          </Link>
+          <Link href="/wide-format-printing" className="btn-primary w-full text-center no-underline md:w-auto">Перейти к широкоформатной печати</Link>
         </div>
       </Section>
     </div>
