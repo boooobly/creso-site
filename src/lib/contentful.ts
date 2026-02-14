@@ -1,9 +1,14 @@
 import { createClient } from 'contentful';
 
-export const client = createClient({
-  space: process.env.CONTENTFUL_SPACE_ID!,
-  accessToken: process.env.CONTENTFUL_ACCESS_TOKEN!,
-});
+const space = process.env.CONTENTFUL_SPACE_ID;
+const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
+
+export const client: any = space && accessToken
+  ? createClient({
+      space,
+      accessToken,
+    })
+  : null;
 
 // Готовые функции-загрузчики
 export async function getServices() {
@@ -34,6 +39,8 @@ export async function getFaq() {
 }
 
 export async function getPosts() {
+  if (!client) return null;
+
   const res = await client.getEntries({ content_type: 'post', order: ['-fields.date'], limit: 1000 });
   return res.items.map((item: any) => ({
     id: item.sys.id,

@@ -12,10 +12,10 @@ import faqLocal from '@/data/faq.json';
 
 // загрузчики из Contentful
 import { getServices, getPortfolio, getFaq } from '@/lib/contentful';
-import { type Locale } from '@/i18n';
+import { getMessages, type Locale } from '@/i18n';
 
 export default async function Home({ params: { locale } }: { params: { locale: Locale } }) {
-  const t = (await import('@/i18n/ru')).messages as any;
+  const t = await getMessages(locale);
 
   // 1) пробуем взять данные из CMS
   const [sCMS, pCMS, fCMS] = await Promise.all([
@@ -29,21 +29,29 @@ export default async function Home({ params: { locale } }: { params: { locale: L
   const portfolio = pCMS ?? portfolioLocal;
   const faq = fCMS ?? faqLocal;
 
+  const resolveServiceHref = (service: any) => {
+    const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
+    if (isPrintService) return `/${locale}/print`;
+    const isMillingService = service?.id === 'cnc' || service?.title === 'Фрезеровка листовых материалов';
+    if (isMillingService) return `/${locale}/milling`;
+    return `/${locale}/${service.slug}`;
+  };
+
   return (
     <div className="space-y-12">
       <Hero t={t} locale={locale} />
 
       <Section className="container">
-        <h2 className="text-2xl font-bold mb-4">Наши услуги</h2>
+        <h2 className="text-2xl font-bold mb-4">{locale === 'en' ? 'Our services' : 'Наши услуги'}</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {services.map((s: any) => (
-            <ServiceCard key={s.id} title={s.title} desc={s.description} href={`/${locale}/${s.slug}`} />
+            <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} />
           ))}
         </div>
       </Section>
 
       <Section className="container">
-        <h2 className="text-2xl font-bold mb-4">Портфолио</h2>
+        <h2 className="text-2xl font-bold mb-4">{locale === 'en' ? 'Portfolio' : 'Портфолио'}</h2>
         <PortfolioGrid items={portfolio as any[]} />
       </Section>
 
