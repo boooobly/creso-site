@@ -4,45 +4,43 @@ import ServiceCard from '@/components/ServiceCard';
 import PortfolioGrid from '@/components/PortfolioGrid';
 import FAQ from '@/components/FAQ';
 import LeadForm from '@/components/LeadForm';
+import { messages as t } from '@/lib/messages';
 
-// локальные файлы как запасной вариант
 import servicesLocal from '@/data/services.json';
 import portfolioLocal from '@/data/portfolio.json';
 import faqLocal from '@/data/faq.json';
 
-// загрузчики из Contentful
 import { getServices, getPortfolio, getFaq } from '@/lib/contentful';
-import { getMessages, type Locale } from '@/i18n';
 
-export default async function Home({ params: { locale } }: { params: { locale: Locale } }) {
-  const t = await getMessages(locale);
-
-  // 1) пробуем взять данные из CMS
+export default async function Home() {
   const [sCMS, pCMS, fCMS] = await Promise.all([
     getServices().catch(() => null),
     getPortfolio().catch(() => null),
     getFaq().catch(() => null),
   ]);
 
-  // 2) если CMS недоступна — используем локальные JSON
   const services = sCMS ?? servicesLocal;
   const portfolio = pCMS ?? portfolioLocal;
   const faq = fCMS ?? faqLocal;
 
   const resolveServiceHref = (service: any) => {
     const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
-    if (isPrintService) return `/${locale}/print`;
+    if (isPrintService) return '/print';
     const isMillingService = service?.id === 'cnc' || service?.title === 'Фрезеровка листовых материалов';
-    if (isMillingService) return `/${locale}/milling`;
-    return `/${locale}/${service.slug}`;
+    if (isMillingService) return '/milling';
+    const isWideFormatService = service?.id === 'print' || service?.title === 'Широкоформатная печать';
+    if (isWideFormatService) return '/wide-format-printing';
+    const isPlotterService = service?.id === 'plotter' || service?.title === 'Плоттерная резка';
+    if (isPlotterService) return '/plotter-cutting';
+    return `/${service.slug}`;
   };
 
   return (
     <div className="space-y-12">
-      <Hero t={t} locale={locale} />
+      <Hero t={t} />
 
       <Section>
-        <h2 className="text-2xl font-bold mb-4">{locale === 'en' ? 'Our services' : 'Наши услуги'}</h2>
+        <h2 className="text-2xl font-bold mb-4">Наши услуги</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {services.map((s: any) => (
             <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} />
@@ -51,7 +49,7 @@ export default async function Home({ params: { locale } }: { params: { locale: L
       </Section>
 
       <Section>
-        <h2 className="text-2xl font-bold mb-4">{locale === 'en' ? 'Portfolio' : 'Портфолио'}</h2>
+        <h2 className="text-2xl font-bold mb-4">Портфолио</h2>
         <PortfolioGrid items={portfolio as any[]} />
       </Section>
 

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import type { Locale } from '@/i18n';
 
 const pricing = [
   { material: 'Акрил', thickness: '3 мм', price: 45 },
@@ -15,7 +14,7 @@ const pricing = [
   { material: 'Дерево (фанера)', thickness: '18 мм', price: 95 },
 ];
 
-export default function MillingPage({ params: { locale } }: { params: { locale: Locale } }) {
+export default function MillingPage() {
   return (
     <section className="container max-w-5xl space-y-6">
       <header className="space-y-2 text-center">
@@ -64,7 +63,7 @@ export default function MillingPage({ params: { locale } }: { params: { locale: 
           <br />
           Стоимость может изменяться в зависимости от сложности макета.
         </p>
-        <Link href={`/${locale}/contacts`} className="btn-primary inline-flex no-underline">
+        <Link href="/contacts" className="btn-primary inline-flex no-underline">
           Рассчитать проект
         </Link>
       </div>

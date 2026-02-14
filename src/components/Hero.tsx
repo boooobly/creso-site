@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-export default function Hero({ t, locale }: { t: any; locale: string }) {
+export default function Hero({ t }: { t: any }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   return (
@@ -18,13 +18,13 @@ export default function Hero({ t, locale }: { t: any; locale: string }) {
           {t.hero.subtitle}
         </motion.p>
         <div className="grid gap-3 md:grid-cols-3">
-          <Link className="btn-primary no-underline text-center" href={`/${locale}/baget`}>
+          <Link className="btn-primary no-underline text-center" href="/baget">
             {t.hero.ctas.baget}
           </Link>
-          <Link className="btn-secondary no-underline text-center" href={`/${locale}/services`}>
+          <Link className="btn-secondary no-underline text-center" href="/services">
             {t.hero.ctas.services}
           </Link>
-          <Link className="btn-primary no-underline text-center" href={`/${locale}/production`}>
+          <Link className="btn-primary no-underline text-center" href="/production">
             {t.hero.ctas.production}
           </Link>
         </div>

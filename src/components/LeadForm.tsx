@@ -1,13 +1,11 @@
 'use client';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postJSON } from '@/lib/fetcher';
-import { messages as ruMessages } from '@/i18n/ru';
-import type { Locale } from '@/i18n';
+import { messages } from '@/lib/messages';
 
 const schema = z.object({
   name: z.string().min(2, 'Введите имя'),
@@ -22,9 +20,8 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function LeadForm({ t }: { t: typeof ruMessages }) {
+export default function LeadForm({ t }: { t: typeof messages }) {
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const { locale } = useParams<{ locale: Locale }>();
   const { register, handleSubmit, formState: { errors, isSubmitSuccessful, isSubmitting }, reset } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
@@ -73,7 +70,7 @@ export default function LeadForm({ t }: { t: typeof ruMessages }) {
       <label className="flex items-start gap-2 text-sm text-neutral-700">
         <input type="checkbox" className="mt-1" required {...register('consent')} />
         <span>
-          Я согласен с <Link href={`/${locale}/privacy`} className="underline hover:no-underline">политикой обработки персональных данных</Link>
+          Я согласен с <Link href="/privacy" className="underline hover:no-underline">политикой обработки персональных данных</Link>
         </span>
       </label>
       {errors.consent && <p className="text-sm text-red-600">{errors.consent.message}</p>}

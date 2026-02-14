@@ -7,9 +7,6 @@ const nextConfig = {
       { protocol: "https", hostname: "assets.ctfassets.net" },
     ],
   },
-  redirects: async () => [
-    { source: "/", destination: "/ru", permanent: false }
-  ],
 };
 
 export default nextConfig;

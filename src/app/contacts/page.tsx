@@ -3,7 +3,7 @@ import { MessageCircle, Mail, Phone, Send } from 'lucide-react';
 import LeadForm from '@/components/LeadForm';
 import MapLeaflet from '@/components/MapLeaflet';
 import { BRAND } from '@/lib/constants';
-import { getMessages, type Locale } from '@/i18n';
+import { messages as t } from '@/lib/messages';
 
 const quickContacts = [
   {
@@ -47,8 +47,7 @@ const processSteps = [
   'Изготавливаем и передаем',
 ];
 
-export default async function ContactsPage({ params: { locale } }: { params: { locale: Locale } }) {
-  const t = await getMessages(locale);
+export default async function ContactsPage() {
 
   return (
     <div className="space-y-10">
@@ -126,7 +125,7 @@ export default async function ContactsPage({ params: { locale } }: { params: { l
       <section className="rounded-2xl bg-[var(--brand-red)]/10 p-6 text-center space-y-3">
         <h2 className="text-2xl font-bold">Нужна консультация?</h2>
         <p className="text-neutral-700 dark:text-neutral-300">Ответим в течение 15 минут в рабочее время.</p>
-        <Link href={`/${locale}/contacts#contact-form`} className="btn-primary no-underline inline-flex">
+        <Link href="/contacts#contact-form" className="btn-primary no-underline inline-flex">
           Перезвоните мне
         </Link>
       </section>
