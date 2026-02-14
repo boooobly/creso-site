@@ -27,7 +27,7 @@ export default async function RootLayout({ params, children }: { params: { local
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body>
+      <body className="bg-white dark:bg-neutral-950">
         <SiteHeader />
         <main className="container py-8">{children}</main>
         <SiteFooter locale={locale} />
