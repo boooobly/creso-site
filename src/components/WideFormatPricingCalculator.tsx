@@ -87,31 +87,37 @@ export default function WideFormatPricingCalculator() {
 
         <div className="space-y-2">
           <label htmlFor="material" className="text-sm font-medium">Материал</label>
-          <select
-            id="material"
-            value={material}
-            onChange={(e) => setMaterial(e.target.value as MaterialType)}
-            className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
-          >
-            {MATERIAL_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="material"
+              value={material}
+              onChange={(e) => setMaterial(e.target.value as MaterialType)}
+              className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
+            >
+              {MATERIAL_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+            <SelectArrow />
+          </div>
         </div>
 
         {material === 'banner' && (
           <div className="space-y-2">
             <label htmlFor="density" className="text-sm font-medium">Плотность</label>
-            <select
-              id="density"
-              value={bannerDensity}
-              onChange={(e) => setBannerDensity(Number(e.target.value) as BannerDensity)}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
-            >
-              {[220, 300, 440].map((density) => (
-                <option key={density} value={density}>{density}g</option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="density"
+                value={bannerDensity}
+                onChange={(e) => setBannerDensity(Number(e.target.value) as BannerDensity)}
+                className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
+              >
+                {[220, 300, 440].map((density) => (
+                  <option key={density} value={density}>{density}g</option>
+                ))}
+              </select>
+              <SelectArrow />
+            </div>
           </div>
         )}
 
@@ -192,9 +198,9 @@ export default function WideFormatPricingCalculator() {
       <aside className="card h-fit p-5 md:p-6 space-y-4 lg:sticky lg:top-24">
         <h2 className="text-xl font-semibold">Расчёт</h2>
         <div className="space-y-2 text-sm">
-          <p className="flex items-center justify-between"><span>Площадь</span><b>{parsedValuesValid ? `${(areaPerUnit * quantityNum).toFixed(2)} м²` : '—'}</b></p>
-          <p className="flex items-center justify-between"><span>Базовая печать</span><b>{basePrintCost.toLocaleString('ru-RU')} ₽</b></p>
-          <p className="flex items-center justify-between"><span>Доп. услуги</span><b>{extrasCost.toLocaleString('ru-RU')} ₽</b></p>
+          <SummaryRow label="Площадь" value={parsedValuesValid ? `${(areaPerUnit * quantityNum).toFixed(2)} м²` : '—'} />
+          <SummaryRow label="Базовая печать" value={`${basePrintCost.toLocaleString('ru-RU')} ₽`} />
+          <SummaryRow label="Доп. услуги" value={`${extrasCost.toLocaleString('ru-RU')} ₽`} />
         </div>
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
@@ -213,6 +219,29 @@ export default function WideFormatPricingCalculator() {
         </div>
       </aside>
     </div>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <p className="flex items-center">
+      <span>{label}</span>
+      <span className="mx-3 flex-1 border-b border-dashed border-neutral-300 dark:border-neutral-700" />
+      <b>{value}</b>
+    </p>
+  );
+}
+
+function SelectArrow() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+      className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500"
+    >
+      <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
