@@ -2,20 +2,20 @@ import { getServices } from '@/lib/contentful';
 import servicesLocal from '@/data/services.json';
 import ServiceCard from '@/components/ServiceCard';
 
-export default async function ServicesPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function ServicesPage() {
   const sCMS = await getServices().catch(() => null);
   const services = (sCMS ?? (servicesLocal as any[]));
 
   const resolveServiceHref = (service: any) => {
     const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
-    if (isPrintService) return `/${locale}/print`;
+    if (isPrintService) return '/print';
     const isMillingService = service?.id === 'cnc' || service?.title === 'Фрезеровка листовых материалов';
-    if (isMillingService) return `/${locale}/milling`;
+    if (isMillingService) return '/milling';
     const isWideFormatService = service?.id === 'print' || service?.title === 'Широкоформатная печать';
-    if (isWideFormatService) return `/${locale}/wide-format-printing`;
+    if (isWideFormatService) return '/wide-format-printing';
     const isPlotterService = service?.id === 'plotter' || service?.title === 'Плоттерная резка';
-    if (isPlotterService) return `/${locale}/plotter-cutting`;
-    return `/${locale}/${service.slug}`;
+    if (isPlotterService) return '/plotter-cutting';
+    return `/${service.slug}`;
   };
 
   return (
@@ -24,12 +24,7 @@ export default async function ServicesPage({ params: { locale } }: { params: { l
       <div className="p-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {services.map((s: any) => (
-            <ServiceCard
-              key={s.id}
-              title={s.title}
-              desc={s.description}
-              href={resolveServiceHref(s)}
-            />
+            <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} />
           ))}
         </div>
       </div>
