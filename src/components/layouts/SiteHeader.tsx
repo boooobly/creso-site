@@ -1,4 +1,5 @@
 'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
@@ -21,24 +22,41 @@ export default function SiteHeader() {
   const pathname = usePathname();
   const { locale } = useParams<{ locale: Locale }>();
   const t = locale === 'en' ? enMessages : ruMessages;
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-neutral-800 dark:bg-neutral-950/80 dark:supports-[backdrop-filter]:bg-neutral-950/60">
-      <div className="container flex items-center justify-between py-3">
+    <header
+      className={
+        `sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-black/70 ${
+          isScrolled ? 'shadow-md' : 'shadow-sm'
+        }`
+      }
+    >
+      <div className={`container flex items-center justify-between transition-all duration-200 ${isScrolled ? 'py-2' : 'py-4'}`}>
         <Link href={`/${locale}`} className="flex items-center gap-2 no-underline">
           <Image
             src="/images/logo-light.png"
             alt="CredoMir logo"
             width={160}
             height={60}
-            className="h-10 w-auto block dark:hidden"
+            className={`w-auto block dark:hidden transition-all duration-200 ${isScrolled ? 'h-8' : 'h-10'}`}
           />
           <Image
             src="/images/logo-dark.png"
             alt="CredoMir logo"
             width={160}
             height={60}
-            className="h-10 w-auto hidden dark:block"
+            className={`w-auto hidden dark:block transition-all duration-200 ${isScrolled ? 'h-8' : 'h-10'}`}
           />
         </Link>
         <nav className="hidden md:flex gap-5">
