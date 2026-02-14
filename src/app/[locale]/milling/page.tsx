@@ -37,7 +37,7 @@ export default function MillingPage({ params: { locale } }: { params: { locale: 
             </thead>
             <tbody>
               {pricing.map((row) => (
-                <tr key={`${row.material}-${row.thickness}`} className="border-t transition hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900/50">
+                <tr key={`${row.material}-${row.thickness}`} className="border-t transition hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/60">
                   <td className="px-4 py-3">{row.material}</td>
                   <td className="px-4 py-3">{row.thickness}</td>
                   <td className="px-4 py-3 font-medium">{row.price} ₽ / м</td>
@@ -49,7 +49,7 @@ export default function MillingPage({ params: { locale } }: { params: { locale: 
 
         <div className="space-y-3 p-4 md:hidden">
           {pricing.map((row) => (
-            <div key={`${row.material}-${row.thickness}`} className="rounded-xl border p-3 transition hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900/50">
+            <div key={`${row.material}-${row.thickness}`} className="rounded-xl border p-3 transition hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/60">
               <p className="font-medium">{row.material}</p>
               <p className="text-sm text-neutral-600 dark:text-neutral-300">Толщина: {row.thickness}</p>
               <p className="text-sm">Цена: <span className="font-medium">{row.price} ₽ / м</span></p>

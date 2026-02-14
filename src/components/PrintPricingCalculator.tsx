@@ -130,7 +130,7 @@ export default function PrintPricingCalculator() {
               value={customQuantity}
               onChange={(e) => setCustomQuantity(e.target.value)}
               placeholder="Введите количество (мин. 100)"
-              className="w-full rounded-xl border p-3 dark:border-neutral-700 dark:bg-neutral-900"
+              className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             />
             {!isQuantityValid && <p className="text-sm text-red-600">Минимальный тираж — 100 шт.</p>}
           </div>

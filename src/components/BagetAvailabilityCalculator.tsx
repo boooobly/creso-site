@@ -45,7 +45,7 @@ export default function BagetAvailabilityCalculator() {
             step="0.1"
             value={width}
             onChange={(e) => setWidth(e.target.value)}
-            className="w-full rounded-xl border p-3"
+            className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             placeholder="Например, 40"
           />
         </label>
@@ -58,7 +58,7 @@ export default function BagetAvailabilityCalculator() {
             step="0.1"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
-            className="w-full rounded-xl border p-3"
+            className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             placeholder="Например, 60"
           />
         </label>
@@ -80,7 +80,7 @@ export default function BagetAvailabilityCalculator() {
 
       <div className="overflow-x-auto rounded-2xl border">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-neutral-50 text-neutral-700">
+          <thead className="bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
             <tr>
               <th className="p-3 font-semibold">Изображение</th>
               <th className="p-3 font-semibold">Название</th>
@@ -100,16 +100,16 @@ export default function BagetAvailabilityCalculator() {
                   className={
                     checked
                       ? suitable
-                        ? 'bg-green-50'
-                        : 'opacity-60'
-                      : ''
+                        ? 'bg-green-50 hover:bg-neutral-50 dark:bg-green-900/20 dark:hover:bg-neutral-800/60'
+                        : 'opacity-60 hover:bg-neutral-50 dark:hover:bg-neutral-800/60'
+                      : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/60'
                   }
                 >
                   <td className="p-3">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="h-12 w-12 rounded-md border object-contain bg-white p-1"
+                      className="h-12 w-12 rounded-md border border-neutral-300 object-contain bg-white p-1 dark:border-neutral-700 dark:bg-neutral-900"
                     />
                   </td>
                   <td className="p-3 font-medium">{item.name}</td>

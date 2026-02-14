@@ -43,21 +43,21 @@ export default function LeadForm({ t }: { t: typeof ruMessages }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       {submitError && <p className="text-sm text-red-600">{submitError}</p>}
       <div>
-        <input className="w-full rounded-xl border p-3" placeholder="Имя" {...register('name')} />
+        <input className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500" placeholder="Имя" {...register('name')} />
         {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         <div>
-          <input className="w-full rounded-xl border p-3" placeholder="E-mail" {...register('email')} />
+          <input className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500" placeholder="E-mail" {...register('email')} />
           {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
         </div>
         <div>
-          <input className="w-full rounded-xl border p-3" placeholder="Телефон" {...register('phone')} />
+          <input className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500" placeholder="Телефон" {...register('phone')} />
           {errors.phone && <p className="text-sm text-red-600">{errors.phone.message}</p>}
         </div>
       </div>
       <div>
-        <select className="w-full rounded-xl border p-3" defaultValue="" {...register('service')}>
+        <select className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100" defaultValue="" {...register('service')}>
           <option value="" disabled>Выберите услугу</option>
           <option>Багет</option>
           <option>Фрезеровка</option>
@@ -69,7 +69,7 @@ export default function LeadForm({ t }: { t: typeof ruMessages }) {
         </select>
         {errors.service && <p className="text-sm text-red-600">{errors.service.message}</p>}
       </div>
-      <textarea className="w-full rounded-xl border p-3" rows={4} placeholder="Краткое ТЗ" {...register('message')} />
+      <textarea className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500" rows={4} placeholder="Краткое ТЗ" {...register('message')} />
       <label className="flex items-start gap-2 text-sm text-neutral-700">
         <input type="checkbox" className="mt-1" required {...register('consent')} />
         <span>
