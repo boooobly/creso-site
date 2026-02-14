@@ -32,6 +32,8 @@ export default async function Home({ params: { locale } }: { params: { locale: L
   const resolveServiceHref = (service: any) => {
     const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
     if (isPrintService) return `/${locale}/print`;
+    const isMillingService = service?.id === 'cnc' || service?.title === 'Фрезеровка листовых материалов';
+    if (isMillingService) return `/${locale}/milling`;
     return `/${locale}/${service.slug}`;
   };
 
