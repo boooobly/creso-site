@@ -3,11 +3,11 @@
 import { useMemo, useState } from 'react';
 
 const MATERIAL_OPTIONS = [
-  { value: 'banner', label: 'Banner' },
-  { value: 'selfAdhesiveFilm', label: 'Self-adhesive film' },
-  { value: 'backlit', label: 'Backlit' },
-  { value: 'perforatedFilm', label: 'Perforated film' },
-  { value: 'posterPaper', label: 'Poster paper' },
+  { value: 'banner', label: 'Баннер' },
+  { value: 'selfAdhesiveFilm', label: 'Самоклеящаяся пленка' },
+  { value: 'backlit', label: 'Бэклит' },
+  { value: 'perforatedFilm', label: 'Перфорированная пленка' },
+  { value: 'posterPaper', label: 'Постерная бумага' },
 ] as const;
 
 type MaterialType = typeof MATERIAL_OPTIONS[number]['value'];
@@ -197,11 +197,41 @@ export default function WideFormatPricingCalculator() {
           <p className="flex items-center justify-between"><span>Доп. услуги</span><b>{extrasCost.toLocaleString('ru-RU')} ₽</b></p>
         </div>
 
-        <div className="rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800">
+        <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className="text-3xl font-bold">{totalCost.toLocaleString('ru-RU')} ₽</p>
+          <p className="mt-1 text-4xl font-extrabold md:text-5xl">{totalCost.toLocaleString('ru-RU')} ₽</p>
+          <Button variant="primary" className="mt-4 w-full">Заказать печать</Button>
+          <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
+            Стоимость ориентировочная. Финальный расчет после проверки макета.
+          </p>
+        </div>
+
+        <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+          <p>Срок изготовления: <b>1–2 рабочих дня</b></p>
+          <p>Максимальная ширина печати: <b>3.2 м</b></p>
+          <p>Работаем с <b>НДС</b></p>
         </div>
       </aside>
     </div>
   );
+}
+
+function Button({
+  children,
+  variant,
+  className = '',
+}: {
+  children: React.ReactNode;
+  variant: 'primary';
+  className?: string;
+}) {
+  if (variant === 'primary') {
+    return (
+      <button type="button" className={`btn-primary ${className}`.trim()}>
+        {children}
+      </button>
+    );
+  }
+
+  return null;
 }
