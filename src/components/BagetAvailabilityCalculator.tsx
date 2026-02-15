@@ -1,38 +1,18 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-
-type Baguette = {
-  id: string;
-  name: string;
-  image: string;
-  availableLength: number;
-  profileWidth?: number;
-};
-
-const baguettes: Baguette[] = [
-  { id: 'bg-01', name: 'Классик Орех', image: '/logo.svg', availableLength: 420, profileWidth: 3.2 },
-  { id: 'bg-02', name: 'Сканди Белый', image: '/logo.svg', availableLength: 300, profileWidth: 2.4 },
-  { id: 'bg-03', name: 'Золото Премиум', image: '/logo.svg', availableLength: 510, profileWidth: 4.1 },
-  { id: 'bg-04', name: 'Минимал Черный', image: '/logo.svg', availableLength: 220, profileWidth: 1.8 },
-];
+import { engineUiCatalog, getBagetValidation, getRequiredBagetLength, isBagetSuitable } from '@/lib/engine';
 
 export default function BagetAvailabilityCalculator() {
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
 
-  const widthNum = Number(width);
-  const heightNum = Number(height);
+  const { inputsFilled, isValid, width: widthNum, height: heightNum } = useMemo(
+    () => getBagetValidation(width, height),
+    [height, width],
+  );
 
-  const inputsFilled = width !== '' && height !== '';
-  const isValid =
-    inputsFilled &&
-    Number.isFinite(widthNum) &&
-    Number.isFinite(heightNum) &&
-    widthNum > 0 &&
-    heightNum > 0;
-
-  const requiredLength = useMemo(() => (isValid ? (widthNum + heightNum) * 2 : null), [isValid, widthNum, heightNum]);
+  const requiredLength = useMemo(() => getRequiredBagetLength(widthNum, heightNum, isValid), [isValid, widthNum, heightNum]);
 
   return (
     <div className="space-y-6">
@@ -90,8 +70,8 @@ export default function BagetAvailabilityCalculator() {
             </tr>
           </thead>
           <tbody>
-            {baguettes.map((item) => {
-              const suitable = requiredLength !== null && item.availableLength >= requiredLength;
+            {engineUiCatalog.baget.items.map((item) => {
+              const suitable = isBagetSuitable(item.availableLength, requiredLength);
               const checked = requiredLength !== null;
 
               return (
