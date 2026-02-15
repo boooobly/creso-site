@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { MessageCircle, Mail, Phone, Send } from 'lucide-react';
-import LeadForm from '@/components/LeadForm';
+import ContactsLeadCapture from '@/components/ContactsLeadCapture';
 import MapSection from '@/components/MapSection';
 import { BRAND } from '@/lib/constants';
 import { messages } from '@/lib/messages';
@@ -68,7 +68,7 @@ export default function ContactsPage() {
       <section className="card rounded-xl p-6">
         <h2 className="mb-2 text-2xl font-bold">{messages.lead.title}</h2>
         <p className="mb-4 text-neutral-700 dark:text-neutral-300">Оставьте контакты и короткое описание задачи.</p>
-        <div id="contact-form"><LeadForm t={messages} /></div>
+        <div id="contact-form"><ContactsLeadCapture t={messages} /></div>
       </section>
 
       <section className="grid items-start gap-6 md:grid-cols-2">

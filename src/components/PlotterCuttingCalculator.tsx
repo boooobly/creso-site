@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import {
   engineParsers,
@@ -8,6 +7,7 @@ import {
   getPlotterCuttingQuote,
   type PlotterMaterialType,
 } from '@/lib/engine';
+import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 
 const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -73,10 +73,7 @@ export default function PlotterCuttingCalculator() {
   const acceptedAttr = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(',');
 
 
-  const sendCalculationHref = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set('service', 'Плоттерная резка');
-
+  const handleSendCalculation = () => {
     const calcSummary = [
       `Материал: ${material}`,
       `Длина реза: ${valuesValid ? `${cutLengthNum.toFixed(2)} м` : '—'}`,
@@ -89,10 +86,12 @@ export default function PlotterCuttingCalculator() {
       `Итого: ${Math.round(totalCost)} ₽`,
     ].join('; ');
 
-    params.set('calc', calcSummary);
-    return `/contacts?${params.toString()}#contact-form`;
-  }, [areaNum, complexity, cutLengthNum, material, mountingFilm, totalCost, transfer, urgent, valuesValid, weeding]);
-
+    openLeadFormWithCalculation({
+      service: 'Плоттерная резка',
+      message: `Расчёт:
+${calcSummary}`,
+    });
+  };
 
   const applyFiles = (incoming: FileList | File[]) => {
     setFileError('');
@@ -396,7 +395,7 @@ export default function PlotterCuttingCalculator() {
           <Button variant="primary" className="mt-4 w-full" disabled={isSubmitting}>
             {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
           </Button>
-          <Link href={sendCalculationHref} className="btn-secondary mt-3 w-full justify-center no-underline">Send this calculation</Link>
+          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Send this calculation</button>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Менеджер свяжется с вами для уточнения деталей.</p>
 
           {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}

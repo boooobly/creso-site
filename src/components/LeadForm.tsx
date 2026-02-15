@@ -1,8 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postJSON } from '@/lib/fetcher';
@@ -21,6 +20,12 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+type LeadFormProps = {
+  t: SiteMessages;
+  initialService?: string;
+  initialMessage?: string;
+};
+
 const DEFAULT_VALUES: Omit<FormData, 'consent'> = {
   name: '',
   email: '',
@@ -29,10 +34,8 @@ const DEFAULT_VALUES: Omit<FormData, 'consent'> = {
   message: '',
 };
 
-export default function LeadForm({ t }: { t: SiteMessages }) {
+export default function LeadForm({ t, initialService, initialMessage }: LeadFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const initializedFromQuery = useRef(false);
 
   const {
     register,
@@ -43,27 +46,15 @@ export default function LeadForm({ t }: { t: SiteMessages }) {
   } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: { ...DEFAULT_VALUES, consent: false } });
 
   useEffect(() => {
-    if (initializedFromQuery.current) return;
+    if (!initialService && !initialMessage) return;
 
-    const service = searchParams.get('service');
-    const calc = searchParams.get('calc');
-
-    if (!service && !calc) {
-      initializedFromQuery.current = true;
-      return;
-    }
-
-    const nextValues = getValues();
-    const calculationMessage = calc ? `Расчёт:\n${calc}` : '';
-
+    const currentValues = getValues();
     reset({
-      ...nextValues,
-      service: service ?? nextValues.service,
-      message: calculationMessage || nextValues.message,
+      ...currentValues,
+      service: initialService ?? currentValues.service,
+      message: initialMessage ?? currentValues.message,
     });
-
-    initializedFromQuery.current = true;
-  }, [getValues, reset, searchParams]);
+  }, [getValues, initialMessage, initialService, reset]);
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);

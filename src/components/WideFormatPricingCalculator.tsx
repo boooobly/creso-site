@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import {
   engineParsers,
@@ -9,6 +8,7 @@ import {
   type WideFormatMaterialType,
   type WideFormatWidthWarningCode,
 } from '@/lib/engine';
+import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 
 type WideFormatQuote = {
   width: number;
@@ -123,10 +123,7 @@ export default function WideFormatPricingCalculator() {
 
   const widthWarning = quote.widthWarningCode ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode] : '';
 
-  const sendCalculationHref = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set('service', 'Широкоформатная печать');
-
+  const handleSendCalculation = () => {
     const calcSummary = [
       `Материал: ${material}`,
       `Плотность: ${material === 'banner' ? `${bannerDensity}g` : '—'}`,
@@ -138,10 +135,12 @@ export default function WideFormatPricingCalculator() {
       `Итого: ${Math.round(quote.totalCost)} ₽`,
     ].join('; ');
 
-    params.set('calc', calcSummary);
-    return `/contacts?${params.toString()}#contact-form`;
-  }, [bannerDensity, edgeGluing, grommets, height, material, quantity, quote.totalCost, width]);
-
+    openLeadFormWithCalculation({
+      service: 'Широкоформатная печать',
+      message: `Расчёт:
+${calcSummary}`,
+    });
+  };
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -270,7 +269,7 @@ export default function WideFormatPricingCalculator() {
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
           <p className="mt-1 text-4xl font-extrabold md:text-5xl">{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
           <Button variant="primary" className="mt-4 w-full">Заказать печать</Button>
-          <Link href={sendCalculationHref} className="btn-secondary mt-3 w-full justify-center no-underline">Send this calculation</Link>
+          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Send this calculation</button>
           <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
             Стоимость ориентировочная. Финальный расчет после проверки макета.
           </p>

@@ -12,6 +12,7 @@ import {
   type TshirtGender,
   type TshirtSize,
 } from '@/lib/engine';
+import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -166,10 +167,7 @@ export default function HeatTransferCalculator() {
   }, [filmTransfer, filmUrgent, mugPrintType, mugType, pricing.safeFilmLength, productType, tshirtGender, tshirtSize, useOwnClothes]);
 
 
-  const sendCalculationHref = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set('service', 'Термоперенос');
-
+  const handleSendCalculation = () => {
     const calcSummary = [
       `Тип изделия: ${productType === 'mug' ? 'Кружка' : productType === 'tshirt' ? 'Футболка' : 'Термоплёнка'}`,
       ...summaryDetails,
@@ -177,9 +175,12 @@ export default function HeatTransferCalculator() {
       `Итого: ${Math.round(pricing.total)} ₽`,
     ].join('; ');
 
-    params.set('calc', calcSummary);
-    return `/contacts?${params.toString()}#contact-form`;
-  }, [pricing.total, productType, quantity, summaryDetails]);
+    openLeadFormWithCalculation({
+      service: 'Термоперенос',
+      message: `Расчёт:
+${calcSummary}`,
+    });
+  };
 
   const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
   const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
@@ -464,7 +465,7 @@ export default function HeatTransferCalculator() {
           >
             {isSubmitting ? 'Отправка…' : 'Заказать термоперенос'}
           </button>
-          <Link href={sendCalculationHref} className="btn-secondary mt-3 w-full justify-center no-underline">Send this calculation</Link>
+          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Send this calculation</button>
           <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
             Стоимость ориентировочная. Финальный расчёт после проверки макета.
           </p>
