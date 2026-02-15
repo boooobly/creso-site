@@ -1,28 +1,25 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
-
-type ProductType = 'mug' | 'tshirt' | 'film';
-type MugType = 'white330' | 'chameleon';
-type MugPrintType = 'single' | 'wrap';
-type TshirtSize = 'S' | 'M' | 'L' | 'XL' | 'XXL';
-type TshirtGender = 'male' | 'female';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  engineParsers,
+  engineUiCatalog,
+  getResolvedHeatTransferQuantity,
+  type HeatTransferProductType,
+  type MugPrintType,
+  type MugType,
+  type TshirtGender,
+  type TshirtSize,
+} from '@/lib/engine';
+import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
+import { trackEvent } from '@/lib/analytics';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
 const ALLOWED_EXTENSIONS = [...VECTOR_EXTENSIONS, ...RASTER_EXTENSIONS];
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const MAX_FILES = 5;
-
-const MUG_PRICES: Record<MugType, Record<MugPrintType, number>> = {
-  white330: { single: 550, wrap: 700 },
-  chameleon: { single: 850, wrap: 1000 },
-};
-
-const QUICK_QTY = [1, 5, 10, 20, 50] as const;
-
-const formatMoney = (value: number) => `${Math.round(value).toLocaleString('ru-RU')} ₽`;
 
 type UploadedItem = {
   name: string;
@@ -31,8 +28,18 @@ type UploadedItem = {
   isRaster: boolean;
 };
 
+
+type HeatTransferQuote = {
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  discount: number;
+  total: number;
+  safeFilmLength: number;
+};
+
 export default function HeatTransferCalculator() {
-  const [productType, setProductType] = useState<ProductType>('mug');
+  const [productType, setProductType] = useState<HeatTransferProductType>('mug');
 
   const [mugType, setMugType] = useState<MugType>('white330');
   const [mugPrintType, setMugPrintType] = useState<MugPrintType>('single');
@@ -63,69 +70,151 @@ export default function HeatTransferCalculator() {
 
   const [touched, setTouched] = useState({ name: false, phone: false, agree: false });
 
-  const quantity = productType === 'mug' ? mugQuantity : productType === 'tshirt' ? tshirtQuantity : 1;
+  const quantity = getResolvedHeatTransferQuantity(productType, mugQuantity, tshirtQuantity);
 
-  const pricing = useMemo(() => {
+  const [pricing, setPricing] = useState<HeatTransferQuote>({
+    quantity: 1,
+    unitPrice: 0,
+    subtotal: 0,
+    discount: 0,
+    total: 0,
+    safeFilmLength: 0,
+  });
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState('');
+  const [pricePulse, setPricePulse] = useState(false);
+
+  useEffect(() => {
+    trackEvent('calculator_started', { calculator: 'heat_transfer' });
+  }, []);
+
+  useEffect(() => {
+    trackEvent('calculator_updated', {
+      calculator: 'heat_transfer',
+      productType,
+      mugType,
+      mugPrintType,
+      mugQuantity,
+      tshirtQuantity,
+      useOwnClothes,
+      filmLength,
+      filmUrgent,
+      filmTransfer,
+    });
+  }, [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtQuantity, useOwnClothes]);
+
+  useEffect(() => {
+    setPricePulse(true);
+    const timer = window.setTimeout(() => setPricePulse(false), 300);
+    return () => window.clearTimeout(timer);
+  }, [pricing.total]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+
+    const fetchQuote = async () => {
+      setIsQuoteLoading(true);
+      setQuoteError('');
+
+      try {
+        const response = await fetch('/api/quotes/heat-transfer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productType,
+            mugType,
+            mugPrintType,
+            mugQuantity,
+            tshirtQuantity,
+            useOwnClothes,
+            filmLengthInput: filmLength,
+            filmUrgent,
+            filmTransfer,
+          }),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error('failed');
+        }
+
+        const data = (await response.json()) as { quote: HeatTransferQuote };
+
+        if (active) {
+          setPricing(data.quote);
+          trackEvent('quote_generated', {
+            calculator: 'heat_transfer',
+            total: data.quote.total,
+            quantity: data.quote.quantity,
+          });
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        if (active) {
+          setQuoteError('Ошибка расчёта');
+          setPricing({ quantity: 1, unitPrice: 0, subtotal: 0, discount: 0, total: 0, safeFilmLength: 0 });
+        }
+      } finally {
+        if (active) {
+          setIsQuoteLoading(false);
+        }
+      }
+    };
+
+    fetchQuote();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtQuantity, useOwnClothes]);
+
+  const summaryDetails = useMemo(() => {
     if (productType === 'mug') {
-      const unitPrice = MUG_PRICES[mugType][mugPrintType];
-      const subtotal = unitPrice * mugQuantity;
-      const discount = mugQuantity >= 10 ? subtotal * 0.1 : 0;
-      const total = subtotal - discount;
-      return {
-        unitPrice,
-        subtotal,
-        discount,
-        total,
-        summaryType: 'Кружка',
-        details: [
-          `Модель: ${mugType === 'white330' ? 'Белая кружка 330 мл' : 'Кружка хамелеон'}`,
-          `Печать: ${mugPrintType === 'single' ? 'Обычная (1 сторона)' : 'Круговая'}`,
-        ],
-      };
+      return [
+        `Модель: ${mugType === 'white330' ? 'Белая кружка 330 мл' : 'Кружка хамелеон'}`,
+        `Печать: ${mugPrintType === 'single' ? 'Обычная (1 сторона)' : 'Круговая'}`,
+      ];
     }
 
     if (productType === 'tshirt') {
-      const unitPrice = useOwnClothes ? 700 : 1200;
-      const subtotal = unitPrice * tshirtQuantity;
-      const discount = tshirtQuantity >= 10 ? subtotal * 0.1 : 0;
-      const total = subtotal - discount;
-      return {
-        unitPrice,
-        subtotal,
-        discount,
-        total,
-        summaryType: 'Футболка',
-        details: [
-          `Размер: ${tshirtSize}`,
-          `Пол: ${tshirtGender === 'male' ? 'Мужская' : 'Женская'}`,
-          'Печать: Формат A4',
-          useOwnClothes ? 'Своя вещь: да' : 'Своя вещь: нет',
-        ],
-      };
+      return [
+        `Размер: ${tshirtSize}`,
+        `Пол: ${tshirtGender === 'male' ? 'Мужская' : 'Женская'}`,
+        'Печать: Формат A4',
+        useOwnClothes ? 'Своя вещь: да' : 'Своя вещь: нет',
+      ];
     }
 
-    const length = Number(filmLength);
-    const safeLength = Number.isFinite(length) && length > 0 ? length : 0;
-    const base = safeLength * 400;
-    const transferCost = filmTransfer ? 300 : 0;
-    const subtotal = base + transferCost;
-    const withUrgent = filmUrgent ? subtotal * 1.3 : subtotal;
-    const total = withUrgent > 0 ? Math.max(withUrgent, 400) : 400;
+    return [
+      `Длина реза: ${pricing.safeFilmLength || 0} м`,
+      'Плёнка: белая',
+      `Срочность: ${filmUrgent ? 'да (+30%)' : 'нет'}`,
+      `Перенос на деталь: ${filmTransfer ? 'да (+300 ₽)' : 'нет'}`,
+    ];
+  }, [filmTransfer, filmUrgent, mugPrintType, mugType, pricing.safeFilmLength, productType, tshirtGender, tshirtSize, useOwnClothes]);
 
-    return {
-      unitPrice: 400,
-      subtotal,
-      discount: 0,
-      total,
-      summaryType: 'Термоплёнка',
-      details: [
-        `Длина реза: ${safeLength || 0} м`,
-        'Плёнка: белая',
-        `Срочность: ${filmUrgent ? 'да (+30%)' : 'нет'}`,
-        `Перенос на деталь: ${filmTransfer ? 'да (+300 ₽)' : 'нет'}`,
-      ],
-    };
-  }, [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtGender, tshirtQuantity, tshirtSize, useOwnClothes]);
+
+  const handleSendCalculation = () => {
+    const calcSummary = [
+      `Тип изделия: ${productType === 'mug' ? 'Кружка' : productType === 'tshirt' ? 'Футболка' : 'Термоплёнка'}`,
+      ...summaryDetails,
+      `Тираж: ${productType === 'film' ? '—' : `${quantity} шт`}`,
+      `Итого: ${Math.round(pricing.total)} ₽`,
+    ].join('; ');
+
+    trackEvent('send_calculation_clicked', { calculator: 'heat_transfer' });
+
+    openLeadFormWithCalculation({
+      service: 'Термоперенос',
+      message: `Расчёт:
+${calcSummary}`,
+    });
+  };
 
   const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
   const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
@@ -199,7 +288,7 @@ export default function HeatTransferCalculator() {
           tshirtGender,
           useOwnClothes,
           tshirtQuantity,
-          filmLength: Number(filmLength) || 0,
+          filmLength: pricing.safeFilmLength,
           filmUrgent,
           filmTransfer,
         },
@@ -208,7 +297,7 @@ export default function HeatTransferCalculator() {
           subtotal: Math.round(pricing.subtotal),
           discount: Math.round(pricing.discount),
           total: Math.round(pricing.total),
-          details: pricing.details,
+          details: summaryDetails,
         },
         files: files.map((file) => file.name),
         contact: {
@@ -390,17 +479,17 @@ export default function HeatTransferCalculator() {
         <div className="card rounded-2xl p-5 md:p-6">
           <h3 className="text-xl font-semibold">Расчёт стоимости</h3>
           <div className="mt-4 space-y-2 text-sm">
-            <SummaryRow label="Тип изделия" value={pricing.summaryType} />
-            {pricing.details.map((detail) => (
+            <SummaryRow label="Тип изделия" value={productType === 'mug' ? 'Кружка' : productType === 'tshirt' ? 'Футболка' : 'Термоплёнка'} />
+            {summaryDetails.map((detail) => (
               <SummaryRow key={detail} label={detail.split(':')[0]} value={detail.split(':').slice(1).join(':').trim()} />
             ))}
             <SummaryRow label="Тираж" value={productType === 'film' ? '—' : `${quantity} шт`} />
-            {pricing.discount > 0 && <SummaryRow label="Скидка" value={`-${formatMoney(pricing.discount)}`} />}
+            {pricing.discount > 0 && <SummaryRow label="Скидка" value={`-${Math.round(pricing.discount).toLocaleString('ru-RU')} ₽`} />}
           </div>
 
           <div className="mt-6 rounded-xl bg-[var(--brand-red)]/10 p-4 text-center">
             <p className="text-xs uppercase tracking-wide text-[var(--brand-red)]">Итого</p>
-            <p className="mt-1 text-3xl font-bold text-[var(--brand-red)]">{formatMoney(pricing.total)}</p>
+            <p className={`mt-1 text-3xl font-bold text-[var(--brand-red)] transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{Math.round(pricing.total).toLocaleString('ru-RU')} ₽</p>
           </div>
 
           <button
@@ -410,12 +499,14 @@ export default function HeatTransferCalculator() {
           >
             {isSubmitting ? 'Отправка…' : 'Заказать термоперенос'}
           </button>
-          <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
-            Стоимость ориентировочная. Финальный расчёт после проверки макета.
-          </p>
+          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Отправить этот расчёт</button>
+          <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
+          <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
 
           {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}
           {submitSuccess && <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
+          <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
         </div>
       </aside>
     </form>
@@ -443,7 +534,7 @@ function QuantityPicker({ quantity, setQuantity }: { quantity: number; setQuanti
     <div className="space-y-3">
       <p className="text-sm font-medium">Тираж</p>
       <div className="flex flex-wrap gap-2">
-        {QUICK_QTY.map((value) => (
+        {engineUiCatalog.heatTransfer.quantityPresets.map((value) => (
           <button
             key={value}
             type="button"
@@ -462,7 +553,7 @@ function QuantityPicker({ quantity, setQuantity }: { quantity: number; setQuanti
         type="number"
         min={1}
         value={quantity}
-        onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
+        onChange={(e) => setQuantity(Math.max(1, engineParsers.parseIntegerInput(e.target.value, 1)))}
         className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
       />
       <p className="text-xs text-neutral-500">Скидка 10% применяется от 10 шт.</p>
