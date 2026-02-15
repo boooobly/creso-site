@@ -57,7 +57,7 @@ export default async function Home() {
 
       <Section containerClassName="grid items-start gap-6 md:grid-cols-2">
         <div>
-          <h2 className="mb-4 text-2xl font-bold">{messages.lead.title}</h2>
+          <h2 id="lead-form" className="mb-4 text-2xl font-bold">{messages.lead.title}</h2>
           <LeadForm t={messages} />
         </div>
         <div>
