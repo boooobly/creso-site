@@ -1,31 +1,34 @@
-export const WIDE_FORMAT_MATERIAL_OPTIONS = [
-  { value: 'banner', label: 'Баннер' },
-  { value: 'selfAdhesiveFilm', label: 'Самоклеящаяся пленка' },
-  { value: 'backlit', label: 'Бэклит' },
-  { value: 'perforatedFilm', label: 'Перфорированная пленка' },
-  { value: 'posterPaper', label: 'Постерная бумага' },
-] as const;
+import { WIDE_FORMAT_PRICING_CONFIG } from '@/lib/pricing-config/wideFormat';
+import { parseNumericInput } from './shared';
+import type { BannerDensity, WideFormatMaterialType } from './types';
 
-export type WideFormatMaterialType = typeof WIDE_FORMAT_MATERIAL_OPTIONS[number]['value'];
-export type BannerDensity = 220 | 300 | 440;
+export type WideFormatWidthWarningCode =
+  | 'invalid_width'
+  | 'max_width_exceeded'
+  | 'banner_width_out_of_range'
+  | 'sheet_width_out_of_range'
+  | null;
 
 export type WideFormatPricingInput = {
   material: WideFormatMaterialType;
   bannerDensity: BannerDensity;
-  width: number;
-  height: number;
-  quantity: number;
+  widthInput: string;
+  heightInput: string;
+  quantityInput: string;
+  grommetsInput: string;
   edgeGluing: boolean;
-  grommets: number;
 };
 
 export type WideFormatCalculationResult = {
+  width: number;
+  height: number;
+  quantity: number;
+  grommets: number;
   parsedValuesValid: boolean;
   positiveInputs: boolean;
-  widthWarning: string;
+  widthWarningCode: WideFormatWidthWarningCode;
   areaPerUnit: number;
   perimeterPerUnit: number;
-  baseRate: number;
   basePrintCost: number;
   edgeGluingCost: number;
   grommetsCost: number;
@@ -33,70 +36,73 @@ export type WideFormatCalculationResult = {
   totalCost: number;
 };
 
-const BANNER_DENSITY_PRICES: Record<BannerDensity, number> = {
-  220: 350,
-  300: 420,
-  440: 520,
-};
+export function getWideFormatWidthWarningCode(material: WideFormatMaterialType, width: number): WideFormatWidthWarningCode {
+  if (!Number.isFinite(width)) return 'invalid_width';
+  if (width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
 
-const MATERIAL_PRICES: Record<Exclude<WideFormatMaterialType, 'banner'>, number> = {
-  selfAdhesiveFilm: 600,
-  backlit: 750,
-  perforatedFilm: 700,
-  posterPaper: 300,
-};
-
-export const MAX_WIDE_FORMAT_WIDTH = 3.2;
-
-export function getWideFormatWidthWarning(material: WideFormatMaterialType, width: number): string {
-  if (!Number.isFinite(width)) return 'Введите корректную ширину.';
-  if (width > MAX_WIDE_FORMAT_WIDTH) return `Максимальная ширина — ${MAX_WIDE_FORMAT_WIDTH} м.`;
-
-  if (material === 'banner' && (width < 1.2 || width > 3)) {
-    return 'Для баннера допустимая ширина: 1.2–3 м.';
+  if (
+    material === 'banner' &&
+    (width < WIDE_FORMAT_PRICING_CONFIG.bannerWidthRange.min || width > WIDE_FORMAT_PRICING_CONFIG.bannerWidthRange.max)
+  ) {
+    return 'banner_width_out_of_range';
   }
 
-  if (material !== 'banner' && (width < 1.06 || width > 1.6)) {
-    return 'Для плёнки и бумаги допустимая ширина: 1.06–1.6 м.';
+  if (
+    material !== 'banner' &&
+    (width < WIDE_FORMAT_PRICING_CONFIG.sheetWidthRange.min || width > WIDE_FORMAT_PRICING_CONFIG.sheetWidthRange.max)
+  ) {
+    return 'sheet_width_out_of_range';
   }
 
-  return '';
+  return null;
 }
 
 export function calculateWideFormatPricing(input: WideFormatPricingInput): WideFormatCalculationResult {
-  const values = [input.width, input.height, input.quantity, input.grommets];
-  const parsedValuesValid = values.every((value) => Number.isFinite(value));
-  const positiveInputs = input.width > 0 && input.height > 0 && input.quantity > 0 && input.grommets >= 0;
-  const widthWarning = getWideFormatWidthWarning(input.material, input.width);
+  const width = parseNumericInput(input.widthInput);
+  const height = parseNumericInput(input.heightInput);
+  const quantity = parseNumericInput(input.quantityInput);
+  const grommets = parseNumericInput(input.grommetsInput);
 
-  const areaPerUnit = input.width * input.height;
-  const perimeterPerUnit = (input.width + input.height) * 2;
+  const parsedValuesValid = [width, height, quantity, grommets].every((value) => Number.isFinite(value));
+  const positiveInputs = width > 0 && height > 0 && quantity > 0 && grommets >= 0;
+  const widthWarningCode = getWideFormatWidthWarningCode(input.material, width);
+
+  const areaPerUnit = width * height;
+  const perimeterPerUnit = (width + height) * 2;
+
   const baseRate =
-    input.material === 'banner' ? BANNER_DENSITY_PRICES[input.bannerDensity] : MATERIAL_PRICES[input.material];
+    input.material === 'banner'
+      ? WIDE_FORMAT_PRICING_CONFIG.bannerDensityPrice[input.bannerDensity]
+      : WIDE_FORMAT_PRICING_CONFIG.materialPrice[input.material];
 
-  const basePrintCost = parsedValuesValid && positiveInputs && !widthWarning
-    ? areaPerUnit * input.quantity * baseRate
+  const basePrintCost = parsedValuesValid && positiveInputs && widthWarningCode === null
+    ? areaPerUnit * quantity * baseRate
     : 0;
 
-  const edgeGluingCost = input.edgeGluing && parsedValuesValid && positiveInputs && !widthWarning
-    ? perimeterPerUnit * input.quantity * 40
+  const edgeGluingCost = input.edgeGluing && parsedValuesValid && positiveInputs && widthWarningCode === null
+    ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.edgeGluingPerimeterPrice
     : 0;
 
-  const grommetsCost = parsedValuesValid && positiveInputs ? input.grommets * input.quantity * 5 : 0;
+  const grommetsCost = parsedValuesValid && positiveInputs
+    ? grommets * quantity * WIDE_FORMAT_PRICING_CONFIG.grommetPrice
+    : 0;
+
   const extrasCost = edgeGluingCost + grommetsCost;
-  const totalCost = basePrintCost + extrasCost;
 
   return {
+    width,
+    height,
+    quantity,
+    grommets,
     parsedValuesValid,
     positiveInputs,
-    widthWarning,
+    widthWarningCode,
     areaPerUnit,
     perimeterPerUnit,
-    baseRate,
     basePrintCost,
     edgeGluingCost,
     grommetsCost,
     extrasCost,
-    totalCost,
+    totalCost: basePrintCost + extrasCost,
   };
 }

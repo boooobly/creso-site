@@ -1,19 +1,9 @@
-export const PLOTTER_MATERIAL_OPTIONS = [
-  { value: 'selfAdhesive', label: 'Самоклеящаяся плёнка' },
-  { value: 'oracal', label: 'Оракал (цветная плёнка)' },
-] as const;
-
-export const PLOTTER_COMPLEXITY_OPTIONS = [
-  { value: 1, label: 'Простая (1.0)' },
-  { value: 1.3, label: 'Средняя (1.3)' },
-  { value: 1.6, label: 'Сложная (1.6)' },
-] as const;
-
-export type PlotterMaterialType = typeof PLOTTER_MATERIAL_OPTIONS[number]['value'];
+import { PLOTTER_CUTTING_PRICING_CONFIG } from '@/lib/pricing-config/plotterCutting';
+import { parseNumericInput } from './shared';
 
 export type PlotterCuttingPricingInput = {
-  cutLength: number;
-  area: number;
+  cutLengthInput: string;
+  areaInput: string;
   complexity: number;
   weeding: boolean;
   mountingFilm: boolean;
@@ -22,6 +12,8 @@ export type PlotterCuttingPricingInput = {
 };
 
 export type PlotterCuttingCalculationResult = {
+  cutLength: number;
+  area: number;
   valuesValid: boolean;
   positiveValues: boolean;
   baseCost: number;
@@ -36,21 +28,29 @@ export type PlotterCuttingCalculationResult = {
 };
 
 export function calculatePlotterCuttingPricing(input: PlotterCuttingPricingInput): PlotterCuttingCalculationResult {
-  const valuesValid = Number.isFinite(input.cutLength) && Number.isFinite(input.area);
-  const positiveValues = input.cutLength >= 0 && input.area >= 0;
+  const cutLength = parseNumericInput(input.cutLengthInput);
+  const area = parseNumericInput(input.areaInput);
 
-  const baseCost = valuesValid && positiveValues ? input.cutLength * 30 * input.complexity : 0;
-  const weedingCost = input.weeding && valuesValid && positiveValues ? input.cutLength * 15 : 0;
-  const mountingFilmCost = input.mountingFilm && valuesValid && positiveValues ? input.area * 100 : 0;
-  const transferCost = input.transfer ? 300 : 0;
+  const valuesValid = Number.isFinite(cutLength) && Number.isFinite(area);
+  const positiveValues = cutLength >= 0 && area >= 0;
+
+  const baseCost = valuesValid && positiveValues ? cutLength * PLOTTER_CUTTING_PRICING_CONFIG.baseCutPricePerMeter * input.complexity : 0;
+  const weedingCost = input.weeding && valuesValid && positiveValues
+    ? cutLength * PLOTTER_CUTTING_PRICING_CONFIG.weedingPricePerMeter
+    : 0;
+  const mountingFilmCost = input.mountingFilm && valuesValid && positiveValues
+    ? area * PLOTTER_CUTTING_PRICING_CONFIG.mountingFilmPricePerSquareMeter
+    : 0;
+  const transferCost = input.transfer ? PLOTTER_CUTTING_PRICING_CONFIG.transferPrice : 0;
+
   const extrasCost = weedingCost + mountingFilmCost + transferCost;
   const subtotal = baseCost + extrasCost;
-  const urgentTotal = input.urgent ? subtotal * 1.3 : subtotal;
-
-  const minimumApplied = urgentTotal > 0 && urgentTotal < 400;
-  const totalCost = minimumApplied ? 400 : urgentTotal;
+  const urgentTotal = input.urgent ? subtotal * PLOTTER_CUTTING_PRICING_CONFIG.urgentMultiplier : subtotal;
+  const minimumApplied = urgentTotal > 0 && urgentTotal < PLOTTER_CUTTING_PRICING_CONFIG.minimumOrderTotal;
 
   return {
+    cutLength,
+    area,
     valuesValid,
     positiveValues,
     baseCost,
@@ -61,6 +61,6 @@ export function calculatePlotterCuttingPricing(input: PlotterCuttingPricingInput
     subtotal,
     urgentTotal,
     minimumApplied,
-    totalCost,
+    totalCost: minimumApplied ? PLOTTER_CUTTING_PRICING_CONFIG.minimumOrderTotal : urgentTotal,
   };
 }

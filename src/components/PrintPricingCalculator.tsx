@@ -1,16 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {
-  calculatePrintTotalPrice,
-  calculatePrintUnitPrice,
-  isPrintQuantityValid,
-  PRINT_QUICK_QUANTITIES,
-  PRINT_SIZE_OPTIONS,
-  type PrintDensity,
-  type PrintProductType,
-  type PrintType,
-} from '@/lib/calculations/printPricing';
+import { calculatePrintPricing, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/calculations';
+import { PRINT_QUANTITY_PRESETS, PRINT_SIZE_OPTIONS } from '@/lib/pricing-config/print';
 
 export default function PrintPricingCalculator() {
   const [productType, setProductType] = useState<PrintProductType>('cards');
@@ -21,22 +13,19 @@ export default function PrintPricingCalculator() {
   const [quantity, setQuantity] = useState<number>(100);
   const [customQuantity, setCustomQuantity] = useState('');
 
-  const effectiveQuantity = customQuantity ? Number(customQuantity) : quantity;
-  const isQuantityValid = isPrintQuantityValid(effectiveQuantity);
-
-  const totalPrice = useMemo(() => {
-    return calculatePrintTotalPrice({
-      productType,
-      density,
-      printType,
-      lamination,
-      effectiveQuantity,
-    });
-  }, [density, effectiveQuantity, isQuantityValid, lamination, printType, productType]);
-
-  const unitPrice = useMemo(() => {
-    return calculatePrintUnitPrice(totalPrice, effectiveQuantity);
-  }, [effectiveQuantity, isQuantityValid, totalPrice]);
+  const pricing = useMemo(
+    () =>
+      calculatePrintPricing({
+        productType,
+        size,
+        density,
+        printType,
+        lamination,
+        presetQuantity: quantity,
+        customQuantityInput: customQuantity,
+      }),
+    [customQuantity, density, lamination, printType, productType, quantity, size],
+  );
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -91,7 +80,7 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Тираж</h2>
           <div className="flex flex-wrap gap-2">
-            {PRINT_QUICK_QUANTITIES.map((q) => (
+            {PRINT_QUANTITY_PRESETS.map((q) => (
               <button
                 key={q}
                 type="button"
@@ -117,7 +106,7 @@ export default function PrintPricingCalculator() {
               placeholder="Введите количество (мин. 100)"
               className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             />
-            {!isQuantityValid && <p className="text-sm text-red-600">Минимальный тираж — 100 шт.</p>}
+            {!pricing.isQuantityValid && <p className="text-sm text-red-600">Минимальный тираж — 100 шт.</p>}
           </div>
         </div>
 
@@ -142,13 +131,13 @@ export default function PrintPricingCalculator() {
           <li>Плотность: <b>{density} gsm</b></li>
           <li>Печать: <b>{printType === 'single' ? 'Односторонняя' : 'Двусторонняя'}</b></li>
           <li>Ламинация: <b>{lamination ? 'Да' : 'Нет'}</b></li>
-          <li>Тираж: <b>{isQuantityValid ? effectiveQuantity : '—'}</b></li>
+          <li>Тираж: <b>{pricing.isQuantityValid ? pricing.quantity : '—'}</b></li>
         </ul>
 
         <div className="rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className="text-3xl font-bold">{totalPrice.toLocaleString('ru-RU')} ₽</p>
-          <p className="text-sm text-neutral-600 dark:text-neutral-300">{unitPrice.toLocaleString('ru-RU')} ₽ / шт.</p>
+          <p className="text-3xl font-bold">{pricing.totalPrice.toLocaleString('ru-RU')} ₽</p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-300">{pricing.unitPrice.toLocaleString('ru-RU')} ₽ / шт.</p>
         </div>
 
         <button type="button" className="btn-primary w-full">Оформить заказ</button>

@@ -1,12 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {
-  calculatePlotterCuttingPricing,
-  PLOTTER_COMPLEXITY_OPTIONS,
-  PLOTTER_MATERIAL_OPTIONS,
-  type PlotterMaterialType,
-} from '@/lib/calculations/plotterCuttingPricing';
+import { calculatePlotterCuttingPricing, parseNumericInput, type PlotterMaterialType } from '@/lib/calculations';
+import { PLOTTER_COMPLEXITY_OPTIONS, PLOTTER_MATERIAL_OPTIONS } from '@/lib/pricing-config/plotterCutting';
 
 const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -50,20 +46,17 @@ export default function PlotterCuttingCalculator() {
     agree: false,
   });
 
-  const cutLengthNum = Number(cutLength);
-  const areaNum = Number(area);
-
   const calculations = useMemo(() => calculatePlotterCuttingPricing({
-    cutLength: cutLengthNum,
-    area: areaNum,
+    cutLengthInput: cutLength,
+    areaInput: area,
     complexity,
     weeding,
     mountingFilm,
     transfer,
     urgent,
-  }), [areaNum, complexity, cutLengthNum, mountingFilm, transfer, urgent, weeding]);
+  }), [area, complexity, cutLength, mountingFilm, transfer, urgent, weeding]);
 
-  const { valuesValid, baseCost, extrasCost, minimumApplied, totalCost } = calculations;
+  const { valuesValid, cutLength: cutLengthNum, area: areaNum, baseCost, extrasCost, minimumApplied, totalCost } = calculations;
 
   const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
   const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
@@ -239,7 +232,7 @@ export default function PlotterCuttingCalculator() {
             <select
               id="complexity"
               value={complexity}
-              onChange={(e) => setComplexity(Number(e.target.value))}
+              onChange={(e) => setComplexity(parseNumericInput(e.target.value))}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
               {PLOTTER_COMPLEXITY_OPTIONS.map((option) => (

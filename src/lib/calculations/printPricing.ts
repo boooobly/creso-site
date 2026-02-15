@@ -1,55 +1,53 @@
-export type PrintProductType = 'cards' | 'flyers';
-export type PrintDensity = 300 | 350 | 400;
-export type PrintType = 'single' | 'double';
+import { PRINT_PRICING_CONFIG } from '@/lib/pricing-config/print';
+import { resolveQuantity } from './shared';
+import type { PrintDensity, PrintProductType, PrintType } from './types';
 
 export type PrintPricingInput = {
   productType: PrintProductType;
+  size: string;
   density: PrintDensity;
   printType: PrintType;
   lamination: boolean;
-  effectiveQuantity: number;
+  presetQuantity: number;
+  customQuantityInput: string;
 };
 
-const DENSITY_COEFFICIENT: Record<PrintDensity, number> = {
-  300: 1,
-  350: 1.2,
-  400: 1.4,
+export type PrintPricingResult = {
+  quantity: number;
+  isQuantityValid: boolean;
+  totalPrice: number;
+  unitPrice: number;
 };
 
-const BASE_PER_100: Record<PrintProductType, number> = {
-  cards: 500,
-  flyers: 650,
-};
+export function calculatePrintPricing(input: PrintPricingInput): PrintPricingResult {
+  const resolved = resolveQuantity({
+    presetQuantity: input.presetQuantity,
+    customQuantityInput: input.customQuantityInput,
+    minimumQuantity: PRINT_PRICING_CONFIG.minimumQuantity,
+  });
 
-export const PRINT_SIZE_OPTIONS: Record<PrintProductType, string[]> = {
-  cards: ['90x50', '85x55'],
-  flyers: ['A6', 'A5'],
-};
-
-export const PRINT_QUICK_QUANTITIES = [100, 500, 1000] as const;
-
-export function isPrintQuantityValid(quantity: number): boolean {
-  return Number.isFinite(quantity) && quantity >= 100;
-}
-
-export function calculatePrintTotalPrice(input: PrintPricingInput): number {
-  if (!isPrintQuantityValid(input.effectiveQuantity)) {
-    return 0;
+  if (!resolved.isValid) {
+    return {
+      quantity: resolved.quantity,
+      isQuantityValid: false,
+      totalPrice: 0,
+      unitPrice: 0,
+    };
   }
 
-  const base = BASE_PER_100[input.productType];
-  const densityCoeff = DENSITY_COEFFICIENT[input.density];
-  const sideCoeff = input.printType === 'double' ? 1.5 : 1;
-  const laminationCoeff = input.lamination ? 1.2 : 1;
+  const base = PRINT_PRICING_CONFIG.basePer100[input.productType];
+  const densityCoefficient = PRINT_PRICING_CONFIG.densityCoefficient[input.density];
+  const sideCoefficient = PRINT_PRICING_CONFIG.sideCoefficient[input.printType];
+  const laminationCoefficient = PRINT_PRICING_CONFIG.laminationCoefficient[String(input.lamination) as 'true' | 'false'];
+  const sizeCoefficient = PRINT_PRICING_CONFIG.sizeCoefficient[input.productType][input.size] ?? 1;
 
-  const price = (input.effectiveQuantity / 100) * base * densityCoeff * sideCoeff * laminationCoeff;
-  return Math.round(price);
-}
+  const rawTotal = (resolved.quantity / 100) * base * densityCoefficient * sideCoefficient * laminationCoefficient * sizeCoefficient;
+  const totalPrice = Math.round(rawTotal);
 
-export function calculatePrintUnitPrice(totalPrice: number, effectiveQuantity: number): number {
-  if (!isPrintQuantityValid(effectiveQuantity) || effectiveQuantity <= 0) {
-    return 0;
-  }
-
-  return Number((totalPrice / effectiveQuantity).toFixed(2));
+  return {
+    quantity: resolved.quantity,
+    isQuantityValid: true,
+    totalPrice,
+    unitPrice: Math.round((totalPrice / resolved.quantity) * 100) / 100,
+  };
 }

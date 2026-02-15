@@ -3,11 +3,19 @@
 import { useMemo, useState } from 'react';
 import {
   calculateWideFormatPricing,
-  MAX_WIDE_FORMAT_WIDTH,
-  WIDE_FORMAT_MATERIAL_OPTIONS,
   type BannerDensity,
+  parseIntegerInput,
   type WideFormatMaterialType,
-} from '@/lib/calculations/wideFormatPricing';
+  type WideFormatWidthWarningCode,
+} from '@/lib/calculations';
+import { WIDE_FORMAT_MATERIAL_OPTIONS, WIDE_FORMAT_PRICING_CONFIG } from '@/lib/pricing-config/wideFormat';
+
+const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
+  invalid_width: 'Введите корректную ширину.',
+  max_width_exceeded: `Максимальная ширина — ${WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
+  banner_width_out_of_range: 'Для баннера допустимая ширина: 1.2–3 м.',
+  sheet_width_out_of_range: 'Для плёнки и бумаги допустимая ширина: 1.06–1.6 м.',
+};
 
 export default function WideFormatPricingCalculator() {
   const [material, setMaterial] = useState<WideFormatMaterialType>('banner');
@@ -18,22 +26,21 @@ export default function WideFormatPricingCalculator() {
   const [edgeGluing, setEdgeGluing] = useState(false);
   const [grommets, setGrommets] = useState<string>('0');
 
-  const widthNum = Number(width);
-  const heightNum = Number(height);
-  const quantityNum = Number(quantity);
-  const grommetsNum = Number(grommets);
+  const calculations = useMemo(
+    () =>
+      calculateWideFormatPricing({
+        material,
+        bannerDensity,
+        widthInput: width,
+        heightInput: height,
+        quantityInput: quantity,
+        grommetsInput: grommets,
+        edgeGluing,
+      }),
+    [bannerDensity, edgeGluing, grommets, height, material, quantity, width],
+  );
 
-  const calculations = useMemo(() => calculateWideFormatPricing({
-    material,
-    bannerDensity,
-    width: widthNum,
-    height: heightNum,
-    quantity: quantityNum,
-    edgeGluing,
-    grommets: grommetsNum,
-  }), [bannerDensity, edgeGluing, grommetsNum, heightNum, material, quantityNum, widthNum]);
-
-  const { parsedValuesValid, widthWarning, areaPerUnit, basePrintCost, extrasCost, totalCost } = calculations;
+  const widthWarning = calculations.widthWarningCode ? WIDTH_WARNING_MESSAGES[calculations.widthWarningCode] : '';
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -64,7 +71,7 @@ export default function WideFormatPricingCalculator() {
               <select
                 id="density"
                 value={bannerDensity}
-                onChange={(e) => setBannerDensity(Number(e.target.value) as BannerDensity)}
+                onChange={(e) => setBannerDensity(parseIntegerInput(e.target.value, 300) as BannerDensity)}
                 className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
               >
                 {[220, 300, 440].map((density) => (
@@ -83,7 +90,7 @@ export default function WideFormatPricingCalculator() {
               id="width"
               type="number"
               min={0}
-              max={MAX_WIDE_FORMAT_WIDTH}
+              max={WIDE_FORMAT_PRICING_CONFIG.maxWidth}
               step="0.01"
               value={width}
               onChange={(e) => setWidth(e.target.value)}
@@ -153,14 +160,14 @@ export default function WideFormatPricingCalculator() {
       <aside className="card h-fit p-5 md:p-6 space-y-4 lg:sticky lg:top-24">
         <h2 className="text-xl font-semibold">Расчёт</h2>
         <div className="space-y-2 text-sm">
-          <SummaryRow label="Площадь" value={parsedValuesValid ? `${(areaPerUnit * quantityNum).toFixed(2)} м²` : '—'} />
-          <SummaryRow label="Базовая печать" value={`${basePrintCost.toLocaleString('ru-RU')} ₽`} />
-          <SummaryRow label="Доп. услуги" value={`${extrasCost.toLocaleString('ru-RU')} ₽`} />
+          <SummaryRow label="Площадь" value={calculations.parsedValuesValid ? `${(calculations.areaPerUnit * calculations.quantity).toFixed(2)} м²` : '—'} />
+          <SummaryRow label="Базовая печать" value={`${calculations.basePrintCost.toLocaleString('ru-RU')} ₽`} />
+          <SummaryRow label="Доп. услуги" value={`${calculations.extrasCost.toLocaleString('ru-RU')} ₽`} />
         </div>
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className="mt-1 text-4xl font-extrabold md:text-5xl">{totalCost.toLocaleString('ru-RU')} ₽</p>
+          <p className="mt-1 text-4xl font-extrabold md:text-5xl">{calculations.totalCost.toLocaleString('ru-RU')} ₽</p>
           <Button variant="primary" className="mt-4 w-full">Заказать печать</Button>
           <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
             Стоимость ориентировочная. Финальный расчет после проверки макета.

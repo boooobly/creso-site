@@ -1,104 +1,75 @@
-export type HeatTransferProductType = 'mug' | 'tshirt' | 'film';
-export type MugType = 'white330' | 'chameleon';
-export type MugPrintType = 'single' | 'wrap';
-export type TshirtSize = 'S' | 'M' | 'L' | 'XL' | 'XXL';
-export type TshirtGender = 'male' | 'female';
+import { HEAT_TRANSFER_PRICING_CONFIG } from '@/lib/pricing-config/heatTransfer';
+import { parseNumericInput } from './shared';
+import type { HeatTransferProductType, MugPrintType, MugType } from './types';
 
 export type HeatTransferPricingInput = {
   productType: HeatTransferProductType;
   mugType: MugType;
   mugPrintType: MugPrintType;
   mugQuantity: number;
-  tshirtSize: TshirtSize;
-  tshirtGender: TshirtGender;
-  useOwnClothes: boolean;
   tshirtQuantity: number;
-  filmLength: string;
+  useOwnClothes: boolean;
+  filmLengthInput: string;
   filmUrgent: boolean;
   filmTransfer: boolean;
 };
 
-export type HeatTransferPricing = {
+export type HeatTransferPricingResult = {
+  quantity: number;
   unitPrice: number;
   subtotal: number;
   discount: number;
   total: number;
-  summaryType: string;
-  details: string[];
+  safeFilmLength: number;
 };
 
-const MUG_PRICES: Record<MugType, Record<MugPrintType, number>> = {
-  white330: { single: 550, wrap: 700 },
-  chameleon: { single: 850, wrap: 1000 },
-};
-
-export const HEAT_TRANSFER_QUICK_QTY = [1, 5, 10, 20, 50] as const;
-
-export function getHeatTransferQuantity(input: Pick<HeatTransferPricingInput, 'productType' | 'mugQuantity' | 'tshirtQuantity'>): number {
-  if (input.productType === 'mug') return input.mugQuantity;
-  if (input.productType === 'tshirt') return input.tshirtQuantity;
+export function resolveHeatTransferQuantity(productType: HeatTransferProductType, mugQuantity: number, tshirtQuantity: number): number {
+  if (productType === 'mug') return mugQuantity;
+  if (productType === 'tshirt') return tshirtQuantity;
   return 1;
 }
 
-export function calculateHeatTransferPricing(input: HeatTransferPricingInput): HeatTransferPricing {
+function calculateDiscount(subtotal: number, quantity: number): number {
+  return quantity >= HEAT_TRANSFER_PRICING_CONFIG.discountThreshold
+    ? subtotal * HEAT_TRANSFER_PRICING_CONFIG.discountRate
+    : 0;
+}
+
+export function calculateHeatTransferPricing(input: HeatTransferPricingInput): HeatTransferPricingResult {
   if (input.productType === 'mug') {
-    const unitPrice = MUG_PRICES[input.mugType][input.mugPrintType];
-    const subtotal = unitPrice * input.mugQuantity;
-    const discount = input.mugQuantity >= 10 ? subtotal * 0.1 : 0;
-    return {
-      unitPrice,
-      subtotal,
-      discount,
-      total: subtotal - discount,
-      summaryType: 'Кружка',
-      details: [
-        `Модель: ${input.mugType === 'white330' ? 'Белая кружка 330 мл' : 'Кружка хамелеон'}`,
-        `Печать: ${input.mugPrintType === 'single' ? 'Обычная (1 сторона)' : 'Круговая'}`,
-      ],
-    };
+    const quantity = input.mugQuantity;
+    const unitPrice = HEAT_TRANSFER_PRICING_CONFIG.mugPrices[input.mugType][input.mugPrintType];
+    const subtotal = unitPrice * quantity;
+    const discount = calculateDiscount(subtotal, quantity);
+    return { quantity, unitPrice, subtotal, discount, total: subtotal - discount, safeFilmLength: 0 };
   }
 
   if (input.productType === 'tshirt') {
-    const unitPrice = input.useOwnClothes ? 700 : 1200;
-    const subtotal = unitPrice * input.tshirtQuantity;
-    const discount = input.tshirtQuantity >= 10 ? subtotal * 0.1 : 0;
-    return {
-      unitPrice,
-      subtotal,
-      discount,
-      total: subtotal - discount,
-      summaryType: 'Футболка',
-      details: [
-        `Размер: ${input.tshirtSize}`,
-        `Пол: ${input.tshirtGender === 'male' ? 'Мужская' : 'Женская'}`,
-        'Печать: Формат A4',
-        input.useOwnClothes ? 'Своя вещь: да' : 'Своя вещь: нет',
-      ],
-    };
+    const quantity = input.tshirtQuantity;
+    const unitPrice = input.useOwnClothes
+      ? HEAT_TRANSFER_PRICING_CONFIG.tshirtPrice.ownClothes
+      : HEAT_TRANSFER_PRICING_CONFIG.tshirtPrice.companyClothes;
+    const subtotal = unitPrice * quantity;
+    const discount = calculateDiscount(subtotal, quantity);
+    return { quantity, unitPrice, subtotal, discount, total: subtotal - discount, safeFilmLength: 0 };
   }
 
-  const length = Number(input.filmLength);
-  const safeLength = Number.isFinite(length) && length > 0 ? length : 0;
-  const base = safeLength * 400;
-  const transferCost = input.filmTransfer ? 300 : 0;
+  const length = parseNumericInput(input.filmLengthInput);
+  const safeFilmLength = Number.isFinite(length) && length > 0 ? length : 0;
+  const base = safeFilmLength * HEAT_TRANSFER_PRICING_CONFIG.film.unitPricePerMeter;
+  const transferCost = input.filmTransfer ? HEAT_TRANSFER_PRICING_CONFIG.film.transferPrice : 0;
   const subtotal = base + transferCost;
-  const withUrgent = input.filmUrgent ? subtotal * 1.3 : subtotal;
+  const urgentTotal = input.filmUrgent ? subtotal * HEAT_TRANSFER_PRICING_CONFIG.film.urgentMultiplier : subtotal;
+  const total = urgentTotal > 0
+    ? Math.max(urgentTotal, HEAT_TRANSFER_PRICING_CONFIG.film.minimumOrderTotal)
+    : HEAT_TRANSFER_PRICING_CONFIG.film.minimumOrderTotal;
 
   return {
-    unitPrice: 400,
+    quantity: 1,
+    unitPrice: HEAT_TRANSFER_PRICING_CONFIG.film.unitPricePerMeter,
     subtotal,
     discount: 0,
-    total: withUrgent > 0 ? Math.max(withUrgent, 400) : 400,
-    summaryType: 'Термоплёнка',
-    details: [
-      `Длина реза: ${safeLength || 0} м`,
-      'Плёнка: белая',
-      `Срочность: ${input.filmUrgent ? 'да (+30%)' : 'нет'}`,
-      `Перенос на деталь: ${input.filmTransfer ? 'да (+300 ₽)' : 'нет'}`,
-    ],
+    total,
+    safeFilmLength,
   };
-}
-
-export function formatHeatTransferMoney(value: number): string {
-  return `${Math.round(value).toLocaleString('ru-RU')} ₽`;
 }

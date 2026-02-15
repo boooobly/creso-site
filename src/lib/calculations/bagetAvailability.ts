@@ -1,47 +1,24 @@
-export type Baguette = {
-  id: string;
-  name: string;
-  image: string;
-  availableLength: number;
-  profileWidth?: number;
-};
+import { parseNumericInput } from './shared';
+import type { BagetInputValidation } from './types';
 
-export const BAGUETTES: Baguette[] = [
-  { id: 'bg-01', name: 'Классик Орех', image: '/logo.svg', availableLength: 420, profileWidth: 3.2 },
-  { id: 'bg-02', name: 'Сканди Белый', image: '/logo.svg', availableLength: 300, profileWidth: 2.4 },
-  { id: 'bg-03', name: 'Золото Премиум', image: '/logo.svg', availableLength: 510, profileWidth: 4.1 },
-  { id: 'bg-04', name: 'Минимал Черный', image: '/logo.svg', availableLength: 220, profileWidth: 1.8 },
-];
+export function validateBagetDimensions(widthInput: string, heightInput: string): BagetInputValidation {
+  const width = parseNumericInput(widthInput);
+  const height = parseNumericInput(heightInput);
+  const inputsFilled = widthInput !== '' && heightInput !== '';
 
-export type BagetInputValidation = {
-  inputsFilled: boolean;
-  isValid: boolean;
-  widthNum: number;
-  heightNum: number;
-};
-
-export function validateBagetDimensions(width: string, height: string): BagetInputValidation {
-  const widthNum = Number(width);
-  const heightNum = Number(height);
-  const inputsFilled = width !== '' && height !== '';
-
-  const isValid =
-    inputsFilled &&
-    Number.isFinite(widthNum) &&
-    Number.isFinite(heightNum) &&
-    widthNum > 0 &&
-    heightNum > 0;
+  const isValid = inputsFilled && Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0;
 
   return {
     inputsFilled,
     isValid,
-    widthNum,
-    heightNum,
+    width,
+    height,
   };
 }
 
-export function calculateRequiredBagetLength(isValid: boolean, width: number, height: number): number | null {
-  return isValid ? (width + height) * 2 : null;
+export function calculateRequiredBagetLength(width: number, height: number, isValid: boolean): number | null {
+  if (!isValid) return null;
+  return (width + height) * 2;
 }
 
 export function isBaguetteSuitable(availableLength: number, requiredLength: number | null): boolean {
