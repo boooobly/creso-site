@@ -25,10 +25,17 @@ export async function POST(req: Request) {
     const input: WideFormatPricingInput = parsed.data;
     const quote = getWideFormatQuote(input);
 
-
     logQuoteGeneration({
       calculatorType: 'wide-format',
-      inputParameters: input,
+      inputParameters: {
+        material: input.material,
+        bannerDensity: input.bannerDensity,
+        widthInput: input.widthInput,
+        heightInput: input.heightInput,
+        quantityInput: input.quantityInput,
+        grommetsInput: input.grommetsInput,
+        edgeGluing: input.edgeGluing,
+      },
       calculatedPrice: quote.totalCost,
     });
     return NextResponse.json({ quote });

@@ -27,10 +27,19 @@ export async function POST(req: Request) {
     const input: HeatTransferPricingInput = parsed.data;
     const quote = getHeatTransferQuote(input);
 
-
     logQuoteGeneration({
       calculatorType: 'heat-transfer',
-      inputParameters: input,
+      inputParameters: {
+        productType: input.productType,
+        mugType: input.mugType,
+        mugPrintType: input.mugPrintType,
+        mugQuantity: input.mugQuantity,
+        tshirtQuantity: input.tshirtQuantity,
+        useOwnClothes: input.useOwnClothes,
+        filmLengthInput: input.filmLengthInput,
+        filmUrgent: input.filmUrgent,
+        filmTransfer: input.filmTransfer,
+      },
       calculatedPrice: quote.total,
     });
     return NextResponse.json({ quote });

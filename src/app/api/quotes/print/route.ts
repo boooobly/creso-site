@@ -25,10 +25,17 @@ export async function POST(req: Request) {
     const input: PrintPricingInput = parsed.data;
     const quote = getPrintQuote(input);
 
-
     logQuoteGeneration({
       calculatorType: 'print',
-      inputParameters: input,
+      inputParameters: {
+        productType: input.productType,
+        size: input.size,
+        density: input.density,
+        printType: input.printType,
+        lamination: input.lamination,
+        presetQuantity: input.presetQuantity,
+        customQuantityInput: input.customQuantityInput,
+      },
       calculatedPrice: quote.totalPrice,
     });
     return NextResponse.json({ quote });
