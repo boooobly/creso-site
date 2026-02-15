@@ -6,9 +6,11 @@ export default function Section({
   children,
   className = '',
   containerClassName = '',
-}: PropsWithChildren<{ className?: string; containerClassName?: string }>) {
+  id,
+}: PropsWithChildren<{ className?: string; containerClassName?: string; id?: string }>) {
   return (
     <motion.section
+      id={id}
       className={`py-16 ${className}`.trim()}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
