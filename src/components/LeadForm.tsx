@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { trackEvent } from '@/lib/analytics';
 import { postJSON } from '@/lib/fetcher';
-import { trackEvent } from '@/lib/analytics';
 import type { SiteMessages } from '@/lib/messages';
 
 const optionalEmailSchema = z.preprocess(
