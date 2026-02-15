@@ -1,35 +1,16 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-
-const MATERIAL_OPTIONS = [
-  { value: 'banner', label: 'Баннер' },
-  { value: 'selfAdhesiveFilm', label: 'Самоклеящаяся пленка' },
-  { value: 'backlit', label: 'Бэклит' },
-  { value: 'perforatedFilm', label: 'Перфорированная пленка' },
-  { value: 'posterPaper', label: 'Постерная бумага' },
-] as const;
-
-type MaterialType = typeof MATERIAL_OPTIONS[number]['value'];
-type BannerDensity = 220 | 300 | 440;
-
-const BANNER_DENSITY_PRICES: Record<BannerDensity, number> = {
-  220: 350,
-  300: 420,
-  440: 520,
-};
-
-const MATERIAL_PRICES: Record<Exclude<MaterialType, 'banner'>, number> = {
-  selfAdhesiveFilm: 600,
-  backlit: 750,
-  perforatedFilm: 700,
-  posterPaper: 300,
-};
-
-const MAX_WIDTH = 3.2;
+import {
+  calculateWideFormatPricing,
+  MAX_WIDE_FORMAT_WIDTH,
+  WIDE_FORMAT_MATERIAL_OPTIONS,
+  type BannerDensity,
+  type WideFormatMaterialType,
+} from '@/lib/calculations/wideFormatPricing';
 
 export default function WideFormatPricingCalculator() {
-  const [material, setMaterial] = useState<MaterialType>('banner');
+  const [material, setMaterial] = useState<WideFormatMaterialType>('banner');
   const [bannerDensity, setBannerDensity] = useState<BannerDensity>(300);
   const [width, setWidth] = useState<string>('1.2');
   const [height, setHeight] = useState<string>('1');
@@ -42,43 +23,17 @@ export default function WideFormatPricingCalculator() {
   const quantityNum = Number(quantity);
   const grommetsNum = Number(grommets);
 
-  const parsedValuesValid = [widthNum, heightNum, quantityNum, grommetsNum].every((value) => Number.isFinite(value));
-  const positiveInputs = widthNum > 0 && heightNum > 0 && quantityNum > 0 && grommetsNum >= 0;
+  const calculations = useMemo(() => calculateWideFormatPricing({
+    material,
+    bannerDensity,
+    width: widthNum,
+    height: heightNum,
+    quantity: quantityNum,
+    edgeGluing,
+    grommets: grommetsNum,
+  }), [bannerDensity, edgeGluing, grommetsNum, heightNum, material, quantityNum, widthNum]);
 
-  const widthWarning = useMemo(() => {
-    if (!Number.isFinite(widthNum)) return 'Введите корректную ширину.';
-    if (widthNum > MAX_WIDTH) return `Максимальная ширина — ${MAX_WIDTH} м.`;
-
-    if (material === 'banner' && (widthNum < 1.2 || widthNum > 3)) {
-      return 'Для баннера допустимая ширина: 1.2–3 м.';
-    }
-
-    if (material !== 'banner' && (widthNum < 1.06 || widthNum > 1.6)) {
-      return 'Для плёнки и бумаги допустимая ширина: 1.06–1.6 м.';
-    }
-
-    return '';
-  }, [material, widthNum]);
-
-  const areaPerUnit = widthNum * heightNum;
-  const perimeterPerUnit = (widthNum + heightNum) * 2;
-
-  const baseRate = material === 'banner' ? BANNER_DENSITY_PRICES[bannerDensity] : MATERIAL_PRICES[material];
-
-  const basePrintCost = parsedValuesValid && positiveInputs && !widthWarning
-    ? areaPerUnit * quantityNum * baseRate
-    : 0;
-
-  const edgeGluingCost = edgeGluing && parsedValuesValid && positiveInputs && !widthWarning
-    ? perimeterPerUnit * quantityNum * 40
-    : 0;
-
-  const grommetsCost = parsedValuesValid && positiveInputs
-    ? grommetsNum * quantityNum * 5
-    : 0;
-
-  const extrasCost = edgeGluingCost + grommetsCost;
-  const totalCost = basePrintCost + extrasCost;
+  const { parsedValuesValid, widthWarning, areaPerUnit, basePrintCost, extrasCost, totalCost } = calculations;
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -91,10 +46,10 @@ export default function WideFormatPricingCalculator() {
             <select
               id="material"
               value={material}
-              onChange={(e) => setMaterial(e.target.value as MaterialType)}
+              onChange={(e) => setMaterial(e.target.value as WideFormatMaterialType)}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
-              {MATERIAL_OPTIONS.map((option) => (
+              {WIDE_FORMAT_MATERIAL_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -128,7 +83,7 @@ export default function WideFormatPricingCalculator() {
               id="width"
               type="number"
               min={0}
-              max={MAX_WIDTH}
+              max={MAX_WIDE_FORMAT_WIDTH}
               step="0.01"
               value={width}
               onChange={(e) => setWidth(e.target.value)}

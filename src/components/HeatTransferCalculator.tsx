@@ -2,27 +2,23 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-
-type ProductType = 'mug' | 'tshirt' | 'film';
-type MugType = 'white330' | 'chameleon';
-type MugPrintType = 'single' | 'wrap';
-type TshirtSize = 'S' | 'M' | 'L' | 'XL' | 'XXL';
-type TshirtGender = 'male' | 'female';
+import {
+  calculateHeatTransferPricing,
+  formatHeatTransferMoney,
+  getHeatTransferQuantity,
+  HEAT_TRANSFER_QUICK_QTY,
+  type HeatTransferProductType,
+  type MugPrintType,
+  type MugType,
+  type TshirtGender,
+  type TshirtSize,
+} from '@/lib/calculations/heatTransferPricing';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
 const ALLOWED_EXTENSIONS = [...VECTOR_EXTENSIONS, ...RASTER_EXTENSIONS];
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const MAX_FILES = 5;
-
-const MUG_PRICES: Record<MugType, Record<MugPrintType, number>> = {
-  white330: { single: 550, wrap: 700 },
-  chameleon: { single: 850, wrap: 1000 },
-};
-
-const QUICK_QTY = [1, 5, 10, 20, 50] as const;
-
-const formatMoney = (value: number) => `${Math.round(value).toLocaleString('ru-RU')} ₽`;
 
 type UploadedItem = {
   name: string;
@@ -32,7 +28,7 @@ type UploadedItem = {
 };
 
 export default function HeatTransferCalculator() {
-  const [productType, setProductType] = useState<ProductType>('mug');
+  const [productType, setProductType] = useState<HeatTransferProductType>('mug');
 
   const [mugType, setMugType] = useState<MugType>('white330');
   const [mugPrintType, setMugPrintType] = useState<MugPrintType>('single');
@@ -63,69 +59,21 @@ export default function HeatTransferCalculator() {
 
   const [touched, setTouched] = useState({ name: false, phone: false, agree: false });
 
-  const quantity = productType === 'mug' ? mugQuantity : productType === 'tshirt' ? tshirtQuantity : 1;
+  const quantity = getHeatTransferQuantity({ productType, mugQuantity, tshirtQuantity });
 
-  const pricing = useMemo(() => {
-    if (productType === 'mug') {
-      const unitPrice = MUG_PRICES[mugType][mugPrintType];
-      const subtotal = unitPrice * mugQuantity;
-      const discount = mugQuantity >= 10 ? subtotal * 0.1 : 0;
-      const total = subtotal - discount;
-      return {
-        unitPrice,
-        subtotal,
-        discount,
-        total,
-        summaryType: 'Кружка',
-        details: [
-          `Модель: ${mugType === 'white330' ? 'Белая кружка 330 мл' : 'Кружка хамелеон'}`,
-          `Печать: ${mugPrintType === 'single' ? 'Обычная (1 сторона)' : 'Круговая'}`,
-        ],
-      };
-    }
-
-    if (productType === 'tshirt') {
-      const unitPrice = useOwnClothes ? 700 : 1200;
-      const subtotal = unitPrice * tshirtQuantity;
-      const discount = tshirtQuantity >= 10 ? subtotal * 0.1 : 0;
-      const total = subtotal - discount;
-      return {
-        unitPrice,
-        subtotal,
-        discount,
-        total,
-        summaryType: 'Футболка',
-        details: [
-          `Размер: ${tshirtSize}`,
-          `Пол: ${tshirtGender === 'male' ? 'Мужская' : 'Женская'}`,
-          'Печать: Формат A4',
-          useOwnClothes ? 'Своя вещь: да' : 'Своя вещь: нет',
-        ],
-      };
-    }
-
-    const length = Number(filmLength);
-    const safeLength = Number.isFinite(length) && length > 0 ? length : 0;
-    const base = safeLength * 400;
-    const transferCost = filmTransfer ? 300 : 0;
-    const subtotal = base + transferCost;
-    const withUrgent = filmUrgent ? subtotal * 1.3 : subtotal;
-    const total = withUrgent > 0 ? Math.max(withUrgent, 400) : 400;
-
-    return {
-      unitPrice: 400,
-      subtotal,
-      discount: 0,
-      total,
-      summaryType: 'Термоплёнка',
-      details: [
-        `Длина реза: ${safeLength || 0} м`,
-        'Плёнка: белая',
-        `Срочность: ${filmUrgent ? 'да (+30%)' : 'нет'}`,
-        `Перенос на деталь: ${filmTransfer ? 'да (+300 ₽)' : 'нет'}`,
-      ],
-    };
-  }, [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtGender, tshirtQuantity, tshirtSize, useOwnClothes]);
+  const pricing = useMemo(() => calculateHeatTransferPricing({
+    productType,
+    mugType,
+    mugPrintType,
+    mugQuantity,
+    tshirtSize,
+    tshirtGender,
+    useOwnClothes,
+    tshirtQuantity,
+    filmLength,
+    filmUrgent,
+    filmTransfer,
+  }), [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtGender, tshirtQuantity, tshirtSize, useOwnClothes]);
 
   const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
   const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
@@ -395,12 +343,12 @@ export default function HeatTransferCalculator() {
               <SummaryRow key={detail} label={detail.split(':')[0]} value={detail.split(':').slice(1).join(':').trim()} />
             ))}
             <SummaryRow label="Тираж" value={productType === 'film' ? '—' : `${quantity} шт`} />
-            {pricing.discount > 0 && <SummaryRow label="Скидка" value={`-${formatMoney(pricing.discount)}`} />}
+            {pricing.discount > 0 && <SummaryRow label="Скидка" value={`-${formatHeatTransferMoney(pricing.discount)}`} />}
           </div>
 
           <div className="mt-6 rounded-xl bg-[var(--brand-red)]/10 p-4 text-center">
             <p className="text-xs uppercase tracking-wide text-[var(--brand-red)]">Итого</p>
-            <p className="mt-1 text-3xl font-bold text-[var(--brand-red)]">{formatMoney(pricing.total)}</p>
+            <p className="mt-1 text-3xl font-bold text-[var(--brand-red)]">{formatHeatTransferMoney(pricing.total)}</p>
           </div>
 
           <button
@@ -443,7 +391,7 @@ function QuantityPicker({ quantity, setQuantity }: { quantity: number; setQuanti
     <div className="space-y-3">
       <p className="text-sm font-medium">Тираж</p>
       <div className="flex flex-wrap gap-2">
-        {QUICK_QTY.map((value) => (
+        {HEAT_TRANSFER_QUICK_QTY.map((value) => (
           <button
             key={value}
             type="button"

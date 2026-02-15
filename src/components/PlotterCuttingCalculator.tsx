@@ -1,25 +1,18 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-
-const MATERIAL_OPTIONS = [
-  { value: 'selfAdhesive', label: 'Самоклеящаяся плёнка' },
-  { value: 'oracal', label: 'Оракал (цветная плёнка)' },
-] as const;
-
-const COMPLEXITY_OPTIONS = [
-  { value: 1, label: 'Простая (1.0)' },
-  { value: 1.3, label: 'Средняя (1.3)' },
-  { value: 1.6, label: 'Сложная (1.6)' },
-] as const;
+import {
+  calculatePlotterCuttingPricing,
+  PLOTTER_COMPLEXITY_OPTIONS,
+  PLOTTER_MATERIAL_OPTIONS,
+  type PlotterMaterialType,
+} from '@/lib/calculations/plotterCuttingPricing';
 
 const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
 const ALLOWED_EXTENSIONS = [...VECTOR_EXTENSIONS, ...RASTER_EXTENSIONS];
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const MAX_FILES = 5;
-
-type MaterialType = typeof MATERIAL_OPTIONS[number]['value'];
 
 type UploadedItem = {
   name: string;
@@ -29,7 +22,7 @@ type UploadedItem = {
 };
 
 export default function PlotterCuttingCalculator() {
-  const [material, setMaterial] = useState<MaterialType>('selfAdhesive');
+  const [material, setMaterial] = useState<PlotterMaterialType>('selfAdhesive');
   const [cutLength, setCutLength] = useState('1');
   const [area, setArea] = useState('0');
   const [complexity, setComplexity] = useState<number>(1);
@@ -60,20 +53,17 @@ export default function PlotterCuttingCalculator() {
   const cutLengthNum = Number(cutLength);
   const areaNum = Number(area);
 
-  const valuesValid = Number.isFinite(cutLengthNum) && Number.isFinite(areaNum);
-  const positiveValues = cutLengthNum >= 0 && areaNum >= 0;
+  const calculations = useMemo(() => calculatePlotterCuttingPricing({
+    cutLength: cutLengthNum,
+    area: areaNum,
+    complexity,
+    weeding,
+    mountingFilm,
+    transfer,
+    urgent,
+  }), [areaNum, complexity, cutLengthNum, mountingFilm, transfer, urgent, weeding]);
 
-  const baseCost = valuesValid && positiveValues ? cutLengthNum * 30 * complexity : 0;
-  const weedingCost = weeding && valuesValid && positiveValues ? cutLengthNum * 15 : 0;
-  const mountingFilmCost = mountingFilm && valuesValid && positiveValues ? areaNum * 100 : 0;
-  const transferCost = transfer ? 300 : 0;
-
-  const extrasCost = weedingCost + mountingFilmCost + transferCost;
-  const subtotal = baseCost + extrasCost;
-  const urgentTotal = urgent ? subtotal * 1.3 : subtotal;
-
-  const minimumApplied = urgentTotal > 0 && urgentTotal < 400;
-  const totalCost = minimumApplied ? 400 : urgentTotal;
+  const { valuesValid, baseCost, extrasCost, minimumApplied, totalCost } = calculations;
 
   const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
   const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
@@ -205,10 +195,10 @@ export default function PlotterCuttingCalculator() {
             <select
               id="material"
               value={material}
-              onChange={(e) => setMaterial(e.target.value as MaterialType)}
+              onChange={(e) => setMaterial(e.target.value as PlotterMaterialType)}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
-              {MATERIAL_OPTIONS.map((option) => (
+              {PLOTTER_MATERIAL_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -252,7 +242,7 @@ export default function PlotterCuttingCalculator() {
               onChange={(e) => setComplexity(Number(e.target.value))}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
-              {COMPLEXITY_OPTIONS.map((option) => (
+              {PLOTTER_COMPLEXITY_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>

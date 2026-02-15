@@ -1,56 +1,41 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-
-type ProductType = 'cards' | 'flyers';
-type Density = 300 | 350 | 400;
-type PrintType = 'single' | 'double';
-
-const SIZE_OPTIONS: Record<ProductType, string[]> = {
-  cards: ['90x50', '85x55'],
-  flyers: ['A6', 'A5'],
-};
-
-const DENSITY_COEFFICIENT: Record<Density, number> = {
-  300: 1,
-  350: 1.2,
-  400: 1.4,
-};
-
-const BASE_PER_100: Record<ProductType, number> = {
-  cards: 500,
-  flyers: 650,
-};
-
-const QUICK_QUANTITIES = [100, 500, 1000];
+import {
+  calculatePrintTotalPrice,
+  calculatePrintUnitPrice,
+  isPrintQuantityValid,
+  PRINT_QUICK_QUANTITIES,
+  PRINT_SIZE_OPTIONS,
+  type PrintDensity,
+  type PrintProductType,
+  type PrintType,
+} from '@/lib/calculations/printPricing';
 
 export default function PrintPricingCalculator() {
-  const [productType, setProductType] = useState<ProductType>('cards');
-  const [size, setSize] = useState<string>(SIZE_OPTIONS.cards[0]);
-  const [density, setDensity] = useState<Density>(300);
+  const [productType, setProductType] = useState<PrintProductType>('cards');
+  const [size, setSize] = useState<string>(PRINT_SIZE_OPTIONS.cards[0]);
+  const [density, setDensity] = useState<PrintDensity>(300);
   const [printType, setPrintType] = useState<PrintType>('single');
   const [lamination, setLamination] = useState(false);
   const [quantity, setQuantity] = useState<number>(100);
   const [customQuantity, setCustomQuantity] = useState('');
 
   const effectiveQuantity = customQuantity ? Number(customQuantity) : quantity;
-  const isQuantityValid = Number.isFinite(effectiveQuantity) && effectiveQuantity >= 100;
+  const isQuantityValid = isPrintQuantityValid(effectiveQuantity);
 
   const totalPrice = useMemo(() => {
-    if (!isQuantityValid) return 0;
-
-    const base = BASE_PER_100[productType];
-    const densityCoeff = DENSITY_COEFFICIENT[density];
-    const sideCoeff = printType === 'double' ? 1.5 : 1;
-    const laminationCoeff = lamination ? 1.2 : 1;
-
-    const price = (effectiveQuantity / 100) * base * densityCoeff * sideCoeff * laminationCoeff;
-    return Math.round(price);
+    return calculatePrintTotalPrice({
+      productType,
+      density,
+      printType,
+      lamination,
+      effectiveQuantity,
+    });
   }, [density, effectiveQuantity, isQuantityValid, lamination, printType, productType]);
 
   const unitPrice = useMemo(() => {
-    if (!isQuantityValid || effectiveQuantity <= 0) return 0;
-    return +(totalPrice / effectiveQuantity).toFixed(2);
+    return calculatePrintUnitPrice(totalPrice, effectiveQuantity);
   }, [effectiveQuantity, isQuantityValid, totalPrice]);
 
   return (
@@ -59,10 +44,10 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Тип продукции</h2>
           <div className="grid grid-cols-2 gap-3">
-            <ToggleButton active={productType === 'cards'} onClick={() => { setProductType('cards'); setSize(SIZE_OPTIONS.cards[0]); }}>
+            <ToggleButton active={productType === 'cards'} onClick={() => { setProductType('cards'); setSize(PRINT_SIZE_OPTIONS.cards[0]); }}>
               Визитки
             </ToggleButton>
-            <ToggleButton active={productType === 'flyers'} onClick={() => { setProductType('flyers'); setSize(SIZE_OPTIONS.flyers[0]); }}>
+            <ToggleButton active={productType === 'flyers'} onClick={() => { setProductType('flyers'); setSize(PRINT_SIZE_OPTIONS.flyers[0]); }}>
               Флаеры
             </ToggleButton>
           </div>
@@ -71,7 +56,7 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Размер</h2>
           <div className="grid grid-cols-2 gap-3">
-            {SIZE_OPTIONS[productType].map((item) => (
+            {PRINT_SIZE_OPTIONS[productType].map((item) => (
               <RadioCard key={item} active={size === item} onClick={() => setSize(item)} label={item} />
             ))}
           </div>
@@ -84,7 +69,7 @@ export default function PrintPricingCalculator() {
               <RadioCard
                 key={value}
                 active={density === value}
-                onClick={() => setDensity(value as Density)}
+                onClick={() => setDensity(value as PrintDensity)}
                 label={`${value} gsm`}
               />
             ))}
@@ -106,7 +91,7 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Тираж</h2>
           <div className="flex flex-wrap gap-2">
-            {QUICK_QUANTITIES.map((q) => (
+            {PRINT_QUICK_QUANTITIES.map((q) => (
               <button
                 key={q}
                 type="button"
