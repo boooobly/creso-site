@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postJSON } from '@/lib/fetcher';
@@ -13,22 +14,62 @@ const schema = z.object({
   phone: z.string().min(6, 'Введите телефон'),
   service: z.string().min(2, 'Выберите услугу'),
   message: z.string().optional(),
-  consent: z.literal(true, {
-    errorMap: () => ({ message: 'Необходимо согласие с политикой обработки персональных данных' }),
+  consent: z.boolean().refine((value) => value, {
+    message: 'Необходимо согласие с политикой обработки персональных данных',
   }),
 });
 
 type FormData = z.infer<typeof schema>;
 
+const DEFAULT_VALUES: Omit<FormData, 'consent'> = {
+  name: '',
+  email: '',
+  phone: '',
+  service: '',
+  message: '',
+};
+
 export default function LeadForm({ t }: { t: SiteMessages }) {
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors, isSubmitSuccessful, isSubmitting }, reset } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const searchParams = useSearchParams();
+  const initializedFromQuery = useRef(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful, isSubmitting },
+    reset,
+    getValues,
+  } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: { ...DEFAULT_VALUES, consent: false } });
+
+  useEffect(() => {
+    if (initializedFromQuery.current) return;
+
+    const service = searchParams.get('service');
+    const calc = searchParams.get('calc');
+
+    if (!service && !calc) {
+      initializedFromQuery.current = true;
+      return;
+    }
+
+    const nextValues = getValues();
+    const calculationMessage = calc ? `Расчёт:\n${calc}` : '';
+
+    reset({
+      ...nextValues,
+      service: service ?? nextValues.service,
+      message: calculationMessage || nextValues.message,
+    });
+
+    initializedFromQuery.current = true;
+  }, [getValues, reset, searchParams]);
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);
     try {
       const res = await postJSON<{ ok: true }>(`/api/lead`, data);
-      if (res.ok) reset();
+      if (res.ok) reset({ ...DEFAULT_VALUES, consent: false });
     } catch {
       setSubmitError('Не удалось отправить заявку. Попробуйте ещё раз.');
     }

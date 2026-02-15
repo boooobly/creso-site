@@ -1,57 +1,106 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { engineUiCatalog, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/engine';
 
-type ProductType = 'cards' | 'flyers';
-type Density = 300 | 350 | 400;
-type PrintType = 'single' | 'double';
-
-const SIZE_OPTIONS: Record<ProductType, string[]> = {
-  cards: ['90x50', '85x55'],
-  flyers: ['A6', 'A5'],
+type PrintQuote = {
+  quantity: number;
+  isQuantityValid: boolean;
+  totalPrice: number;
+  unitPrice: number;
 };
-
-const DENSITY_COEFFICIENT: Record<Density, number> = {
-  300: 1,
-  350: 1.2,
-  400: 1.4,
-};
-
-const BASE_PER_100: Record<ProductType, number> = {
-  cards: 500,
-  flyers: 650,
-};
-
-const QUICK_QUANTITIES = [100, 500, 1000];
 
 export default function PrintPricingCalculator() {
-  const [productType, setProductType] = useState<ProductType>('cards');
-  const [size, setSize] = useState<string>(SIZE_OPTIONS.cards[0]);
-  const [density, setDensity] = useState<Density>(300);
+  const [productType, setProductType] = useState<PrintProductType>('cards');
+  const [size, setSize] = useState<string>(engineUiCatalog.print.sizeOptions.cards[0]);
+  const [density, setDensity] = useState<PrintDensity>(300);
   const [printType, setPrintType] = useState<PrintType>('single');
   const [lamination, setLamination] = useState(false);
   const [quantity, setQuantity] = useState<number>(100);
   const [customQuantity, setCustomQuantity] = useState('');
 
-  const effectiveQuantity = customQuantity ? Number(customQuantity) : quantity;
-  const isQuantityValid = Number.isFinite(effectiveQuantity) && effectiveQuantity >= 100;
+  const [pricing, setPricing] = useState<PrintQuote>({ quantity: 100, isQuantityValid: true, totalPrice: 0, unitPrice: 0 });
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState('');
 
-  const totalPrice = useMemo(() => {
-    if (!isQuantityValid) return 0;
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
 
-    const base = BASE_PER_100[productType];
-    const densityCoeff = DENSITY_COEFFICIENT[density];
-    const sideCoeff = printType === 'double' ? 1.5 : 1;
-    const laminationCoeff = lamination ? 1.2 : 1;
+    const fetchQuote = async () => {
+      setIsQuoteLoading(true);
+      setQuoteError('');
 
-    const price = (effectiveQuantity / 100) * base * densityCoeff * sideCoeff * laminationCoeff;
-    return Math.round(price);
-  }, [density, effectiveQuantity, isQuantityValid, lamination, printType, productType]);
+      try {
+        const response = await fetch('/api/quotes/print', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productType,
+            size,
+            density,
+            printType,
+            lamination,
+            presetQuantity: quantity,
+            customQuantityInput: customQuantity,
+          }),
+          signal: controller.signal,
+        });
 
-  const unitPrice = useMemo(() => {
-    if (!isQuantityValid || effectiveQuantity <= 0) return 0;
-    return +(totalPrice / effectiveQuantity).toFixed(2);
-  }, [effectiveQuantity, isQuantityValid, totalPrice]);
+        if (!response.ok) {
+          throw new Error('failed');
+        }
+
+        const data = (await response.json()) as { quote: PrintQuote };
+
+        if (active) {
+          setPricing(data.quote);
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        if (active) {
+          setQuoteError('Ошибка расчёта');
+          setPricing({ quantity: 0, isQuantityValid: false, totalPrice: 0, unitPrice: 0 });
+        }
+      } finally {
+        if (active) {
+          setIsQuoteLoading(false);
+        }
+      }
+    };
+
+    fetchQuote();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [customQuantity, density, lamination, printType, productType, quantity, size]);
+
+  const effectiveQuantityLabel = useMemo(() => (pricing.isQuantityValid ? pricing.quantity : '—'), [pricing.isQuantityValid, pricing.quantity]);
+
+  const sendCalculationHref = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set('service', 'Визитки и флаеры');
+
+    const calcSummary = [
+      `Продукция: ${productType === 'cards' ? 'Визитки' : 'Флаеры'}`,
+      `Размер: ${size}`,
+      `Плотность: ${density} gsm`,
+      `Печать: ${printType === 'single' ? 'Односторонняя' : 'Двусторонняя'}`,
+      `Ламинация: ${lamination ? 'Да' : 'Нет'}`,
+      `Тираж: ${pricing.isQuantityValid ? pricing.quantity : '—'}`,
+      `Итого: ${pricing.totalPrice} ₽`,
+    ].join('; ');
+
+    params.set('calc', calcSummary);
+    return `/contacts?${params.toString()}#contact-form`;
+  }, [density, lamination, pricing.isQuantityValid, pricing.quantity, pricing.totalPrice, printType, productType, size]);
+
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -59,10 +108,10 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Тип продукции</h2>
           <div className="grid grid-cols-2 gap-3">
-            <ToggleButton active={productType === 'cards'} onClick={() => { setProductType('cards'); setSize(SIZE_OPTIONS.cards[0]); }}>
+            <ToggleButton active={productType === 'cards'} onClick={() => { setProductType('cards'); setSize(engineUiCatalog.print.sizeOptions.cards[0]); }}>
               Визитки
             </ToggleButton>
-            <ToggleButton active={productType === 'flyers'} onClick={() => { setProductType('flyers'); setSize(SIZE_OPTIONS.flyers[0]); }}>
+            <ToggleButton active={productType === 'flyers'} onClick={() => { setProductType('flyers'); setSize(engineUiCatalog.print.sizeOptions.flyers[0]); }}>
               Флаеры
             </ToggleButton>
           </div>
@@ -71,7 +120,7 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Размер</h2>
           <div className="grid grid-cols-2 gap-3">
-            {SIZE_OPTIONS[productType].map((item) => (
+            {engineUiCatalog.print.sizeOptions[productType].map((item) => (
               <RadioCard key={item} active={size === item} onClick={() => setSize(item)} label={item} />
             ))}
           </div>
@@ -84,7 +133,7 @@ export default function PrintPricingCalculator() {
               <RadioCard
                 key={value}
                 active={density === value}
-                onClick={() => setDensity(value as Density)}
+                onClick={() => setDensity(value as PrintDensity)}
                 label={`${value} gsm`}
               />
             ))}
@@ -106,7 +155,7 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Тираж</h2>
           <div className="flex flex-wrap gap-2">
-            {QUICK_QUANTITIES.map((q) => (
+            {engineUiCatalog.print.quantityPresets.map((q) => (
               <button
                 key={q}
                 type="button"
@@ -132,7 +181,7 @@ export default function PrintPricingCalculator() {
               placeholder="Введите количество (мин. 100)"
               className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             />
-            {!isQuantityValid && <p className="text-sm text-red-600">Минимальный тираж — 100 шт.</p>}
+            {!pricing.isQuantityValid && <p className="text-sm text-red-600">Минимальный тираж — 100 шт.</p>}
           </div>
         </div>
 
@@ -157,16 +206,18 @@ export default function PrintPricingCalculator() {
           <li>Плотность: <b>{density} gsm</b></li>
           <li>Печать: <b>{printType === 'single' ? 'Односторонняя' : 'Двусторонняя'}</b></li>
           <li>Ламинация: <b>{lamination ? 'Да' : 'Нет'}</b></li>
-          <li>Тираж: <b>{isQuantityValid ? effectiveQuantity : '—'}</b></li>
+          <li>Тираж: <b>{effectiveQuantityLabel}</b></li>
         </ul>
 
         <div className="rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className="text-3xl font-bold">{totalPrice.toLocaleString('ru-RU')} ₽</p>
-          <p className="text-sm text-neutral-600 dark:text-neutral-300">{unitPrice.toLocaleString('ru-RU')} ₽ / шт.</p>
+          <p className="text-3xl font-bold">{pricing.totalPrice.toLocaleString('ru-RU')} ₽</p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-300">{pricing.unitPrice.toLocaleString('ru-RU')} ₽ / шт.</p>
         </div>
 
         <button type="button" className="btn-primary w-full">Оформить заказ</button>
+        <Link href={sendCalculationHref} className="btn-secondary w-full justify-center no-underline">Send this calculation</Link>
+        <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
       </aside>
     </div>
   );

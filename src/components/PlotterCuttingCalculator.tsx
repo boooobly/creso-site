@@ -1,25 +1,19 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
-
-const MATERIAL_OPTIONS = [
-  { value: 'selfAdhesive', label: 'Самоклеящаяся плёнка' },
-  { value: 'oracal', label: 'Оракал (цветная плёнка)' },
-] as const;
-
-const COMPLEXITY_OPTIONS = [
-  { value: 1, label: 'Простая (1.0)' },
-  { value: 1.3, label: 'Средняя (1.3)' },
-  { value: 1.6, label: 'Сложная (1.6)' },
-] as const;
+import {
+  engineParsers,
+  engineUiCatalog,
+  getPlotterCuttingQuote,
+  type PlotterMaterialType,
+} from '@/lib/engine';
 
 const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
 const ALLOWED_EXTENSIONS = [...VECTOR_EXTENSIONS, ...RASTER_EXTENSIONS];
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const MAX_FILES = 5;
-
-type MaterialType = typeof MATERIAL_OPTIONS[number]['value'];
 
 type UploadedItem = {
   name: string;
@@ -29,7 +23,7 @@ type UploadedItem = {
 };
 
 export default function PlotterCuttingCalculator() {
-  const [material, setMaterial] = useState<MaterialType>('selfAdhesive');
+  const [material, setMaterial] = useState<PlotterMaterialType>('selfAdhesive');
   const [cutLength, setCutLength] = useState('1');
   const [area, setArea] = useState('0');
   const [complexity, setComplexity] = useState<number>(1);
@@ -57,23 +51,17 @@ export default function PlotterCuttingCalculator() {
     agree: false,
   });
 
-  const cutLengthNum = Number(cutLength);
-  const areaNum = Number(area);
+  const calculations = useMemo(() => getPlotterCuttingQuote({
+    cutLengthInput: cutLength,
+    areaInput: area,
+    complexity,
+    weeding,
+    mountingFilm,
+    transfer,
+    urgent,
+  }), [area, complexity, cutLength, mountingFilm, transfer, urgent, weeding]);
 
-  const valuesValid = Number.isFinite(cutLengthNum) && Number.isFinite(areaNum);
-  const positiveValues = cutLengthNum >= 0 && areaNum >= 0;
-
-  const baseCost = valuesValid && positiveValues ? cutLengthNum * 30 * complexity : 0;
-  const weedingCost = weeding && valuesValid && positiveValues ? cutLengthNum * 15 : 0;
-  const mountingFilmCost = mountingFilm && valuesValid && positiveValues ? areaNum * 100 : 0;
-  const transferCost = transfer ? 300 : 0;
-
-  const extrasCost = weedingCost + mountingFilmCost + transferCost;
-  const subtotal = baseCost + extrasCost;
-  const urgentTotal = urgent ? subtotal * 1.3 : subtotal;
-
-  const minimumApplied = urgentTotal > 0 && urgentTotal < 400;
-  const totalCost = minimumApplied ? 400 : urgentTotal;
+  const { valuesValid, cutLength: cutLengthNum, area: areaNum, baseCost, extrasCost, minimumApplied, totalCost } = calculations;
 
   const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
   const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
@@ -83,6 +71,28 @@ export default function PlotterCuttingCalculator() {
   const agreeError = touched.agree && !agree ? 'Необходимо согласие с политикой.' : '';
 
   const acceptedAttr = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(',');
+
+
+  const sendCalculationHref = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set('service', 'Плоттерная резка');
+
+    const calcSummary = [
+      `Материал: ${material}`,
+      `Длина реза: ${valuesValid ? `${cutLengthNum.toFixed(2)} м` : '—'}`,
+      `Площадь: ${valuesValid ? `${areaNum.toFixed(2)} м²` : '—'}`,
+      `Сложность: ${complexity}`,
+      `Выборка: ${weeding ? 'Да' : 'Нет'}`,
+      `Монтажная плёнка: ${mountingFilm ? 'Да' : 'Нет'}`,
+      `Перенос: ${transfer ? 'Да' : 'Нет'}`,
+      `Срочно: ${urgent ? 'Да' : 'Нет'}`,
+      `Итого: ${Math.round(totalCost)} ₽`,
+    ].join('; ');
+
+    params.set('calc', calcSummary);
+    return `/contacts?${params.toString()}#contact-form`;
+  }, [areaNum, complexity, cutLengthNum, material, mountingFilm, totalCost, transfer, urgent, valuesValid, weeding]);
+
 
   const applyFiles = (incoming: FileList | File[]) => {
     setFileError('');
@@ -205,10 +215,10 @@ export default function PlotterCuttingCalculator() {
             <select
               id="material"
               value={material}
-              onChange={(e) => setMaterial(e.target.value as MaterialType)}
+              onChange={(e) => setMaterial(e.target.value as PlotterMaterialType)}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
-              {MATERIAL_OPTIONS.map((option) => (
+              {engineUiCatalog.plotterCutting.materialOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -249,10 +259,10 @@ export default function PlotterCuttingCalculator() {
             <select
               id="complexity"
               value={complexity}
-              onChange={(e) => setComplexity(Number(e.target.value))}
+              onChange={(e) => setComplexity(engineParsers.parseNumericInput(e.target.value))}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
-              {COMPLEXITY_OPTIONS.map((option) => (
+              {engineUiCatalog.plotterCutting.complexityOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -386,6 +396,7 @@ export default function PlotterCuttingCalculator() {
           <Button variant="primary" className="mt-4 w-full" disabled={isSubmitting}>
             {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
           </Button>
+          <Link href={sendCalculationHref} className="btn-secondary mt-3 w-full justify-center no-underline">Send this calculation</Link>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Менеджер свяжется с вами для уточнения деталей.</p>
 
           {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}
