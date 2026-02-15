@@ -14,6 +14,7 @@ import {
 } from '@/lib/engine';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
+import { useDebouncedValue } from '@/lib/useDebouncedValue';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -84,6 +85,20 @@ export default function HeatTransferCalculator() {
   const [quoteError, setQuoteError] = useState('');
   const [pricePulse, setPricePulse] = useState(false);
 
+  const quoteRequest = useMemo(() => ({
+    productType,
+    mugType,
+    mugPrintType,
+    mugQuantity,
+    tshirtQuantity,
+    useOwnClothes,
+    filmLengthInput: filmLength,
+    filmUrgent,
+    filmTransfer,
+  }), [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtQuantity, useOwnClothes]);
+  const debouncedQuoteRequest = useDebouncedValue(quoteRequest, 300);
+  const isQuotePending = quoteRequest !== debouncedQuoteRequest || isQuoteLoading;
+
   useEffect(() => {
     trackEvent('calculator_started', { calculator: 'heat_transfer' });
   }, []);
@@ -121,17 +136,7 @@ export default function HeatTransferCalculator() {
         const response = await fetch('/api/quotes/heat-transfer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productType,
-            mugType,
-            mugPrintType,
-            mugQuantity,
-            tshirtQuantity,
-            useOwnClothes,
-            filmLengthInput: filmLength,
-            filmUrgent,
-            filmTransfer,
-          }),
+          body: JSON.stringify(debouncedQuoteRequest),
           signal: controller.signal,
         });
 
@@ -171,7 +176,7 @@ export default function HeatTransferCalculator() {
       active = false;
       controller.abort();
     };
-  }, [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtQuantity, useOwnClothes]);
+  }, [debouncedQuoteRequest]);
 
   const summaryDetails = useMemo(() => {
     if (productType === 'mug') {
@@ -490,6 +495,7 @@ ${calcSummary}`,
           <div className="mt-6 rounded-xl bg-[var(--brand-red)]/10 p-4 text-center">
             <p className="text-xs uppercase tracking-wide text-[var(--brand-red)]">Итого</p>
             <p className={`mt-1 text-3xl font-bold text-[var(--brand-red)] transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{Math.round(pricing.total).toLocaleString('ru-RU')} ₽</p>
+            <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
           </div>
 
           <button

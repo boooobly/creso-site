@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getHeatTransferQuote, type HeatTransferPricingInput } from '@/lib/engine';
 
 const heatTransferQuoteSchema = z.object({
@@ -26,6 +27,21 @@ export async function POST(req: Request) {
     const input: HeatTransferPricingInput = parsed.data;
     const quote = getHeatTransferQuote(input);
 
+    logQuoteGeneration({
+      calculatorType: 'heat-transfer',
+      inputParameters: {
+        productType: input.productType,
+        mugType: input.mugType,
+        mugPrintType: input.mugPrintType,
+        mugQuantity: input.mugQuantity,
+        tshirtQuantity: input.tshirtQuantity,
+        useOwnClothes: input.useOwnClothes,
+        filmLengthInput: input.filmLengthInput,
+        filmUrgent: input.filmUrgent,
+        filmTransfer: input.filmTransfer,
+      },
+      calculatedPrice: quote.total,
+    });
     return NextResponse.json({ quote });
   } catch {
     return NextResponse.json({ error: 'Ошибка расчёта.' }, { status: 500 });

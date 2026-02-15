@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getWideFormatQuote, type WideFormatPricingInput } from '@/lib/engine';
 
 const wideFormatQuoteSchema = z.object({
@@ -24,6 +25,19 @@ export async function POST(req: Request) {
     const input: WideFormatPricingInput = parsed.data;
     const quote = getWideFormatQuote(input);
 
+    logQuoteGeneration({
+      calculatorType: 'wide-format',
+      inputParameters: {
+        material: input.material,
+        bannerDensity: input.bannerDensity,
+        widthInput: input.widthInput,
+        heightInput: input.heightInput,
+        quantityInput: input.quantityInput,
+        grommetsInput: input.grommetsInput,
+        edgeGluing: input.edgeGluing,
+      },
+      calculatedPrice: quote.totalCost,
+    });
     return NextResponse.json({ quote });
   } catch {
     return NextResponse.json({ error: 'Ошибка расчёта.' }, { status: 500 });

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { engineUiCatalog, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/engine';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
+import { useDebouncedValue } from '@/lib/useDebouncedValue';
 
 type PrintQuote = {
   quantity: number;
@@ -25,6 +26,18 @@ export default function PrintPricingCalculator() {
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState('');
   const [pricePulse, setPricePulse] = useState(false);
+
+  const quoteRequest = useMemo(() => ({
+    productType,
+    size,
+    density,
+    printType,
+    lamination,
+    presetQuantity: quantity,
+    customQuantityInput: customQuantity,
+  }), [customQuantity, density, lamination, printType, productType, quantity, size]);
+  const debouncedQuoteRequest = useDebouncedValue(quoteRequest, 300);
+  const isQuotePending = quoteRequest !== debouncedQuoteRequest || isQuoteLoading;
 
   useEffect(() => {
     trackEvent('calculator_started', { calculator: 'print' });
@@ -61,15 +74,7 @@ export default function PrintPricingCalculator() {
         const response = await fetch('/api/quotes/print', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productType,
-            size,
-            density,
-            printType,
-            lamination,
-            presetQuantity: quantity,
-            customQuantityInput: customQuantity,
-          }),
+          body: JSON.stringify(debouncedQuoteRequest),
           signal: controller.signal,
         });
 
@@ -109,7 +114,7 @@ export default function PrintPricingCalculator() {
       active = false;
       controller.abort();
     };
-  }, [customQuantity, density, lamination, printType, productType, quantity, size]);
+  }, [debouncedQuoteRequest]);
 
   const effectiveQuantityLabel = useMemo(() => (pricing.isQuantityValid ? pricing.quantity : '—'), [pricing.isQuantityValid, pricing.quantity]);
 
@@ -243,6 +248,7 @@ ${calcSummary}`,
         <div className="rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
           <p className={`text-3xl font-extrabold transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{pricing.totalPrice.toLocaleString('ru-RU')} ₽</p>
+          <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
           <p className="text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
           <p className="text-sm text-neutral-600 dark:text-neutral-300">{pricing.unitPrice.toLocaleString('ru-RU')} ₽ / шт.</p>
           <p className="text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
