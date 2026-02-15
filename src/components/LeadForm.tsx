@@ -37,6 +37,7 @@ const schema = z
     consent: z.boolean().refine((value) => value, {
       message: 'Необходимо согласие с политикой обработки персональных данных',
     }),
+    website: z.string().optional(),
   })
   .superRefine((values, ctx) => {
     if (!values.email && !values.phone) {
@@ -64,6 +65,7 @@ const DEFAULT_VALUES: Omit<FormData, 'consent'> = {
   phone: undefined,
   service: DEFAULT_SERVICE,
   message: '',
+  website: '',
 };
 
 export default function LeadForm({ t, initialService, initialMessage }: LeadFormProps) {
@@ -120,6 +122,14 @@ export default function LeadForm({ t, initialService, initialMessage }: LeadForm
 
       <input type="hidden" {...register('service')} />
       <input type="hidden" {...register('message')} />
+      <input
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="hidden"
+        {...register('website')}
+      />
 
       <div>
         <input
