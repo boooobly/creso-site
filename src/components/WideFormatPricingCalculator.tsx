@@ -1,20 +1,53 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   engineParsers,
   engineUiCatalog,
-  getWideFormatQuote,
   type BannerDensity,
   type WideFormatMaterialType,
   type WideFormatWidthWarningCode,
 } from '@/lib/engine';
+
+type WideFormatQuote = {
+  width: number;
+  height: number;
+  quantity: number;
+  grommets: number;
+  parsedValuesValid: boolean;
+  positiveInputs: boolean;
+  widthWarningCode: WideFormatWidthWarningCode;
+  areaPerUnit: number;
+  perimeterPerUnit: number;
+  basePrintCost: number;
+  edgeGluingCost: number;
+  grommetsCost: number;
+  extrasCost: number;
+  totalCost: number;
+};
 
 const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
   invalid_width: 'Введите корректную ширину.',
   max_width_exceeded: `Максимальная ширина — ${engineUiCatalog.wideFormat.maxWidth} м.`,
   banner_width_out_of_range: 'Для баннера допустимая ширина: 1.2–3 м.',
   sheet_width_out_of_range: 'Для плёнки и бумаги допустимая ширина: 1.06–1.6 м.',
+};
+
+const EMPTY_QUOTE: WideFormatQuote = {
+  width: 0,
+  height: 0,
+  quantity: 0,
+  grommets: 0,
+  parsedValuesValid: false,
+  positiveInputs: false,
+  widthWarningCode: null,
+  areaPerUnit: 0,
+  perimeterPerUnit: 0,
+  basePrintCost: 0,
+  edgeGluingCost: 0,
+  grommetsCost: 0,
+  extrasCost: 0,
+  totalCost: 0,
 };
 
 export default function WideFormatPricingCalculator() {
@@ -26,21 +59,68 @@ export default function WideFormatPricingCalculator() {
   const [edgeGluing, setEdgeGluing] = useState(false);
   const [grommets, setGrommets] = useState<string>('0');
 
-  const calculations = useMemo(
-    () =>
-      getWideFormatQuote({
-        material,
-        bannerDensity,
-        widthInput: width,
-        heightInput: height,
-        quantityInput: quantity,
-        grommetsInput: grommets,
-        edgeGluing,
-      }),
-    [bannerDensity, edgeGluing, grommets, height, material, quantity, width],
-  );
+  const [quote, setQuote] = useState<WideFormatQuote>(EMPTY_QUOTE);
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState('');
 
-  const widthWarning = calculations.widthWarningCode ? WIDTH_WARNING_MESSAGES[calculations.widthWarningCode] : '';
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+
+    const fetchQuote = async () => {
+      setIsQuoteLoading(true);
+      setQuoteError('');
+
+      try {
+        const response = await fetch('/api/quotes/wide-format', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            material,
+            bannerDensity,
+            widthInput: width,
+            heightInput: height,
+            quantityInput: quantity,
+            grommetsInput: grommets,
+            edgeGluing,
+          }),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error('failed');
+        }
+
+        const data = (await response.json()) as { quote: WideFormatQuote };
+
+        if (active) {
+          setQuote(data.quote);
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        if (active) {
+          setQuoteError('Ошибка расчёта');
+          setQuote(EMPTY_QUOTE);
+        }
+      } finally {
+        if (active) {
+          setIsQuoteLoading(false);
+        }
+      }
+    };
+
+    fetchQuote();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [bannerDensity, edgeGluing, grommets, height, material, quantity, width]);
+
+  const widthWarning = quote.widthWarningCode ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode] : '';
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -160,14 +240,14 @@ export default function WideFormatPricingCalculator() {
       <aside className="card h-fit p-5 md:p-6 space-y-4 lg:sticky lg:top-24">
         <h2 className="text-xl font-semibold">Расчёт</h2>
         <div className="space-y-2 text-sm">
-          <SummaryRow label="Площадь" value={calculations.parsedValuesValid ? `${(calculations.areaPerUnit * calculations.quantity).toFixed(2)} м²` : '—'} />
-          <SummaryRow label="Базовая печать" value={`${calculations.basePrintCost.toLocaleString('ru-RU')} ₽`} />
-          <SummaryRow label="Доп. услуги" value={`${calculations.extrasCost.toLocaleString('ru-RU')} ₽`} />
+          <SummaryRow label="Площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
+          <SummaryRow label="Базовая печать" value={`${quote.basePrintCost.toLocaleString('ru-RU')} ₽`} />
+          <SummaryRow label="Доп. услуги" value={`${quote.extrasCost.toLocaleString('ru-RU')} ₽`} />
         </div>
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className="mt-1 text-4xl font-extrabold md:text-5xl">{calculations.totalCost.toLocaleString('ru-RU')} ₽</p>
+          <p className="mt-1 text-4xl font-extrabold md:text-5xl">{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
           <Button variant="primary" className="mt-4 w-full">Заказать печать</Button>
           <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
             Стоимость ориентировочная. Финальный расчет после проверки макета.
@@ -179,6 +259,7 @@ export default function WideFormatPricingCalculator() {
           <p>Максимальная ширина печати: <b>3.2 м</b></p>
           <p>Работаем с <b>НДС</b></p>
         </div>
+        <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
       </aside>
     </div>
   );

@@ -1,7 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { engineUiCatalog, getPrintQuote, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/engine';
+import { useEffect, useMemo, useState } from 'react';
+import { engineUiCatalog, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/engine';
+
+type PrintQuote = {
+  quantity: number;
+  isQuantityValid: boolean;
+  totalPrice: number;
+  unitPrice: number;
+};
 
 export default function PrintPricingCalculator() {
   const [productType, setProductType] = useState<PrintProductType>('cards');
@@ -12,19 +19,68 @@ export default function PrintPricingCalculator() {
   const [quantity, setQuantity] = useState<number>(100);
   const [customQuantity, setCustomQuantity] = useState('');
 
-  const pricing = useMemo(
-    () =>
-      getPrintQuote({
-        productType,
-        size,
-        density,
-        printType,
-        lamination,
-        presetQuantity: quantity,
-        customQuantityInput: customQuantity,
-      }),
-    [customQuantity, density, lamination, printType, productType, quantity, size],
-  );
+  const [pricing, setPricing] = useState<PrintQuote>({ quantity: 100, isQuantityValid: true, totalPrice: 0, unitPrice: 0 });
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState('');
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+
+    const fetchQuote = async () => {
+      setIsQuoteLoading(true);
+      setQuoteError('');
+
+      try {
+        const response = await fetch('/api/quotes/print', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productType,
+            size,
+            density,
+            printType,
+            lamination,
+            presetQuantity: quantity,
+            customQuantityInput: customQuantity,
+          }),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error('failed');
+        }
+
+        const data = (await response.json()) as { quote: PrintQuote };
+
+        if (active) {
+          setPricing(data.quote);
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        if (active) {
+          setQuoteError('Ошибка расчёта');
+          setPricing({ quantity: 0, isQuantityValid: false, totalPrice: 0, unitPrice: 0 });
+        }
+      } finally {
+        if (active) {
+          setIsQuoteLoading(false);
+        }
+      }
+    };
+
+    fetchQuote();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [customQuantity, density, lamination, printType, productType, quantity, size]);
+
+  const effectiveQuantityLabel = useMemo(() => (pricing.isQuantityValid ? pricing.quantity : '—'), [pricing.isQuantityValid, pricing.quantity]);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -130,7 +186,7 @@ export default function PrintPricingCalculator() {
           <li>Плотность: <b>{density} gsm</b></li>
           <li>Печать: <b>{printType === 'single' ? 'Односторонняя' : 'Двусторонняя'}</b></li>
           <li>Ламинация: <b>{lamination ? 'Да' : 'Нет'}</b></li>
-          <li>Тираж: <b>{pricing.isQuantityValid ? pricing.quantity : '—'}</b></li>
+          <li>Тираж: <b>{effectiveQuantityLabel}</b></li>
         </ul>
 
         <div className="rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800">
@@ -140,6 +196,7 @@ export default function PrintPricingCalculator() {
         </div>
 
         <button type="button" className="btn-primary w-full">Оформить заказ</button>
+        <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
       </aside>
     </div>
   );

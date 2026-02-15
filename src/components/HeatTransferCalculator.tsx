@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   engineParsers,
   engineUiCatalog,
-  getHeatTransferQuote,
   getResolvedHeatTransferQuantity,
   type HeatTransferProductType,
   type MugPrintType,
@@ -25,6 +24,16 @@ type UploadedItem = {
   size: number;
   ext: string;
   isRaster: boolean;
+};
+
+
+type HeatTransferQuote = {
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  discount: number;
+  total: number;
+  safeFilmLength: number;
 };
 
 export default function HeatTransferCalculator() {
@@ -61,17 +70,75 @@ export default function HeatTransferCalculator() {
 
   const quantity = getResolvedHeatTransferQuantity(productType, mugQuantity, tshirtQuantity);
 
-  const pricing = useMemo(() => getHeatTransferQuote({
-    productType,
-    mugType,
-    mugPrintType,
-    mugQuantity,
-    useOwnClothes,
-    tshirtQuantity,
-    filmLengthInput: filmLength,
-    filmUrgent,
-    filmTransfer,
-  }), [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtQuantity, useOwnClothes]);
+  const [pricing, setPricing] = useState<HeatTransferQuote>({
+    quantity: 1,
+    unitPrice: 0,
+    subtotal: 0,
+    discount: 0,
+    total: 0,
+    safeFilmLength: 0,
+  });
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState('');
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+
+    const fetchQuote = async () => {
+      setIsQuoteLoading(true);
+      setQuoteError('');
+
+      try {
+        const response = await fetch('/api/quotes/heat-transfer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productType,
+            mugType,
+            mugPrintType,
+            mugQuantity,
+            tshirtQuantity,
+            useOwnClothes,
+            filmLengthInput: filmLength,
+            filmUrgent,
+            filmTransfer,
+          }),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error('failed');
+        }
+
+        const data = (await response.json()) as { quote: HeatTransferQuote };
+
+        if (active) {
+          setPricing(data.quote);
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        if (active) {
+          setQuoteError('Ошибка расчёта');
+          setPricing({ quantity: 1, unitPrice: 0, subtotal: 0, discount: 0, total: 0, safeFilmLength: 0 });
+        }
+      } finally {
+        if (active) {
+          setIsQuoteLoading(false);
+        }
+      }
+    };
+
+    fetchQuote();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtQuantity, useOwnClothes]);
 
   const summaryDetails = useMemo(() => {
     if (productType === 'mug') {
@@ -387,6 +454,7 @@ export default function HeatTransferCalculator() {
 
           {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}
           {submitSuccess && <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
+          <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
         </div>
       </aside>
     </form>
