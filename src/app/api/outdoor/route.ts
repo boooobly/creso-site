@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { getClientIp, hasUserAgent, isEmptyPayload, isHoneypotTriggered, isRateLimited } from '@/lib/anti-spam';
 
 type OutdoorPayload = {
   address: string;
@@ -63,6 +64,22 @@ async function sendEmail(text: string) {
 export async function POST(req: NextRequest) {
   try {
     const payload = (await req.json()) as OutdoorPayload;
+
+    if (!hasUserAgent(req)) {
+      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
+    }
+
+    if (isRateLimited(getClientIp(req))) {
+      return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
+    }
+
+    if (isEmptyPayload(payload)) {
+      return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });
+    }
+
+    if (isHoneypotTriggered(payload, 'website')) {
+      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
+    }
 
     if (!payload?.address || !payload?.dimensions || !payload?.phone || !payload?.agreed) {
       return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });
