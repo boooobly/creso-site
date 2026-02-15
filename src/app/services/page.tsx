@@ -17,6 +17,8 @@ export default async function ServicesPage() {
     if (isPlotterService) return '/plotter-cutting';
     const isHeatTransferService = service?.id === 'thermo' || service?.title === 'Термоперенос на футболки и кружки';
     if (isHeatTransferService) return '/heat-transfer';
+    const isOutdoorService = service?.id === 'outdoor' || service?.title === 'Наружная реклама';
+    if (isOutdoorService) return '/outdoor-advertising';
     return `/${service.slug}`;
   };
 
