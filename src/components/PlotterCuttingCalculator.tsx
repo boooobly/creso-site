@@ -7,6 +7,7 @@ import {
   getPlotterCuttingQuote,
   type PlotterMaterialType,
 } from '@/lib/engine';
+import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 
 const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -70,6 +71,27 @@ export default function PlotterCuttingCalculator() {
   const agreeError = touched.agree && !agree ? 'Необходимо согласие с политикой.' : '';
 
   const acceptedAttr = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(',');
+
+
+  const handleSendCalculation = () => {
+    const calcSummary = [
+      `Материал: ${material}`,
+      `Длина реза: ${valuesValid ? `${cutLengthNum.toFixed(2)} м` : '—'}`,
+      `Площадь: ${valuesValid ? `${areaNum.toFixed(2)} м²` : '—'}`,
+      `Сложность: ${complexity}`,
+      `Выборка: ${weeding ? 'Да' : 'Нет'}`,
+      `Монтажная плёнка: ${mountingFilm ? 'Да' : 'Нет'}`,
+      `Перенос: ${transfer ? 'Да' : 'Нет'}`,
+      `Срочно: ${urgent ? 'Да' : 'Нет'}`,
+      `Итого: ${Math.round(totalCost)} ₽`,
+    ].join('; ');
+
+    openLeadFormWithCalculation({
+      service: 'Плоттерная резка',
+      message: `Расчёт:
+${calcSummary}`,
+    });
+  };
 
   const applyFiles = (incoming: FileList | File[]) => {
     setFileError('');
@@ -373,6 +395,7 @@ export default function PlotterCuttingCalculator() {
           <Button variant="primary" className="mt-4 w-full" disabled={isSubmitting}>
             {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
           </Button>
+          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Send this calculation</button>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Менеджер свяжется с вами для уточнения деталей.</p>
 
           {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}

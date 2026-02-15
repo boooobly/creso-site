@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { engineUiCatalog, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/engine';
+import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 
 type PrintQuote = {
   quantity: number;
@@ -81,6 +82,24 @@ export default function PrintPricingCalculator() {
   }, [customQuantity, density, lamination, printType, productType, quantity, size]);
 
   const effectiveQuantityLabel = useMemo(() => (pricing.isQuantityValid ? pricing.quantity : '—'), [pricing.isQuantityValid, pricing.quantity]);
+
+  const handleSendCalculation = () => {
+    const calcSummary = [
+      `Продукция: ${productType === 'cards' ? 'Визитки' : 'Флаеры'}`,
+      `Размер: ${size}`,
+      `Плотность: ${density} gsm`,
+      `Печать: ${printType === 'single' ? 'Односторонняя' : 'Двусторонняя'}`,
+      `Ламинация: ${lamination ? 'Да' : 'Нет'}`,
+      `Тираж: ${pricing.isQuantityValid ? pricing.quantity : '—'}`,
+      `Итого: ${pricing.totalPrice} ₽`,
+    ].join('; ');
+
+    openLeadFormWithCalculation({
+      service: 'Визитки и флаеры',
+      message: `Расчёт:
+${calcSummary}`,
+    });
+  };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -196,6 +215,7 @@ export default function PrintPricingCalculator() {
         </div>
 
         <button type="button" className="btn-primary w-full">Оформить заказ</button>
+        <button type="button" onClick={handleSendCalculation} className="btn-secondary w-full justify-center">Send this calculation</button>
         <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
       </aside>
     </div>
