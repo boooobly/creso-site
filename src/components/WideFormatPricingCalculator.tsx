@@ -64,6 +64,7 @@ export default function WideFormatPricingCalculator() {
   const [quote, setQuote] = useState<WideFormatQuote>(EMPTY_QUOTE);
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState('');
+  const [pricePulse, setPricePulse] = useState(false);
 
   useEffect(() => {
     trackEvent('calculator_started', { calculator: 'wide_format' });
@@ -81,6 +82,12 @@ export default function WideFormatPricingCalculator() {
       edgeGluing,
     });
   }, [bannerDensity, edgeGluing, grommets, height, material, quantity, width]);
+
+  useEffect(() => {
+    setPricePulse(true);
+    const timer = window.setTimeout(() => setPricePulse(false), 300);
+    return () => window.clearTimeout(timer);
+  }, [quote.totalCost]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -291,12 +298,12 @@ ${calcSummary}`,
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className="mt-1 text-4xl font-extrabold md:text-5xl">{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
+          <p className={`mt-1 text-4xl font-extrabold transition-transform duration-300 md:text-5xl ${pricePulse ? 'scale-105' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
+          <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
+          <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
           <Button variant="primary" className="mt-4 w-full">Заказать печать</Button>
-          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Send this calculation</button>
-          <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
-            Стоимость ориентировочная. Финальный расчет после проверки макета.
-          </p>
+          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Отправить этот расчёт</button>
         </div>
 
         <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">

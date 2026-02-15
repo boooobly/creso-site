@@ -36,6 +36,7 @@ export default function PlotterCuttingCalculator() {
   const [files, setFiles] = useState<UploadedItem[]>([]);
   const [fileError, setFileError] = useState('');
   const [fileWarning, setFileWarning] = useState('');
+  const [pricePulse, setPricePulse] = useState(false);
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -101,6 +102,12 @@ export default function PlotterCuttingCalculator() {
       extrasCost,
     });
   }, [baseCost, extrasCost, totalCost, valuesValid]);
+
+  useEffect(() => {
+    setPricePulse(true);
+    const timer = window.setTimeout(() => setPricePulse(false), 300);
+    return () => window.clearTimeout(timer);
+  }, [totalCost]);
 
   const handleSendCalculation = () => {
     const calcSummary = [
@@ -418,7 +425,7 @@ ${calcSummary}`,
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className="mt-1 text-4xl font-extrabold md:text-5xl">{Math.round(totalCost).toLocaleString('ru-RU')} ₽</p>
+          <p className={`mt-1 text-4xl font-extrabold transition-transform duration-300 md:text-5xl ${pricePulse ? 'scale-105' : 'scale-100'}`}>{Math.round(totalCost).toLocaleString('ru-RU')} ₽</p>
           {minimumApplied && (
             <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">Минимальный заказ применён — 400 ₽</p>
           )}
@@ -426,8 +433,10 @@ ${calcSummary}`,
           <Button variant="primary" className="mt-4 w-full" disabled={isSubmitting}>
             {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
           </Button>
-          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Send this calculation</button>
-          <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Менеджер свяжется с вами для уточнения деталей.</p>
+          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Отправить этот расчёт</button>
+          <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
+          <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
 
           {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}
           {submitSuccess && <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}

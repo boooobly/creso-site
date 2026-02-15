@@ -82,6 +82,7 @@ export default function HeatTransferCalculator() {
   });
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState('');
+  const [pricePulse, setPricePulse] = useState(false);
 
   useEffect(() => {
     trackEvent('calculator_started', { calculator: 'heat_transfer' });
@@ -101,6 +102,12 @@ export default function HeatTransferCalculator() {
       filmTransfer,
     });
   }, [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtQuantity, useOwnClothes]);
+
+  useEffect(() => {
+    setPricePulse(true);
+    const timer = window.setTimeout(() => setPricePulse(false), 300);
+    return () => window.clearTimeout(timer);
+  }, [pricing.total]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -482,7 +489,7 @@ ${calcSummary}`,
 
           <div className="mt-6 rounded-xl bg-[var(--brand-red)]/10 p-4 text-center">
             <p className="text-xs uppercase tracking-wide text-[var(--brand-red)]">Итого</p>
-            <p className="mt-1 text-3xl font-bold text-[var(--brand-red)]">{Math.round(pricing.total).toLocaleString('ru-RU')} ₽</p>
+            <p className={`mt-1 text-3xl font-bold text-[var(--brand-red)] transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{Math.round(pricing.total).toLocaleString('ru-RU')} ₽</p>
           </div>
 
           <button
@@ -492,10 +499,10 @@ ${calcSummary}`,
           >
             {isSubmitting ? 'Отправка…' : 'Заказать термоперенос'}
           </button>
-          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Send this calculation</button>
-          <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
-            Стоимость ориентировочная. Финальный расчёт после проверки макета.
-          </p>
+          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Отправить этот расчёт</button>
+          <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
+          <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
 
           {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}
           {submitSuccess && <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}

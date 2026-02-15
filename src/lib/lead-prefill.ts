@@ -9,6 +9,16 @@ export function openLeadFormWithCalculation(draft: LeadCalculationDraft): void {
   if (typeof window === 'undefined') return;
 
   window.sessionStorage.setItem(LEAD_CALC_STORAGE_KEY, JSON.stringify(draft));
+
+  if (window.location.pathname === '/contacts') {
+    const form = document.getElementById('contact-form');
+    if (form) {
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.history.replaceState(null, '', '#contact-form');
+      return;
+    }
+  }
+
   window.location.href = '/contacts#contact-form';
 }
 

@@ -24,6 +24,7 @@ export default function PrintPricingCalculator() {
   const [pricing, setPricing] = useState<PrintQuote>({ quantity: 100, isQuantityValid: true, totalPrice: 0, unitPrice: 0 });
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState('');
+  const [pricePulse, setPricePulse] = useState(false);
 
   useEffect(() => {
     trackEvent('calculator_started', { calculator: 'print' });
@@ -41,6 +42,12 @@ export default function PrintPricingCalculator() {
       hasCustomQuantity: Boolean(customQuantity),
     });
   }, [customQuantity, density, lamination, printType, productType, quantity, size]);
+
+  useEffect(() => {
+    setPricePulse(true);
+    const timer = window.setTimeout(() => setPricePulse(false), 300);
+    return () => window.clearTimeout(timer);
+  }, [pricing.totalPrice]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -235,12 +242,15 @@ ${calcSummary}`,
 
         <div className="rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className="text-3xl font-bold">{pricing.totalPrice.toLocaleString('ru-RU')} ₽</p>
+          <p className={`text-3xl font-extrabold transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{pricing.totalPrice.toLocaleString('ru-RU')} ₽</p>
+          <p className="text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
           <p className="text-sm text-neutral-600 dark:text-neutral-300">{pricing.unitPrice.toLocaleString('ru-RU')} ₽ / шт.</p>
+          <p className="text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
+          <p className="text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
         </div>
 
         <button type="button" className="btn-primary w-full">Оформить заказ</button>
-        <button type="button" onClick={handleSendCalculation} className="btn-secondary w-full justify-center">Send this calculation</button>
+        <button type="button" onClick={handleSendCalculation} className="btn-secondary w-full justify-center">Отправить этот расчёт</button>
         <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
       </aside>
     </div>
