@@ -1,8 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { calculatePlotterCuttingPricing, parseNumericInput, type PlotterMaterialType } from '@/lib/calculations';
-import { PLOTTER_COMPLEXITY_OPTIONS, PLOTTER_MATERIAL_OPTIONS } from '@/lib/pricing-config/plotterCutting';
+import {
+  engineParsers,
+  engineUiCatalog,
+  getPlotterCuttingQuote,
+  type PlotterMaterialType,
+} from '@/lib/engine';
 
 const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -46,7 +50,7 @@ export default function PlotterCuttingCalculator() {
     agree: false,
   });
 
-  const calculations = useMemo(() => calculatePlotterCuttingPricing({
+  const calculations = useMemo(() => getPlotterCuttingQuote({
     cutLengthInput: cutLength,
     areaInput: area,
     complexity,
@@ -191,7 +195,7 @@ export default function PlotterCuttingCalculator() {
               onChange={(e) => setMaterial(e.target.value as PlotterMaterialType)}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
-              {PLOTTER_MATERIAL_OPTIONS.map((option) => (
+              {engineUiCatalog.plotterCutting.materialOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -232,10 +236,10 @@ export default function PlotterCuttingCalculator() {
             <select
               id="complexity"
               value={complexity}
-              onChange={(e) => setComplexity(parseNumericInput(e.target.value))}
+              onChange={(e) => setComplexity(engineParsers.parseNumericInput(e.target.value))}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
-              {PLOTTER_COMPLEXITY_OPTIONS.map((option) => (
+              {engineUiCatalog.plotterCutting.complexityOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>

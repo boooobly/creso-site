@@ -2,17 +2,17 @@
 
 import { useMemo, useState } from 'react';
 import {
-  calculateWideFormatPricing,
+  engineParsers,
+  engineUiCatalog,
+  getWideFormatQuote,
   type BannerDensity,
-  parseIntegerInput,
   type WideFormatMaterialType,
   type WideFormatWidthWarningCode,
-} from '@/lib/calculations';
-import { WIDE_FORMAT_MATERIAL_OPTIONS, WIDE_FORMAT_PRICING_CONFIG } from '@/lib/pricing-config/wideFormat';
+} from '@/lib/engine';
 
 const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
   invalid_width: 'Введите корректную ширину.',
-  max_width_exceeded: `Максимальная ширина — ${WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
+  max_width_exceeded: `Максимальная ширина — ${engineUiCatalog.wideFormat.maxWidth} м.`,
   banner_width_out_of_range: 'Для баннера допустимая ширина: 1.2–3 м.',
   sheet_width_out_of_range: 'Для плёнки и бумаги допустимая ширина: 1.06–1.6 м.',
 };
@@ -28,7 +28,7 @@ export default function WideFormatPricingCalculator() {
 
   const calculations = useMemo(
     () =>
-      calculateWideFormatPricing({
+      getWideFormatQuote({
         material,
         bannerDensity,
         widthInput: width,
@@ -56,7 +56,7 @@ export default function WideFormatPricingCalculator() {
               onChange={(e) => setMaterial(e.target.value as WideFormatMaterialType)}
               className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
             >
-              {WIDE_FORMAT_MATERIAL_OPTIONS.map((option) => (
+              {engineUiCatalog.wideFormat.materialOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -71,7 +71,7 @@ export default function WideFormatPricingCalculator() {
               <select
                 id="density"
                 value={bannerDensity}
-                onChange={(e) => setBannerDensity(parseIntegerInput(e.target.value, 300) as BannerDensity)}
+                onChange={(e) => setBannerDensity(engineParsers.parseIntegerInput(e.target.value, 300) as BannerDensity)}
                 className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
               >
                 {[220, 300, 440].map((density) => (
@@ -90,7 +90,7 @@ export default function WideFormatPricingCalculator() {
               id="width"
               type="number"
               min={0}
-              max={WIDE_FORMAT_PRICING_CONFIG.maxWidth}
+              max={engineUiCatalog.wideFormat.maxWidth}
               step="0.01"
               value={width}
               onChange={(e) => setWidth(e.target.value)}

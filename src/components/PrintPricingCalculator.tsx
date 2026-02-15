@@ -1,12 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { calculatePrintPricing, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/calculations';
-import { PRINT_QUANTITY_PRESETS, PRINT_SIZE_OPTIONS } from '@/lib/pricing-config/print';
+import { engineUiCatalog, getPrintQuote, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/engine';
 
 export default function PrintPricingCalculator() {
   const [productType, setProductType] = useState<PrintProductType>('cards');
-  const [size, setSize] = useState<string>(PRINT_SIZE_OPTIONS.cards[0]);
+  const [size, setSize] = useState<string>(engineUiCatalog.print.sizeOptions.cards[0]);
   const [density, setDensity] = useState<PrintDensity>(300);
   const [printType, setPrintType] = useState<PrintType>('single');
   const [lamination, setLamination] = useState(false);
@@ -15,7 +14,7 @@ export default function PrintPricingCalculator() {
 
   const pricing = useMemo(
     () =>
-      calculatePrintPricing({
+      getPrintQuote({
         productType,
         size,
         density,
@@ -33,10 +32,10 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Тип продукции</h2>
           <div className="grid grid-cols-2 gap-3">
-            <ToggleButton active={productType === 'cards'} onClick={() => { setProductType('cards'); setSize(PRINT_SIZE_OPTIONS.cards[0]); }}>
+            <ToggleButton active={productType === 'cards'} onClick={() => { setProductType('cards'); setSize(engineUiCatalog.print.sizeOptions.cards[0]); }}>
               Визитки
             </ToggleButton>
-            <ToggleButton active={productType === 'flyers'} onClick={() => { setProductType('flyers'); setSize(PRINT_SIZE_OPTIONS.flyers[0]); }}>
+            <ToggleButton active={productType === 'flyers'} onClick={() => { setProductType('flyers'); setSize(engineUiCatalog.print.sizeOptions.flyers[0]); }}>
               Флаеры
             </ToggleButton>
           </div>
@@ -45,7 +44,7 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Размер</h2>
           <div className="grid grid-cols-2 gap-3">
-            {PRINT_SIZE_OPTIONS[productType].map((item) => (
+            {engineUiCatalog.print.sizeOptions[productType].map((item) => (
               <RadioCard key={item} active={size === item} onClick={() => setSize(item)} label={item} />
             ))}
           </div>
@@ -80,7 +79,7 @@ export default function PrintPricingCalculator() {
         <div className="card p-4 md:p-6 space-y-4">
           <h2 className="text-lg font-semibold">Тираж</h2>
           <div className="flex flex-wrap gap-2">
-            {PRINT_QUANTITY_PRESETS.map((q) => (
+            {engineUiCatalog.print.quantityPresets.map((q) => (
               <button
                 key={q}
                 type="button"

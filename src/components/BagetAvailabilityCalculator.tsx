@@ -1,19 +1,18 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { calculateRequiredBagetLength, isBaguetteSuitable, validateBagetDimensions } from '@/lib/calculations';
-import { BAGUETTES } from '@/lib/pricing-config/baget';
+import { engineUiCatalog, getBagetValidation, getRequiredBagetLength, isBagetSuitable } from '@/lib/engine';
 
 export default function BagetAvailabilityCalculator() {
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
 
   const { inputsFilled, isValid, width: widthNum, height: heightNum } = useMemo(
-    () => validateBagetDimensions(width, height),
+    () => getBagetValidation(width, height),
     [height, width],
   );
 
-  const requiredLength = useMemo(() => calculateRequiredBagetLength(widthNum, heightNum, isValid), [isValid, widthNum, heightNum]);
+  const requiredLength = useMemo(() => getRequiredBagetLength(widthNum, heightNum, isValid), [isValid, widthNum, heightNum]);
 
   return (
     <div className="space-y-6">
@@ -71,8 +70,8 @@ export default function BagetAvailabilityCalculator() {
             </tr>
           </thead>
           <tbody>
-            {BAGUETTES.map((item) => {
-              const suitable = isBaguetteSuitable(item.availableLength, requiredLength);
+            {engineUiCatalog.baget.items.map((item) => {
+              const suitable = isBagetSuitable(item.availableLength, requiredLength);
               const checked = requiredLength !== null;
 
               return (

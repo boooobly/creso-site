@@ -3,17 +3,16 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import {
-  calculateHeatTransferPricing,
-  clampMinimum,
-  parseIntegerInput,
-  resolveHeatTransferQuantity,
+  engineParsers,
+  engineUiCatalog,
+  getHeatTransferQuote,
+  getResolvedHeatTransferQuantity,
   type HeatTransferProductType,
   type MugPrintType,
   type MugType,
   type TshirtGender,
   type TshirtSize,
-} from '@/lib/calculations';
-import { HEAT_TRANSFER_QUANTITY_PRESETS } from '@/lib/pricing-config/heatTransfer';
+} from '@/lib/engine';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -60,9 +59,9 @@ export default function HeatTransferCalculator() {
 
   const [touched, setTouched] = useState({ name: false, phone: false, agree: false });
 
-  const quantity = resolveHeatTransferQuantity(productType, mugQuantity, tshirtQuantity);
+  const quantity = getResolvedHeatTransferQuantity(productType, mugQuantity, tshirtQuantity);
 
-  const pricing = useMemo(() => calculateHeatTransferPricing({
+  const pricing = useMemo(() => getHeatTransferQuote({
     productType,
     mugType,
     mugPrintType,
@@ -415,7 +414,7 @@ function QuantityPicker({ quantity, setQuantity }: { quantity: number; setQuanti
     <div className="space-y-3">
       <p className="text-sm font-medium">Тираж</p>
       <div className="flex flex-wrap gap-2">
-        {HEAT_TRANSFER_QUANTITY_PRESETS.map((value) => (
+        {engineUiCatalog.heatTransfer.quantityPresets.map((value) => (
           <button
             key={value}
             type="button"
@@ -434,7 +433,7 @@ function QuantityPicker({ quantity, setQuantity }: { quantity: number; setQuanti
         type="number"
         min={1}
         value={quantity}
-        onChange={(e) => setQuantity(clampMinimum(parseIntegerInput(e.target.value, 1), 1))}
+        onChange={(e) => setQuantity(Math.max(1, engineParsers.parseIntegerInput(e.target.value, 1)))}
         className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
       />
       <p className="text-xs text-neutral-500">Скидка 10% применяется от 10 шт.</p>
