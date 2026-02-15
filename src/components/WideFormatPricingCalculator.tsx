@@ -10,6 +10,7 @@ import {
 } from '@/lib/engine';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
+import { useDebouncedValue } from '@/lib/useDebouncedValue';
 
 type WideFormatQuote = {
   width: number;
@@ -66,6 +67,18 @@ export default function WideFormatPricingCalculator() {
   const [quoteError, setQuoteError] = useState('');
   const [pricePulse, setPricePulse] = useState(false);
 
+  const quoteRequest = useMemo(() => ({
+    material,
+    bannerDensity,
+    widthInput: width,
+    heightInput: height,
+    quantityInput: quantity,
+    grommetsInput: grommets,
+    edgeGluing,
+  }), [bannerDensity, edgeGluing, grommets, height, material, quantity, width]);
+  const debouncedQuoteRequest = useDebouncedValue(quoteRequest, 300);
+  const isQuotePending = quoteRequest !== debouncedQuoteRequest || isQuoteLoading;
+
   useEffect(() => {
     trackEvent('calculator_started', { calculator: 'wide_format' });
   }, []);
@@ -101,15 +114,7 @@ export default function WideFormatPricingCalculator() {
         const response = await fetch('/api/quotes/wide-format', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            material,
-            bannerDensity,
-            widthInput: width,
-            heightInput: height,
-            quantityInput: quantity,
-            grommetsInput: grommets,
-            edgeGluing,
-          }),
+          body: JSON.stringify(debouncedQuoteRequest),
           signal: controller.signal,
         });
 
@@ -148,7 +153,7 @@ export default function WideFormatPricingCalculator() {
       active = false;
       controller.abort();
     };
-  }, [bannerDensity, edgeGluing, grommets, height, material, quantity, width]);
+  }, [debouncedQuoteRequest]);
 
   const widthWarning = quote.widthWarningCode ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode] : '';
 
@@ -299,6 +304,7 @@ ${calcSummary}`,
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
           <p className={`mt-1 text-4xl font-extrabold transition-transform duration-300 md:text-5xl ${pricePulse ? 'scale-105' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
+          <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
           <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
