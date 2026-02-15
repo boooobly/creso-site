@@ -1,10 +1,11 @@
 'use client';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postJSON } from '@/lib/fetcher';
+import { trackEvent } from '@/lib/analytics';
 import type { SiteMessages } from '@/lib/messages';
 
 const schema = z.object({
@@ -13,22 +14,57 @@ const schema = z.object({
   phone: z.string().min(6, 'Введите телефон'),
   service: z.string().min(2, 'Выберите услугу'),
   message: z.string().optional(),
-  consent: z.literal(true, {
-    errorMap: () => ({ message: 'Необходимо согласие с политикой обработки персональных данных' }),
+  consent: z.boolean().refine((value) => value, {
+    message: 'Необходимо согласие с политикой обработки персональных данных',
   }),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function LeadForm({ t }: { t: SiteMessages }) {
+type LeadFormProps = {
+  t: SiteMessages;
+  initialService?: string;
+  initialMessage?: string;
+};
+
+const DEFAULT_VALUES: Omit<FormData, 'consent'> = {
+  name: '',
+  email: '',
+  phone: '',
+  service: '',
+  message: '',
+};
+
+export default function LeadForm({ t, initialService, initialMessage }: LeadFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors, isSubmitSuccessful, isSubmitting }, reset } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful, isSubmitting },
+    reset,
+    getValues,
+  } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: { ...DEFAULT_VALUES, consent: false } });
+
+  useEffect(() => {
+    if (!initialService && !initialMessage) return;
+
+    const currentValues = getValues();
+    reset({
+      ...currentValues,
+      service: initialService ?? currentValues.service,
+      message: initialMessage ?? currentValues.message,
+    });
+  }, [getValues, initialMessage, initialService, reset]);
 
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);
     try {
       const res = await postJSON<{ ok: true }>(`/api/lead`, data);
-      if (res.ok) reset();
+      if (res.ok) {
+        trackEvent('lead_form_submitted', { service: data.service });
+        reset({ ...DEFAULT_VALUES, consent: false });
+      }
     } catch {
       setSubmitError('Не удалось отправить заявку. Попробуйте ещё раз.');
     }
