@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getPrintQuote, type PrintPricingInput } from '@/lib/engine';
 
 const printQuoteSchema = z.object({
@@ -24,6 +25,12 @@ export async function POST(req: Request) {
     const input: PrintPricingInput = parsed.data;
     const quote = getPrintQuote(input);
 
+
+    logQuoteGeneration({
+      calculatorType: 'print',
+      inputParameters: input,
+      calculatedPrice: quote.totalPrice,
+    });
     return NextResponse.json({ quote });
   } catch {
     return NextResponse.json({ error: 'Ошибка расчёта.' }, { status: 500 });
