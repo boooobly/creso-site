@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { engineUiCatalog, type PrintDensity, type PrintProductType, type PrintType } from '@/lib/engine';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
+import { trackEvent } from '@/lib/analytics';
 
 type PrintQuote = {
   quantity: number;
@@ -23,6 +24,23 @@ export default function PrintPricingCalculator() {
   const [pricing, setPricing] = useState<PrintQuote>({ quantity: 100, isQuantityValid: true, totalPrice: 0, unitPrice: 0 });
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState('');
+
+  useEffect(() => {
+    trackEvent('calculator_started', { calculator: 'print' });
+  }, []);
+
+  useEffect(() => {
+    trackEvent('calculator_updated', {
+      calculator: 'print',
+      productType,
+      size,
+      density,
+      printType,
+      lamination,
+      quantity,
+      hasCustomQuantity: Boolean(customQuantity),
+    });
+  }, [customQuantity, density, lamination, printType, productType, quantity, size]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -56,6 +74,11 @@ export default function PrintPricingCalculator() {
 
         if (active) {
           setPricing(data.quote);
+          trackEvent('quote_generated', {
+            calculator: 'print',
+            totalPrice: data.quote.totalPrice,
+            unitPrice: data.quote.unitPrice,
+          });
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
@@ -93,6 +116,8 @@ export default function PrintPricingCalculator() {
       `Тираж: ${pricing.isQuantityValid ? pricing.quantity : '—'}`,
       `Итого: ${pricing.totalPrice} ₽`,
     ].join('; ');
+
+    trackEvent('send_calculation_clicked', { calculator: 'print' });
 
     openLeadFormWithCalculation({
       service: 'Визитки и флаеры',

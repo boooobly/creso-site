@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   engineParsers,
   engineUiCatalog,
@@ -8,6 +8,7 @@ import {
   type PlotterMaterialType,
 } from '@/lib/engine';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
+import { trackEvent } from '@/lib/analytics';
 
 const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -72,6 +73,34 @@ export default function PlotterCuttingCalculator() {
 
   const acceptedAttr = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(',');
 
+  useEffect(() => {
+    trackEvent('calculator_started', { calculator: 'plotter_cutting' });
+  }, []);
+
+  useEffect(() => {
+    trackEvent('calculator_updated', {
+      calculator: 'plotter_cutting',
+      material,
+      cutLength,
+      area,
+      complexity,
+      weeding,
+      mountingFilm,
+      transfer,
+      urgent,
+    });
+  }, [area, complexity, cutLength, material, mountingFilm, transfer, urgent, weeding]);
+
+  useEffect(() => {
+    if (!valuesValid) return;
+
+    trackEvent('quote_generated', {
+      calculator: 'plotter_cutting',
+      totalCost,
+      baseCost,
+      extrasCost,
+    });
+  }, [baseCost, extrasCost, totalCost, valuesValid]);
 
   const handleSendCalculation = () => {
     const calcSummary = [
@@ -85,6 +114,8 @@ export default function PlotterCuttingCalculator() {
       `Срочно: ${urgent ? 'Да' : 'Нет'}`,
       `Итого: ${Math.round(totalCost)} ₽`,
     ].join('; ');
+
+    trackEvent('send_calculation_clicked', { calculator: 'plotter_cutting' });
 
     openLeadFormWithCalculation({
       service: 'Плоттерная резка',

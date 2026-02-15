@@ -13,6 +13,7 @@ import {
   type TshirtSize,
 } from '@/lib/engine';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
+import { trackEvent } from '@/lib/analytics';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -83,6 +84,25 @@ export default function HeatTransferCalculator() {
   const [quoteError, setQuoteError] = useState('');
 
   useEffect(() => {
+    trackEvent('calculator_started', { calculator: 'heat_transfer' });
+  }, []);
+
+  useEffect(() => {
+    trackEvent('calculator_updated', {
+      calculator: 'heat_transfer',
+      productType,
+      mugType,
+      mugPrintType,
+      mugQuantity,
+      tshirtQuantity,
+      useOwnClothes,
+      filmLength,
+      filmUrgent,
+      filmTransfer,
+    });
+  }, [filmLength, filmTransfer, filmUrgent, mugPrintType, mugQuantity, mugType, productType, tshirtQuantity, useOwnClothes]);
+
+  useEffect(() => {
     const controller = new AbortController();
     let active = true;
 
@@ -116,6 +136,11 @@ export default function HeatTransferCalculator() {
 
         if (active) {
           setPricing(data.quote);
+          trackEvent('quote_generated', {
+            calculator: 'heat_transfer',
+            total: data.quote.total,
+            quantity: data.quote.quantity,
+          });
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
@@ -174,6 +199,8 @@ export default function HeatTransferCalculator() {
       `Тираж: ${productType === 'film' ? '—' : `${quantity} шт`}`,
       `Итого: ${Math.round(pricing.total)} ₽`,
     ].join('; ');
+
+    trackEvent('send_calculation_clicked', { calculator: 'heat_transfer' });
 
     openLeadFormWithCalculation({
       service: 'Термоперенос',

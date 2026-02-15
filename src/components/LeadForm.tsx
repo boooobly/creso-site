@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postJSON } from '@/lib/fetcher';
+import { trackEvent } from '@/lib/analytics';
 import type { SiteMessages } from '@/lib/messages';
 
 const schema = z.object({
@@ -60,7 +61,10 @@ export default function LeadForm({ t, initialService, initialMessage }: LeadForm
     setSubmitError(null);
     try {
       const res = await postJSON<{ ok: true }>(`/api/lead`, data);
-      if (res.ok) reset({ ...DEFAULT_VALUES, consent: false });
+      if (res.ok) {
+        trackEvent('lead_form_submitted', { service: data.service });
+        reset({ ...DEFAULT_VALUES, consent: false });
+      }
     } catch {
       setSubmitError('Не удалось отправить заявку. Попробуйте ещё раз.');
     }

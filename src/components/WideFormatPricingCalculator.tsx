@@ -9,6 +9,7 @@ import {
   type WideFormatWidthWarningCode,
 } from '@/lib/engine';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
+import { trackEvent } from '@/lib/analytics';
 
 type WideFormatQuote = {
   width: number;
@@ -65,6 +66,23 @@ export default function WideFormatPricingCalculator() {
   const [quoteError, setQuoteError] = useState('');
 
   useEffect(() => {
+    trackEvent('calculator_started', { calculator: 'wide_format' });
+  }, []);
+
+  useEffect(() => {
+    trackEvent('calculator_updated', {
+      calculator: 'wide_format',
+      material,
+      bannerDensity,
+      width,
+      height,
+      quantity,
+      grommets,
+      edgeGluing,
+    });
+  }, [bannerDensity, edgeGluing, grommets, height, material, quantity, width]);
+
+  useEffect(() => {
     const controller = new AbortController();
     let active = true;
 
@@ -96,6 +114,10 @@ export default function WideFormatPricingCalculator() {
 
         if (active) {
           setQuote(data.quote);
+          trackEvent('quote_generated', {
+            calculator: 'wide_format',
+            totalCost: data.quote.totalCost,
+          });
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
@@ -134,6 +156,8 @@ export default function WideFormatPricingCalculator() {
       `Проклейка края: ${edgeGluing ? 'Да' : 'Нет'}`,
       `Итого: ${Math.round(quote.totalCost)} ₽`,
     ].join('; ');
+
+    trackEvent('send_calculation_clicked', { calculator: 'wide_format' });
 
     openLeadFormWithCalculation({
       service: 'Широкоформатная печать',
