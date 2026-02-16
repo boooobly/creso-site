@@ -10,9 +10,10 @@ type BagetPreviewProps = {
   selectedBaget: BagetItem | null;
   imageUrl: string | null;
   highlighted?: boolean;
+  className?: string;
 };
 
-export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUrl, highlighted = false }: BagetPreviewProps) {
+export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUrl, highlighted = false, className = "" }: BagetPreviewProps) {
   const frameThickness = useMemo(() => {
     if (!selectedBaget) return 8;
     return Math.max(8, Math.min(24, Math.round(selectedBaget.width_mm / 2.2)));
@@ -24,12 +25,12 @@ export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUr
   }, [widthMm, heightMm]);
 
   return (
-    <div className="card rounded-2xl p-4 shadow-md">
+    <div className={["card rounded-2xl p-5 shadow-md", className].join(" ")}>
       <h2 className="mb-3 text-base font-semibold">Превью</h2>
-      <div className="mx-auto w-full max-w-[300px]">
+      <div className="mx-auto flex h-full w-full items-center justify-center">
         <div
           className={[
-            'relative mx-auto w-full max-w-[280px] overflow-hidden rounded-md bg-neutral-100 transition-shadow duration-500',
+            'relative mx-auto w-full max-w-[520px] overflow-hidden rounded-md bg-neutral-100 transition-all duration-500',
             highlighted ? 'animate-pulse shadow-[0_0_0_4px_rgba(220,38,38,0.18)]' : '',
           ].join(' ')}
           style={{
@@ -40,7 +41,7 @@ export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUr
           }}
         >
           {imageUrl ? (
-            <Image src={imageUrl} alt="Загруженное изображение" fill sizes="280px" className="object-cover" unoptimized />
+            <Image src={imageUrl} alt="Загруженное изображение" fill sizes="(max-width: 1280px) 90vw, 520px" className="object-cover" unoptimized />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm text-neutral-500">Загрузите изображение для превью</div>
           )}
