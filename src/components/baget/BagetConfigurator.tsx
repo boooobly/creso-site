@@ -182,7 +182,7 @@ export default function BagetConfigurator() {
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[20%_45%_35%] lg:items-start">
-      <aside className="space-y-4 lg:sticky lg:top-24 lg:flex lg:h-[calc(100vh-7rem)] lg:flex-col">
+      <aside className="space-y-4 lg:sticky lg:top-24">
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-3 text-base font-semibold">Размер изделия (мм)</h2>
           <div className="space-y-3">
@@ -221,7 +221,7 @@ export default function BagetConfigurator() {
         />
       </aside>
 
-      <main className="space-y-3 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-2">
+      <main className="space-y-3 lg:pr-2">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
           {pagedItems.map((item) => (
             <BagetCard
@@ -260,7 +260,7 @@ export default function BagetConfigurator() {
         )}
       </main>
 
-      <aside className="space-y-4 lg:sticky lg:top-24 lg:flex lg:h-[calc(100vh-7rem)] lg:flex-col">
+      <aside className="space-y-4 lg:sticky lg:top-24">
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-2 text-base font-semibold">Изображение</h2>
           <input id="baget-image-upload" type="file" accept="image/*" onChange={onImageUpload} className="hidden" />
@@ -278,9 +278,9 @@ export default function BagetConfigurator() {
           ) : null}
         </div>
 
-        <div ref={previewRef} className="lg:basis-[70%]">
+        <div ref={previewRef} >
           <BagetPreview
-            className="h-full"
+            
             widthMm={widthMm}
             heightMm={heightMm}
             selectedBaget={selectedBaget}
@@ -289,7 +289,7 @@ export default function BagetConfigurator() {
           />
         </div>
 
-        <div className="card rounded-2xl p-4 shadow-md lg:basis-[30%] lg:overflow-auto">
+        <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
           {selectedBaget ? (
             <ul className="space-y-2 text-sm transition-all duration-300">
