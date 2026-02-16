@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { memo } from 'react';
 
 export type BagetItem = {
   id: string;
@@ -19,18 +20,32 @@ type BagetCardProps = {
   onSelect: (item: BagetItem) => void;
 };
 
-export default function BagetCard({ item, selected, onSelect }: BagetCardProps) {
+function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   return (
-    <article className={`card rounded-2xl p-4 shadow-md transition ${selected ? 'border-[var(--brand-red)] ring-1 ring-[var(--brand-red)]/30' : ''}`}>
-      <div className="relative mb-3 aspect-[4/3] overflow-hidden rounded-xl bg-neutral-100">
-        <Image src={item.image} alt={item.name} fill sizes="(max-width: 768px) 100vw, 320px" className="object-cover" loading="lazy" />
+    <article
+      className={`card rounded-2xl p-3 shadow-sm transition ${
+        selected ? 'border-[var(--brand-red)] ring-1 ring-[var(--brand-red)]/30' : ''
+      }`}
+    >
+      <div className="relative mb-2 aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100">
+        <Image
+          src={item.image}
+          alt={item.name}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
+          className="object-cover"
+          loading="lazy"
+        />
       </div>
-      <h3 className="text-base font-semibold">{item.name}</h3>
-      <p className="mt-1 text-sm text-neutral-600">Ширина профиля: {item.width_mm} мм</p>
-      <p className="text-sm text-neutral-700">{item.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
-      <button type="button" onClick={() => onSelect(item)} className="btn-secondary mt-3 w-full no-underline">
+      <h3 className="text-sm font-semibold leading-tight">{item.name}</h3>
+      <p className="mt-1 text-xs text-neutral-600">{item.width_mm} мм</p>
+      <p className="text-xs text-neutral-700">{item.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
+      <button type="button" onClick={() => onSelect(item)} className="btn-secondary mt-2 w-full py-2 text-sm no-underline">
         Выбрать багет
       </button>
     </article>
   );
 }
+
+const BagetCard = memo(BagetCardBase);
+export default BagetCard;
