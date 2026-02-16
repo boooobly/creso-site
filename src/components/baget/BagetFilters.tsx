@@ -51,7 +51,7 @@ export default function BagetFilters({
             <select
               value={filters.color}
               onChange={(e) => setFilters({ ...filters, color: e.target.value })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2"
+              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             >
               <option value="all">Все</option>
               {colors.map((color) => (
@@ -67,7 +67,7 @@ export default function BagetFilters({
             <select
               value={filters.style}
               onChange={(e) => setFilters({ ...filters, style: e.target.value })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2"
+              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             >
               <option value="all">Все</option>
               {styles.map((style) => (
@@ -86,7 +86,7 @@ export default function BagetFilters({
                 min={0}
                 value={filters.widthMin}
                 onChange={(e) => setFilters({ ...filters, widthMin: Number(e.target.value || 0) })}
-                className="w-full rounded-xl border border-neutral-300 p-2"
+                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
               />
             </label>
             <label className="space-y-1 text-sm">
@@ -96,7 +96,7 @@ export default function BagetFilters({
                 min={0}
                 value={filters.widthMax}
                 onChange={(e) => setFilters({ ...filters, widthMax: Number(e.target.value || 0) })}
-                className="w-full rounded-xl border border-neutral-300 p-2"
+                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
               />
             </label>
           </div>
@@ -109,7 +109,7 @@ export default function BagetFilters({
                 min={0}
                 value={filters.priceMin}
                 onChange={(e) => setFilters({ ...filters, priceMin: Number(e.target.value || 0) })}
-                className="w-full rounded-xl border border-neutral-300 p-2"
+                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
               />
             </label>
             <label className="space-y-1 text-sm">
@@ -119,7 +119,7 @@ export default function BagetFilters({
                 min={0}
                 value={filters.priceMax}
                 onChange={(e) => setFilters({ ...filters, priceMax: Number(e.target.value || 0) })}
-                className="w-full rounded-xl border border-neutral-300 p-2"
+                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
               />
             </label>
           </div>
@@ -134,7 +134,7 @@ export default function BagetFilters({
             <select
               value={materials.glazing}
               onChange={(e) => setMaterials({ ...materials, glazing: e.target.value as GlazingType })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2"
+              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             >
               <option value="none">Без остекления</option>
               <option value="glass">Стекло</option>

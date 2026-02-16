@@ -173,7 +173,7 @@ export default function BagetConfigurator() {
                 min={50}
                 value={widthInput}
                 onChange={(e) => setWidthInput(e.target.value)}
-                className="w-full rounded-xl border border-neutral-300 p-2"
+                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
               />
             </label>
             <label className="block space-y-1 text-sm">
@@ -183,7 +183,7 @@ export default function BagetConfigurator() {
                 min={50}
                 value={heightInput}
                 onChange={(e) => setHeightInput(e.target.value)}
-                className="w-full rounded-xl border border-neutral-300 p-2"
+                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
               />
             </label>
             {!validSize && <p className="text-xs text-red-600">Введите корректные значения не менее 50 мм.</p>}
@@ -243,7 +243,7 @@ export default function BagetConfigurator() {
       <aside className="space-y-4 lg:sticky lg:top-24">
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-2 text-base font-semibold">Изображение</h2>
-          <input type="file" accept="image/*" onChange={onImageUpload} className="w-full text-sm" />
+          <input type="file" accept="image/*" onChange={onImageUpload} className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-sm text-neutral-900 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-100 file:px-3 file:py-1.5 file:text-neutral-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:file:bg-neutral-800 dark:file:text-neutral-200" />
         </div>
 
         <BagetPreview widthMm={widthMm} heightMm={heightMm} selectedBaget={selectedBaget} imageUrl={imageUrl} />
