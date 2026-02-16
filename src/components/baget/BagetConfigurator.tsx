@@ -31,6 +31,7 @@ const MATERIAL_PRICE_PER_M2 = {
   cardboard: 450,
   pvc3: 850,
   pvc4: 1100,
+  orabond: 390,
 } as const;
 
 const initialFilters: FilterState = {
@@ -46,9 +47,9 @@ const initialMaterials: MaterialsState = {
   glazing: 'none',
   passepartout: false,
   backPanel: true,
-  pvc: 'none',
   hanging: 'crocodile',
   stand: false,
+  workType: 'canvas',
 };
 
 export default function BagetConfigurator() {
@@ -74,6 +75,42 @@ export default function BagetConfigurator() {
       setMaterials((prev) => ({ ...prev, stand: false }));
     }
   }, [materials.stand, standAllowed]);
+
+  const autoAdditions = useMemo(() => {
+    if (materials.workType === 'rhinestone') {
+      return {
+        pvcType: 'pvc3' as const,
+        addOrabond: true,
+        forceCardboard: false,
+        stretchingRequired: false,
+      };
+    }
+
+    if (materials.workType === 'embroidery' || materials.workType === 'beads') {
+      return {
+        pvcType: 'pvc4' as const,
+        addOrabond: false,
+        forceCardboard: true,
+        stretchingRequired: true,
+      };
+    }
+
+    if (materials.workType === 'photo') {
+      return {
+        pvcType: 'pvc3' as const,
+        addOrabond: true,
+        forceCardboard: true,
+        stretchingRequired: false,
+      };
+    }
+
+    return {
+      pvcType: 'none' as const,
+      addOrabond: false,
+      forceCardboard: false,
+      stretchingRequired: false,
+    };
+  }, [materials.workType]);
 
   const colors = useMemo(() => Array.from(new Set(items.map((item) => item.color))), [items]);
   const styles = useMemo(() => Array.from(new Set(items.map((item) => item.style))), [items]);
@@ -109,9 +146,12 @@ export default function BagetConfigurator() {
         bagetCost: 0,
         materialsCost: 0,
         pvcCost: 0,
+        orabondCost: 0,
         hangingCost: 0,
+        hangingLabel: materials.hanging === 'crocodile' ? 'Крокодильчик × 1' : 'Тросик × 1',
         standCost: 0,
         total: 0,
+        autoBadges: [] as string[],
       };
     }
 
@@ -124,6 +164,8 @@ export default function BagetConfigurator() {
     const areaMm2 = widthMm * heightMm;
     const areaM2 = areaMm2 / 1_000_000;
 
+    const effectiveCardboard = materials.backPanel || autoAdditions.forceCardboard;
+
     let materialsCost = 0;
     if (materials.glazing !== 'none') {
       materialsCost += areaM2 * MATERIAL_PRICE_PER_M2[materials.glazing];
@@ -131,18 +173,25 @@ export default function BagetConfigurator() {
     if (materials.passepartout) {
       materialsCost += areaM2 * MATERIAL_PRICE_PER_M2.passepartout;
     }
-    if (materials.backPanel) {
+    if (effectiveCardboard) {
       materialsCost += areaM2 * MATERIAL_PRICE_PER_M2.cardboard;
     }
 
-    let pvcCost = 0;
-    if (materials.pvc !== 'none') {
-      pvcCost = areaM2 * MATERIAL_PRICE_PER_M2[materials.pvc];
-    }
+    const pvcCost = autoAdditions.pvcType === 'none' ? 0 : areaM2 * MATERIAL_PRICE_PER_M2[autoAdditions.pvcType];
+    const orabondCost = autoAdditions.addOrabond ? areaM2 * MATERIAL_PRICE_PER_M2.orabond : 0;
 
-    const hangingCost = HANGING_PRICES[materials.hanging];
+    const hangingQuantity = materials.hanging === 'crocodile' ? (widthMm > 600 ? 2 : 1) : 1;
+    const hangingCost = HANGING_PRICES[materials.hanging] * hangingQuantity;
+    const hangingLabel = materials.hanging === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик × ${hangingQuantity}`;
+
     const standCost = materials.stand && standAllowed ? STAND_PRICE : 0;
-    const total = Math.round(bagetCost + materialsCost + pvcCost + hangingCost + standCost);
+    const total = Math.round(bagetCost + materialsCost + pvcCost + orabondCost + hangingCost + standCost);
+
+    const autoBadges: string[] = [];
+    if (autoAdditions.pvcType === 'pvc3') autoBadges.push('ПВХ 3мм');
+    if (autoAdditions.pvcType === 'pvc4') autoBadges.push('ПВХ 4мм');
+    if (autoAdditions.addOrabond) autoBadges.push('Orabond');
+    if (autoAdditions.forceCardboard) autoBadges.push('Картон (задник)');
 
     return {
       areaM2,
@@ -150,11 +199,14 @@ export default function BagetConfigurator() {
       bagetCost,
       materialsCost,
       pvcCost,
+      orabondCost,
       hangingCost,
+      hangingLabel,
       standCost,
       total,
+      autoBadges,
     };
-  }, [heightMm, materials, selectedBaget, standAllowed, validSize, widthMm]);
+  }, [heightMm, materials, selectedBaget, standAllowed, validSize, widthMm, autoAdditions]);
 
   const onImageUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -312,13 +364,24 @@ export default function BagetConfigurator() {
               </li>
               <li>
                 <span className="text-neutral-500">ПВХ:</span> {Math.round(calculation.pvcCost).toLocaleString('ru-RU')} ₽
+                {autoAdditions.pvcType !== 'none' ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : null}
               </li>
               <li>
-                <span className="text-neutral-500">Подвес:</span> {Math.round(calculation.hangingCost).toLocaleString('ru-RU')} ₽
+                <span className="text-neutral-500">Orabond:</span> {Math.round(calculation.orabondCost).toLocaleString('ru-RU')} ₽
+                {autoAdditions.addOrabond ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : null}
+              </li>
+              <li>
+                <span className="text-neutral-500">{calculation.hangingLabel}:</span> {Math.round(calculation.hangingCost).toLocaleString('ru-RU')} ₽
               </li>
               <li>
                 <span className="text-neutral-500">Ножка-подставка:</span> {Math.round(calculation.standCost).toLocaleString('ru-RU')} ₽
               </li>
+              {autoAdditions.forceCardboard ? (
+                <li className="text-xs text-neutral-500">Картон (задник): Добавлено автоматически</li>
+              ) : null}
+              {autoAdditions.stretchingRequired ? (
+                <li className="text-xs text-neutral-500">Требуется натяжка: Добавлено автоматически</li>
+              ) : null}
               <li className="border-t border-neutral-200 pt-2 font-semibold">
                 Итого: {calculation.total.toLocaleString('ru-RU')} ₽
               </li>

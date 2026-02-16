@@ -10,16 +10,16 @@ export type FilterState = {
 };
 
 export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlass' | 'plexiglass' | 'pet1mm';
-export type PvcType = 'none' | 'pvc3' | 'pvc4';
 export type HangingType = 'crocodile' | 'wire';
+export type WorkType = 'canvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
 
 export type MaterialsState = {
   glazing: GlazingType;
   passepartout: boolean;
   backPanel: boolean;
-  pvc: PvcType;
   hanging: HangingType;
   stand: boolean;
+  workType: WorkType;
 };
 
 const COLOR_LABELS: Record<string, string> = {
@@ -50,6 +50,9 @@ type BagetFiltersProps = {
   standAllowed: boolean;
 };
 
+const selectClassName =
+  'w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100';
+
 export default function BagetFilters({
   filters,
   setFilters,
@@ -69,7 +72,7 @@ export default function BagetFilters({
             <select
               value={filters.color}
               onChange={(e) => setFilters({ ...filters, color: e.target.value })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+              className={selectClassName}
             >
               <option value="all">Все</option>
               {colors.map((color) => (
@@ -85,7 +88,7 @@ export default function BagetFilters({
             <select
               value={filters.style}
               onChange={(e) => setFilters({ ...filters, style: e.target.value })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+              className={selectClassName}
             >
               <option value="all">Все</option>
               {styles.map((style) => (
@@ -145,6 +148,18 @@ export default function BagetFilters({
       </div>
 
       <div className="card rounded-2xl p-4 shadow-md">
+        <h2 className="mb-3 text-base font-semibold">Тип работы</h2>
+        <div className="space-y-2 text-sm">
+          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
+          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
+          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'embroidery'} onChange={() => setMaterials({ ...materials, workType: 'embroidery' })} />Вышивка</label>
+          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'beads'} onChange={() => setMaterials({ ...materials, workType: 'beads' })} />Бисер</label>
+          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'photo'} onChange={() => setMaterials({ ...materials, workType: 'photo' })} />Фото</label>
+          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'other'} onChange={() => setMaterials({ ...materials, workType: 'other' })} />Другое</label>
+        </div>
+      </div>
+
+      <div className="card rounded-2xl p-4 shadow-md">
         <h2 className="mb-3 text-base font-semibold">Материалы (за м²)</h2>
         <div className="space-y-3 text-sm">
           <label className="block space-y-1">
@@ -152,7 +167,7 @@ export default function BagetFilters({
             <select
               value={materials.glazing}
               onChange={(e) => setMaterials({ ...materials, glazing: e.target.value as GlazingType })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+              className={selectClassName}
             >
               <option value="none">Без остекления</option>
               <option value="glass">Стекло</option>
@@ -180,43 +195,6 @@ export default function BagetFilters({
             />
             Картон (задник)
           </label>
-
-          <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">ПВХ</p>
-            <label className="flex items-start gap-2">
-              <input
-                type="radio"
-                name="pvc"
-                checked={materials.pvc === 'none'}
-                onChange={() => setMaterials({ ...materials, pvc: 'none' })}
-              />
-              <span>Без ПВХ</span>
-            </label>
-            <label className="flex items-start gap-2">
-              <input
-                type="radio"
-                name="pvc"
-                checked={materials.pvc === 'pvc3'}
-                onChange={() => setMaterials({ ...materials, pvc: 'pvc3' })}
-              />
-              <span>
-                ПВХ 3мм
-                <span className="block text-xs text-neutral-500">Для монтажа на клей (например, стразы)</span>
-              </span>
-            </label>
-            <label className="flex items-start gap-2">
-              <input
-                type="radio"
-                name="pvc"
-                checked={materials.pvc === 'pvc4'}
-                onChange={() => setMaterials({ ...materials, pvc: 'pvc4' })}
-              />
-              <span>
-                ПВХ 4мм
-                <span className="block text-xs text-neutral-500">Для натяжки вышивки/бисера</span>
-              </span>
-            </label>
-          </div>
 
           <div className="space-y-1">
             <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Подвес</p>
