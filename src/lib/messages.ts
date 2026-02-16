@@ -4,7 +4,7 @@ export const messages = {
     services: 'Услуги',
     production: 'Производство',
     portfolio: 'Портфолио',
-    blog: 'Блог',
+    blog: 'Отзывы',
     contacts: 'Контакты',
   },
   hero: {
