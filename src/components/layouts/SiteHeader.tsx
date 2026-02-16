@@ -12,7 +12,7 @@ const nav: Array<{ href: string; key: keyof typeof messages.nav }> = [
   { href: '/services', key: 'services' },
   { href: '/production', key: 'production' },
   { href: '/portfolio', key: 'portfolio' },
-  { href: '/blog', key: 'blog' },
+  { href: '/reviews', key: 'blog' },
   { href: '/contacts', key: 'contacts' },
 ];
 
