@@ -22,6 +22,24 @@ export type MaterialsState = {
   stand: boolean;
 };
 
+const COLOR_LABELS: Record<string, string> = {
+  gold: 'Золото',
+  silver: 'Серебро',
+  black: 'Чёрный',
+  white: 'Белый',
+  wood: 'Дерево',
+  brown: 'Дерево',
+  bronze: 'Бронза',
+};
+
+const STYLE_LABELS: Record<string, string> = {
+  classic: 'Классика',
+  modern: 'Модерн',
+  minimal: 'Минимализм',
+  baroque: 'Барокко',
+  scandi: 'Сканди',
+};
+
 type BagetFiltersProps = {
   filters: FilterState;
   setFilters: (next: FilterState) => void;
@@ -51,12 +69,12 @@ export default function BagetFilters({
             <select
               value={filters.color}
               onChange={(e) => setFilters({ ...filters, color: e.target.value })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             >
               <option value="all">Все</option>
               {colors.map((color) => (
                 <option key={color} value={color}>
-                  {color}
+                  {COLOR_LABELS[color] ?? color}
                 </option>
               ))}
             </select>
@@ -67,12 +85,12 @@ export default function BagetFilters({
             <select
               value={filters.style}
               onChange={(e) => setFilters({ ...filters, style: e.target.value })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             >
               <option value="all">Все</option>
               {styles.map((style) => (
                 <option key={style} value={style}>
-                  {style}
+                  {STYLE_LABELS[style] ?? style}
                 </option>
               ))}
             </select>
@@ -134,7 +152,7 @@ export default function BagetFilters({
             <select
               value={materials.glazing}
               onChange={(e) => setMaterials({ ...materials, glazing: e.target.value as GlazingType })}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+              className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             >
               <option value="none">Без остекления</option>
               <option value="glass">Стекло</option>

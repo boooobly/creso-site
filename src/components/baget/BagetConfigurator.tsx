@@ -266,21 +266,22 @@ export default function BagetConfigurator() {
           <input id="baget-image-upload" type="file" accept="image/*" onChange={onImageUpload} className="hidden" />
           <label
             htmlFor="baget-image-upload"
-            className="inline-flex cursor-pointer items-center rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm text-neutral-900 transition-all hover:bg-neutral-50 hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+            className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 transition-all duration-200 hover:bg-neutral-50 hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
           >
-            Загрузить изображение
+            {fileName ? 'Изменить изображение' : 'Загрузить изображение'}
           </label>
           {fileName ? (
-            <div className="mt-2 text-xs">
-              <p className="truncate text-neutral-600 dark:text-neutral-300">{fileName}</p>
-              <p className="text-green-600">Файл загружен</p>
+            <div className="mt-2 rounded-lg bg-green-50 px-3 py-2 text-xs dark:bg-green-900/20">
+              <p className="truncate text-neutral-700 dark:text-neutral-200">{fileName}</p>
+              <p className="text-green-600 dark:text-green-400">Файл загружен</p>
             </div>
-          ) : null}
+          ) : (
+            <p className="mt-2 text-xs text-neutral-500">Поддерживаются изображения JPG, PNG, WEBP.</p>
+          )}
         </div>
 
-        <div ref={previewRef} >
+        <div ref={previewRef}>
           <BagetPreview
-            
             widthMm={widthMm}
             heightMm={heightMm}
             selectedBaget={selectedBaget}
