@@ -1,0 +1,102 @@
+[
+  {
+    "id": "b001",
+    "article": "A-101",
+    "name": "Золотой классик",
+    "color": "gold",
+    "style": "classic",
+    "width_mm": 35,
+    "price_per_meter": 1200,
+    "image": "/images/outdoor-portfolio/placeholder-1.svg"
+  },
+  {
+    "id": "b002",
+    "article": "A-102",
+    "name": "Серебряный модерн",
+    "color": "silver",
+    "style": "modern",
+    "width_mm": 28,
+    "price_per_meter": 980,
+    "image": "/images/outdoor-portfolio/placeholder-2.svg"
+  },
+  {
+    "id": "b003",
+    "article": "A-103",
+    "name": "Орех премиум",
+    "color": "brown",
+    "style": "classic",
+    "width_mm": 42,
+    "price_per_meter": 1650,
+    "image": "/images/outdoor-portfolio/placeholder-3.svg"
+  },
+  {
+    "id": "b004",
+    "article": "A-104",
+    "name": "Графит минимал",
+    "color": "black",
+    "style": "minimal",
+    "width_mm": 20,
+    "price_per_meter": 850,
+    "image": "/images/outdoor-portfolio/placeholder-4.svg"
+  },
+  {
+    "id": "b005",
+    "article": "A-105",
+    "name": "Белый сканди",
+    "color": "white",
+    "style": "minimal",
+    "width_mm": 24,
+    "price_per_meter": 900,
+    "image": "/images/outdoor-portfolio/placeholder-5.svg"
+  },
+  {
+    "id": "b006",
+    "article": "A-106",
+    "name": "Бронза арт",
+    "color": "bronze",
+    "style": "vintage",
+    "width_mm": 38,
+    "price_per_meter": 1450,
+    "image": "/images/outdoor-portfolio/placeholder-6.svg"
+  },
+  {
+    "id": "b007",
+    "article": "A-107",
+    "name": "Дуб натуральный",
+    "color": "brown",
+    "style": "eco",
+    "width_mm": 30,
+    "price_per_meter": 1100,
+    "image": "/images/outdoor-portfolio/placeholder-1.svg"
+  },
+  {
+    "id": "b008",
+    "article": "A-108",
+    "name": "Черный люкс",
+    "color": "black",
+    "style": "classic",
+    "width_mm": 50,
+    "price_per_meter": 2100,
+    "image": "/images/outdoor-portfolio/placeholder-2.svg"
+  },
+  {
+    "id": "b009",
+    "article": "A-109",
+    "name": "Шампань элегант",
+    "color": "gold",
+    "style": "modern",
+    "width_mm": 32,
+    "price_per_meter": 1300,
+    "image": "/images/outdoor-portfolio/placeholder-3.svg"
+  },
+  {
+    "id": "b010",
+    "article": "A-110",
+    "name": "Светлый лен",
+    "color": "beige",
+    "style": "eco",
+    "width_mm": 26,
+    "price_per_meter": 990,
+    "image": "/images/outdoor-portfolio/placeholder-4.svg"
+  }
+]
