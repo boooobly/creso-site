@@ -141,7 +141,7 @@ export default function BagetFilters({
               <option value="antiReflectiveGlass">Антибликовое стекло</option>
               <option value="museumGlass">Музейное стекло</option>
               <option value="plexiglass">Оргстекло</option>
-              <option value="pet1mm">PET 1мм</option>
+              <option value="pet1mm">ПЭТ 1мм</option>
             </select>
           </label>
 
@@ -164,7 +164,7 @@ export default function BagetFilters({
           </label>
 
           <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">PVC</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">ПВХ</p>
             <label className="flex items-start gap-2">
               <input
                 type="radio"
@@ -172,7 +172,7 @@ export default function BagetFilters({
                 checked={materials.pvc === 'none'}
                 onChange={() => setMaterials({ ...materials, pvc: 'none' })}
               />
-              <span>Без PVC</span>
+              <span>Без ПВХ</span>
             </label>
             <label className="flex items-start gap-2">
               <input
@@ -182,7 +182,7 @@ export default function BagetFilters({
                 onChange={() => setMaterials({ ...materials, pvc: 'pvc3' })}
               />
               <span>
-                PVC 3мм
+                ПВХ 3мм
                 <span className="block text-xs text-neutral-500">Для монтажа на клей (например, стразы)</span>
               </span>
             </label>
@@ -194,7 +194,7 @@ export default function BagetFilters({
                 onChange={() => setMaterials({ ...materials, pvc: 'pvc4' })}
               />
               <span>
-                PVC 4мм
+                ПВХ 4мм
                 <span className="block text-xs text-neutral-500">Для натяжки вышивки/бисера</span>
               </span>
             </label>

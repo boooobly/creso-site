@@ -1,7 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import bagetData from '../../../data/baget.json';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
@@ -53,6 +60,9 @@ export default function BagetConfigurator() {
   const [selectedBaget, setSelectedBaget] = useState<BagetItem | null>(items[0] ?? null);
   const [page, setPage] = useState(1);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string>('');
+  const [previewHighlighted, setPreviewHighlighted] = useState(false);
+  const previewRef = useRef<HTMLDivElement | null>(null);
 
   const widthMm = Number(widthInput);
   const heightMm = Number(heightInput);
@@ -149,7 +159,9 @@ export default function BagetConfigurator() {
   const onImageUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
     const next = URL.createObjectURL(file);
+    setFileName(file.name);
     setImageUrl((prev) => {
       if (prev) URL.revokeObjectURL(prev);
       return next;
@@ -158,7 +170,15 @@ export default function BagetConfigurator() {
 
   const handleSelectBaget = useCallback((item: BagetItem) => {
     setSelectedBaget(item);
+    previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setPreviewHighlighted(true);
   }, []);
+
+  useEffect(() => {
+    if (!previewHighlighted) return;
+    const t = window.setTimeout(() => setPreviewHighlighted(false), 900);
+    return () => window.clearTimeout(t);
+  }, [previewHighlighted]);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)_320px] lg:items-start">
@@ -243,10 +263,30 @@ export default function BagetConfigurator() {
       <aside className="space-y-4 lg:sticky lg:top-24">
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-2 text-base font-semibold">Изображение</h2>
-          <input type="file" accept="image/*" onChange={onImageUpload} className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-sm text-neutral-900 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-100 file:px-3 file:py-1.5 file:text-neutral-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:file:bg-neutral-800 dark:file:text-neutral-200" />
+          <input id="baget-image-upload" type="file" accept="image/*" onChange={onImageUpload} className="hidden" />
+          <label
+            htmlFor="baget-image-upload"
+            className="inline-flex cursor-pointer items-center rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm text-neutral-900 transition-all hover:bg-neutral-50 hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          >
+            Загрузить изображение
+          </label>
+          {fileName ? (
+            <div className="mt-2 text-xs">
+              <p className="truncate text-neutral-600 dark:text-neutral-300">{fileName}</p>
+              <p className="text-green-600">Файл загружен</p>
+            </div>
+          ) : null}
         </div>
 
-        <BagetPreview widthMm={widthMm} heightMm={heightMm} selectedBaget={selectedBaget} imageUrl={imageUrl} />
+        <div ref={previewRef}>
+          <BagetPreview
+            widthMm={widthMm}
+            heightMm={heightMm}
+            selectedBaget={selectedBaget}
+            imageUrl={imageUrl}
+            highlighted={previewHighlighted}
+          />
+        </div>
 
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
@@ -269,7 +309,7 @@ export default function BagetConfigurator() {
                 <span className="text-neutral-500">Материалы:</span> {Math.round(calculation.materialsCost).toLocaleString('ru-RU')} ₽
               </li>
               <li>
-                <span className="text-neutral-500">PVC:</span> {Math.round(calculation.pvcCost).toLocaleString('ru-RU')} ₽
+                <span className="text-neutral-500">ПВХ:</span> {Math.round(calculation.pvcCost).toLocaleString('ru-RU')} ₽
               </li>
               <li>
                 <span className="text-neutral-500">Подвес:</span> {Math.round(calculation.hangingCost).toLocaleString('ru-RU')} ₽

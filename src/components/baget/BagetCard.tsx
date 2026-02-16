@@ -40,8 +40,17 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
       <h3 className="text-sm font-semibold leading-tight">{item.name}</h3>
       <p className="mt-1 text-xs text-neutral-600">{item.width_mm} мм</p>
       <p className="text-xs text-neutral-700">{item.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
-      <button type="button" onClick={() => onSelect(item)} className="btn-secondary mt-2 w-full py-2 text-sm no-underline">
-        Выбрать багет
+      <button
+        type="button"
+        onClick={() => onSelect(item)}
+        className={[
+          'mt-2 w-full rounded-xl border px-3 py-2 text-sm transition-all duration-200 active:scale-[0.98]',
+          selected
+            ? 'border-red-600 bg-red-600 text-white shadow-md'
+            : 'border-neutral-300 bg-white text-neutral-900 hover:scale-[1.02] hover:border-red-500 hover:bg-red-50',
+        ].join(' ')}
+      >
+        {selected ? 'Выбран' : 'Выбрать багет'}
       </button>
     </article>
   );

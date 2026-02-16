@@ -9,9 +9,10 @@ type BagetPreviewProps = {
   heightMm: number;
   selectedBaget: BagetItem | null;
   imageUrl: string | null;
+  highlighted?: boolean;
 };
 
-export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUrl }: BagetPreviewProps) {
+export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUrl, highlighted = false }: BagetPreviewProps) {
   const frameThickness = useMemo(() => {
     if (!selectedBaget) return 8;
     return Math.max(8, Math.min(24, Math.round(selectedBaget.width_mm / 2.2)));
@@ -27,7 +28,10 @@ export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUr
       <h2 className="mb-3 text-base font-semibold">Превью</h2>
       <div className="mx-auto w-full max-w-[300px]">
         <div
-          className="relative mx-auto w-full max-w-[280px] overflow-hidden rounded-md bg-neutral-100"
+          className={[
+            'relative mx-auto w-full max-w-[280px] overflow-hidden rounded-md bg-neutral-100 transition-shadow duration-500',
+            highlighted ? 'animate-pulse shadow-[0_0_0_4px_rgba(220,38,38,0.18)]' : '',
+          ].join(' ')}
           style={{
             aspectRatio: `${ratio}`,
             borderStyle: 'solid',
