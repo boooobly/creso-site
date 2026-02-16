@@ -4,6 +4,7 @@ import Section from '@/components/Section';
 import OutdoorLeadForm from '@/components/OutdoorLeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import OutdoorFloatingCtas from '@/components/OutdoorFloatingCtas';
+import ProductionTrustBlock from '@/components/ProductionTrustBlock';
 
 const services = [
   'Световые короба',
@@ -91,6 +92,9 @@ export default function OutdoorAdvertisingPage() {
           </div>
         </RevealOnScroll>
       </Section>
+
+
+      <ProductionTrustBlock />
 
       <Section className="pt-0">
         <RevealOnScroll>
