@@ -11,9 +11,18 @@ type BagetPreviewProps = {
   imageUrl: string | null;
   highlighted?: boolean;
   className?: string;
+  stretchedCanvas?: boolean;
 };
 
-export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUrl, highlighted = false, className = "" }: BagetPreviewProps) {
+export default function BagetPreview({
+  widthMm,
+  heightMm,
+  selectedBaget,
+  imageUrl,
+  highlighted = false,
+  className = '',
+  stretchedCanvas = false,
+}: BagetPreviewProps) {
   const frameThickness = useMemo(() => {
     if (!selectedBaget) return 8;
     return Math.max(8, Math.min(24, Math.round(selectedBaget.width_mm / 2.2)));
@@ -35,9 +44,10 @@ export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUr
           ].join(' ')}
           style={{
             aspectRatio: `${ratio}`,
-            borderStyle: 'solid',
+            borderStyle: stretchedCanvas ? 'none' : 'solid',
             borderColor: '#b91c1c',
-            borderWidth: `${frameThickness}px`,
+            borderWidth: stretchedCanvas ? '0px' : `${frameThickness}px`,
+            boxShadow: stretchedCanvas ? '0 12px 22px rgba(15, 23, 42, 0.18)' : 'none',
           }}
         >
           {imageUrl ? (
@@ -47,7 +57,7 @@ export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUr
           )}
         </div>
       </div>
-      <p className="mt-3 text-xs text-neutral-500">Толщина рамки зависит от выбранной ширины профиля.</p>
+      <p className="mt-3 text-xs text-neutral-500">{stretchedCanvas ? 'Превью показывает холст на подрамнике без рамки.' : 'Толщина рамки зависит от выбранной ширины профиля.'}</p>
     </div>
   );
 }
