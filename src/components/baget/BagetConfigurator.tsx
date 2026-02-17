@@ -20,6 +20,10 @@ const HANGING_PRICES = {
   wire: 220,
 } as const;
 const STAND_PRICE = 280;
+const STRETCHER_PRICE_PER_METER = {
+  narrow: 320,
+  wide: 480,
+} as const;
 
 const MATERIAL_PRICE_PER_M2 = {
   glass: 1600,
@@ -50,6 +54,7 @@ const initialMaterials: MaterialsState = {
   hanging: 'crocodile',
   stand: false,
   workType: 'canvas',
+  stretcherType: 'narrow',
 };
 
 export default function BagetConfigurator() {
@@ -69,12 +74,29 @@ export default function BagetConfigurator() {
   const heightMm = Number(heightInput);
   const validSize = Number.isFinite(widthMm) && Number.isFinite(heightMm) && widthMm >= 50 && heightMm >= 50;
   const standAllowed = validSize && widthMm <= 300 && heightMm <= 300;
+  const stretcherNarrowAllowed = widthMm <= 500 && heightMm <= 500;
 
   useEffect(() => {
     if (!standAllowed && materials.stand) {
       setMaterials((prev) => ({ ...prev, stand: false }));
     }
   }, [materials.stand, standAllowed]);
+
+  useEffect(() => {
+    if (materials.workType === 'stretchedCanvas' && !stretcherNarrowAllowed && materials.stretcherType === 'narrow') {
+      setMaterials((prev) => ({ ...prev, stretcherType: 'wide' }));
+    }
+  }, [materials.stretcherType, materials.workType, stretcherNarrowAllowed]);
+
+  useEffect(() => {
+    if (materials.workType !== 'stretchedCanvas') return;
+
+    setMaterials((prev) => ({
+      ...prev,
+      hanging: 'wire',
+      backPanel: false,
+    }));
+  }, [materials.workType]);
 
   const autoAdditions = useMemo(() => {
     if (materials.workType === 'rhinestone') {
@@ -83,6 +105,7 @@ export default function BagetConfigurator() {
         addOrabond: true,
         forceCardboard: false,
         stretchingRequired: false,
+        removeCardboard: false,
       };
     }
 
@@ -92,6 +115,7 @@ export default function BagetConfigurator() {
         addOrabond: false,
         forceCardboard: true,
         stretchingRequired: true,
+        removeCardboard: false,
       };
     }
 
@@ -101,6 +125,17 @@ export default function BagetConfigurator() {
         addOrabond: true,
         forceCardboard: true,
         stretchingRequired: false,
+        removeCardboard: false,
+      };
+    }
+
+    if (materials.workType === 'stretchedCanvas') {
+      return {
+        pvcType: 'none' as const,
+        addOrabond: false,
+        forceCardboard: false,
+        stretchingRequired: true,
+        removeCardboard: true,
       };
     }
 
@@ -109,6 +144,7 @@ export default function BagetConfigurator() {
       addOrabond: false,
       forceCardboard: false,
       stretchingRequired: false,
+      removeCardboard: false,
     };
   }, [materials.workType]);
 
@@ -150,6 +186,7 @@ export default function BagetConfigurator() {
         hangingCost: 0,
         hangingLabel: materials.hanging === 'crocodile' ? 'Крокодильчик × 1' : 'Тросик × 1',
         standCost: 0,
+        stretcherCost: 0,
         total: 0,
         autoBadges: [] as string[],
       };
@@ -164,7 +201,7 @@ export default function BagetConfigurator() {
     const areaMm2 = widthMm * heightMm;
     const areaM2 = areaMm2 / 1_000_000;
 
-    const effectiveCardboard = materials.backPanel || autoAdditions.forceCardboard;
+    const effectiveCardboard = autoAdditions.removeCardboard ? false : materials.backPanel || autoAdditions.forceCardboard;
 
     let materialsCost = 0;
     if (materials.glazing !== 'none') {
@@ -185,7 +222,15 @@ export default function BagetConfigurator() {
     const hangingLabel = materials.hanging === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик × ${hangingQuantity}`;
 
     const standCost = materials.stand && standAllowed ? STAND_PRICE : 0;
-    const total = Math.round(bagetCost + materialsCost + pvcCost + orabondCost + hangingCost + standCost);
+
+    const stretcherPerimeterMm = widthMm * 2 + heightMm * 2;
+    const stretcherMeters = stretcherPerimeterMm / 1000;
+    const stretcherCost =
+      materials.workType === 'stretchedCanvas'
+        ? stretcherMeters * STRETCHER_PRICE_PER_METER[materials.stretcherType]
+        : 0;
+
+    const total = Math.round(bagetCost + materialsCost + pvcCost + orabondCost + hangingCost + standCost + stretcherCost);
 
     const autoBadges: string[] = [];
     if (autoAdditions.pvcType === 'pvc3') autoBadges.push('ПВХ 3мм');
@@ -203,6 +248,7 @@ export default function BagetConfigurator() {
       hangingCost,
       hangingLabel,
       standCost,
+      stretcherCost,
       total,
       autoBadges,
     };
@@ -270,6 +316,7 @@ export default function BagetConfigurator() {
           colors={colors}
           styles={styles}
           standAllowed={standAllowed}
+          stretcherNarrowAllowed={stretcherNarrowAllowed}
         />
       </aside>
 
@@ -339,6 +386,7 @@ export default function BagetConfigurator() {
             selectedBaget={selectedBaget}
             imageUrl={imageUrl}
             highlighted={previewHighlighted}
+            stretchedCanvas={materials.workType === 'stretchedCanvas'}
           />
         </div>
 
@@ -375,6 +423,12 @@ export default function BagetConfigurator() {
               </li>
               <li>
                 <span className="text-neutral-500">Ножка-подставка:</span> {Math.round(calculation.standCost).toLocaleString('ru-RU')} ₽
+              </li>
+              <li>
+                <span className="text-neutral-500">Подрамник:</span> {Math.round(calculation.stretcherCost).toLocaleString('ru-RU')} ₽
+                {materials.workType === 'stretchedCanvas' ? (
+                  <span className="ml-2 text-xs text-neutral-500">{materials.stretcherType === 'narrow' ? 'Узкий (2 см)' : 'Широкий (4 см)'}</span>
+                ) : null}
               </li>
               {autoAdditions.forceCardboard ? (
                 <li className="text-xs text-neutral-500">Картон (задник): Добавлено автоматически</li>

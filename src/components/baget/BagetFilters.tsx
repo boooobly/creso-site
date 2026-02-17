@@ -11,7 +11,8 @@ export type FilterState = {
 
 export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlass' | 'plexiglass' | 'pet1mm';
 export type HangingType = 'crocodile' | 'wire';
-export type WorkType = 'canvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
+export type WorkType = 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
+export type StretcherType = 'narrow' | 'wide';
 
 export type MaterialsState = {
   glazing: GlazingType;
@@ -20,6 +21,7 @@ export type MaterialsState = {
   hanging: HangingType;
   stand: boolean;
   workType: WorkType;
+  stretcherType: StretcherType;
 };
 
 const COLOR_LABELS: Record<string, string> = {
@@ -48,6 +50,7 @@ type BagetFiltersProps = {
   colors: string[];
   styles: string[];
   standAllowed: boolean;
+  stretcherNarrowAllowed: boolean;
 };
 
 const selectClassName =
@@ -61,6 +64,7 @@ export default function BagetFilters({
   colors,
   styles,
   standAllowed,
+  stretcherNarrowAllowed,
 }: BagetFiltersProps) {
   return (
     <div className="space-y-4">
@@ -151,6 +155,7 @@ export default function BagetFilters({
         <h2 className="mb-3 text-base font-semibold">Тип работы</h2>
         <div className="space-y-2 text-sm">
           <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
+          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст на подрамнике</label>
           <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
           <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'embroidery'} onChange={() => setMaterials({ ...materials, workType: 'embroidery' })} />Вышивка</label>
           <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'beads'} onChange={() => setMaterials({ ...materials, workType: 'beads' })} />Бисер</label>
@@ -162,6 +167,32 @@ export default function BagetFilters({
       <div className="card rounded-2xl p-4 shadow-md">
         <h2 className="mb-3 text-base font-semibold">Материалы (за м²)</h2>
         <div className="space-y-3 text-sm">
+          {materials.workType === 'stretchedCanvas' ? (
+            <div className="space-y-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
+              <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Подрамник</p>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="stretcherType"
+                  checked={materials.stretcherType === 'narrow'}
+                  disabled={!stretcherNarrowAllowed}
+                  onChange={() => setMaterials({ ...materials, stretcherType: 'narrow' })}
+                />
+                Узкий (2 см)
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="stretcherType"
+                  checked={materials.stretcherType === 'wide'}
+                  onChange={() => setMaterials({ ...materials, stretcherType: 'wide' })}
+                />
+                Широкий (4 см)
+              </label>
+              {!stretcherNarrowAllowed ? <p className="text-xs text-amber-700">Узкий подрамник доступен до 50x50 см</p> : null}
+            </div>
+          ) : null}
+
           <label className="block space-y-1">
             <span>Остекление</span>
             <select
