@@ -23,8 +23,10 @@ type BagetCardProps = {
 function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   return (
     <article
-      className={`card rounded-2xl p-3 shadow-sm transition ${
-        selected ? 'border-[var(--brand-red)] ring-1 ring-[var(--brand-red)]/30' : ''
+      className={`card rounded-2xl p-3 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md ${
+        selected
+          ? 'border-[var(--brand-red)] ring-1 ring-[var(--brand-red)]/30 shadow-[0_8px_22px_rgba(220,38,38,0.2)]'
+          : ''
       }`}
     >
       <div className="relative mb-2 aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100">
