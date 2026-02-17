@@ -14,17 +14,51 @@ type FormValues = {
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
 
-const PHONE_PATTERN = /^(\+7\d{10}|8\d{10})$/;
-
 const defaultValues: FormValues = {
   name: '',
-  phone: '',
+  phone: '+7 ',
   email: '',
   width: '',
   height: '',
   comment: '',
   website: '',
 };
+
+function extractDigits(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+function formatRuPhone(digits: string): string {
+  let normalized = digits;
+  if (!normalized) return '+7 ';
+
+  if (normalized.startsWith('8')) {
+    normalized = `7${normalized.slice(1)}`;
+  }
+
+  if (!normalized.startsWith('7')) {
+    normalized = `7${normalized}`;
+  }
+
+  normalized = normalized.slice(0, 11);
+
+  const local = normalized.slice(1);
+  if (!local) return '+7 ';
+
+  const p1 = local.slice(0, 3);
+  const p2 = local.slice(3, 6);
+  const p3 = local.slice(6, 8);
+  const p4 = local.slice(8, 10);
+
+  let result = '+7 ';
+  if (p1) result += `(${p1}`;
+  if (p1.length === 3) result += ')';
+  if (p2) result += ` ${p2}`;
+  if (p3) result += `-${p3}`;
+  if (p4) result += `-${p4}`;
+
+  return result;
+}
 
 export default function OrderWideFormatForm() {
   const [values, setValues] = useState<FormValues>(defaultValues);
@@ -48,11 +82,11 @@ export default function OrderWideFormatForm() {
 
     if (!values.name.trim()) nextErrors.name = 'Укажите имя';
 
-    const phone = values.phone.replace(/[^\d+]/g, '');
-    if (!phone) {
+    const phoneDigits = extractDigits(values.phone);
+    if (phoneDigits.length === 0) {
       nextErrors.phone = 'Укажите телефон';
-    } else if (!PHONE_PATTERN.test(phone)) {
-      nextErrors.phone = 'Формат: +7XXXXXXXXXX или 8XXXXXXXXXX';
+    } else if (phoneDigits.length !== 11 || !phoneDigits.startsWith('7')) {
+      nextErrors.phone = 'Формат: +7 (999) 999-99-99';
     }
 
     if (values.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
@@ -89,6 +123,7 @@ export default function OrderWideFormatForm() {
     try {
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => formData.append(key, value));
+      formData.append('phoneDigits', extractDigits(values.phone));
       if (file) formData.append('file', file);
 
       const response = await fetch('/api/wide-format-order', {
@@ -134,7 +169,19 @@ export default function OrderWideFormatForm() {
 
           <label className="space-y-2">
             <span className="text-sm font-medium">Телефон *</span>
-            <input className={inputClass('phone')} placeholder="+7XXXXXXXXXX" value={values.phone} onChange={(e) => setValues((prev) => ({ ...prev, phone: e.target.value }))} />
+            <input
+              className={inputClass('phone')}
+              placeholder="+7 (___) ___-__-__"
+              inputMode="numeric"
+              value={values.phone}
+              onChange={(e) => {
+                let digits = extractDigits(e.target.value);
+                if (digits.startsWith('8')) digits = `7${digits.slice(1)}`;
+                if (!digits.startsWith('7')) digits = `7${digits}`;
+                digits = digits.slice(0, 11);
+                setValues((prev) => ({ ...prev, phone: formatRuPhone(digits) }));
+              }}
+            />
             {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
           </label>
 
@@ -144,8 +191,8 @@ export default function OrderWideFormatForm() {
             {errors.email && <span className="text-xs text-red-600">{errors.email}</span>}
           </label>
 
-          <div className="space-y-2">
-            <span className="text-sm font-medium">Загрузка файла</span>
+          <div className="flex flex-col gap-2">
+            <span className="block text-sm font-medium">Загрузка файла</span>
             <input
               id="wide-format-file"
               ref={fileInputRef}
@@ -155,11 +202,11 @@ export default function OrderWideFormatForm() {
             />
             <label
               htmlFor="wide-format-file"
-              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white shadow-md ring-1 ring-red-600/20 transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
+              className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 self-start rounded-xl bg-red-600 px-4 text-sm font-semibold text-white shadow-md ring-1 ring-red-600/20 transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
             >
               Загрузить файл
             </label>
-            <p className="text-xs text-neutral-500">JPG, PNG, PDF до 20 МБ</p>
+            <p className="text-sm text-neutral-500">JPG, PNG, PDF до 20 МБ</p>
             {file && (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-lg bg-neutral-100 px-2 py-1 text-sm text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">{file.name}</span>
