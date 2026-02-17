@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useRef, useState } from 'react';
+import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 type FormValues = {
   name: string;
@@ -16,49 +17,13 @@ type FormErrors = Partial<Record<keyof FormValues, string>>;
 
 const defaultValues: FormValues = {
   name: '',
-  phone: '+7 ',
+  phone: '',
   email: '',
   width: '',
   height: '',
   comment: '',
   website: '',
 };
-
-function extractDigits(value: string): string {
-  return value.replace(/\D/g, '');
-}
-
-function formatRuPhone(digits: string): string {
-  let normalized = digits;
-  if (!normalized) return '+7 ';
-
-  if (normalized.startsWith('8')) {
-    normalized = `7${normalized.slice(1)}`;
-  }
-
-  if (!normalized.startsWith('7')) {
-    normalized = `7${normalized}`;
-  }
-
-  normalized = normalized.slice(0, 11);
-
-  const local = normalized.slice(1);
-  if (!local) return '+7 ';
-
-  const p1 = local.slice(0, 3);
-  const p2 = local.slice(3, 6);
-  const p3 = local.slice(6, 8);
-  const p4 = local.slice(8, 10);
-
-  let result = '+7 ';
-  if (p1) result += `(${p1}`;
-  if (p1.length === 3) result += ')';
-  if (p2) result += ` ${p2}`;
-  if (p3) result += `-${p3}`;
-  if (p4) result += `-${p4}`;
-
-  return result;
-}
 
 export default function OrderWideFormatForm() {
   const [values, setValues] = useState<FormValues>(defaultValues);
@@ -82,7 +47,7 @@ export default function OrderWideFormatForm() {
 
     if (!values.name.trim()) nextErrors.name = 'Укажите имя';
 
-    const phoneDigits = extractDigits(values.phone);
+    const phoneDigits = getPhoneDigits(values.phone);
     if (phoneDigits.length === 0) {
       nextErrors.phone = 'Укажите телефон';
     } else if (phoneDigits.length !== 11 || !phoneDigits.startsWith('7')) {
@@ -123,7 +88,7 @@ export default function OrderWideFormatForm() {
     try {
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => formData.append(key, value));
-      formData.append('phoneDigits', extractDigits(values.phone));
+      formData.append('phoneDigits', getPhoneDigits(values.phone));
       if (file) formData.append('file', file);
 
       const response = await fetch('/api/wide-format-order', {
@@ -169,18 +134,11 @@ export default function OrderWideFormatForm() {
 
           <label className="space-y-2">
             <span className="text-sm font-medium">Телефон *</span>
-            <input
-              className={inputClass('phone')}
-              placeholder="+7 (___) ___-__-__"
-              inputMode="numeric"
+            <PhoneInput
               value={values.phone}
-              onChange={(e) => {
-                let digits = extractDigits(e.target.value);
-                if (digits.startsWith('8')) digits = `7${digits.slice(1)}`;
-                if (!digits.startsWith('7')) digits = `7${digits}`;
-                digits = digits.slice(0, 11);
-                setValues((prev) => ({ ...prev, phone: formatRuPhone(digits) }));
-              }}
+              onChange={(phone) => setValues((prev) => ({ ...prev, phone }))}
+              placeholder="+7 (___) ___-__-__"
+              className={inputClass('phone')}
             />
             {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
           </label>

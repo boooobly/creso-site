@@ -15,6 +15,7 @@ import {
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
+import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -222,9 +223,10 @@ ${calcSummary}`,
   };
 
   const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
-  const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
+  const phoneDigits = useMemo(() => getPhoneDigits(phone), [phone]);
+  const phoneValid = phoneDigits.length === 11 && phoneDigits.startsWith('7');
   const nameError = touched.name && !name.trim() ? 'Введите имя.' : '';
-  const phoneError = touched.phone && !phoneValid ? 'Введите телефон в формате +7XXXXXXXXXX или 8XXXXXXXXXX.' : '';
+  const phoneError = touched.phone && !phoneValid ? 'Введите телефон в формате +7 (999) 999-99-99.' : '';
   const agreeError = touched.agree && !agree ? 'Необходимо согласие с политикой.' : '';
 
   const applyFiles = (incoming: FileList | File[]) => {
@@ -449,7 +451,10 @@ ${calcSummary}`,
           <InputField label="Имя" value={name} onChange={setName} onBlur={() => setTouched((prev) => ({ ...prev, name: true }))} />
           {nameError && <p className="-mt-2 text-sm text-red-600">{nameError}</p>}
 
-          <InputField label="Телефон" value={phone} onChange={setPhone} onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))} placeholder="+7XXXXXXXXXX" />
+          <label className="space-y-2 text-sm font-medium">
+            <span>Телефон</span>
+            <PhoneInput value={phone} onChange={setPhone} onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))} />
+          </label>
           {phoneError && <p className="-mt-2 text-sm text-red-600">{phoneError}</p>}
 
           <InputField label="Email" value={email} onChange={setEmail} type="email" />

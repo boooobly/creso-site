@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
+import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 type FormState = {
   address: string;
@@ -34,9 +35,9 @@ function getFieldError(field: keyof FormState, value: string | boolean) {
   }
 
   if (field === 'phone' && text) {
-    const normalized = text.replace(/[^\d+]/g, '');
-    if (!/^(\+7\d{10}|8\d{10})$/.test(normalized)) {
-      return 'Укажите телефон в формате +7XXXXXXXXXX или 8XXXXXXXXXX.';
+    const normalized = getPhoneDigits(text);
+    if (normalized.length !== 11 || !normalized.startsWith('7')) {
+      return 'Укажите телефон в формате +7 (999) 999-99-99.';
     }
   }
 
@@ -156,12 +157,11 @@ export default function OutdoorLeadForm() {
 
       <label className="block space-y-2">
         <span className="text-sm font-medium">Телефон *</span>
-        <input
+        <PhoneInput
           required
-          type="tel"
           value={form.phone}
           onBlur={() => onBlurField('phone')}
-          onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
+          onChange={(phone) => setForm((prev) => ({ ...prev, phone }))}
           className={inputClass('phone')}
           placeholder="+7 (___) ___-__-__"
         />
