@@ -20,6 +20,10 @@ const HANGING_PRICES = {
   wire: 220,
 } as const;
 const STAND_PRICE = 280;
+const STRETCHER_PRICE_PER_METER = {
+  narrow: 320,
+  wide: 480,
+} as const;
 
 const MATERIAL_PRICE_PER_M2 = {
   glass: 1600,
@@ -46,10 +50,14 @@ const initialFilters: FilterState = {
 const initialMaterials: MaterialsState = {
   glazing: 'none',
   passepartout: false,
+  passepartoutMm: 40,
+  passepartoutBottomMm: 55,
+  passepartoutColor: 'white',
   backPanel: true,
   hanging: 'crocodile',
   stand: false,
   workType: 'canvas',
+  stretcherType: 'narrow',
 };
 
 export default function BagetConfigurator() {
@@ -68,13 +76,34 @@ export default function BagetConfigurator() {
   const widthMm = Number(widthInput);
   const heightMm = Number(heightInput);
   const validSize = Number.isFinite(widthMm) && Number.isFinite(heightMm) && widthMm >= 50 && heightMm >= 50;
-  const standAllowed = validSize && widthMm <= 300 && heightMm <= 300;
+  const passepartoutMm = Math.max(0, materials.passepartoutMm);
+  const passepartoutBottomMm = Math.max(0, materials.passepartoutBottomMm);
+  const effectiveWidthMm = materials.passepartout ? widthMm + 2 * passepartoutMm : widthMm;
+  const effectiveHeightMm = materials.passepartout ? heightMm + passepartoutMm + passepartoutBottomMm : heightMm;
+  const standAllowed = validSize && effectiveWidthMm <= 300 && effectiveHeightMm <= 300;
+  const stretcherNarrowAllowed = widthMm <= 500 && heightMm <= 500;
 
   useEffect(() => {
     if (!standAllowed && materials.stand) {
       setMaterials((prev) => ({ ...prev, stand: false }));
     }
   }, [materials.stand, standAllowed]);
+
+  useEffect(() => {
+    if (materials.workType === 'stretchedCanvas' && !stretcherNarrowAllowed && materials.stretcherType === 'narrow') {
+      setMaterials((prev) => ({ ...prev, stretcherType: 'wide' }));
+    }
+  }, [materials.stretcherType, materials.workType, stretcherNarrowAllowed]);
+
+  useEffect(() => {
+    if (materials.workType !== 'stretchedCanvas') return;
+
+    setMaterials((prev) => ({
+      ...prev,
+      hanging: 'wire',
+      backPanel: false,
+    }));
+  }, [materials.workType]);
 
   const autoAdditions = useMemo(() => {
     if (materials.workType === 'rhinestone') {
@@ -83,6 +112,7 @@ export default function BagetConfigurator() {
         addOrabond: true,
         forceCardboard: false,
         stretchingRequired: false,
+        removeCardboard: false,
       };
     }
 
@@ -92,6 +122,7 @@ export default function BagetConfigurator() {
         addOrabond: false,
         forceCardboard: true,
         stretchingRequired: true,
+        removeCardboard: false,
       };
     }
 
@@ -101,6 +132,17 @@ export default function BagetConfigurator() {
         addOrabond: true,
         forceCardboard: true,
         stretchingRequired: false,
+        removeCardboard: false,
+      };
+    }
+
+    if (materials.workType === 'stretchedCanvas') {
+      return {
+        pvcType: 'none' as const,
+        addOrabond: false,
+        forceCardboard: false,
+        stretchingRequired: true,
+        removeCardboard: true,
       };
     }
 
@@ -109,6 +151,7 @@ export default function BagetConfigurator() {
       addOrabond: false,
       forceCardboard: false,
       stretchingRequired: false,
+      removeCardboard: false,
     };
   }, [materials.workType]);
 
@@ -142,6 +185,10 @@ export default function BagetConfigurator() {
     if (!validSize || !selectedBaget) {
       return {
         areaM2: 0,
+        effectiveWidthMm: 0,
+        effectiveHeightMm: 0,
+        framedWidthMm: 0,
+        framedHeightMm: 0,
         bagetMeters: 0,
         bagetCost: 0,
         materialsCost: 0,
@@ -150,21 +197,22 @@ export default function BagetConfigurator() {
         hangingCost: 0,
         hangingLabel: materials.hanging === 'crocodile' ? 'Крокодильчик × 1' : 'Тросик × 1',
         standCost: 0,
+        stretcherCost: 0,
         total: 0,
         autoBadges: [] as string[],
       };
     }
 
     const B = selectedBaget.width_mm;
-    const totalMm = (widthMm + 2 * B) * 2 + (heightMm + 2 * B) * 2;
+    const totalMm = 2 * (effectiveWidthMm + effectiveHeightMm) + 8 * B;
     const meters = totalMm / 1000;
     const metersWithWaste = meters * 1.05;
     const bagetCost = metersWithWaste * selectedBaget.price_per_meter;
 
-    const areaMm2 = widthMm * heightMm;
+    const areaMm2 = effectiveWidthMm * effectiveHeightMm;
     const areaM2 = areaMm2 / 1_000_000;
 
-    const effectiveCardboard = materials.backPanel || autoAdditions.forceCardboard;
+    const effectiveCardboard = autoAdditions.removeCardboard ? false : materials.backPanel || autoAdditions.forceCardboard;
 
     let materialsCost = 0;
     if (materials.glazing !== 'none') {
@@ -180,12 +228,20 @@ export default function BagetConfigurator() {
     const pvcCost = autoAdditions.pvcType === 'none' ? 0 : areaM2 * MATERIAL_PRICE_PER_M2[autoAdditions.pvcType];
     const orabondCost = autoAdditions.addOrabond ? areaM2 * MATERIAL_PRICE_PER_M2.orabond : 0;
 
-    const hangingQuantity = materials.hanging === 'crocodile' ? (widthMm > 600 ? 2 : 1) : 1;
+    const hangingQuantity = materials.hanging === 'crocodile' ? (effectiveWidthMm > 600 ? 2 : 1) : 1;
     const hangingCost = HANGING_PRICES[materials.hanging] * hangingQuantity;
     const hangingLabel = materials.hanging === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик × ${hangingQuantity}`;
 
     const standCost = materials.stand && standAllowed ? STAND_PRICE : 0;
-    const total = Math.round(bagetCost + materialsCost + pvcCost + orabondCost + hangingCost + standCost);
+
+    const stretcherPerimeterMm = widthMm * 2 + heightMm * 2;
+    const stretcherMeters = stretcherPerimeterMm / 1000;
+    const stretcherCost =
+      materials.workType === 'stretchedCanvas'
+        ? stretcherMeters * STRETCHER_PRICE_PER_METER[materials.stretcherType]
+        : 0;
+
+    const total = Math.round(bagetCost + materialsCost + pvcCost + orabondCost + hangingCost + standCost + stretcherCost);
 
     const autoBadges: string[] = [];
     if (autoAdditions.pvcType === 'pvc3') autoBadges.push('ПВХ 3мм');
@@ -194,6 +250,10 @@ export default function BagetConfigurator() {
     if (autoAdditions.forceCardboard) autoBadges.push('Картон (задник)');
 
     return {
+      effectiveWidthMm,
+      effectiveHeightMm,
+      framedWidthMm: effectiveWidthMm + 2 * B,
+      framedHeightMm: effectiveHeightMm + 2 * B,
       areaM2,
       bagetMeters: metersWithWaste,
       bagetCost,
@@ -203,10 +263,11 @@ export default function BagetConfigurator() {
       hangingCost,
       hangingLabel,
       standCost,
+      stretcherCost,
       total,
       autoBadges,
     };
-  }, [heightMm, materials, selectedBaget, standAllowed, validSize, widthMm, autoAdditions]);
+  }, [autoAdditions, effectiveHeightMm, effectiveWidthMm, heightMm, materials, selectedBaget, standAllowed, validSize, widthMm]);
 
   const onImageUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -270,6 +331,7 @@ export default function BagetConfigurator() {
           colors={colors}
           styles={styles}
           standAllowed={standAllowed}
+          stretcherNarrowAllowed={stretcherNarrowAllowed}
         />
       </aside>
 
@@ -339,42 +401,64 @@ export default function BagetConfigurator() {
             selectedBaget={selectedBaget}
             imageUrl={imageUrl}
             highlighted={previewHighlighted}
+            stretchedCanvas={materials.workType === 'stretchedCanvas'}
+            passepartoutEnabled={materials.passepartout}
+            passepartoutMm={passepartoutMm}
+            passepartoutBottomMm={passepartoutBottomMm}
+            passepartoutColor={materials.passepartoutColor}
           />
         </div>
 
-        <div className="card rounded-2xl p-4 shadow-md">
+        <div className="card rounded-2xl bg-white/90 p-4 shadow-md ring-1 ring-neutral-200/70 backdrop-blur-sm dark:bg-neutral-900/80 dark:ring-neutral-700/70">
           <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
           {selectedBaget ? (
             <ul className="space-y-2 text-sm transition-all duration-300">
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Артикул:</span> {selectedBaget.article}
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Ширина профиля:</span> {selectedBaget.width_mm} мм
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                <span className="text-neutral-500">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
+              </li>
+              {materials.passepartout ? (
+                <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                  <span className="text-neutral-500">Размер с паспарту:</span> {Math.round(calculation.effectiveWidthMm)} × {Math.round(calculation.effectiveHeightMm)} мм
+                </li>
+              ) : null}
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                <span className="text-neutral-500">Габарит с рамкой:</span> {Math.round(calculation.framedWidthMm)} × {Math.round(calculation.framedHeightMm)} мм
+              </li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Площадь:</span> {calculation.areaM2.toFixed(3)} м²
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Багет:</span> {calculation.bagetMeters.toFixed(2)} м ×{' '}
                 {selectedBaget.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(calculation.bagetCost).toLocaleString('ru-RU')} ₽
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Материалы:</span> {Math.round(calculation.materialsCost).toLocaleString('ru-RU')} ₽
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">ПВХ:</span> {Math.round(calculation.pvcCost).toLocaleString('ru-RU')} ₽
                 {autoAdditions.pvcType !== 'none' ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : null}
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Orabond:</span> {Math.round(calculation.orabondCost).toLocaleString('ru-RU')} ₽
                 {autoAdditions.addOrabond ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : null}
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">{calculation.hangingLabel}:</span> {Math.round(calculation.hangingCost).toLocaleString('ru-RU')} ₽
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Ножка-подставка:</span> {Math.round(calculation.standCost).toLocaleString('ru-RU')} ₽
+              </li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                <span className="text-neutral-500">Подрамник:</span> {Math.round(calculation.stretcherCost).toLocaleString('ru-RU')} ₽
+                {materials.workType === 'stretchedCanvas' ? (
+                  <span className="ml-2 text-xs text-neutral-500">{materials.stretcherType === 'narrow' ? 'Узкий (2 см)' : 'Широкий (4 см)'}</span>
+                ) : null}
               </li>
               {autoAdditions.forceCardboard ? (
                 <li className="text-xs text-neutral-500">Картон (задник): Добавлено автоматически</li>
@@ -382,7 +466,7 @@ export default function BagetConfigurator() {
               {autoAdditions.stretchingRequired ? (
                 <li className="text-xs text-neutral-500">Требуется натяжка: Добавлено автоматически</li>
               ) : null}
-              <li className="border-t border-neutral-200 pt-2 font-semibold">
+              <li className="mt-1 border-t border-neutral-300 pt-3 text-xl font-bold text-neutral-900 dark:border-neutral-600 dark:text-neutral-100">
                 Итого: {calculation.total.toLocaleString('ru-RU')} ₽
               </li>
             </ul>
@@ -392,7 +476,7 @@ export default function BagetConfigurator() {
 
           <Link
             href="/contacts"
-            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all hover:scale-[1.02] hover:bg-red-700"
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
           >
             Получить расчёт
           </Link>
