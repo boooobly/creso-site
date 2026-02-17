@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BagetItem } from './BagetCard';
 
 type BagetPreviewProps = {
@@ -11,43 +11,138 @@ type BagetPreviewProps = {
   imageUrl: string | null;
   highlighted?: boolean;
   className?: string;
+  stretchedCanvas?: boolean;
 };
 
-export default function BagetPreview({ widthMm, heightMm, selectedBaget, imageUrl, highlighted = false, className = "" }: BagetPreviewProps) {
-  const frameThickness = useMemo(() => {
-    if (!selectedBaget) return 8;
-    return Math.max(8, Math.min(24, Math.round(selectedBaget.width_mm / 2.2)));
-  }, [selectedBaget]);
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-  const ratio = useMemo(() => {
-    if (widthMm < 50 || heightMm < 50) return 1;
-    return widthMm / heightMm;
-  }, [widthMm, heightMm]);
+export default function BagetPreview({
+  widthMm,
+  heightMm,
+  selectedBaget,
+  imageUrl,
+  highlighted = false,
+  className = '',
+  stretchedCanvas = false,
+}: BagetPreviewProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [containerPx, setContainerPx] = useState({ width: 0, height: 0 });
+
+  const safeWidthMm = widthMm >= 50 ? widthMm : 500;
+  const safeHeightMm = heightMm >= 50 ? heightMm : 500;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+
+      const nextWidth = Math.round(entry.contentRect.width);
+      const nextHeight = Math.round(entry.contentRect.height);
+
+      setContainerPx((prev) => {
+        if (prev.width === nextWidth && prev.height === nextHeight) return prev;
+        return { width: nextWidth, height: nextHeight };
+      });
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const previewGeometry = useMemo(() => {
+    const cw = containerPx.width;
+    const ch = containerPx.height;
+    const bagetWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_mm ?? 0);
+
+    if (!cw || !ch) {
+      return {
+        scale: 0,
+        framePx: 0,
+        innerWpx: 0,
+        innerHpx: 0,
+        outerWpx: 0,
+        outerHpx: 0,
+      };
+    }
+
+    const scale = Math.min(cw / (safeWidthMm + 2 * bagetWidthMm), ch / (safeHeightMm + 2 * bagetWidthMm));
+    const innerWpx = safeWidthMm * scale;
+    const innerHpx = safeHeightMm * scale;
+    const framePx = bagetWidthMm > 0 ? clamp(bagetWidthMm * scale, 6, 48) : 0;
+    const outerWpx = innerWpx + 2 * framePx;
+    const outerHpx = innerHpx + 2 * framePx;
+
+    return {
+      scale,
+      framePx,
+      innerWpx,
+      innerHpx,
+      outerWpx,
+      outerHpx,
+    };
+  }, [containerPx.height, containerPx.width, safeHeightMm, safeWidthMm, selectedBaget, stretchedCanvas]);
+
+  const frameStyle = useMemo(
+    () => ({
+      width: `${previewGeometry.outerWpx}px`,
+      height: `${previewGeometry.outerHpx}px`,
+      padding: `${previewGeometry.framePx}px`,
+      boxSizing: 'border-box' as const,
+      background: stretchedCanvas
+        ? 'transparent'
+        : 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)',
+      boxShadow: stretchedCanvas
+        ? '0 10px 20px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.1), inset 0 -2px 4px rgba(15, 23, 42, 0.1)'
+        : '0 12px 26px rgba(15, 23, 42, 0.16), inset 0 2px 4px rgba(255,255,255,0.42), inset 2px 0 4px rgba(255,255,255,0.24), inset 0 -4px 8px rgba(15,23,42,0.28), inset -3px 0 6px rgba(15,23,42,0.24)',
+    }),
+    [previewGeometry.framePx, previewGeometry.outerHpx, previewGeometry.outerWpx, stretchedCanvas],
+  );
 
   return (
-    <div className={["card rounded-2xl p-5 shadow-md", className].join(" ")}>
+    <div className={['card rounded-2xl p-5 shadow-md', className].join(' ')}>
       <h2 className="mb-3 text-base font-semibold">Превью</h2>
-      <div className="mx-auto flex h-full w-full items-center justify-center">
+
+      <div className="mx-auto w-full max-w-[520px]">
         <div
-          className={[
-            'relative mx-auto w-full max-w-[520px] overflow-hidden rounded-md bg-neutral-100 transition-all duration-500',
-            highlighted ? 'animate-pulse shadow-[0_0_0_4px_rgba(220,38,38,0.18)]' : '',
-          ].join(' ')}
-          style={{
-            aspectRatio: `${ratio}`,
-            borderStyle: 'solid',
-            borderColor: '#b91c1c',
-            borderWidth: `${frameThickness}px`,
-          }}
+          ref={containerRef}
+          className="relative grid aspect-square min-h-[280px] w-full place-items-center overflow-hidden rounded-xl p-2"
         >
-          {imageUrl ? (
-            <Image src={imageUrl} alt="Загруженное изображение" fill sizes="(max-width: 1280px) 90vw, 520px" className="object-cover" unoptimized />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-neutral-500">Загрузите изображение для превью</div>
-          )}
+          <div
+            className={[
+              'max-h-full max-w-full rounded-md transition-all duration-200',
+              highlighted ? 'animate-pulse shadow-[0_0_0_4px_rgba(220,38,38,0.18)]' : '',
+            ].join(' ')}
+            style={frameStyle}
+          >
+            <div
+              className="relative overflow-hidden rounded-[2px] bg-neutral-100 transition-all duration-200"
+              style={{ width: `${previewGeometry.innerWpx}px`, height: `${previewGeometry.innerHpx}px` }}
+            >
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt="Загруженное изображение"
+                  fill
+                  sizes="(max-width: 1280px) 90vw, 520px"
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-sm text-neutral-500">Загрузите изображение для превью</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      <p className="mt-3 text-xs text-neutral-500">Толщина рамки зависит от выбранной ширины профиля.</p>
+
+      <p className="mt-3 text-xs text-neutral-500">
+        {stretchedCanvas
+          ? 'Превью показывает холст на подрамнике без рамки.'
+          : `Толщина рамки масштабируется по реальным размерам (${previewGeometry.scale > 0 ? `${previewGeometry.framePx.toFixed(1)}px` : '...'}).`}
+      </p>
     </div>
   );
 }
