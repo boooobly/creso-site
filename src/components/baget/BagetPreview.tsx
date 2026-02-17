@@ -31,8 +31,6 @@ export default function BagetPreview({
   const safeWidthMm = widthMm >= 50 ? widthMm : 500;
   const safeHeightMm = heightMm >= 50 ? heightMm : 500;
 
-  const ratio = useMemo(() => safeWidthMm / safeHeightMm, [safeHeightMm, safeWidthMm]);
-
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -55,34 +53,44 @@ export default function BagetPreview({
   }, []);
 
   const previewGeometry = useMemo(() => {
-    const measuredW = containerPx.width;
-    const measuredH = containerPx.height;
+    const cw = containerPx.width;
+    const ch = containerPx.height;
+    const bagetWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_mm ?? 0);
 
-    if (!measuredW || !measuredH || !selectedBaget) {
+    if (!cw || !ch) {
       return {
         scale: 0,
-        framePx: stretchedCanvas ? 0 : 8,
-        workPxW: measuredW,
-        workPxH: measuredH,
+        framePx: 0,
+        innerWpx: 0,
+        innerHpx: 0,
+        outerWpx: 0,
+        outerHpx: 0,
       };
     }
 
-    const scale = Math.min(measuredW / safeWidthMm, measuredH / safeHeightMm);
-    const framePx = stretchedCanvas ? 0 : clamp(selectedBaget.width_mm * scale, 6, 48);
+    const scale = Math.min(cw / (safeWidthMm + 2 * bagetWidthMm), ch / (safeHeightMm + 2 * bagetWidthMm));
+    const innerWpx = safeWidthMm * scale;
+    const innerHpx = safeHeightMm * scale;
+    const framePx = bagetWidthMm > 0 ? clamp(bagetWidthMm * scale, 6, 48) : 0;
+    const outerWpx = innerWpx + 2 * framePx;
+    const outerHpx = innerHpx + 2 * framePx;
 
     return {
       scale,
       framePx,
-      workPxW: safeWidthMm * scale,
-      workPxH: safeHeightMm * scale,
+      innerWpx,
+      innerHpx,
+      outerWpx,
+      outerHpx,
     };
   }, [containerPx.height, containerPx.width, safeHeightMm, safeWidthMm, selectedBaget, stretchedCanvas]);
 
   const frameStyle = useMemo(
     () => ({
+      width: `${previewGeometry.outerWpx}px`,
+      height: `${previewGeometry.outerHpx}px`,
       padding: `${previewGeometry.framePx}px`,
-      width: `${previewGeometry.workPxW + previewGeometry.framePx * 2}px`,
-      height: `${previewGeometry.workPxH + previewGeometry.framePx * 2}px`,
+      boxSizing: 'border-box' as const,
       background: stretchedCanvas
         ? 'transparent'
         : 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)',
@@ -90,27 +98,29 @@ export default function BagetPreview({
         ? '0 10px 20px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.1), inset 0 -2px 4px rgba(15, 23, 42, 0.1)'
         : '0 12px 26px rgba(15, 23, 42, 0.16), inset 0 2px 4px rgba(255,255,255,0.42), inset 2px 0 4px rgba(255,255,255,0.24), inset 0 -4px 8px rgba(15,23,42,0.28), inset -3px 0 6px rgba(15,23,42,0.24)',
     }),
-    [previewGeometry.framePx, previewGeometry.workPxH, previewGeometry.workPxW, stretchedCanvas],
+    [previewGeometry.framePx, previewGeometry.outerHpx, previewGeometry.outerWpx, stretchedCanvas],
   );
 
   return (
     <div className={['card rounded-2xl p-5 shadow-md', className].join(' ')}>
       <h2 className="mb-3 text-base font-semibold">Превью</h2>
 
-      <div className="mx-auto flex w-full items-center justify-center">
+      <div className="mx-auto w-full max-w-[520px]">
         <div
           ref={containerRef}
-          className="relative w-full max-w-[520px]"
-          style={{ aspectRatio: `${ratio}` }}
+          className="relative grid aspect-square min-h-[280px] w-full place-items-center overflow-hidden rounded-xl p-2"
         >
           <div
             className={[
-              'absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-visible rounded-md transition-all duration-200',
+              'max-h-full max-w-full rounded-md transition-all duration-200',
               highlighted ? 'animate-pulse shadow-[0_0_0_4px_rgba(220,38,38,0.18)]' : '',
             ].join(' ')}
             style={frameStyle}
           >
-            <div className="relative h-full w-full overflow-hidden rounded-[2px] bg-neutral-100 transition-all duration-200">
+            <div
+              className="relative overflow-hidden rounded-[2px] bg-neutral-100 transition-all duration-200"
+              style={{ width: `${previewGeometry.innerWpx}px`, height: `${previewGeometry.innerHpx}px` }}
+            >
               {imageUrl ? (
                 <Image
                   src={imageUrl}
