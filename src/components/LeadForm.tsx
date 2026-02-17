@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { trackEvent } from '@/lib/analytics';
 import { postJSON } from '@/lib/fetcher';
 import type { SiteMessages } from '@/lib/messages';
+import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 const optionalEmailSchema = z.preprocess(
   (value) => {
@@ -24,7 +25,7 @@ const optionalPhoneSchema = z.preprocess(
     const trimmed = value.trim();
     return trimmed === '' ? undefined : trimmed;
   },
-  z.string().min(6, 'Введите корректный телефон').optional(),
+  z.string().refine((value) => getPhoneDigits(value).length === 11, 'Введите корректный телефон').optional(),
 );
 
 const schema = z
@@ -75,6 +76,7 @@ export default function LeadForm({ t, initialService, initialMessage }: LeadForm
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitSuccessful, isSubmitting },
     reset,
@@ -142,10 +144,18 @@ export default function LeadForm({ t, initialService, initialMessage }: LeadForm
 
       <div className="grid gap-3 md:grid-cols-2">
         <div>
-          <input
-            className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-            placeholder="Телефон"
-            {...register('phone')}
+          <Controller
+            name="phone"
+            control={control}
+            render={({ field }) => (
+              <PhoneInput
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+                placeholder="+7 (___) ___-__-__"
+              />
+            )}
           />
           {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
         </div>

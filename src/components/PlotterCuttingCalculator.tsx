@@ -9,6 +9,7 @@ import {
 } from '@/lib/engine';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
+import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 const VECTOR_EXTENSIONS = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -66,10 +67,11 @@ export default function PlotterCuttingCalculator() {
   const { valuesValid, cutLength: cutLengthNum, area: areaNum, baseCost, extrasCost, minimumApplied, totalCost } = calculations;
 
   const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
-  const phoneValid = /^(\+7\d{10}|8\d{10})$/.test(normalizedPhone);
+  const phoneDigits = useMemo(() => getPhoneDigits(phone), [phone]);
+  const phoneValid = phoneDigits.length === 11 && phoneDigits.startsWith('7');
 
   const nameError = touched.name && !name.trim() ? 'Введите имя.' : '';
-  const phoneError = touched.phone && !phoneValid ? 'Введите телефон в формате +7XXXXXXXXXX или 8XXXXXXXXXX.' : '';
+  const phoneError = touched.phone && !phoneValid ? 'Введите телефон в формате +7 (999) 999-99-99.' : '';
   const agreeError = touched.agree && !agree ? 'Необходимо согласие с политикой.' : '';
 
   const acceptedAttr = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(',');
@@ -367,13 +369,12 @@ ${calcSummary}`,
 
           <div className="space-y-1">
             <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
-            <input
+            <PhoneInput
               id="phone"
               value={phone}
               onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+79991234567 или 89991234567"
-              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+              onChange={setPhone}
+              placeholder="+7 (___) ___-__-__"
             />
             {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
           </div>
