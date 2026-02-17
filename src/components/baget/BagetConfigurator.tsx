@@ -390,41 +390,41 @@ export default function BagetConfigurator() {
           />
         </div>
 
-        <div className="card rounded-2xl p-4 shadow-md">
+        <div className="card rounded-2xl bg-white/90 p-4 shadow-md ring-1 ring-neutral-200/70 backdrop-blur-sm dark:bg-neutral-900/80 dark:ring-neutral-700/70">
           <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
           {selectedBaget ? (
             <ul className="space-y-2 text-sm transition-all duration-300">
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Артикул:</span> {selectedBaget.article}
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Ширина профиля:</span> {selectedBaget.width_mm} мм
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Площадь:</span> {calculation.areaM2.toFixed(3)} м²
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Багет:</span> {calculation.bagetMeters.toFixed(2)} м ×{' '}
                 {selectedBaget.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(calculation.bagetCost).toLocaleString('ru-RU')} ₽
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Материалы:</span> {Math.round(calculation.materialsCost).toLocaleString('ru-RU')} ₽
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">ПВХ:</span> {Math.round(calculation.pvcCost).toLocaleString('ru-RU')} ₽
                 {autoAdditions.pvcType !== 'none' ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : null}
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Orabond:</span> {Math.round(calculation.orabondCost).toLocaleString('ru-RU')} ₽
                 {autoAdditions.addOrabond ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : null}
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">{calculation.hangingLabel}:</span> {Math.round(calculation.hangingCost).toLocaleString('ru-RU')} ₽
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Ножка-подставка:</span> {Math.round(calculation.standCost).toLocaleString('ru-RU')} ₽
               </li>
-              <li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Подрамник:</span> {Math.round(calculation.stretcherCost).toLocaleString('ru-RU')} ₽
                 {materials.workType === 'stretchedCanvas' ? (
                   <span className="ml-2 text-xs text-neutral-500">{materials.stretcherType === 'narrow' ? 'Узкий (2 см)' : 'Широкий (4 см)'}</span>
@@ -436,7 +436,7 @@ export default function BagetConfigurator() {
               {autoAdditions.stretchingRequired ? (
                 <li className="text-xs text-neutral-500">Требуется натяжка: Добавлено автоматически</li>
               ) : null}
-              <li className="border-t border-neutral-200 pt-2 font-semibold">
+              <li className="mt-1 border-t border-neutral-300 pt-3 text-xl font-bold text-neutral-900 dark:border-neutral-600 dark:text-neutral-100">
                 Итого: {calculation.total.toLocaleString('ru-RU')} ₽
               </li>
             </ul>
@@ -446,7 +446,7 @@ export default function BagetConfigurator() {
 
           <Link
             href="/contacts"
-            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all hover:scale-[1.02] hover:bg-red-700"
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
           >
             Получить расчёт
           </Link>
