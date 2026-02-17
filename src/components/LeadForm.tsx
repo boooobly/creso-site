@@ -56,6 +56,7 @@ type LeadFormProps = {
   t: SiteMessages;
   initialService?: string;
   initialMessage?: string;
+  source?: string;
 };
 
 const DEFAULT_SERVICE = 'Общая заявка';
@@ -69,7 +70,7 @@ const DEFAULT_VALUES: Omit<FormData, 'consent'> = {
   website: '',
 };
 
-export default function LeadForm({ t, initialService, initialMessage }: LeadFormProps) {
+export default function LeadForm({ t, initialService, initialMessage, source = 'main' }: LeadFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const resolvedService = useMemo(() => (initialService?.trim() ? initialService.trim() : DEFAULT_SERVICE), [initialService]);
@@ -100,23 +101,31 @@ export default function LeadForm({ t, initialService, initialMessage }: LeadForm
     setSubmitError(null);
 
     try {
-      const payload = {
-        ...data,
-        email: data.email ?? 'no-email@lead.local',
-        phone: data.phone ?? 'не указан',
-      };
-
-      const res = await postJSON<{ ok: true }>(`/api/lead`, payload);
+      const phoneDigits = getPhoneDigits(data.phone ?? '');
+      const res = await postJSON<{ ok: true }>(`/api/leads`, {
+        source,
+        name: data.name,
+        phone: phoneDigits,
+        email: data.email,
+        comment: data.message,
+        extras: {
+          service: data.service,
+          consent: data.consent,
+        },
+        company: data.website,
+      });
       if (res.ok) {
         trackEvent('lead_form_submitted', { service: data.service });
         reset({ ...DEFAULT_VALUES, service: resolvedService, message: initialMessage ?? '', consent: false });
       }
     } catch {
-      setSubmitError('Не удалось отправить заявку. Попробуйте ещё раз.');
+      setSubmitError('Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
     }
   };
 
-  if (isSubmitSuccessful) return <p className="text-green-700">{t.lead.success}</p>;
+  if (isSubmitSuccessful) {
+    return <p className="text-green-700">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

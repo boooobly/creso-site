@@ -83,17 +83,28 @@ export default function OutdoorLeadForm() {
       setStatus('loading');
       setError('');
 
-      const response = await fetch('/api/outdoor', {
+      const response = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          source: 'outdoor',
+          name: form.address.trim(),
+          phone: getPhoneDigits(form.phone),
+          comment: `Размеры: ${form.dimensions.trim() || '—'}\nБюджет: ${form.budget.trim() || '—'}`,
+          extras: {
+            address: form.address.trim(),
+            dimensions: form.dimensions.trim(),
+            budget: form.budget.trim() || undefined,
+            agreed: form.agreed,
+          },
+        }),
       });
 
       const data = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
 
       if (!response.ok || !data?.ok) {
         setStatus('error');
-        setError(data?.error || 'Не удалось отправить заявку. Попробуйте позже.');
+        setError(data?.error || 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
         return;
       }
 
@@ -103,7 +114,7 @@ export default function OutdoorLeadForm() {
       setErrors({});
     } catch {
       setStatus('error');
-      setError('Не удалось отправить заявку. Попробуйте позже.');
+      setError('Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
     }
   };
 

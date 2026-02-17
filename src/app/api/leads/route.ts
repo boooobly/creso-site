@@ -1,0 +1,163 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { sendEmailLead } from '@/lib/notifications/email';
+import { sendTelegramLead } from '@/lib/notifications/telegram';
+
+type RateRecord = { count: number; resetAt: number };
+
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT = 10;
+const ipRequests = new Map<string, RateRecord>();
+
+const leadSchema = z.object({
+  source: z.string().trim().min(1),
+  name: z.string().trim().min(2),
+  phone: z.string().trim().min(1),
+  email: z.string().trim().email().optional(),
+  widthMm: z.number().positive().optional(),
+  heightMm: z.number().positive().optional(),
+  comment: z.string().trim().optional(),
+  extras: z.record(z.any()).optional(),
+  company: z.string().optional(),
+});
+
+function getClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown';
+  return request.headers.get('x-real-ip')?.trim() || 'unknown';
+}
+
+function normalizePhone(phone: string): string | null {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length !== 11 || !digits.startsWith('7')) {
+    return null;
+  }
+  return digits;
+}
+
+function isRateLimited(ip: string, now = Date.now()) {
+  const current = ipRequests.get(ip);
+  if (!current || current.resetAt <= now) {
+    ipRequests.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+
+  if (current.count >= RATE_LIMIT) return true;
+
+  current.count += 1;
+  ipRequests.set(ip, current);
+  return false;
+}
+
+function sourceTitle(source: string): string {
+  const dictionary: Record<string, string> = {
+    wideformat: 'Широкоформатная печать',
+    baget: 'Багет',
+    contacts: 'Контакты',
+    outdoor: 'Наружная реклама',
+    'heat-transfer': 'Термоперенос',
+    'plotter-cutting': 'Плоттерная резка',
+    main: 'Главная страница',
+  };
+
+  return dictionary[source] || source;
+}
+
+function formatValue(value?: string | number | null): string {
+  if (value === null || value === undefined) return '—';
+  const text = String(value).trim();
+  return text || '—';
+}
+
+function buildText(params: {
+  source: string;
+  name: string;
+  phone: string;
+  email?: string;
+  widthMm?: number;
+  heightMm?: number;
+  comment?: string;
+  extras?: Record<string, unknown>;
+  referer: string;
+  ua: string;
+  ip: string;
+}) {
+  const size = params.widthMm && params.heightMm ? `${params.widthMm} x ${params.heightMm} мм` : '—';
+  const extras = params.extras ? JSON.stringify(params.extras, null, 2) : '';
+
+  return [
+    `🧾 Новая заявка: ${sourceTitle(params.source)}`,
+    `Имя: ${formatValue(params.name)}`,
+    `Телефон: ${formatValue(params.phone)}`,
+    `Email: ${formatValue(params.email)}`,
+    `Размер: ${size}`,
+    `Комментарий: ${formatValue(params.comment)}`,
+    `Страница: ${formatValue(params.referer)}`,
+    `Время: ${new Date().toISOString()}`,
+    `User-Agent: ${formatValue(params.ua)}`,
+    `IP: ${formatValue(params.ip)}`,
+    extras ? `Дополнительно:\n${extras}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+function buildHtml(text: string) {
+  return `<div style="font-family:Arial,sans-serif;white-space:pre-wrap;line-height:1.5;">${text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')}</div>`;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const ip = getClientIp(request);
+
+    if (isRateLimited(ip)) {
+      return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
+    }
+
+    const payload = await request.json().catch(() => null);
+    const parsed = leadSchema.safeParse(payload);
+
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });
+    }
+
+    if (parsed.data.company?.trim()) {
+      return NextResponse.json({ ok: true });
+    }
+
+    const normalizedPhone = normalizePhone(parsed.data.phone);
+    if (!normalizedPhone) {
+      return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
+    }
+
+    const ua = request.headers.get('user-agent') || '';
+    const referer = request.headers.get('referer') || request.headers.get('origin') || '';
+
+    const text = buildText({
+      ...parsed.data,
+      phone: normalizedPhone,
+      referer,
+      ua,
+      ip,
+    });
+
+    await Promise.all([
+      sendTelegramLead(text).catch((error) => {
+        console.error('[leads] Telegram send failed', error);
+      }),
+      sendEmailLead({
+        subject: `Новая заявка: ${sourceTitle(parsed.data.source)}`,
+        html: buildHtml(text),
+      }).catch((error) => {
+        console.error('[leads] Email send failed', error);
+      }),
+    ]);
+
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
+  }
+}
