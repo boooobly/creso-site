@@ -13,10 +13,14 @@ export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlas
 export type HangingType = 'crocodile' | 'wire';
 export type WorkType = 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
 export type StretcherType = 'narrow' | 'wide';
+export type PassepartoutColor = 'white' | 'ivory' | 'beige' | 'gray' | 'black';
 
 export type MaterialsState = {
   glazing: GlazingType;
   passepartout: boolean;
+  passepartoutMm: number;
+  passepartoutBottomMm: number;
+  passepartoutColor: PassepartoutColor;
   backPanel: boolean;
   hanging: HangingType;
   stand: boolean;
@@ -217,6 +221,45 @@ export default function BagetFilters({
             />
             Паспарту
           </label>
+
+          {materials.passepartout ? (
+            <div className="grid grid-cols-2 gap-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
+              <label className="space-y-1">
+                <span>Поля, мм (верх/лево/право)</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={materials.passepartoutMm}
+                  onChange={(e) => setMaterials({ ...materials, passepartoutMm: Number(e.target.value || 0) })}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+              <label className="space-y-1">
+                <span>Нижнее поле, мм</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={materials.passepartoutBottomMm}
+                  onChange={(e) => setMaterials({ ...materials, passepartoutBottomMm: Number(e.target.value || 0) })}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+              <label className="col-span-2 block space-y-1">
+                <span>Цвет паспарту</span>
+                <select
+                  value={materials.passepartoutColor}
+                  onChange={(e) => setMaterials({ ...materials, passepartoutColor: e.target.value as PassepartoutColor })}
+                  className={selectClassName}
+                >
+                  <option value="white">Белый</option>
+                  <option value="ivory">Слоновая кость</option>
+                  <option value="beige">Бежевый</option>
+                  <option value="gray">Серый</option>
+                  <option value="black">Чёрный</option>
+                </select>
+              </label>
+            </div>
+          ) : null}
 
           <label className="flex items-center gap-2">
             <input

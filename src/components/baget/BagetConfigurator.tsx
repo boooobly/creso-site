@@ -50,6 +50,9 @@ const initialFilters: FilterState = {
 const initialMaterials: MaterialsState = {
   glazing: 'none',
   passepartout: false,
+  passepartoutMm: 40,
+  passepartoutBottomMm: 55,
+  passepartoutColor: 'white',
   backPanel: true,
   hanging: 'crocodile',
   stand: false,
@@ -73,7 +76,11 @@ export default function BagetConfigurator() {
   const widthMm = Number(widthInput);
   const heightMm = Number(heightInput);
   const validSize = Number.isFinite(widthMm) && Number.isFinite(heightMm) && widthMm >= 50 && heightMm >= 50;
-  const standAllowed = validSize && widthMm <= 300 && heightMm <= 300;
+  const passepartoutMm = Math.max(0, materials.passepartoutMm);
+  const passepartoutBottomMm = Math.max(0, materials.passepartoutBottomMm);
+  const effectiveWidthMm = materials.passepartout ? widthMm + 2 * passepartoutMm : widthMm;
+  const effectiveHeightMm = materials.passepartout ? heightMm + passepartoutMm + passepartoutBottomMm : heightMm;
+  const standAllowed = validSize && effectiveWidthMm <= 300 && effectiveHeightMm <= 300;
   const stretcherNarrowAllowed = widthMm <= 500 && heightMm <= 500;
 
   useEffect(() => {
@@ -178,6 +185,10 @@ export default function BagetConfigurator() {
     if (!validSize || !selectedBaget) {
       return {
         areaM2: 0,
+        effectiveWidthMm: 0,
+        effectiveHeightMm: 0,
+        framedWidthMm: 0,
+        framedHeightMm: 0,
         bagetMeters: 0,
         bagetCost: 0,
         materialsCost: 0,
@@ -193,12 +204,12 @@ export default function BagetConfigurator() {
     }
 
     const B = selectedBaget.width_mm;
-    const totalMm = (widthMm + 2 * B) * 2 + (heightMm + 2 * B) * 2;
+    const totalMm = 2 * (effectiveWidthMm + effectiveHeightMm) + 8 * B;
     const meters = totalMm / 1000;
     const metersWithWaste = meters * 1.05;
     const bagetCost = metersWithWaste * selectedBaget.price_per_meter;
 
-    const areaMm2 = widthMm * heightMm;
+    const areaMm2 = effectiveWidthMm * effectiveHeightMm;
     const areaM2 = areaMm2 / 1_000_000;
 
     const effectiveCardboard = autoAdditions.removeCardboard ? false : materials.backPanel || autoAdditions.forceCardboard;
@@ -217,7 +228,7 @@ export default function BagetConfigurator() {
     const pvcCost = autoAdditions.pvcType === 'none' ? 0 : areaM2 * MATERIAL_PRICE_PER_M2[autoAdditions.pvcType];
     const orabondCost = autoAdditions.addOrabond ? areaM2 * MATERIAL_PRICE_PER_M2.orabond : 0;
 
-    const hangingQuantity = materials.hanging === 'crocodile' ? (widthMm > 600 ? 2 : 1) : 1;
+    const hangingQuantity = materials.hanging === 'crocodile' ? (effectiveWidthMm > 600 ? 2 : 1) : 1;
     const hangingCost = HANGING_PRICES[materials.hanging] * hangingQuantity;
     const hangingLabel = materials.hanging === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик × ${hangingQuantity}`;
 
@@ -239,6 +250,10 @@ export default function BagetConfigurator() {
     if (autoAdditions.forceCardboard) autoBadges.push('Картон (задник)');
 
     return {
+      effectiveWidthMm,
+      effectiveHeightMm,
+      framedWidthMm: effectiveWidthMm + 2 * B,
+      framedHeightMm: effectiveHeightMm + 2 * B,
       areaM2,
       bagetMeters: metersWithWaste,
       bagetCost,
@@ -252,7 +267,7 @@ export default function BagetConfigurator() {
       total,
       autoBadges,
     };
-  }, [heightMm, materials, selectedBaget, standAllowed, validSize, widthMm, autoAdditions]);
+  }, [autoAdditions, effectiveHeightMm, effectiveWidthMm, heightMm, materials, selectedBaget, standAllowed, validSize, widthMm]);
 
   const onImageUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -387,6 +402,10 @@ export default function BagetConfigurator() {
             imageUrl={imageUrl}
             highlighted={previewHighlighted}
             stretchedCanvas={materials.workType === 'stretchedCanvas'}
+            passepartoutEnabled={materials.passepartout}
+            passepartoutMm={passepartoutMm}
+            passepartoutBottomMm={passepartoutBottomMm}
+            passepartoutColor={materials.passepartoutColor}
           />
         </div>
 
@@ -399,6 +418,17 @@ export default function BagetConfigurator() {
               </li>
               <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Ширина профиля:</span> {selectedBaget.width_mm} мм
+              </li>
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                <span className="text-neutral-500">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
+              </li>
+              {materials.passepartout ? (
+                <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                  <span className="text-neutral-500">Размер с паспарту:</span> {Math.round(calculation.effectiveWidthMm)} × {Math.round(calculation.effectiveHeightMm)} мм
+                </li>
+              ) : null}
+              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                <span className="text-neutral-500">Габарит с рамкой:</span> {Math.round(calculation.framedWidthMm)} × {Math.round(calculation.framedHeightMm)} мм
               </li>
               <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                 <span className="text-neutral-500">Площадь:</span> {calculation.areaM2.toFixed(3)} м²
