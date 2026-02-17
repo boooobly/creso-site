@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useMemo, useRef, useState } from 'react';
 
 type FormValues = {
   name: string;
@@ -33,6 +33,7 @@ export default function OrderWideFormatForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const bagetHref = useMemo(() => {
     const params = new URLSearchParams();
@@ -112,8 +113,8 @@ export default function OrderWideFormatForm() {
     }
   };
 
-  const inputClass = (field: keyof FormValues) => `w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:ring-2 focus:ring-red-200 ${
-    errors[field] ? 'border-red-500 bg-red-50' : 'border-neutral-200 bg-white'
+  const inputClass = (field: keyof FormValues) => `h-11 w-full rounded-xl border px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 focus:bg-white dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-red-500 dark:focus:ring-red-500/30 ${
+    errors[field] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-neutral-300 bg-neutral-50'
   }`;
 
   return (
@@ -123,7 +124,7 @@ export default function OrderWideFormatForm() {
         <p className="mt-2 text-sm text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-medium">Имя *</span>
@@ -143,14 +144,39 @@ export default function OrderWideFormatForm() {
             {errors.email && <span className="text-xs text-red-600">{errors.email}</span>}
           </label>
 
-          <label className="space-y-2">
+          <div className="space-y-2">
             <span className="text-sm font-medium">Загрузка файла</span>
             <input
-              className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm"
+              id="wide-format-file"
+              ref={fileInputRef}
+              className="sr-only"
               type="file"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
             />
-          </label>
+            <label
+              htmlFor="wide-format-file"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white shadow-md ring-1 ring-red-600/20 transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
+            >
+              Загрузить файл
+            </label>
+            <p className="text-xs text-neutral-500">JPG, PNG, PDF до 20 МБ</p>
+            {file && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-lg bg-neutral-100 px-2 py-1 text-sm text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">{file.name}</span>
+                <span className="text-xs font-medium text-emerald-600">Файл выбран</span>
+                <button
+                  type="button"
+                  className="text-xs font-medium text-neutral-500 underline transition-colors hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  onClick={() => {
+                    setFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                  }}
+                >
+                  Удалить
+                </button>
+              </div>
+            )}
+          </div>
 
           <label className="space-y-2">
             <span className="text-sm font-medium">Ширина (мм)</span>
@@ -167,7 +193,7 @@ export default function OrderWideFormatForm() {
 
         <label className="space-y-2 block">
           <span className="text-sm font-medium">Комментарий</span>
-          <textarea className={inputClass('comment')} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
+          <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
         </label>
 
         <input
@@ -183,11 +209,11 @@ export default function OrderWideFormatForm() {
           <button
             type="submit"
             disabled={isSending}
-            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
-          <a href={bagetHref} className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02]">
+          <a href={bagetHref} className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] md:min-w-[180px]">
             Оформить в багет
           </a>
         </div>
