@@ -222,7 +222,6 @@ ${calcSummary}`,
     });
   };
 
-  const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
   const phoneDigits = useMemo(() => getPhoneDigits(phone), [phone]);
   const phoneValid = phoneDigits.length === 11 && phoneDigits.startsWith('7');
   const nameError = touched.name && !name.trim() ? 'Введите имя.' : '';
@@ -286,50 +285,53 @@ ${calcSummary}`,
 
     try {
       const payload = {
-        productType,
-        configuration: {
-          mugType,
-          mugPrintType,
-          mugQuantity,
-          tshirtSize,
-          tshirtGender,
-          useOwnClothes,
-          tshirtQuantity,
-          filmLength: pricing.safeFilmLength,
-          filmUrgent,
-          filmTransfer,
-        },
-        pricing: {
-          quantity,
-          subtotal: Math.round(pricing.subtotal),
-          discount: Math.round(pricing.discount),
-          total: Math.round(pricing.total),
-          details: summaryDetails,
-        },
-        files: files.map((file) => file.name),
-        contact: {
-          name: name.trim(),
-          phone: normalizedPhone,
-          email: email.trim(),
-          comment: comment.trim(),
-          agreed: agree,
+        source: 'heat-transfer',
+        name: name.trim(),
+        phone: phoneDigits,
+        email: email.trim() || undefined,
+        comment: comment.trim() || undefined,
+        extras: {
+          productType,
+          configuration: {
+            mugType,
+            mugPrintType,
+            mugQuantity,
+            tshirtSize,
+            tshirtGender,
+            useOwnClothes,
+            tshirtQuantity,
+            filmLength: pricing.safeFilmLength,
+            filmUrgent,
+            filmTransfer,
+          },
+          pricing: {
+            quantity,
+            subtotal: Math.round(pricing.subtotal),
+            discount: Math.round(pricing.discount),
+            total: Math.round(pricing.total),
+            details: summaryDetails,
+          },
+          files: files.map((file) => ({ name: file.name, size: file.size, ext: file.ext })),
+          contact: {
+            agreed: agree,
+          },
         },
       };
 
-      const res = await fetch('/api/heat-transfer', {
+      const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({ error: 'Не удалось отправить заявку.' }));
-        throw new Error(data.error || 'Не удалось отправить заявку.');
+        const data = await res.json().catch(() => ({ error: 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.' }));
+        throw new Error(data.error || 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
       }
 
       setSubmitSuccess('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Не удалось отправить заявку.');
+      setSubmitError(error instanceof Error ? error.message : 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
     } finally {
       setIsSubmitting(false);
     }

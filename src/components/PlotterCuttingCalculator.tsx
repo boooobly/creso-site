@@ -66,7 +66,6 @@ export default function PlotterCuttingCalculator() {
 
   const { valuesValid, cutLength: cutLengthNum, area: areaNum, baseCost, extrasCost, minimumApplied, totalCost } = calculations;
 
-  const normalizedPhone = useMemo(() => phone.replace(/[\s()-]/g, ''), [phone]);
   const phoneDigits = useMemo(() => getPhoneDigits(phone), [phone]);
   const phoneValid = phoneDigits.length === 11 && phoneDigits.startsWith('7');
 
@@ -197,33 +196,36 @@ ${calcSummary}`,
 
     try {
       const payload = {
-        calculator: {
-          material,
-          cutLength: cutLengthNum,
-          area: areaNum,
-          complexity,
-          extras: {
-            weeding,
-            mountingFilm,
-            transfer,
-            urgent,
+        source: 'plotter-cutting',
+        name: name.trim(),
+        phone: phoneDigits,
+        email: email.trim() || undefined,
+        comment: comment.trim() || undefined,
+        extras: {
+          calculator: {
+            material,
+            cutLength: cutLengthNum,
+            area: areaNum,
+            complexity,
+            extras: {
+              weeding,
+              mountingFilm,
+              transfer,
+              urgent,
+            },
+            baseCost,
+            extrasCost,
+            minimumApplied,
+            total: Math.round(totalCost),
           },
-          baseCost,
-          extrasCost,
-          minimumApplied,
-          total: Math.round(totalCost),
-        },
-        files: files.map((f) => f.name),
-        contact: {
-          name: name.trim(),
-          phone: normalizedPhone,
-          email: email.trim(),
-          comment: comment.trim(),
-          agreed: agree,
+          files: files.map((f) => ({ name: f.name, size: f.size, ext: f.ext, isRaster: f.isRaster })),
+          contact: {
+            agreed: agree,
+          },
         },
       };
 
-      const res = await fetch('/api/plotter', {
+      const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -231,13 +233,13 @@ ${calcSummary}`,
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || 'Не удалось отправить заявку. Попробуйте позже.');
+        throw new Error(data?.error || 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
       }
 
-      setSubmitSuccess('Заявка отправлена. Мы скоро свяжемся с вами.');
+      setSubmitSuccess('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
       setComment('');
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Ошибка отправки заявки.');
+      setSubmitError(err instanceof Error ? err.message : 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
     } finally {
       setIsSubmitting(false);
     }

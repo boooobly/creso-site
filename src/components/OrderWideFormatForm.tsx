@@ -86,14 +86,28 @@ export default function OrderWideFormatForm() {
     setIsSending(true);
 
     try {
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => formData.append(key, value));
-      formData.append('phoneDigits', getPhoneDigits(values.phone));
-      if (file) formData.append('file', file);
-
-      const response = await fetch('/api/wide-format-order', {
+      const response = await fetch('/api/leads', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'wideformat',
+          name: values.name.trim(),
+          phone: getPhoneDigits(values.phone),
+          email: values.email.trim() || undefined,
+          widthMm: values.width.trim() ? Number(values.width.trim()) : undefined,
+          heightMm: values.height.trim() ? Number(values.height.trim()) : undefined,
+          comment: values.comment.trim() || undefined,
+          extras: {
+            file: file
+              ? {
+                  name: file.name,
+                  size: file.size,
+                  type: file.type || undefined,
+                }
+              : undefined,
+          },
+          company: values.website,
+        }),
       });
 
       const result = await response.json();
@@ -102,12 +116,12 @@ export default function OrderWideFormatForm() {
         throw new Error(result.error || 'Не удалось отправить заявку');
       }
 
-      setSuccessMessage('Заявка отправлена! Мы свяжемся с вами в ближайшее время.');
+      setSuccessMessage('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
       setValues(defaultValues);
       setFile(null);
       setErrors({});
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Ошибка отправки. Попробуйте позже.');
+      setFormError(error instanceof Error ? error.message : 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
     } finally {
       setIsSending(false);
     }

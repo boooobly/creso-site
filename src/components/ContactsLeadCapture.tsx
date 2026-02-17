@@ -22,5 +22,5 @@ export default function ContactsLeadCapture({ t }: { t: SiteMessages }) {
     }
   }, []);
 
-  return <LeadForm t={t} initialService={draft?.service} initialMessage={draft?.message} />;
+  return <LeadForm t={t} initialService={draft?.service} initialMessage={draft?.message} source="contacts" />;
 }
