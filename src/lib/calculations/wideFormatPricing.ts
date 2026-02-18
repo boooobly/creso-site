@@ -8,8 +8,6 @@ import type { BannerDensity, WideFormatMaterialType } from './types';
 
 const BANNER_MATERIALS: ReadonlySet<WideFormatMaterialType> = new Set([
   'banner_240_gloss_3_2m',
-  'banner_240_matt_3_2m',
-  'banner_280',
   'banner_330',
   'banner_440',
   'banner_460_cast_3_2m',
@@ -33,7 +31,6 @@ export type WideFormatPricingInput = {
   edgeGluing: boolean;
   imageWelding: boolean;
   plotterCutByRegistrationMarks: boolean;
-  manualContourCut: boolean;
   cutByPositioningMarks: boolean;
 };
 
@@ -51,7 +48,6 @@ export type WideFormatCalculationResult = {
   edgeGluingCost: number;
   imageWeldingCost: number;
   plotterCutCost: number;
-  manualContourCutCost: number;
   positioningMarksCutCost: number;
   extrasCost: number;
   totalCost: number;
@@ -107,15 +103,11 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.plotterCutPerimeterPrice
     : 0;
 
-  const manualContourCutCost = input.manualContourCut && parsedValuesValid && positiveInputs && widthWarningCode === null
-    ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.manualContourCutPerimeterPrice
-    : 0;
-
   const positioningMarksCutCost = input.cutByPositioningMarks && basePrintCost > 0
     ? basePrintCost * WIDE_FORMAT_PRICING_CONFIG.positioningMarksCutPercent
     : 0;
 
-  const extrasCost = edgeGluingCost + imageWeldingCost + plotterCutCost + manualContourCutCost + positioningMarksCutCost;
+  const extrasCost = edgeGluingCost + imageWeldingCost + plotterCutCost + positioningMarksCutCost;
 
   return {
     width,
@@ -131,7 +123,6 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     edgeGluingCost,
     imageWeldingCost,
     plotterCutCost,
-    manualContourCutCost,
     positioningMarksCutCost,
     extrasCost,
     totalCost: basePrintCost + extrasCost,
