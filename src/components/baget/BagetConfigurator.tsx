@@ -17,6 +17,14 @@ import BagetPreview from './BagetPreview';
 
 const ITEMS_PER_PAGE = 12;
 
+
+const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
+
+type TransferredBagetImagePayload = {
+  dataUrl: string;
+  fileName: string;
+};
+
 const GLAZING_LABELS: Record<MaterialsState['glazing'], string> = {
   none: 'Без остекления',
   glass: 'Стекло',
@@ -66,10 +74,15 @@ const initialMaterials: MaterialsState = {
   stretcherType: 'narrow',
 };
 
-export default function BagetConfigurator() {
+type BagetConfiguratorProps = {
+  initialWidth?: string;
+  initialHeight?: string;
+};
+
+export default function BagetConfigurator({ initialWidth, initialHeight }: BagetConfiguratorProps) {
   const items = bagetData as BagetItem[];
-  const [widthInput, setWidthInput] = useState('500');
-  const [heightInput, setHeightInput] = useState('700');
+  const [widthInput, setWidthInput] = useState(initialWidth?.trim() || '500');
+  const [heightInput, setHeightInput] = useState(initialHeight?.trim() || '700');
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [materials, setMaterials] = useState<MaterialsState>(initialMaterials);
   const [selectedBaget, setSelectedBaget] = useState<BagetItem | null>(items[0] ?? null);
@@ -79,6 +92,23 @@ export default function BagetConfigurator() {
   const [previewHighlighted, setPreviewHighlighted] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const storedPayload = localStorage.getItem(BAGET_TRANSFER_IMAGE_KEY);
+    if (!storedPayload) return;
+
+    try {
+      const parsed = JSON.parse(storedPayload) as Partial<TransferredBagetImagePayload>;
+      if (typeof parsed.dataUrl === 'string' && parsed.dataUrl) {
+        setImageUrl(parsed.dataUrl);
+        setFileName(typeof parsed.fileName === 'string' && parsed.fileName ? parsed.fileName : 'Переданное изображение');
+      }
+    } catch {
+      // ignore malformed local storage payload
+    } finally {
+      localStorage.removeItem(BAGET_TRANSFER_IMAGE_KEY);
+    }
+  }, []);
 
   const widthMm = Number(widthInput);
   const heightMm = Number(heightInput);
