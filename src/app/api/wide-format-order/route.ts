@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
+import { calculateWideFormatPricing } from '@/lib/calculations/wideFormatPricing';
+import type { WideFormatMaterialType } from '@/lib/calculations/types';
 import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentWithCaption';
+import { getWideFormatMaterialLabel, WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/pricing-config/wideFormat';
 
 export const runtime = 'nodejs';
 
@@ -10,6 +13,18 @@ const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'i
 
 function toStringValue(value: FormDataEntryValue | null) {
   return typeof value === 'string' ? value.trim() : '';
+}
+
+function toBooleanValue(value: FormDataEntryValue | null): boolean {
+  return toStringValue(value).toLowerCase() === 'true';
+}
+
+function formatRub(value: number): string {
+  return `${Math.round(value).toLocaleString('ru-RU')} ₽`;
+}
+
+function isWideFormatMaterialType(value: string): value is WideFormatMaterialType {
+  return WIDE_FORMAT_MATERIAL_OPTIONS.some((option) => option.value === value);
 }
 
 async function sendTelegramMessage(text: string) {
@@ -75,8 +90,14 @@ export async function POST(request: NextRequest) {
     const email = toStringValue(formData.get('email'));
     const width = toStringValue(formData.get('width'));
     const height = toStringValue(formData.get('height'));
+    const quantity = toStringValue(formData.get('quantity'));
+    const materialIdRaw = toStringValue(formData.get('materialId'));
     const comment = toStringValue(formData.get('comment'));
     const website = toStringValue(formData.get('website'));
+    const edgeGluing = toBooleanValue(formData.get('edgeGluing'));
+    const imageWelding = toBooleanValue(formData.get('imageWelding'));
+    const plotterCutByRegistrationMarks = toBooleanValue(formData.get('plotterCutByRegistrationMarks'));
+    const cutByPositioningMarks = toBooleanValue(formData.get('cutByPositioningMarks'));
     const fileRaw = formData.get('file');
 
     if (website) {
@@ -97,6 +118,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Некорректный email.' }, { status: 400 });
     }
 
+    if (!isWideFormatMaterialType(materialIdRaw)) {
+      return NextResponse.json({ ok: false, error: 'Некорректный материал.' }, { status: 400 });
+    }
+
+    const parsedWidthMm = Number(width);
+    const parsedHeightMm = Number(height);
+    const parsedQuantity = Number(quantity);
+
+    if (!Number.isFinite(parsedWidthMm) || parsedWidthMm <= 0 || !Number.isFinite(parsedHeightMm) || parsedHeightMm <= 0 || !Number.isFinite(parsedQuantity) || parsedQuantity <= 0) {
+      return NextResponse.json({ ok: false, error: 'Проверьте размеры и количество.' }, { status: 400 });
+    }
+
+    const calculated = calculateWideFormatPricing({
+      material: materialIdRaw,
+      bannerDensity: 300,
+      widthInput: String(parsedWidthMm / 1000),
+      heightInput: String(parsedHeightMm / 1000),
+      quantityInput: String(parsedQuantity),
+      edgeGluing,
+      imageWelding,
+      plotterCutByRegistrationMarks,
+      cutByPositioningMarks,
+    });
+
+    const materialLabel = getWideFormatMaterialLabel(materialIdRaw);
+
+    const extras = [
+      { enabled: edgeGluing, label: 'Проклейка края', cost: calculated.edgeGluingCost },
+      { enabled: imageWelding, label: 'Сварка изображения', cost: calculated.imageWeldingCost },
+      { enabled: plotterCutByRegistrationMarks, label: 'Плоттерная резка по меткам', cost: calculated.plotterCutCost },
+      { enabled: cutByPositioningMarks, label: 'Резка по меткам позиционирования (+30%)', cost: calculated.positioningMarksCutCost },
+    ].filter((item) => item.enabled && item.cost > 0);
+
+    const extrasText = extras.length > 0
+      ? extras.map((item) => `• ${item.label}: ${formatRub(item.cost)}`).join('\n')
+      : 'Доп. услуги: нет';
+
     const file = fileRaw instanceof File ? fileRaw : undefined;
 
     if (file && !ALLOWED_IMAGE_TYPES.has(file.type)) {
@@ -104,13 +162,23 @@ export async function POST(request: NextRequest) {
     }
 
     const message = [
-      'Новая заявка — Широкоформатная печать',
+      'Широкоформатная печать — новая заявка',
+      '',
+      `Материал: ${materialLabel} (${materialIdRaw})`,
+      `Размер: ${Math.round(parsedWidthMm)} × ${Math.round(parsedHeightMm)} мм (${calculated.width.toFixed(2)} × ${calculated.height.toFixed(2)} м)`,
+      `Кол-во: ${Math.round(parsedQuantity)}`,
+      '',
+      'Доп. услуги:',
+      extrasText,
+      '',
+      'Стоимость:',
+      `Материал: ${formatRub(calculated.basePrintCost)}`,
+      `Доп. услуги: ${formatRub(calculated.extrasCost)}`,
+      `Итого: ${formatRub(calculated.totalCost)}`,
       '',
       `Имя: ${name}`,
       `Телефон: ${phone}`,
       `Email: ${email || '—'}`,
-      `Ширина (мм): ${width || '—'}`,
-      `Высота (мм): ${height || '—'}`,
       `Комментарий: ${comment || '—'}`,
       `Файл: ${file?.name ? `${file.name} (${Math.round(file.size / 1024)} KB)` : '—'}`,
     ].join('\n');
@@ -134,7 +202,7 @@ export async function POST(request: NextRequest) {
       await sendTelegramDocument({
         chatId: chatId!,
         token: botToken!,
-        caption: 'Файл для заявки — широкоформатная печать',
+        caption: 'Файл заявки (широкоформат)',
         file: uploadedFile,
       }).catch(() => null);
     }

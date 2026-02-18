@@ -4,8 +4,6 @@ export type PrintType = 'single' | 'double';
 
 export type WideFormatMaterialType =
   | 'banner_240_gloss_3_2m'
-  | 'banner_240_matt_3_2m'
-  | 'banner_280'
   | 'banner_330'
   | 'banner_440'
   | 'banner_460_cast_3_2m'

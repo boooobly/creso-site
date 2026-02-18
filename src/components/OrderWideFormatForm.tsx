@@ -1,7 +1,8 @@
 'use client';
 
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import type { WideFormatMaterialType } from '@/lib/calculations/types';
 
 type FormValues = {
   name: string;
@@ -9,6 +10,13 @@ type FormValues = {
   email: string;
   width: string;
   height: string;
+  quantity: string;
+  materialLabel: string;
+  materialId: WideFormatMaterialType | '';
+  edgeGluing: boolean;
+  imageWelding: boolean;
+  plotterCutByRegistrationMarks: boolean;
+  cutByPositioningMarks: boolean;
   comment: string;
   website: string;
 };
@@ -21,9 +29,32 @@ const defaultValues: FormValues = {
   email: '',
   width: '',
   height: '',
+  quantity: '',
+  materialLabel: '',
+  materialId: '',
+  edgeGluing: false,
+  imageWelding: false,
+  plotterCutByRegistrationMarks: false,
+  cutByPositioningMarks: false,
   comment: '',
   website: '',
 };
+
+type WideFormatPrefillDetail = {
+  widthM?: string;
+  heightM?: string;
+  widthMm?: number | null;
+  heightMm?: number | null;
+  quantity?: string;
+  materialId?: WideFormatMaterialType;
+  materialLabel?: string;
+  edgeGluing?: boolean;
+  imageWelding?: boolean;
+  plotterCutByRegistrationMarks?: boolean;
+  cutByPositioningMarks?: boolean;
+};
+
+type WideFormatPrefillEvent = CustomEvent<WideFormatPrefillDetail>;
 
 export default function OrderWideFormatForm() {
   const [values, setValues] = useState<FormValues>(defaultValues);
@@ -31,9 +62,47 @@ export default function OrderWideFormatForm() {
   const [isSending, setIsSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
+  const [isScrollHighlighted, setIsScrollHighlighted] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const highlightTimeoutRef = useRef<number | null>(null);
   const isFileTooLargeForTelegram = Boolean(file && file.size > 50 * 1024 * 1024);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const customEvent = event as WideFormatPrefillEvent;
+      const detail = customEvent.detail;
+
+      setValues((prev) => ({
+        ...prev,
+        width: typeof detail?.widthMm === 'number' ? String(detail.widthMm) : prev.width,
+        height: typeof detail?.heightMm === 'number' ? String(detail.heightMm) : prev.height,
+        quantity: detail?.quantity ?? prev.quantity,
+        materialLabel: detail?.materialLabel ?? prev.materialLabel,
+        materialId: detail?.materialId ?? prev.materialId,
+        edgeGluing: detail?.edgeGluing ?? prev.edgeGluing,
+        imageWelding: detail?.imageWelding ?? prev.imageWelding,
+        plotterCutByRegistrationMarks: detail?.plotterCutByRegistrationMarks ?? prev.plotterCutByRegistrationMarks,
+        cutByPositioningMarks: detail?.cutByPositioningMarks ?? prev.cutByPositioningMarks,
+      }));
+
+      setIsScrollHighlighted(true);
+      if (highlightTimeoutRef.current) {
+        window.clearTimeout(highlightTimeoutRef.current);
+      }
+      highlightTimeoutRef.current = window.setTimeout(() => {
+        setIsScrollHighlighted(false);
+      }, 1800);
+    };
+
+    window.addEventListener('wideFormatPrefill', handler);
+    return () => {
+      window.removeEventListener('wideFormatPrefill', handler);
+      if (highlightTimeoutRef.current) {
+        window.clearTimeout(highlightTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const formatFileSize = (size: number) => {
     if (size < 1024) return `${size} Б`;
@@ -93,6 +162,13 @@ export default function OrderWideFormatForm() {
       formData.set('email', values.email.trim());
       formData.set('width', values.width.trim());
       formData.set('height', values.height.trim());
+      formData.set('quantity', values.quantity.trim());
+      formData.set('material', values.materialLabel.trim());
+      formData.set('materialId', values.materialId);
+      formData.set('edgeGluing', String(values.edgeGluing));
+      formData.set('imageWelding', String(values.imageWelding));
+      formData.set('plotterCutByRegistrationMarks', String(values.plotterCutByRegistrationMarks));
+      formData.set('cutByPositioningMarks', String(values.cutByPositioningMarks));
       formData.set('comment', values.comment.trim());
       formData.set('website', values.website);
       if (file) {
@@ -130,9 +206,9 @@ export default function OrderWideFormatForm() {
   }`;
 
   return (
-    <div id="wide-format-order-form" className="card p-6 shadow-sm md:p-8">
+    <div id="wide-format-form" className={`card p-6 shadow-sm transition-all duration-300 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold">Рассчитать стоимость</h2>
+        <h2 id="wide-format-form-title" className="text-2xl font-semibold">Рассчитать стоимость</h2>
         <p className="mt-2 text-sm text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
       </div>
 
@@ -208,6 +284,16 @@ export default function OrderWideFormatForm() {
             <span className="text-sm font-medium">Высота (мм)</span>
             <input className={inputClass('height')} inputMode="numeric" value={values.height} onChange={(e) => setValues((prev) => ({ ...prev, height: e.target.value }))} />
             {errors.height && <span className="text-xs text-red-600">{errors.height}</span>}
+          </label>
+
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Количество</span>
+            <input className={inputClass('quantity')} inputMode="numeric" value={values.quantity} onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))} />
+          </label>
+
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Материал</span>
+            <input className={inputClass('materialLabel')} value={values.materialLabel} onChange={(e) => setValues((prev) => ({ ...prev, materialLabel: e.target.value }))} />
           </label>
         </div>
 
