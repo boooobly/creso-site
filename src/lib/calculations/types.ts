@@ -2,7 +2,27 @@ export type PrintProductType = 'cards' | 'flyers';
 export type PrintDensity = 300 | 350 | 400;
 export type PrintType = 'single' | 'double';
 
-export type WideFormatMaterialType = 'banner' | 'selfAdhesiveFilm' | 'backlit' | 'perforatedFilm' | 'posterPaper';
+export type WideFormatMaterialType =
+  | 'banner_240_gloss_3_2m'
+  | 'banner_240_matt_3_2m'
+  | 'banner_280'
+  | 'banner_330'
+  | 'banner_440'
+  | 'banner_460_cast_3_2m'
+  | 'banner_mesh_380_3_2m'
+  | 'banner_510_cast_3_2m'
+  | 'self_adhesive_film_gloss'
+  | 'perforated_film_1_37'
+  | 'paper_dupaper_blue_120'
+  | 'paper_trans_skylight'
+  | 'trans_film_1_27'
+  | 'polyester_fabric_140'
+  | 'flag_fabric_with_liner'
+  | 'canvas_cotton_350'
+  | 'canvas_poly_260'
+  | 'backlit_1_07'
+  | 'photo_paper_220';
+
 export type BannerDensity = 220 | 300 | 440;
 
 export type HeatTransferProductType = 'mug' | 'tshirt' | 'film';
