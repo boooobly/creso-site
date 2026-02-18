@@ -6,6 +6,19 @@ import {
 import { parseNumericInput } from './shared';
 import type { BannerDensity, WideFormatMaterialType } from './types';
 
+const BANNER_MATERIALS: ReadonlySet<WideFormatMaterialType> = new Set([
+  'banner_240_gloss_3_2m',
+  'banner_240_matt_3_2m',
+  'banner_280',
+  'banner_330',
+  'banner_440',
+  'banner_460_cast_3_2m',
+  'banner_mesh_380_3_2m',
+  'banner_510_cast_3_2m',
+  'customer_roll_textured',
+  'customer_roll_smooth',
+]);
+
 export type WideFormatWidthWarningCode =
   | 'invalid_width'
   | 'max_width_exceeded'
@@ -49,6 +62,18 @@ export function getWideFormatWidthWarningCode(_material: WideFormatMaterialType,
   if (width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
 
   return null;
+}
+
+function getMaterialPricePerM2(material: WideFormatMaterialType): number {
+  if (material === 'customer_roll_textured') {
+    return WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
+  }
+
+  if (material === 'customer_roll_smooth') {
+    return WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
+  }
+
+  return WIDE_FORMAT_PRICING_CONFIG.pricesRUBPerM2[material];
 }
 
 function getMaterialPricePerM2(material: WideFormatMaterialType): number {
