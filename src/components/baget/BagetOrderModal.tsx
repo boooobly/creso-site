@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
@@ -86,6 +87,7 @@ export default function BagetOrderModal({
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [animateIn, setAnimateIn] = useState(false);
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -94,19 +96,41 @@ export default function BagetOrderModal({
       setSubmitted(false);
       setSending(false);
       setErrors({});
+      setAnimateIn(false);
       return;
     }
 
     setOrderNumber(generateOrderNumber());
+    const scrollY = window.scrollY;
+    const originalOverflow = document.body.style.overflow;
+    const originalPosition = document.body.style.position;
+    const originalTop = document.body.style.top;
+    const originalLeft = document.body.style.left;
+    const originalRight = document.body.style.right;
+    const originalWidth = document.body.style.width;
+
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
 
     const timer = window.setTimeout(() => {
       modalRef.current?.focus();
-    }, 0);
+      setAnimateIn(true);
+    }, 16);
 
     return () => {
       window.clearTimeout(timer);
-      document.body.style.overflow = '';
+      document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.left = originalLeft;
+      document.body.style.right = originalRight;
+      document.body.style.width = originalWidth;
+      window.scrollTo({ top: scrollY });
+      setAnimateIn(false);
     };
   }, [open]);
 
@@ -124,6 +148,9 @@ export default function BagetOrderModal({
   const canSubmit = useMemo(() => {
     return !sending && !!consent;
   }, [consent, sending]);
+
+  const prepayNow = useMemo(() => Math.round(totalPriceRub * 0.5), [totalPriceRub]);
+  const remainderAtPickup = useMemo(() => totalPriceRub - prepayNow, [prepayNow, totalPriceRub]);
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -208,7 +235,9 @@ export default function BagetOrderModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/55 p-4 backdrop-blur-sm"
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-200 ease-out ${
+        animateIn ? 'bg-black/40 backdrop-blur-[2px]' : 'bg-black/0 backdrop-blur-0'
+      }`}
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -219,193 +248,241 @@ export default function BagetOrderModal({
       <div
         ref={modalRef}
         tabIndex={-1}
-        className="relative max-h-[90vh] w-full max-w-5xl overflow-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-xl outline-none dark:border-neutral-700 dark:bg-neutral-900 sm:p-6"
+        className={`relative max-h-[85vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-neutral-200 bg-white shadow-xl outline-none transition-all duration-200 ease-out dark:border-neutral-700 dark:bg-neutral-900 ${
+          animateIn ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-2 scale-95 opacity-0'
+        }`}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Закрыть модальное окно"
-          className="absolute right-4 top-4 rounded-lg p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+          className="absolute right-4 top-4 z-10 rounded-lg p-2 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
         >
           ✕
         </button>
 
-        <div className="mb-4 border-b border-neutral-200 pb-4 pr-10 dark:border-neutral-700">
-          <h3 id="baget-order-title" className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-            Оформление заказа
-          </h3>
-          <p className="mt-2 inline-flex rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700 ring-1 ring-red-200 dark:bg-red-900/25 dark:text-red-300 dark:ring-red-700/60">
-            Номер заказа: {orderNumber}
-          </p>
+        <div className="sticky top-0 z-[1] rounded-t-2xl border-b border-neutral-200 bg-white/95 px-5 py-4 pr-14 backdrop-blur-sm dark:border-neutral-700 dark:bg-neutral-900/95 sm:px-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h3 id="baget-order-title" className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+              Оформление заказа
+            </h3>
+            <p className="inline-flex self-start rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
+              Заказ: {orderNumber}
+            </p>
+          </div>
         </div>
 
-        {submitted ? (
-          <div className="space-y-4">
-            <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-900/20 dark:text-emerald-200">
-              Заявка отправлена. Мы свяжемся с вами в ближайшее время.
-            </p>
-            <p className="text-sm text-neutral-700 dark:text-neutral-200">Номер заказа: {orderNumber}</p>
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.01] hover:bg-red-700"
-            >
-              Закрыть
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <section className="space-y-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/40">
-              <h4 className="text-base font-semibold">Состав заказа</h4>
-              {previewImageUrl ? (
-                <img
-                  src={previewImageUrl}
-                  alt="Предпросмотр работы"
-                  className="h-36 w-full rounded-xl border border-neutral-200 object-cover dark:border-neutral-700"
-                />
-              ) : null}
-
-              <dl className="space-y-2 text-sm">
-                <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                  <dt className="text-neutral-500">Размер работы</dt>
-                  <dd className="text-right">{orderSummary.workSizeMm.wMm} × {orderSummary.workSizeMm.hMm} мм</dd>
-                </div>
-                {orderSummary.passepartout?.enabled ? (
-                  <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                    <dt className="text-neutral-500">Размер с паспарту</dt>
-                    <dd className="text-right">{effectiveSize.wMm} × {effectiveSize.hMm} мм</dd>
-                  </div>
-                ) : null}
-                {outerSize ? (
-                  <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                    <dt className="text-neutral-500">Габарит с рамкой</dt>
-                    <dd className="text-right">{outerSize.wMm} × {outerSize.hMm} мм</dd>
-                  </div>
-                ) : null}
-                <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                  <dt className="text-neutral-500">Багет</dt>
-                  <dd className="text-right">
-                    {orderSummary.selectedBaget
-                      ? `${orderSummary.selectedBaget.title || 'Выбран'} (${orderSummary.selectedBaget.article || 'без артикула'})`
-                      : 'Не выбран'}
-                    {orderSummary.selectedBaget?.widthMm ? `, ${orderSummary.selectedBaget.widthMm} мм` : ''}
-                    {orderSummary.selectedBaget?.pricePerM ? `, ${orderSummary.selectedBaget.pricePerM.toLocaleString('ru-RU')} ₽/м` : ''}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                  <dt className="text-neutral-500">Паспарту</dt>
-                  <dd className="text-right">
-                    {orderSummary.passepartout?.enabled
-                      ? `${orderSummary.passepartout.color}, верх/бок ${orderSummary.passepartout.topMm} мм, низ ${orderSummary.passepartout.bottomMm} мм`
-                      : 'Без паспарту'}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                  <dt className="text-neutral-500">Остекление</dt>
-                  <dd className="text-right">{orderSummary.glazing}</dd>
-                </div>
-                <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                  <dt className="text-neutral-500">Материалы</dt>
-                  <dd className="text-right">{orderSummary.materials.join(', ') || '—'}</dd>
-                </div>
-                <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                  <dt className="text-neutral-500">Тип работы</dt>
-                  <dd className="text-right">{orderSummary.workType}</dd>
-                </div>
-                <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                  <dt className="text-neutral-500">Подвес</dt>
-                  <dd className="text-right">{orderSummary.hanging.label} × {orderSummary.hanging.quantity}</dd>
-                </div>
-                <div className="flex justify-between gap-3 border-b border-neutral-200 pb-2 dark:border-neutral-700">
-                  <dt className="text-neutral-500">Ножка-подставка</dt>
-                  <dd className="text-right">{orderSummary.stand ? 'Да' : 'Нет'}</dd>
-                </div>
-              </dl>
-
-              <div className="rounded-xl border border-red-200 bg-white p-4 text-red-700 shadow-sm dark:border-red-800/60 dark:bg-neutral-900 dark:text-red-300">
-                <p className="text-xs uppercase tracking-wide">Итоговая стоимость</p>
-                <p className="mt-1 text-2xl font-bold">{totalPriceRub.toLocaleString('ru-RU')} ₽</p>
-                <p className="mt-1 text-xs text-neutral-500">Самовывоз: предоплата 50%</p>
+        <div className="p-5 sm:p-6">
+          {submitted ? (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-900/20 dark:text-emerald-200">
+                <p className="font-medium">Заявка отправлена. Мы свяжемся с вами в ближайшее время.</p>
+                <p className="mt-2 text-xs sm:text-sm">Номер заказа: {orderNumber}</p>
               </div>
-            </section>
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-xl active:scale-[0.98]"
+              >
+                Закрыть
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <section className="space-y-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/40">
+                {previewImageUrl ? (
+                  <div className="rounded-xl border border-neutral-200 bg-white p-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+                    <p className="mb-2 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Превью</p>
+                    <img
+                      src={previewImageUrl}
+                      alt="Предпросмотр работы"
+                      className="mx-auto max-h-[200px] w-full rounded-lg border border-neutral-200 object-contain dark:border-neutral-700"
+                    />
+                    <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Финальный вид (пример)</p>
+                  </div>
+                ) : null}
 
-            <section className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
-              <h4 className="mb-4 text-base font-semibold">Контакты</h4>
-              <form className="space-y-3" onSubmit={handleSubmit}>
-                <label className="block space-y-1 text-sm">
-                  <span>Имя *</span>
-                  <input
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                    className="h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900"
-                    placeholder="Введите имя"
-                  />
-                  {errors.name ? <p className="text-xs text-red-600">{errors.name}</p> : null}
-                </label>
+                <h4 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Состав заказа</h4>
 
-                <label className="block space-y-1 text-sm">
-                  <span>Телефон *</span>
-                  <PhoneInput value={phone} onChange={setPhone} />
-                  {errors.phone ? <p className="text-xs text-red-600">{errors.phone}</p> : null}
-                </label>
+                <dl className="grid grid-cols-1 gap-2">
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">📐 Размер работы</dt>
+                    <dd className="rounded-lg bg-neutral-100 px-2 py-1 text-right text-sm font-medium text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                      {orderSummary.workSizeMm.wMm} × {orderSummary.workSizeMm.hMm} мм
+                    </dd>
+                  </div>
 
-                <label className="block space-y-1 text-sm">
-                  <span>Email</span>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className="h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900"
-                    placeholder="name@example.com"
-                  />
-                  {errors.email ? <p className="text-xs text-red-600">{errors.email}</p> : null}
-                </label>
+                  {orderSummary.passepartout?.enabled ? (
+                    <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                      <dt className="text-sm text-neutral-500 dark:text-neutral-400">Размер с паспарту</dt>
+                      <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        {effectiveSize.wMm} × {effectiveSize.hMm} мм
+                      </dd>
+                    </div>
+                  ) : null}
 
-                <label className="block space-y-1 text-sm">
-                  <span>Комментарий</span>
-                  <textarea
-                    value={comment}
-                    onChange={(event) => setComment(event.target.value)}
-                    rows={3}
-                    className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900"
-                    placeholder="Уточнения по заказу"
-                  />
-                  {errors.comment ? <p className="text-xs text-red-600">{errors.comment}</p> : null}
-                </label>
+                  {outerSize ? (
+                    <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                      <dt className="text-sm text-neutral-500 dark:text-neutral-400">Габарит с рамкой</dt>
+                      <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        {outerSize.wMm} × {outerSize.hMm} мм
+                      </dd>
+                    </div>
+                  ) : null}
 
-                <label className="flex items-start gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={consent}
-                    onChange={(event) => setConsent(event.target.checked)}
-                    className="mt-1"
-                  />
-                  <span>Я согласен с обработкой персональных данных</span>
-                </label>
-                {errors.consent ? <p className="text-xs text-red-600">{errors.consent}</p> : null}
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🖼 Багет</dt>
+                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {orderSummary.selectedBaget
+                        ? `${orderSummary.selectedBaget.title || 'Выбран'} (${orderSummary.selectedBaget.article || 'без артикула'})`
+                        : 'Не выбран'}
+                      {orderSummary.selectedBaget?.widthMm ? `, ${orderSummary.selectedBaget.widthMm} мм` : ''}
+                      {orderSummary.selectedBaget?.pricePerM ? `, ${orderSummary.selectedBaget.pricePerM.toLocaleString('ru-RU')} ₽/м` : ''}
+                    </dd>
+                  </div>
 
-                {errors.submit ? <p className="text-sm text-red-600">{errors.submit}</p> : null}
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🎨 Паспарту</dt>
+                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {orderSummary.passepartout?.enabled
+                        ? `${orderSummary.passepartout.color}, верх/бок ${orderSummary.passepartout.topMm} мм, низ ${orderSummary.passepartout.bottomMm} мм`
+                        : 'Без паспарту'}
+                    </dd>
+                  </div>
 
-                <div className="flex flex-col gap-2 pt-2 sm:flex-row">
-                  <button
-                    type="submit"
-                    disabled={!canSubmit}
-                    className="inline-flex flex-1 items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.01] hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {sending ? 'Отправка...' : 'Отправить заказ'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="inline-flex flex-1 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-neutral-700 transition-all hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-                  >
-                    Вернуться к настройкам
-                  </button>
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🪟 Остекление</dt>
+                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.glazing}</dd>
+                  </div>
+
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🧱 Материалы</dt>
+                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {orderSummary.materials.join(', ') || '—'}
+                    </dd>
+                  </div>
+
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Тип работы</dt>
+                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.workType}</dd>
+                  </div>
+
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🔩 Подвес</dt>
+                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {orderSummary.hanging.label} × {orderSummary.hanging.quantity}
+                    </dd>
+                  </div>
+
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Ножка-подставка</dt>
+                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.stand ? 'Да' : 'Нет'}</dd>
+                  </div>
+                </dl>
+
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4 shadow-[0_10px_30px_rgba(220,38,38,0.12)] dark:border-red-800 dark:bg-red-950/30 dark:shadow-[0_10px_30px_rgba(220,38,38,0.18)]">
+                  <p className="text-xs uppercase tracking-wide text-red-700/80 dark:text-red-200/80">Итоговая стоимость</p>
+                  <p className="mt-1 text-3xl font-bold text-red-700 dark:text-red-200">{totalPriceRub.toLocaleString('ru-RU')} ₽</p>
+                  <p className="mt-3 text-sm text-neutral-700 dark:text-neutral-200">
+                    К оплате сейчас: <span className="font-semibold">{prepayNow.toLocaleString('ru-RU')} ₽</span>
+                  </p>
+                  <p className="text-sm text-neutral-700 dark:text-neutral-200">
+                    Остаток при получении: <span className="font-semibold">{remainderAtPickup.toLocaleString('ru-RU')} ₽</span>
+                  </p>
                 </div>
-              </form>
-            </section>
-          </div>
-        )}
+              </section>
+
+              <section className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+                <h4 className="mb-4 text-base font-semibold text-neutral-900 dark:text-neutral-100">Контакты</h4>
+                <form className="space-y-3" onSubmit={handleSubmit}>
+                  <label className="block space-y-1 text-sm">
+                    <span>Имя *</span>
+                    <input
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                      className="h-11 w-full rounded-xl border border-neutral-300 bg-neutral-50 px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+                      placeholder="Введите имя"
+                    />
+                    {errors.name ? <p className="text-xs text-red-600">{errors.name}</p> : null}
+                  </label>
+
+                  <label className="block space-y-1 text-sm">
+                    <span>Телефон *</span>
+                    <PhoneInput
+                      value={phone}
+                      onChange={setPhone}
+                      className="bg-neutral-50 dark:bg-neutral-800"
+                    />
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Мы свяжемся для уточнения деталей</p>
+                    {errors.phone ? <p className="text-xs text-red-600">{errors.phone}</p> : null}
+                  </label>
+
+                  <label className="block space-y-1 text-sm">
+                    <span>Email</span>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      className="h-11 w-full rounded-xl border border-neutral-300 bg-neutral-50 px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+                      placeholder="name@example.com"
+                    />
+                    {errors.email ? <p className="text-xs text-red-600">{errors.email}</p> : null}
+                  </label>
+
+                  <label className="block space-y-1 text-sm">
+                    <span>Комментарий</span>
+                    <textarea
+                      value={comment}
+                      onChange={(event) => setComment(event.target.value)}
+                      rows={3}
+                      className="w-full rounded-xl border border-neutral-300 bg-neutral-50 px-4 py-2 text-sm text-neutral-900 shadow-sm transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+                      placeholder="Уточнения по заказу"
+                    />
+                    {errors.comment ? <p className="text-xs text-red-600">{errors.comment}</p> : null}
+                  </label>
+
+                  <div className={`rounded-xl border p-3 transition-colors ${errors.consent ? 'border-red-300 bg-red-50/60 dark:border-red-700/70 dark:bg-red-900/15' : 'border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/60'}`}>
+                    <label className="flex items-start gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={consent}
+                        onChange={(event) => setConsent(event.target.checked)}
+                        className="mt-1"
+                      />
+                      <span>
+                        Я согласен с обработкой персональных данных и ознакомлен с{' '}
+                        <Link href="/privacy" className="text-red-600 underline underline-offset-2 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                          политикой конфиденциальности
+                        </Link>
+                        .
+                      </span>
+                    </label>
+                    {errors.consent ? <p className="mt-2 text-xs text-red-600">{errors.consent}</p> : null}
+                  </div>
+
+                  {errors.submit ? <p className="text-sm text-red-600">{errors.submit}</p> : null}
+
+                  <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                    <button
+                      type="submit"
+                      disabled={!canSubmit}
+                      className="inline-flex h-11 flex-1 items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-lg"
+                    >
+                      {sending ? 'Отправка...' : 'Отправить заказ'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-neutral-700 transition-all duration-200 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      Вернуться к настройкам
+                    </button>
+                  </div>
+                </form>
+              </section>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
