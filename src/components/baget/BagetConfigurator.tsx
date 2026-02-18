@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import {
   ChangeEvent,
   useCallback,
@@ -12,6 +11,7 @@ import {
 import bagetData from '../../../data/baget.json';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
+import BagetOrderModal, { BagetOrderSummary } from './BagetOrderModal';
 import BagetPreview from './BagetPreview';
 
 const ITEMS_PER_PAGE = 12;
@@ -37,6 +37,33 @@ const MATERIAL_PRICE_PER_M2 = {
   pvc4: 1100,
   orabond: 390,
 } as const;
+
+const GLAZING_LABELS: Record<MaterialsState['glazing'], string> = {
+  none: 'Без остекления',
+  glass: 'Стекло',
+  antiReflectiveGlass: 'Антибликовое стекло',
+  museumGlass: 'Музейное стекло',
+  plexiglass: 'Оргстекло',
+  pet1mm: 'ПЭТ 1мм',
+};
+
+const WORK_TYPE_LABELS: Record<MaterialsState['workType'], string> = {
+  canvas: 'Картина на основе',
+  stretchedCanvas: 'Холст на подрамнике',
+  rhinestone: 'Стразы',
+  embroidery: 'Вышивка',
+  beads: 'Бисер',
+  photo: 'Фото',
+  other: 'Другое',
+};
+
+const PASSEPARTOUT_COLOR_LABELS: Record<MaterialsState['passepartoutColor'], string> = {
+  white: 'Белый',
+  ivory: 'Слоновая кость',
+  beige: 'Бежевый',
+  gray: 'Серый',
+  black: 'Чёрный',
+};
 
 const initialFilters: FilterState = {
   color: 'all',
@@ -71,6 +98,7 @@ export default function BagetConfigurator() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [previewHighlighted, setPreviewHighlighted] = useState(false);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   const widthMm = Number(widthInput);
@@ -293,6 +321,84 @@ export default function BagetConfigurator() {
     return () => window.clearTimeout(t);
   }, [previewHighlighted]);
 
+  const summaryMaterials = useMemo(() => {
+    const materialItems: string[] = [];
+
+    if (materials.glazing !== 'none') {
+      materialItems.push(GLAZING_LABELS[materials.glazing]);
+    }
+
+    if (materials.backPanel || autoAdditions.forceCardboard) {
+      materialItems.push('Картон (задник)');
+    }
+
+    if (autoAdditions.pvcType === 'pvc3') materialItems.push('ПВХ 3мм');
+    if (autoAdditions.pvcType === 'pvc4') materialItems.push('ПВХ 4мм');
+    if (autoAdditions.addOrabond) materialItems.push('Orabond');
+    if (materials.workType === 'stretchedCanvas') {
+      materialItems.push(`Подрамник ${materials.stretcherType === 'narrow' ? 'узкий (2 см)' : 'широкий (4 см)'}`);
+    }
+
+    return materialItems;
+  }, [autoAdditions, materials.backPanel, materials.glazing, materials.stretcherType, materials.workType]);
+
+  const orderSummary = useMemo<BagetOrderSummary>(() => {
+    const hangingQuantity = materials.hanging === 'crocodile' ? (effectiveWidthMm > 600 ? 2 : 1) : 1;
+
+    return {
+      workSizeMm: {
+        wMm: Math.round(widthMm),
+        hMm: Math.round(heightMm),
+      },
+      selectedBaget: selectedBaget
+        ? {
+            id: selectedBaget.id,
+            article: selectedBaget.article,
+            title: selectedBaget.name,
+            widthMm: selectedBaget.width_mm,
+            pricePerM: selectedBaget.price_per_meter,
+          }
+        : null,
+      passepartout: materials.passepartout
+        ? {
+            enabled: true,
+            color: PASSEPARTOUT_COLOR_LABELS[materials.passepartoutColor],
+            topMm: passepartoutMm,
+            bottomMm: passepartoutBottomMm,
+          }
+        : {
+            enabled: false,
+            color: PASSEPARTOUT_COLOR_LABELS[materials.passepartoutColor],
+            topMm: 0,
+            bottomMm: 0,
+          },
+      glazing: GLAZING_LABELS[materials.glazing],
+      materials: summaryMaterials,
+      workType: WORK_TYPE_LABELS[materials.workType],
+      hanging: {
+        type: materials.hanging,
+        label: materials.hanging === 'crocodile' ? 'Крокодильчик' : 'Тросик',
+        quantity: hangingQuantity,
+      },
+      stand: materials.stand && standAllowed,
+    };
+  }, [
+    effectiveWidthMm,
+    materials.glazing,
+    materials.hanging,
+    materials.passepartout,
+    materials.passepartoutColor,
+    materials.stand,
+    materials.workType,
+    passepartoutBottomMm,
+    passepartoutMm,
+    selectedBaget,
+    standAllowed,
+    summaryMaterials,
+    widthMm,
+    heightMm,
+  ]);
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[20%_45%_35%] lg:items-start">
       <aside className="space-y-4 lg:sticky lg:top-24">
@@ -474,13 +580,31 @@ export default function BagetConfigurator() {
             <p className="text-sm text-neutral-600">Выберите багет для расчёта.</p>
           )}
 
-          <Link
-            href="/contacts"
+          <button
+            type="button"
+            onClick={() => setIsOrderModalOpen(true)}
+            disabled={!selectedBaget || !validSize}
             className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
           >
-            Получить расчёт
-          </Link>
+            Оформить заказ
+          </button>
         </div>
+
+        <BagetOrderModal
+          open={isOrderModalOpen}
+          onClose={() => setIsOrderModalOpen(false)}
+          orderSummary={orderSummary}
+          previewImageUrl={imageUrl ?? undefined}
+          totalPriceRub={calculation.total}
+          effectiveSize={{
+            wMm: Math.round(calculation.effectiveWidthMm),
+            hMm: Math.round(calculation.effectiveHeightMm),
+          }}
+          outerSize={{
+            wMm: Math.round(calculation.framedWidthMm),
+            hMm: Math.round(calculation.framedHeightMm),
+          }}
+        />
       </aside>
     </div>
   );
