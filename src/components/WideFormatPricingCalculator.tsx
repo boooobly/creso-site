@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  engineParsers,
   engineUiCatalog,
   type BannerDensity,
   type WideFormatMaterialType,
@@ -16,23 +16,33 @@ type WideFormatQuote = {
   width: number;
   height: number;
   quantity: number;
-  grommets: number;
   parsedValuesValid: boolean;
   positiveInputs: boolean;
   widthWarningCode: WideFormatWidthWarningCode;
   areaPerUnit: number;
+  billableAreaPerUnit: number;
   perimeterPerUnit: number;
   basePrintCost: number;
   edgeGluingCost: number;
-  grommetsCost: number;
+  imageWeldingCost: number;
+  plotterCutCost: number;
+  manualContourCutCost: number;
+  positioningMarksCutCost: number;
   extrasCost: number;
   totalCost: number;
 };
 
+type TransferredBagetImagePayload = {
+  dataUrl: string;
+  fileName: string;
+};
+
+const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
+
 const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
   invalid_width: 'Введите корректную ширину.',
   max_width_exceeded: `Максимальная ширина — ${engineUiCatalog.wideFormat.maxWidth} м.`,
-  banner_width_out_of_range: 'Для баннера допустимая ширина: 1.2–3 м.',
+  banner_width_out_of_range: 'Для баннера и материала заказчика допустимая ширина: 1.2–3 м.',
   sheet_width_out_of_range: 'Для плёнки и бумаги допустимая ширина: 1.06–1.6 м.',
 };
 
@@ -40,32 +50,54 @@ const EMPTY_QUOTE: WideFormatQuote = {
   width: 0,
   height: 0,
   quantity: 0,
-  grommets: 0,
   parsedValuesValid: false,
   positiveInputs: false,
   widthWarningCode: null,
   areaPerUnit: 0,
+  billableAreaPerUnit: 0,
   perimeterPerUnit: 0,
   basePrintCost: 0,
   edgeGluingCost: 0,
-  grommetsCost: 0,
+  imageWeldingCost: 0,
+  plotterCutCost: 0,
+  manualContourCutCost: 0,
+  positioningMarksCutCost: 0,
   extrasCost: 0,
   totalCost: 0,
 };
 
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(new Error('failed_to_read_file'));
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function WideFormatPricingCalculator() {
-  const [material, setMaterial] = useState<WideFormatMaterialType>('banner');
-  const [bannerDensity, setBannerDensity] = useState<BannerDensity>(300);
+  const router = useRouter();
+
+  const [material, setMaterial] = useState<WideFormatMaterialType>('banner_240_gloss_3_2m');
+  const [bannerDensity] = useState<BannerDensity>(300);
   const [width, setWidth] = useState<string>('1.2');
   const [height, setHeight] = useState<string>('1');
   const [quantity, setQuantity] = useState<string>('1');
+
   const [edgeGluing, setEdgeGluing] = useState(false);
-  const [grommets, setGrommets] = useState<string>('0');
+  const [imageWelding, setImageWelding] = useState(false);
+  const [plotterCutByRegistrationMarks, setPlotterCutByRegistrationMarks] = useState(false);
+  const [manualContourCut, setManualContourCut] = useState(false);
+  const [cutByPositioningMarks, setCutByPositioningMarks] = useState(false);
+
+  const [canvasImageFile, setCanvasImageFile] = useState<File | null>(null);
 
   const [quote, setQuote] = useState<WideFormatQuote>(EMPTY_QUOTE);
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState('');
   const [pricePulse, setPricePulse] = useState(false);
+
+  const isCanvasMaterial = material.includes('canvas');
 
   const quoteRequest = useMemo(() => ({
     material,
@@ -73,9 +105,23 @@ export default function WideFormatPricingCalculator() {
     widthInput: width,
     heightInput: height,
     quantityInput: quantity,
-    grommetsInput: grommets,
     edgeGluing,
-  }), [bannerDensity, edgeGluing, grommets, height, material, quantity, width]);
+    imageWelding,
+    plotterCutByRegistrationMarks,
+    manualContourCut,
+    cutByPositioningMarks,
+  }), [
+    bannerDensity,
+    cutByPositioningMarks,
+    edgeGluing,
+    height,
+    imageWelding,
+    manualContourCut,
+    material,
+    plotterCutByRegistrationMarks,
+    quantity,
+    width,
+  ]);
   const debouncedQuoteRequest = useDebouncedValue(quoteRequest, 300);
   const isQuotePending = quoteRequest !== debouncedQuoteRequest || isQuoteLoading;
 
@@ -91,10 +137,24 @@ export default function WideFormatPricingCalculator() {
       width,
       height,
       quantity,
-      grommets,
       edgeGluing,
+      imageWelding,
+      plotterCutByRegistrationMarks,
+      manualContourCut,
+      cutByPositioningMarks,
     });
-  }, [bannerDensity, edgeGluing, grommets, height, material, quantity, width]);
+  }, [
+    bannerDensity,
+    cutByPositioningMarks,
+    edgeGluing,
+    height,
+    imageWelding,
+    manualContourCut,
+    material,
+    plotterCutByRegistrationMarks,
+    quantity,
+    width,
+  ]);
 
   useEffect(() => {
     setPricePulse(true);
@@ -160,12 +220,14 @@ export default function WideFormatPricingCalculator() {
   const handleSendCalculation = () => {
     const calcSummary = [
       `Материал: ${material}`,
-      `Плотность: ${material === 'banner' ? `${bannerDensity}g` : '—'}`,
       `Ширина: ${width}`,
       `Высота: ${height}`,
       `Количество: ${quantity}`,
-      `Люверсы: ${grommets}`,
       `Проклейка края: ${edgeGluing ? 'Да' : 'Нет'}`,
+      `Сварка изображения: ${imageWelding ? 'Да' : 'Нет'}`,
+      `Плоттерная резка по меткам: ${plotterCutByRegistrationMarks ? 'Да' : 'Нет'}`,
+      `Ручная контурная резка: ${manualContourCut ? 'Да' : 'Нет'}`,
+      `Резка по меткам позиционирования (+30%): ${cutByPositioningMarks ? 'Да' : 'Нет'}`,
       `Итого: ${Math.round(quote.totalCost)} ₽`,
     ].join('; ');
 
@@ -176,6 +238,30 @@ export default function WideFormatPricingCalculator() {
       message: `Расчёт:
 ${calcSummary}`,
     });
+  };
+
+  const handleFrameInBaget = async () => {
+    if (canvasImageFile) {
+      try {
+        const dataUrl = await fileToDataUrl(canvasImageFile);
+        const payload: TransferredBagetImagePayload = {
+          dataUrl,
+          fileName: canvasImageFile.name,
+        };
+        localStorage.setItem(BAGET_TRANSFER_IMAGE_KEY, JSON.stringify(payload));
+      } catch {
+        localStorage.removeItem(BAGET_TRANSFER_IMAGE_KEY);
+      }
+    } else {
+      localStorage.removeItem(BAGET_TRANSFER_IMAGE_KEY);
+    }
+
+    const params = new URLSearchParams();
+    if (width.trim()) params.set('width', width.trim());
+    if (height.trim()) params.set('height', height.trim());
+    const query = params.toString();
+
+    router.push(query ? `/baget?${query}` : '/baget');
   };
 
   return (
@@ -199,25 +285,6 @@ ${calcSummary}`,
             <SelectArrow />
           </div>
         </div>
-
-        {material === 'banner' && (
-          <div className="space-y-2">
-            <label htmlFor="density" className="text-sm font-medium">Плотность</label>
-            <div className="relative">
-              <select
-                id="density"
-                value={bannerDensity}
-                onChange={(e) => setBannerDensity(engineParsers.parseIntegerInput(e.target.value, 300) as BannerDensity)}
-                className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
-              >
-                {[220, 300, 440].map((density) => (
-                  <option key={density} value={density}>{density}g</option>
-                ))}
-              </select>
-              <SelectArrow />
-            </div>
-          </div>
-        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -248,43 +315,53 @@ ${calcSummary}`,
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="quantity" className="text-sm font-medium">Количество</label>
-            <input
-              id="quantity"
-              type="number"
-              min={1}
-              step="1"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="grommets" className="text-sm font-medium">Люверсы (шт.)</label>
-            <input
-              id="grommets"
-              type="number"
-              min={0}
-              step="1"
-              value={grommets}
-              onChange={(e) => setGrommets(e.target.value)}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
-            />
-          </div>
+        <div className="space-y-2">
+          <label htmlFor="quantity" className="text-sm font-medium">Количество</label>
+          <input
+            id="quantity"
+            type="number"
+            min={1}
+            step="1"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+          />
         </div>
 
-        <label className="flex items-center gap-3 cursor-pointer pt-1">
-          <input
-            type="checkbox"
-            checked={edgeGluing}
-            onChange={(e) => setEdgeGluing(e.target.checked)}
-            className="h-4 w-4"
-          />
-          <span className="text-sm font-medium">Проклейка края (+40 ₽ за пог. метр)</span>
-        </label>
+        <div className="space-y-2 pt-1">
+          <p className="text-sm font-medium">Дополнительные услуги</p>
+          <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />
+          <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />
+          <CheckboxRow label="Плоттерная резка по меткам (+25 ₽ за пог. метр)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />
+          <CheckboxRow label="Ручная контурная резка (+10 ₽ за пог. метр)" checked={manualContourCut} onChange={setManualContourCut} />
+          <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
+        </div>
+
+        {isCanvasMaterial && (
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
+            <h3 className="text-base font-semibold">Печать на холсте</h3>
+            <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
+              Для последующего оформления в багет можно сразу передать размеры и изображение в конфигуратор.
+            </p>
+
+            <label htmlFor="canvas-image-file" className="mt-3 block text-sm font-medium">Изображение (опционально)</label>
+            <input
+              id="canvas-image-file"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setCanvasImageFile(e.target.files?.[0] ?? null)}
+              className="mt-1 block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-200 file:px-3 file:py-2 file:font-medium dark:file:bg-neutral-700"
+            />
+
+            <button
+              type="button"
+              onClick={handleFrameInBaget}
+              className="mt-4 w-full rounded-xl bg-red-600 px-5 py-3 text-center text-sm font-semibold text-white transition-all hover:scale-[1.02] md:w-auto"
+            >
+              Оформить в багет
+            </button>
+          </div>
+        )}
 
         {widthWarning && (
           <p className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
@@ -296,9 +373,17 @@ ${calcSummary}`,
       <aside className="card h-fit p-5 md:p-6 space-y-4 lg:sticky lg:top-24">
         <h2 className="text-xl font-semibold">Расчёт</h2>
         <div className="space-y-2 text-sm">
-          <SummaryRow label="Площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
-          <SummaryRow label="Базовая печать" value={`${quote.basePrintCost.toLocaleString('ru-RU')} ₽`} />
+          <SummaryRow label="Фактическая площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
+          {quote.parsedValuesValid && quote.billableAreaPerUnit !== quote.areaPerUnit && (
+            <SummaryRow label="Тарифицируемая площадь" value={`${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²`} />
+          )}
+          <SummaryRow label="Материал" value={`${quote.basePrintCost.toLocaleString('ru-RU')} ₽`} />
           <SummaryRow label="Доп. услуги" value={`${quote.extrasCost.toLocaleString('ru-RU')} ₽`} />
+          {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
+          {quote.imageWeldingCost > 0 && <SummaryRow label="— Сварка изображения" value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
+          {quote.plotterCutCost > 0 && <SummaryRow label="— Плоттерная резка" value={`${quote.plotterCutCost.toLocaleString('ru-RU')} ₽`} />}
+          {quote.manualContourCutCost > 0 && <SummaryRow label="— Ручная контурная" value={`${quote.manualContourCutCost.toLocaleString('ru-RU')} ₽`} />}
+          {quote.positioningMarksCutCost > 0 && <SummaryRow label="— Метки позиционирования" value={`${quote.positioningMarksCutCost.toLocaleString('ru-RU')} ₽`} />}
         </div>
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
@@ -320,6 +405,20 @@ ${calcSummary}`,
         <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
       </aside>
     </div>
+  );
+}
+
+function CheckboxRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
+  return (
+    <label className="flex items-center gap-3 cursor-pointer">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="h-4 w-4"
+      />
+      <span className="text-sm">{label}</span>
+    </label>
   );
 }
 
