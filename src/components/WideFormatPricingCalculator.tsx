@@ -232,6 +232,12 @@ export default function WideFormatPricingCalculator() {
   }, [debouncedQuoteRequest]);
 
   const widthWarning = quote.widthWarningCode ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode] : '';
+  const canShowPricingDetails = quote.parsedValuesValid && quote.positiveInputs && quote.widthWarningCode === null;
+  const pricePerM2 = canShowPricingDetails && quote.billableAreaPerUnit > 0 && quote.quantity > 0
+    ? quote.basePrintCost / (quote.billableAreaPerUnit * quote.quantity)
+    : null;
+
+  const formatRubles = (value: number) => `${Math.round(value).toLocaleString('ru-RU')} ₽`;
 
   const handleSendCalculation = () => {
     const calcSummary = [
@@ -278,6 +284,22 @@ ${calcSummary}`,
     const query = params.toString();
 
     router.push(query ? `/baget?${query}` : '/baget');
+  };
+
+  const handleOrderClick = () => {
+    window.dispatchEvent(new CustomEvent('wideFormatPrefill', {
+      detail: {
+        width,
+        height,
+        quantity,
+        material,
+      },
+    }));
+
+    const formSection = document.getElementById('wide-format-form');
+    if (formSection) {
+      formSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -393,8 +415,20 @@ ${calcSummary}`,
           {quote.parsedValuesValid && quote.billableAreaPerUnit !== quote.areaPerUnit && (
             <SummaryRow label="Тарифицируемая площадь" value={`${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²`} />
           )}
-          <SummaryRow label="Материал" value={`${quote.basePrintCost.toLocaleString('ru-RU')} ₽`} />
-          <SummaryRow label="Доп. услуги" value={`${quote.extrasCost.toLocaleString('ru-RU')} ₽`} />
+          <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
+            <p className="text-sm font-medium">Материал</p>
+            <p className="text-xs text-neutral-600 dark:text-neutral-400">({(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м² × {pricePerM2 ? formatRubles(pricePerM2) : '—'})</p>
+            <p className="text-sm font-semibold">= {formatRubles(quote.basePrintCost)}</p>
+            {pricePerM2 && (
+              <p className="text-right text-xs text-neutral-500 dark:text-neutral-400">
+                {formatRubles(pricePerM2)} / м²
+              </p>
+            )}
+          </div>
+          <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
+            <p className="text-sm font-medium">Доп. услуги</p>
+            <p className="text-sm font-semibold">= {formatRubles(quote.extrasCost)}</p>
+          </div>
           {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.imageWeldingCost > 0 && <SummaryRow label="— Сварка изображения" value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.plotterCutCost > 0 && <SummaryRow label="— Плоттерная резка" value={`${quote.plotterCutCost.toLocaleString('ru-RU')} ₽`} />}
@@ -403,13 +437,14 @@ ${calcSummary}`,
         </div>
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
+          <div className="mb-3 border-t border-neutral-200 pt-3 dark:border-neutral-700" />
           <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className={`mt-1 text-4xl font-extrabold transition-transform duration-300 md:text-5xl ${pricePulse ? 'scale-105' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
+          <p className={`mt-1 text-5xl font-extrabold transition-transform duration-300 md:text-6xl ${pricePulse ? 'scale-105' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
           <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
           <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
-          <Button variant="primary" className="mt-4 w-full">Заказать печать</Button>
+          <Button variant="primary" className="mt-4 w-full" onClick={handleOrderClick}>Заказать печать</Button>
           <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Отправить этот расчёт</button>
         </div>
 
@@ -465,14 +500,16 @@ function Button({
   children,
   variant,
   className = '',
+  onClick,
 }: {
   children: React.ReactNode;
   variant: 'primary';
   className?: string;
+  onClick?: () => void;
 }) {
   if (variant === 'primary') {
     return (
-      <button type="button" className={`btn-primary ${className}`.trim()}>
+      <button type="button" onClick={onClick} className={`btn-primary ${className}`.trim()}>
         {children}
       </button>
     );
