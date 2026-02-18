@@ -1,4 +1,8 @@
-import { WIDE_FORMAT_PRICING_CONFIG } from '@/lib/pricing-config/wideFormat';
+import {
+  isBannerMaterial,
+  isFilmMaterial,
+  WIDE_FORMAT_PRICING_CONFIG,
+} from '@/lib/pricing-config/wideFormat';
 import { parseNumericInput } from './shared';
 import type { BannerDensity, WideFormatMaterialType } from './types';
 
@@ -18,8 +22,6 @@ const BANNER_MATERIALS: ReadonlySet<WideFormatMaterialType> = new Set([
 export type WideFormatWidthWarningCode =
   | 'invalid_width'
   | 'max_width_exceeded'
-  | 'banner_width_out_of_range'
-  | 'sheet_width_out_of_range'
   | null;
 
 export type WideFormatPricingInput = {
@@ -55,23 +57,9 @@ export type WideFormatCalculationResult = {
   totalCost: number;
 };
 
-export function getWideFormatWidthWarningCode(material: WideFormatMaterialType, width: number): WideFormatWidthWarningCode {
+export function getWideFormatWidthWarningCode(_material: WideFormatMaterialType, width: number): WideFormatWidthWarningCode {
   if (!Number.isFinite(width)) return 'invalid_width';
   if (width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
-
-  if (
-    BANNER_MATERIALS.has(material) &&
-    (width < WIDE_FORMAT_PRICING_CONFIG.bannerWidthRange.min || width > WIDE_FORMAT_PRICING_CONFIG.bannerWidthRange.max)
-  ) {
-    return 'banner_width_out_of_range';
-  }
-
-  if (
-    !BANNER_MATERIALS.has(material) &&
-    (width < WIDE_FORMAT_PRICING_CONFIG.sheetWidthRange.min || width > WIDE_FORMAT_PRICING_CONFIG.sheetWidthRange.max)
-  ) {
-    return 'sheet_width_out_of_range';
-  }
 
   return null;
 }
@@ -107,15 +95,15 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     ? billableAreaPerUnit * quantity * materialPricePerM2
     : 0;
 
-  const edgeGluingCost = input.edgeGluing && parsedValuesValid && positiveInputs && widthWarningCode === null
+  const edgeGluingCost = input.edgeGluing && isBannerMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
     ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.edgeGluingPerimeterPrice
     : 0;
 
-  const imageWeldingCost = input.imageWelding && parsedValuesValid && positiveInputs && widthWarningCode === null
+  const imageWeldingCost = input.imageWelding && width > WIDE_FORMAT_PRICING_CONFIG.maxWidth && parsedValuesValid && positiveInputs && widthWarningCode === null
     ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.imageWeldingPerimeterPrice
     : 0;
 
-  const plotterCutCost = input.plotterCutByRegistrationMarks && parsedValuesValid && positiveInputs && widthWarningCode === null
+  const plotterCutCost = input.plotterCutByRegistrationMarks && isFilmMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
     ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.plotterCutPerimeterPrice
     : 0;
 

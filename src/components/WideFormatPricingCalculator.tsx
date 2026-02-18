@@ -11,6 +11,7 @@ import {
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
+import { isBannerMaterial, isFilmMaterial, WIDE_FORMAT_PRICING_CONFIG } from '@/lib/pricing-config/wideFormat';
 
 type WideFormatQuote = {
   width: number;
@@ -41,9 +42,7 @@ const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
 
 const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
   invalid_width: 'Введите корректную ширину.',
-  max_width_exceeded: `Максимальная ширина — ${engineUiCatalog.wideFormat.maxWidth} м.`,
-  banner_width_out_of_range: 'Для баннера и материала заказчика допустимая ширина: 1.2–3 м.',
-  sheet_width_out_of_range: 'Для плёнки и бумаги допустимая ширина: 1.06–1.6 м.',
+  max_width_exceeded: `Максимальная ширина — ${WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
 };
 
 const EMPTY_QUOTE: WideFormatQuote = {
@@ -98,6 +97,11 @@ export default function WideFormatPricingCalculator() {
   const [pricePulse, setPricePulse] = useState(false);
 
   const isCanvasMaterial = material.includes('canvas');
+
+  const isBanner = isBannerMaterial(material);
+  const isFilm = isFilmMaterial(material);
+  const parsedWidth = Number(width);
+  const canShowWelding = Number.isFinite(parsedWidth) && parsedWidth > WIDE_FORMAT_PRICING_CONFIG.maxWidth;
 
   const quoteRequest = useMemo(() => ({
     material,
@@ -161,6 +165,18 @@ export default function WideFormatPricingCalculator() {
     const timer = window.setTimeout(() => setPricePulse(false), 300);
     return () => window.clearTimeout(timer);
   }, [quote.totalCost]);
+
+  useEffect(() => {
+    if (!isBanner && edgeGluing) setEdgeGluing(false);
+  }, [edgeGluing, isBanner]);
+
+  useEffect(() => {
+    if (!canShowWelding && imageWelding) setImageWelding(false);
+  }, [canShowWelding, imageWelding]);
+
+  useEffect(() => {
+    if (!isFilm && plotterCutByRegistrationMarks) setPlotterCutByRegistrationMarks(false);
+  }, [isFilm, plotterCutByRegistrationMarks]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -330,9 +346,9 @@ ${calcSummary}`,
 
         <div className="space-y-2 pt-1">
           <p className="text-sm font-medium">Дополнительные услуги</p>
-          <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />
-          <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />
-          <CheckboxRow label="Плоттерная резка по меткам (+25 ₽ за пог. метр)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />
+          {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
+          {canShowWelding && <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />}
+          {isFilm && <CheckboxRow label="Плоттерная резка по меткам (+25 ₽ за пог. метр)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
           <CheckboxRow label="Ручная контурная резка (+10 ₽ за пог. метр)" checked={manualContourCut} onChange={setManualContourCut} />
           <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
         </div>

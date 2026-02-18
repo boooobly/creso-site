@@ -1,5 +1,30 @@
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 
+const BANNER_MATERIALS: ReadonlySet<WideFormatMaterialType> = new Set([
+  'banner_240_gloss_3_2m',
+  'banner_240_matt_3_2m',
+  'banner_280',
+  'banner_330',
+  'banner_440',
+  'banner_460_cast_3_2m',
+  'banner_mesh_380_3_2m',
+  'banner_510_cast_3_2m',
+]);
+
+const FILM_MATERIALS: ReadonlySet<WideFormatMaterialType> = new Set([
+  'self_adhesive_film_gloss',
+  'perforated_film_1_37',
+  'trans_film_1_27',
+]);
+
+export function isBannerMaterial(material: WideFormatMaterialType): boolean {
+  return BANNER_MATERIALS.has(material);
+}
+
+export function isFilmMaterial(material: WideFormatMaterialType): boolean {
+  return FILM_MATERIALS.has(material);
+}
+
 export const WIDE_FORMAT_MATERIAL_OPTIONS = [
   { value: 'banner_240_gloss_3_2m', label: 'Баннер 240 г/м² глянец, 3.2 м' },
   { value: 'banner_240_matt_3_2m', label: 'Баннер 240 г/м² матовый, 3.2 м' },
@@ -26,8 +51,6 @@ export const WIDE_FORMAT_MATERIAL_OPTIONS = [
 
 export const WIDE_FORMAT_PRICING_CONFIG = {
   maxWidth: 3.2,
-  bannerWidthRange: { min: 1.2, max: 3 },
-  sheetWidthRange: { min: 1.06, max: 1.6 },
   edgeGluingPerimeterPrice: 50,
   imageWeldingPerimeterPrice: 150,
   plotterCutPerimeterPrice: 25,
