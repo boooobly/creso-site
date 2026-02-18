@@ -49,6 +49,14 @@ export const WIDE_FORMAT_MATERIAL_OPTIONS = [
   { value: 'customer_roll_smooth', label: 'Материал заказчика (гладкий)' },
 ] as const;
 
+const WIDE_FORMAT_MATERIAL_LABELS: Record<WideFormatMaterialType, string> = Object.fromEntries(
+  WIDE_FORMAT_MATERIAL_OPTIONS.map((option) => [option.value, option.label]),
+) as Record<WideFormatMaterialType, string>;
+
+export function getWideFormatMaterialLabel(material: WideFormatMaterialType): string {
+  return WIDE_FORMAT_MATERIAL_LABELS[material] ?? material;
+}
+
 export const WIDE_FORMAT_PRICING_CONFIG = {
   maxWidth: 3.2,
   edgeGluingPerimeterPrice: 50,
