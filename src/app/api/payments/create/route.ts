@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       provider: 'mock',
       paymentRef,
       amount,
-      redirectUrl: `/pay/mock?ref=${encodeURIComponent(paymentRef)}`,
+      redirectUrl: `/pay/mock?ref=${encodeURIComponent(paymentRef)}&order=${encodeURIComponent(order.number)}`,
     });
   } catch {
     return NextResponse.json({ ok: false, error: 'Payment session creation failed.' }, { status: 500 });
