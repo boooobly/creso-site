@@ -21,7 +21,7 @@ import {
   isFilmMaterial,
   WIDE_FORMAT_PRICING_CONFIG,
 } from '@/lib/pricing-config/wideFormat';
-import FileUploadButton from '@/components/FileUploadButton';
+import ImageDropzone from '@/components/ImageDropzone';
 import {
   Select,
   SelectContent,
@@ -434,13 +434,14 @@ export default function WideFormatPricingCalculator() {
               Для последующего оформления в багет можно сразу передать размеры и изображение в конфигуратор.
             </p>
 
-            <p className="mt-3 text-sm font-medium">Изображение (опционально)</p>
-            <FileUploadButton
-              accept="image/*"
-              value={canvasImageFile}
-              onChange={setCanvasImageFile}
-              helperText="JPG, PNG, WEBP, TIFF. До 50 МБ для отправки в Telegram."
-            />
+            <div className="mt-3">
+              <ImageDropzone
+                value={canvasImageFile}
+                onChange={setCanvasImageFile}
+                title="Изображение (опционально)"
+                helperText="JPG, PNG, WEBP, TIFF. До 50 МБ."
+              />
+            </div>
 
             <button
               type="button"
