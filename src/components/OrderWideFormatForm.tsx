@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import type { WideFormatMaterialType } from '@/lib/calculations/types';
 
 type FormValues = {
   name: string;
@@ -10,7 +11,8 @@ type FormValues = {
   width: string;
   height: string;
   quantity: string;
-  material: string;
+  materialLabel: string;
+  materialId: WideFormatMaterialType | '';
   comment: string;
   website: string;
 };
@@ -24,16 +26,20 @@ const defaultValues: FormValues = {
   width: '',
   height: '',
   quantity: '',
-  material: '',
+  materialLabel: '',
+  materialId: '',
   comment: '',
   website: '',
 };
 
 type WideFormatPrefillDetail = {
-  width?: string;
-  height?: string;
+  widthM?: string;
+  heightM?: string;
+  widthMm?: number | null;
+  heightMm?: number | null;
   quantity?: string;
-  material?: string;
+  materialId?: WideFormatMaterialType;
+  materialLabel?: string;
 };
 
 type WideFormatPrefillEvent = CustomEvent<WideFormatPrefillDetail>;
@@ -57,10 +63,11 @@ export default function OrderWideFormatForm() {
 
       setValues((prev) => ({
         ...prev,
-        width: detail?.width ?? prev.width,
-        height: detail?.height ?? prev.height,
+        width: typeof detail?.widthMm === 'number' ? String(detail.widthMm) : prev.width,
+        height: typeof detail?.heightMm === 'number' ? String(detail.heightMm) : prev.height,
         quantity: detail?.quantity ?? prev.quantity,
-        material: detail?.material ?? prev.material,
+        materialLabel: detail?.materialLabel ?? prev.materialLabel,
+        materialId: detail?.materialId ?? prev.materialId,
       }));
 
       setIsScrollHighlighted(true);
@@ -140,7 +147,8 @@ export default function OrderWideFormatForm() {
       formData.set('width', values.width.trim());
       formData.set('height', values.height.trim());
       formData.set('quantity', values.quantity.trim());
-      formData.set('material', values.material.trim());
+      formData.set('material', values.materialLabel.trim());
+      formData.set('materialId', values.materialId);
       formData.set('comment', values.comment.trim());
       formData.set('website', values.website);
       if (file) {
@@ -265,7 +273,7 @@ export default function OrderWideFormatForm() {
 
           <label className="space-y-2">
             <span className="text-sm font-medium">Материал</span>
-            <input className={inputClass('material')} value={values.material} onChange={(e) => setValues((prev) => ({ ...prev, material: e.target.value }))} />
+            <input className={inputClass('materialLabel')} value={values.materialLabel} onChange={(e) => setValues((prev) => ({ ...prev, materialLabel: e.target.value }))} />
           </label>
         </div>
 

@@ -10,7 +10,12 @@ import {
 } from '@/lib/engine';
 import { trackEvent } from '@/lib/analytics';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
-import { isBannerMaterial, isFilmMaterial, WIDE_FORMAT_PRICING_CONFIG } from '@/lib/pricing-config/wideFormat';
+import {
+  getWideFormatMaterialLabel,
+  isBannerMaterial,
+  isFilmMaterial,
+  WIDE_FORMAT_PRICING_CONFIG,
+} from '@/lib/pricing-config/wideFormat';
 
 type WideFormatQuote = {
   width: number;
@@ -266,12 +271,18 @@ export default function WideFormatPricingCalculator() {
   const handleOrderClick = () => {
     trackEvent('order_button_clicked', { calculator: 'wide_format' });
 
+    const parsedWidth = Number(width);
+    const parsedHeight = Number(height);
+
     window.dispatchEvent(new CustomEvent('wideFormatPrefill', {
       detail: {
-        width,
-        height,
+        widthM: width,
+        heightM: height,
+        widthMm: Number.isFinite(parsedWidth) ? Math.round(parsedWidth * 1000) : null,
+        heightMm: Number.isFinite(parsedHeight) ? Math.round(parsedHeight * 1000) : null,
         quantity,
-        material,
+        materialId: material,
+        materialLabel: getWideFormatMaterialLabel(material),
       },
     }));
 
