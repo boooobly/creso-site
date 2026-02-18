@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
+import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentWithCaption';
+
+export const runtime = 'nodejs';
+
+const MAX_TELEGRAM_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/tiff']);
 
 function toStringValue(value: FormDataEntryValue | null) {
   return typeof value === 'string' ? value.trim() : '';
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const name = toStringValue(formData.get('name'));
-    const phone = toStringValue(formData.get('phone')).replace(/[^\d+]/g, '');
+    const phoneRaw = toStringValue(formData.get('phone')).replace(/\D/g, '');
     const email = toStringValue(formData.get('email'));
     const width = toStringValue(formData.get('width'));
     const height = toStringValue(formData.get('height'));
@@ -77,19 +83,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
     }
 
-    if (!name || !phone) {
+    if (!name || !phoneRaw) {
       return NextResponse.json({ ok: false, error: 'Заполните обязательные поля.' }, { status: 400 });
     }
 
-    if (!/^(\+7\d{10}|8\d{10})$/.test(phone)) {
+    if (!/^(7\d{10}|8\d{10})$/.test(phoneRaw)) {
       return NextResponse.json({ ok: false, error: 'Неверный формат телефона.' }, { status: 400 });
     }
+
+    const phone = phoneRaw.startsWith('8') ? `7${phoneRaw.slice(1)}` : phoneRaw;
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ ok: false, error: 'Некорректный email.' }, { status: 400 });
     }
 
     const file = fileRaw instanceof File ? fileRaw : undefined;
+
+    if (file && !ALLOWED_IMAGE_TYPES.has(file.type)) {
+      return NextResponse.json({ ok: false, error: 'Допустимы только изображения (JPG, PNG, WEBP, TIFF).' }, { status: 400 });
+    }
 
     const message = [
       'Новая заявка — Широкоформатная печать',
@@ -103,10 +115,28 @@ export async function POST(request: NextRequest) {
       `Файл: ${file?.name ? `${file.name} (${Math.round(file.size / 1024)} KB)` : '—'}`,
     ].join('\n');
 
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const telegramCanSendFile = Boolean(botToken && chatId && file && file.size <= MAX_TELEGRAM_FILE_SIZE_BYTES);
+    const isFileTooLarge = Boolean(file && file.size > MAX_TELEGRAM_FILE_SIZE_BYTES);
+
+    const telegramText = isFileTooLarge
+      ? `${message}\n\n⚠️ File too large for bot upload (>50MB).`
+      : message;
+
     const [emailSent, telegramSent] = await Promise.all([
       sendEmail(message, file).catch(() => false),
-      sendTelegramMessage(message).catch(() => false),
+      sendTelegramMessage(telegramText).catch(() => false),
     ]);
+
+    if (telegramCanSendFile) {
+      await sendTelegramDocument({
+        chatId: chatId!,
+        token: botToken!,
+        caption: 'Файл для заявки — широкоформатная печать',
+        file,
+      }).catch(() => null);
+    }
 
     if (!emailSent && !telegramSent) {
       return NextResponse.json(
@@ -115,7 +145,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ ok: true });
+    if (isFileTooLarge) {
+      return NextResponse.json({ ok: true, fileSent: false, reason: 'too_large' });
+    }
+
+    return NextResponse.json({ ok: true, fileSent: telegramCanSendFile ? true : undefined });
   } catch {
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }

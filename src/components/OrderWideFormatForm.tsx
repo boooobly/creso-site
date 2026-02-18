@@ -33,6 +33,13 @@ export default function OrderWideFormatForm() {
   const [formError, setFormError] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isFileTooLargeForTelegram = Boolean(file && file.size > 50 * 1024 * 1024);
+
+  const formatFileSize = (size: number) => {
+    if (size < 1024) return `${size} Б`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} КБ`;
+    return `${(size / (1024 * 1024)).toFixed(1)} МБ`;
+  };
 
   const bagetHref = useMemo(() => {
     const params = new URLSearchParams();
@@ -86,28 +93,21 @@ export default function OrderWideFormatForm() {
     setIsSending(true);
 
     try {
-      const response = await fetch('/api/leads', {
+      const formData = new FormData();
+      formData.set('name', values.name.trim());
+      formData.set('phone', getPhoneDigits(values.phone));
+      formData.set('email', values.email.trim());
+      formData.set('width', values.width.trim());
+      formData.set('height', values.height.trim());
+      formData.set('comment', values.comment.trim());
+      formData.set('website', values.website);
+      if (file) {
+        formData.set('file', file, file.name);
+      }
+
+      const response = await fetch('/api/wide-format-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          source: 'wideformat',
-          name: values.name.trim(),
-          phone: getPhoneDigits(values.phone),
-          email: values.email.trim() || undefined,
-          widthMm: values.width.trim() ? Number(values.width.trim()) : undefined,
-          heightMm: values.height.trim() ? Number(values.height.trim()) : undefined,
-          comment: values.comment.trim() || undefined,
-          extras: {
-            file: file
-              ? {
-                  name: file.name,
-                  size: file.size,
-                  type: file.type || undefined,
-                }
-              : undefined,
-          },
-          company: values.website,
-        }),
+        body: formData,
       });
 
       const result = await response.json();
@@ -116,7 +116,11 @@ export default function OrderWideFormatForm() {
         throw new Error(result.error || 'Не удалось отправить заявку');
       }
 
-      setSuccessMessage('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
+      if (result.fileSent === false && result.reason === 'too_large') {
+        setSuccessMessage('Заявка отправлена. Файл слишком большой для Telegram-бота, менеджер свяжется с вами для получения исходника.');
+      } else {
+        setSuccessMessage('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
+      }
       setValues(defaultValues);
       setFile(null);
       setErrors({});
@@ -170,6 +174,7 @@ export default function OrderWideFormatForm() {
               ref={fileInputRef}
               className="sr-only"
               type="file"
+              accept="image/*"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
             />
             <label
@@ -178,10 +183,11 @@ export default function OrderWideFormatForm() {
             >
               Загрузить файл
             </label>
-            <p className="text-sm text-neutral-500">JPG, PNG, PDF до 20 МБ</p>
+            <p className="text-sm text-neutral-500">JPG, PNG, WEBP, TIFF. До 50 МБ для отправки в Telegram.</p>
             {file && (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-lg bg-neutral-100 px-2 py-1 text-sm text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">{file.name}</span>
+                <span className="text-xs text-neutral-600 dark:text-neutral-300">{formatFileSize(file.size)}</span>
                 <span className="text-xs font-medium text-emerald-600">Файл выбран</span>
                 <button
                   type="button"
@@ -195,6 +201,7 @@ export default function OrderWideFormatForm() {
                 </button>
               </div>
             )}
+            {isFileTooLargeForTelegram && <p className="text-xs text-amber-600">Telegram bot may not accept files larger than 50MB, we will send a link instead.</p>}
           </div>
 
           <label className="space-y-2">
