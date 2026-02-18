@@ -4,6 +4,8 @@ import bagetData from '../../../../data/baget.json';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import { getPrismaClient } from '@/lib/db/prisma';
 import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
+import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
+import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
 
 const bagetItemSchema = z.object({
@@ -162,6 +164,24 @@ export async function POST(request: NextRequest) {
       prepayAmount,
     });
 
+
+    const shouldSendCustomerEmail = process.env.SEND_CUSTOMER_EMAILS === 'true';
+    const customerEmail = parsed.data.customer.email?.trim();
+    const pdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf`;
+
+    if (shouldSendCustomerEmail && customerEmail) {
+      await sendCustomerOrderEmail({
+        toEmail: customerEmail,
+        customerName: parsed.data.customer.name,
+        orderNumber,
+        total: quote.total,
+        prepayRequired,
+        prepayAmount,
+        pdfUrl,
+      }).catch((error) => {
+        console.error('[orders] Customer email send failed', error);
+      });
+    }
     return NextResponse.json({
       orderNumber,
       quote,
