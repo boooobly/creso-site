@@ -16,10 +16,12 @@ import {
   WIDE_FORMAT_CATEGORY_OPTIONS,
   WIDE_FORMAT_VARIANTS_BY_CATEGORY,
   getWideFormatMaterialLabel,
+  isExtrasAllowedForWideFormat,
   isBannerMaterial,
   isFilmMaterial,
   WIDE_FORMAT_PRICING_CONFIG,
 } from '@/lib/pricing-config/wideFormat';
+import FileUploadButton from '@/components/FileUploadButton';
 import {
   Select,
   SelectContent,
@@ -117,6 +119,7 @@ export default function WideFormatPricingCalculator() {
 
   const isBanner = isBannerMaterial(material);
   const isFilm = isFilmMaterial(material);
+  const isExtrasAllowed = isExtrasAllowedForWideFormat(material);
   const availableVariants = WIDE_FORMAT_VARIANTS_BY_CATEGORY[category];
   const parsedWidth = Number(width);
   const canShowWelding = Number.isFinite(parsedWidth) && parsedWidth > WIDE_FORMAT_PRICING_CONFIG.maxWidth;
@@ -203,6 +206,15 @@ export default function WideFormatPricingCalculator() {
   useEffect(() => {
     if (!isFilm && plotterCutByRegistrationMarks) setPlotterCutByRegistrationMarks(false);
   }, [isFilm, plotterCutByRegistrationMarks]);
+
+  useEffect(() => {
+    if (!isExtrasAllowed) {
+      setEdgeGluing(false);
+      setImageWelding(false);
+      setPlotterCutByRegistrationMarks(false);
+      setCutByPositioningMarks(false);
+    }
+  }, [isExtrasAllowed]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -405,13 +417,15 @@ export default function WideFormatPricingCalculator() {
           />
         </div>
 
-        <div className="space-y-2 pt-1">
-          <p className="text-sm font-medium">Дополнительные услуги</p>
-          {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
-          {canShowWelding && <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />}
-          {isFilm && <CheckboxRow label="Плоттерная резка по меткам (+25 ₽ за пог. метр)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
-          <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
-        </div>
+        {isExtrasAllowed && (
+          <div className="space-y-2 pt-1">
+            <p className="text-sm font-medium">Дополнительные услуги</p>
+            {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
+            {canShowWelding && <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />}
+            {isFilm && <CheckboxRow label="Плоттерная резка по меткам (+25 ₽ за пог. метр)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
+            <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
+          </div>
+        )}
 
         {isCanvasMaterial && (
           <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
@@ -420,13 +434,12 @@ export default function WideFormatPricingCalculator() {
               Для последующего оформления в багет можно сразу передать размеры и изображение в конфигуратор.
             </p>
 
-            <label htmlFor="canvas-image-file" className="mt-3 block text-sm font-medium">Изображение (опционально)</label>
-            <input
-              id="canvas-image-file"
-              type="file"
+            <p className="mt-3 text-sm font-medium">Изображение (опционально)</p>
+            <FileUploadButton
               accept="image/*"
-              onChange={(e) => setCanvasImageFile(e.target.files?.[0] ?? null)}
-              className="mt-1 block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-200 file:px-3 file:py-2 file:font-medium dark:file:bg-neutral-700"
+              value={canvasImageFile}
+              onChange={setCanvasImageFile}
+              helperText="JPG, PNG, WEBP, TIFF. До 50 МБ для отправки в Telegram."
             />
 
             <button

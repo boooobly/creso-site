@@ -23,6 +23,10 @@ export function isFilmMaterial(material: WideFormatMaterialType): boolean {
   return FILM_MATERIALS.has(material);
 }
 
+export function isExtrasAllowedForWideFormat(material: WideFormatMaterialType): boolean {
+  return isBannerMaterial(material) || isFilmMaterial(material);
+}
+
 export const WIDE_FORMAT_MATERIAL_OPTIONS = [
   { value: 'banner_240_gloss_3_2m', label: 'Баннер 240 г/м² глянец, 3.2 м' },
   { value: 'banner_330', label: 'Баннер 330 г/м²' },
