@@ -12,7 +12,7 @@ import bagetData from '../../../data/baget.json';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
-import BagetOrderModal, { BagetOrderSummary } from './BagetOrderModal';
+import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
 import BagetPreview from './BagetPreview';
 
 const ITEMS_PER_PAGE = 12;
@@ -278,6 +278,44 @@ export default function BagetConfigurator() {
     heightMm,
   ]);
 
+
+
+  const orderInput = useMemo<{ baget: BagetOrderRequestBagetInput; fulfillmentType: 'pickup' } | null>(() => {
+    if (!selectedBaget) return null;
+
+    return {
+      baget: {
+        width: widthMm,
+        height: heightMm,
+        quantity: 1,
+        selectedBagetId: selectedBaget.id,
+        workType: materials.workType,
+        glazing: materials.glazing,
+        hasPassepartout: materials.passepartout,
+        passepartoutSize: passepartoutMm,
+        passepartoutBottomSize: passepartoutBottomMm,
+        backPanel: materials.backPanel,
+        hangerType: materials.hanging,
+        stand: materials.stand,
+        stretcherType: materials.stretcherType,
+      },
+      fulfillmentType: 'pickup',
+    };
+  }, [
+    heightMm,
+    materials.backPanel,
+    materials.glazing,
+    materials.hanging,
+    materials.passepartout,
+    materials.stand,
+    materials.stretcherType,
+    materials.workType,
+    passepartoutBottomMm,
+    passepartoutMm,
+    selectedBaget,
+    widthMm,
+  ]);
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[20%_45%_35%] lg:items-start">
       <aside className="space-y-4 lg:sticky lg:top-24">
@@ -473,6 +511,7 @@ export default function BagetConfigurator() {
           open={isOrderModalOpen}
           onClose={() => setIsOrderModalOpen(false)}
           orderSummary={orderSummary}
+          orderInput={orderInput}
           previewImageUrl={imageUrl ?? undefined}
           totalPriceRub={quote.total}
           effectiveSize={{
