@@ -65,12 +65,12 @@ export function getWideFormatWidthWarningCode(_material: WideFormatMaterialType,
 }
 
 function getMaterialPricePerM2(material: WideFormatMaterialType): number {
-  if (material === 'customer_roll_textured') {
-    return WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
-  }
+  if (material === 'customer_roll_textured' || material === 'customer_roll_smooth') {
+    const customerRollPerPass = material === 'customer_roll_textured'
+      ? WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured
+      : WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth;
 
-  if (material === 'customer_roll_smooth') {
-    return WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
+    return customerRollPerPass * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
   }
 
   return WIDE_FORMAT_PRICING_CONFIG.pricesRUBPerM2[material];
