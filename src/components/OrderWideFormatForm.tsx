@@ -13,6 +13,11 @@ type FormValues = {
   quantity: string;
   materialLabel: string;
   materialId: WideFormatMaterialType | '';
+  edgeGluing: boolean;
+  imageWelding: boolean;
+  plotterCutByRegistrationMarks: boolean;
+  manualContourCut: boolean;
+  cutByPositioningMarks: boolean;
   comment: string;
   website: string;
 };
@@ -28,6 +33,11 @@ const defaultValues: FormValues = {
   quantity: '',
   materialLabel: '',
   materialId: '',
+  edgeGluing: false,
+  imageWelding: false,
+  plotterCutByRegistrationMarks: false,
+  manualContourCut: false,
+  cutByPositioningMarks: false,
   comment: '',
   website: '',
 };
@@ -40,6 +50,11 @@ type WideFormatPrefillDetail = {
   quantity?: string;
   materialId?: WideFormatMaterialType;
   materialLabel?: string;
+  edgeGluing?: boolean;
+  imageWelding?: boolean;
+  plotterCutByRegistrationMarks?: boolean;
+  manualContourCut?: boolean;
+  cutByPositioningMarks?: boolean;
 };
 
 type WideFormatPrefillEvent = CustomEvent<WideFormatPrefillDetail>;
@@ -68,6 +83,11 @@ export default function OrderWideFormatForm() {
         quantity: detail?.quantity ?? prev.quantity,
         materialLabel: detail?.materialLabel ?? prev.materialLabel,
         materialId: detail?.materialId ?? prev.materialId,
+        edgeGluing: detail?.edgeGluing ?? prev.edgeGluing,
+        imageWelding: detail?.imageWelding ?? prev.imageWelding,
+        plotterCutByRegistrationMarks: detail?.plotterCutByRegistrationMarks ?? prev.plotterCutByRegistrationMarks,
+        manualContourCut: detail?.manualContourCut ?? prev.manualContourCut,
+        cutByPositioningMarks: detail?.cutByPositioningMarks ?? prev.cutByPositioningMarks,
       }));
 
       setIsScrollHighlighted(true);
@@ -149,6 +169,11 @@ export default function OrderWideFormatForm() {
       formData.set('quantity', values.quantity.trim());
       formData.set('material', values.materialLabel.trim());
       formData.set('materialId', values.materialId);
+      formData.set('edgeGluing', String(values.edgeGluing));
+      formData.set('imageWelding', String(values.imageWelding));
+      formData.set('plotterCutByRegistrationMarks', String(values.plotterCutByRegistrationMarks));
+      formData.set('manualContourCut', String(values.manualContourCut));
+      formData.set('cutByPositioningMarks', String(values.cutByPositioningMarks));
       formData.set('comment', values.comment.trim());
       formData.set('website', values.website);
       if (file) {

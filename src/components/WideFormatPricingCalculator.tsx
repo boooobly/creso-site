@@ -283,6 +283,11 @@ export default function WideFormatPricingCalculator() {
         quantity,
         materialId: material,
         materialLabel: getWideFormatMaterialLabel(material),
+        edgeGluing,
+        imageWelding,
+        plotterCutByRegistrationMarks,
+        manualContourCut,
+        cutByPositioningMarks,
       },
     }));
 
