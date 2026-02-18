@@ -16,7 +16,6 @@ type FormValues = {
   edgeGluing: boolean;
   imageWelding: boolean;
   plotterCutByRegistrationMarks: boolean;
-  manualContourCut: boolean;
   cutByPositioningMarks: boolean;
   comment: string;
   website: string;
@@ -36,7 +35,6 @@ const defaultValues: FormValues = {
   edgeGluing: false,
   imageWelding: false,
   plotterCutByRegistrationMarks: false,
-  manualContourCut: false,
   cutByPositioningMarks: false,
   comment: '',
   website: '',
@@ -53,7 +51,6 @@ type WideFormatPrefillDetail = {
   edgeGluing?: boolean;
   imageWelding?: boolean;
   plotterCutByRegistrationMarks?: boolean;
-  manualContourCut?: boolean;
   cutByPositioningMarks?: boolean;
 };
 
@@ -86,7 +83,6 @@ export default function OrderWideFormatForm() {
         edgeGluing: detail?.edgeGluing ?? prev.edgeGluing,
         imageWelding: detail?.imageWelding ?? prev.imageWelding,
         plotterCutByRegistrationMarks: detail?.plotterCutByRegistrationMarks ?? prev.plotterCutByRegistrationMarks,
-        manualContourCut: detail?.manualContourCut ?? prev.manualContourCut,
         cutByPositioningMarks: detail?.cutByPositioningMarks ?? prev.cutByPositioningMarks,
       }));
 
@@ -172,7 +168,6 @@ export default function OrderWideFormatForm() {
       formData.set('edgeGluing', String(values.edgeGluing));
       formData.set('imageWelding', String(values.imageWelding));
       formData.set('plotterCutByRegistrationMarks', String(values.plotterCutByRegistrationMarks));
-      formData.set('manualContourCut', String(values.manualContourCut));
       formData.set('cutByPositioningMarks', String(values.cutByPositioningMarks));
       formData.set('comment', values.comment.trim());
       formData.set('website', values.website);

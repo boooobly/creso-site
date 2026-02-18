@@ -97,7 +97,6 @@ export async function POST(request: NextRequest) {
     const edgeGluing = toBooleanValue(formData.get('edgeGluing'));
     const imageWelding = toBooleanValue(formData.get('imageWelding'));
     const plotterCutByRegistrationMarks = toBooleanValue(formData.get('plotterCutByRegistrationMarks'));
-    const manualContourCut = toBooleanValue(formData.get('manualContourCut'));
     const cutByPositioningMarks = toBooleanValue(formData.get('cutByPositioningMarks'));
     const fileRaw = formData.get('file');
 
@@ -140,7 +139,6 @@ export async function POST(request: NextRequest) {
       edgeGluing,
       imageWelding,
       plotterCutByRegistrationMarks,
-      manualContourCut,
       cutByPositioningMarks,
     });
 
@@ -150,7 +148,6 @@ export async function POST(request: NextRequest) {
       { enabled: edgeGluing, label: 'Проклейка края', cost: calculated.edgeGluingCost },
       { enabled: imageWelding, label: 'Сварка изображения', cost: calculated.imageWeldingCost },
       { enabled: plotterCutByRegistrationMarks, label: 'Плоттерная резка по меткам', cost: calculated.plotterCutCost },
-      { enabled: manualContourCut, label: 'Ручная контурная резка', cost: calculated.manualContourCutCost },
       { enabled: cutByPositioningMarks, label: 'Резка по меткам позиционирования (+30%)', cost: calculated.positioningMarksCutCost },
     ].filter((item) => item.enabled && item.cost > 0);
 

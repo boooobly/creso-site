@@ -31,7 +31,6 @@ type WideFormatQuote = {
   edgeGluingCost: number;
   imageWeldingCost: number;
   plotterCutCost: number;
-  manualContourCutCost: number;
   positioningMarksCutCost: number;
   extrasCost: number;
   totalCost: number;
@@ -64,7 +63,6 @@ const EMPTY_QUOTE: WideFormatQuote = {
   edgeGluingCost: 0,
   imageWeldingCost: 0,
   plotterCutCost: 0,
-  manualContourCutCost: 0,
   positioningMarksCutCost: 0,
   extrasCost: 0,
   totalCost: 0,
@@ -91,7 +89,6 @@ export default function WideFormatPricingCalculator() {
   const [edgeGluing, setEdgeGluing] = useState(false);
   const [imageWelding, setImageWelding] = useState(false);
   const [plotterCutByRegistrationMarks, setPlotterCutByRegistrationMarks] = useState(false);
-  const [manualContourCut, setManualContourCut] = useState(false);
   const [cutByPositioningMarks, setCutByPositioningMarks] = useState(false);
 
   const [canvasImageFile, setCanvasImageFile] = useState<File | null>(null);
@@ -117,7 +114,6 @@ export default function WideFormatPricingCalculator() {
     edgeGluing,
     imageWelding,
     plotterCutByRegistrationMarks,
-    manualContourCut,
     cutByPositioningMarks,
   }), [
     bannerDensity,
@@ -125,7 +121,6 @@ export default function WideFormatPricingCalculator() {
     edgeGluing,
     height,
     imageWelding,
-    manualContourCut,
     material,
     plotterCutByRegistrationMarks,
     quantity,
@@ -149,7 +144,6 @@ export default function WideFormatPricingCalculator() {
       edgeGluing,
       imageWelding,
       plotterCutByRegistrationMarks,
-      manualContourCut,
       cutByPositioningMarks,
     });
   }, [
@@ -158,7 +152,6 @@ export default function WideFormatPricingCalculator() {
     edgeGluing,
     height,
     imageWelding,
-    manualContourCut,
     material,
     plotterCutByRegistrationMarks,
     quantity,
@@ -286,7 +279,6 @@ export default function WideFormatPricingCalculator() {
         edgeGluing,
         imageWelding,
         plotterCutByRegistrationMarks,
-        manualContourCut,
         cutByPositioningMarks,
       },
     }));
@@ -367,7 +359,6 @@ export default function WideFormatPricingCalculator() {
           {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
           {canShowWelding && <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />}
           {isFilm && <CheckboxRow label="Плоттерная резка по меткам (+25 ₽ за пог. метр)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
-          <CheckboxRow label="Ручная контурная резка (+10 ₽ за пог. метр)" checked={manualContourCut} onChange={setManualContourCut} />
           <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
         </div>
 
@@ -428,7 +419,6 @@ export default function WideFormatPricingCalculator() {
           {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.imageWeldingCost > 0 && <SummaryRow label="— Сварка изображения" value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.plotterCutCost > 0 && <SummaryRow label="— Плоттерная резка" value={`${quote.plotterCutCost.toLocaleString('ru-RU')} ₽`} />}
-          {quote.manualContourCutCost > 0 && <SummaryRow label="— Ручная контурная" value={`${quote.manualContourCutCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.positioningMarksCutCost > 0 && <SummaryRow label="— Метки позиционирования" value={`${quote.positioningMarksCutCost.toLocaleString('ru-RU')} ₽`} />}
         </div>
 

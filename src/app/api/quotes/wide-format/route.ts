@@ -6,8 +6,6 @@ import { getWideFormatQuote, type WideFormatPricingInput } from '@/lib/engine';
 const wideFormatQuoteSchema = z.object({
   material: z.enum([
     'banner_240_gloss_3_2m',
-    'banner_240_matt_3_2m',
-    'banner_280',
     'banner_330',
     'banner_440',
     'banner_460_cast_3_2m',
@@ -34,7 +32,6 @@ const wideFormatQuoteSchema = z.object({
   edgeGluing: z.boolean(),
   imageWelding: z.boolean(),
   plotterCutByRegistrationMarks: z.boolean(),
-  manualContourCut: z.boolean(),
   cutByPositioningMarks: z.boolean(),
 });
 
@@ -61,7 +58,6 @@ export async function POST(req: Request) {
         edgeGluing: input.edgeGluing,
         imageWelding: input.imageWelding,
         plotterCutByRegistrationMarks: input.plotterCutByRegistrationMarks,
-        manualContourCut: input.manualContourCut,
         cutByPositioningMarks: input.cutByPositioningMarks,
       },
       calculatedPrice: quote.totalCost,
