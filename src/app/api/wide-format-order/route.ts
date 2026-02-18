@@ -129,12 +129,13 @@ export async function POST(request: NextRequest) {
       sendTelegramMessage(telegramText).catch(() => false),
     ]);
 
-    if (telegramCanSendFile) {
+    if (telegramCanSendFile && file instanceof File) {
+      const uploadedFile = file;
       await sendTelegramDocument({
         chatId: chatId!,
         token: botToken!,
         caption: 'Файл для заявки — широкоформатная печать',
-        file,
+        file: uploadedFile,
       }).catch(() => null);
     }
 
