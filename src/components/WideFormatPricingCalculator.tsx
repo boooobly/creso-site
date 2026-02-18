@@ -101,6 +101,7 @@ export default function WideFormatPricingCalculator() {
   const [width, setWidth] = useState<string>('1.2');
   const [height, setHeight] = useState<string>('1');
   const [quantity, setQuantity] = useState<string>('1');
+  const [materialSearchTerm, setMaterialSearchTerm] = useState('');
 
   const [edgeGluing, setEdgeGluing] = useState(false);
   const [imageWelding, setImageWelding] = useState(false);
