@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import type { BagetQuoteResult } from '@/lib/calculations/bagetQuote';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 type SizeMm = {
@@ -41,10 +42,30 @@ export type BagetOrderSummary = {
   stand: boolean;
 };
 
+export type BagetOrderRequestBagetInput = {
+  width: number;
+  height: number;
+  quantity: number;
+  selectedBagetId: string;
+  workType: 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
+  glazing: 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlass' | 'plexiglass' | 'pet1mm';
+  hasPassepartout: boolean;
+  passepartoutSize?: number;
+  passepartoutBottomSize?: number;
+  backPanel: boolean;
+  hangerType?: 'crocodile' | 'wire' | null;
+  stand: boolean;
+  stretcherType?: 'narrow' | 'wide' | null;
+};
+
 type BagetOrderModalProps = {
   open: boolean;
   onClose: () => void;
   orderSummary: BagetOrderSummary;
+  orderInput: {
+    baget: BagetOrderRequestBagetInput;
+    fulfillmentType?: 'pickup' | 'selfPickup' | 'delivery';
+  } | null;
   previewImageUrl?: string;
   totalPriceRub: number;
   effectiveSize: SizeMm;
@@ -60,25 +81,25 @@ type FormErrors = {
   submit?: string;
 };
 
-function generateOrderNumber() {
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
-  const randomPart = String(Math.floor(Math.random() * 10_000)).padStart(4, '0');
-  return `CRD-${yyyy}${mm}${dd}-${randomPart}`;
-}
+
+type OrderResponse = {
+  orderNumber: string;
+  quote: BagetQuoteResult;
+  prepayRequired: boolean;
+  prepayAmount: number | null;
+};
 
 export default function BagetOrderModal({
   open,
   onClose,
   orderSummary,
+  orderInput,
   previewImageUrl,
   totalPriceRub,
   effectiveSize,
   outerSize,
 }: BagetOrderModalProps) {
-  const [orderNumber, setOrderNumber] = useState('');
+  const [serverResult, setServerResult] = useState<OrderResponse | null>(null);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -92,7 +113,7 @@ export default function BagetOrderModal({
 
   useEffect(() => {
     if (!open) {
-      setOrderNumber('');
+      setServerResult(null);
       setSubmitted(false);
       setSending(false);
       setErrors({});
@@ -100,7 +121,6 @@ export default function BagetOrderModal({
       return;
     }
 
-    setOrderNumber(generateOrderNumber());
     const scrollY = window.scrollY;
     const originalOverflow = document.body.style.overflow;
     const originalPosition = document.body.style.position;
@@ -149,8 +169,12 @@ export default function BagetOrderModal({
     return !sending && !!consent;
   }, [consent, sending]);
 
-  const prepayNow = useMemo(() => Math.round(totalPriceRub * 0.5), [totalPriceRub]);
-  const remainderAtPickup = useMemo(() => totalPriceRub - prepayNow, [prepayNow, totalPriceRub]);
+  const finalTotalRub = serverResult?.quote.total ?? totalPriceRub;
+  const prepayNow = useMemo(() => {
+    if (serverResult) return serverResult.prepayAmount ?? 0;
+    return Math.round(totalPriceRub * 0.5);
+  }, [serverResult, totalPriceRub]);
+  const remainderAtPickup = useMemo(() => finalTotalRub - prepayNow, [finalTotalRub, prepayNow]);
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -183,45 +207,38 @@ export default function BagetOrderModal({
       return;
     }
 
+    if (!orderInput) {
+      setErrors((prev) => ({ ...prev, submit: 'Не выбран багет для оформления заказа.' }));
+      return;
+    }
+
     try {
       setSending(true);
-      const response = await fetch('/api/leads', {
+      const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          source: 'baget_order',
-          name: name.trim(),
-          phone,
-          email: email.trim() || undefined,
-          comment: comment.trim() || undefined,
-          widthMm: orderSummary.workSizeMm.wMm,
-          heightMm: orderSummary.workSizeMm.hMm,
-          extras: {
-            orderNumber,
-            totalPriceRub,
-            workSizeMm: orderSummary.workSizeMm,
-            effectiveSizeMm: effectiveSize,
-            outerSizeMm: outerSize ?? null,
-            selectedBaget: orderSummary.selectedBaget,
-            passepartout: orderSummary.passepartout,
-            glazing: orderSummary.glazing,
-            materials: orderSummary.materials,
-            workType: orderSummary.workType,
-            hanging: orderSummary.hanging,
-            stand: orderSummary.stand,
+          customer: {
+            name: name.trim(),
+            phone,
+            email: email.trim() || undefined,
+            comment: comment.trim() || undefined,
           },
+          baget: orderInput.baget,
+          fulfillmentType: orderInput.fulfillmentType ?? 'pickup',
         }),
       });
 
-      const result = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+      const result = (await response.json().catch(() => null)) as (OrderResponse & { error?: string }) | null;
 
-      if (!response.ok || !result?.ok) {
-        setErrors((prev) => ({ ...prev, submit: result?.error || 'Не удалось отправить заявку. Попробуйте ещё раз.' }));
+      if (!response.ok || !result?.orderNumber || !result.quote) {
+        setErrors((prev) => ({ ...prev, submit: result?.error || 'Не удалось отправить заказ. Попробуйте ещё раз.' }));
         return;
       }
 
+      setServerResult(result);
       setSubmitted(true);
       setErrors({});
     } catch {
@@ -267,7 +284,7 @@ export default function BagetOrderModal({
               Оформление заказа
             </h3>
             <p className="inline-flex self-start rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
-              Заказ: {orderNumber}
+              Заказ: {serverResult?.orderNumber ?? 'будет присвоен после отправки'}
             </p>
           </div>
         </div>
@@ -277,7 +294,8 @@ export default function BagetOrderModal({
             <div className="space-y-4">
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-900/20 dark:text-emerald-200">
                 <p className="font-medium">Заявка отправлена. Мы свяжемся с вами в ближайшее время.</p>
-                <p className="mt-2 text-xs sm:text-sm">Номер заказа: {orderNumber}</p>
+                <p className="mt-2 text-xs sm:text-sm">Номер заказа: {serverResult?.orderNumber}</p>
+                <p className="mt-1 text-xs sm:text-sm">Итог по расчёту сервера: {serverResult?.quote.total.toLocaleString('ru-RU')} ₽</p>
               </div>
               <button
                 type="button"
@@ -382,7 +400,7 @@ export default function BagetOrderModal({
 
                 <div className="rounded-xl border border-red-200 bg-red-50 p-4 shadow-[0_10px_30px_rgba(220,38,38,0.12)] dark:border-red-800 dark:bg-red-950/30 dark:shadow-[0_10px_30px_rgba(220,38,38,0.18)]">
                   <p className="text-xs uppercase tracking-wide text-red-700/80 dark:text-red-200/80">Итоговая стоимость</p>
-                  <p className="mt-1 text-3xl font-bold text-red-700 dark:text-red-200">{totalPriceRub.toLocaleString('ru-RU')} ₽</p>
+                  <p className="mt-1 text-3xl font-bold text-red-700 dark:text-red-200">{finalTotalRub.toLocaleString('ru-RU')} ₽</p>
                   <p className="mt-3 text-sm text-neutral-700 dark:text-neutral-200">
                     К оплате сейчас: <span className="font-semibold">{prepayNow.toLocaleString('ru-RU')} ₽</span>
                   </p>
