@@ -76,18 +76,6 @@ function getMaterialPricePerM2(material: WideFormatMaterialType): number {
   return WIDE_FORMAT_PRICING_CONFIG.pricesRUBPerM2[material];
 }
 
-function getMaterialPricePerM2(material: WideFormatMaterialType): number {
-  if (material === 'customer_roll_textured') {
-    return WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
-  }
-
-  if (material === 'customer_roll_smooth') {
-    return WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
-  }
-
-  return WIDE_FORMAT_PRICING_CONFIG.pricesRUBPerM2[material];
-}
-
 export function calculateWideFormatPricing(input: WideFormatPricingInput): WideFormatCalculationResult {
   const width = parseNumericInput(input.widthInput);
   const height = parseNumericInput(input.heightInput);
