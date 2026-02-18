@@ -11,10 +11,13 @@ import {
 import { trackEvent } from '@/lib/analytics';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import {
+  getWideFormatCategoryByMaterial,
+  type WideFormatCategory,
+  WIDE_FORMAT_CATEGORY_OPTIONS,
+  WIDE_FORMAT_VARIANTS_BY_CATEGORY,
   getWideFormatMaterialLabel,
   isBannerMaterial,
   isFilmMaterial,
-  WIDE_FORMAT_MATERIAL_GROUPS,
   WIDE_FORMAT_PRICING_CONFIG,
 } from '@/lib/pricing-config/wideFormat';
 import {
@@ -91,6 +94,7 @@ export default function WideFormatPricingCalculator() {
   const router = useRouter();
 
   const [material, setMaterial] = useState<WideFormatMaterialType>('banner_240_gloss_3_2m');
+  const [category, setCategory] = useState<WideFormatCategory>(getWideFormatCategoryByMaterial('banner_240_gloss_3_2m'));
   const [bannerDensity] = useState<BannerDensity>(300);
   const [width, setWidth] = useState<string>('1.2');
   const [height, setHeight] = useState<string>('1');
@@ -113,8 +117,21 @@ export default function WideFormatPricingCalculator() {
 
   const isBanner = isBannerMaterial(material);
   const isFilm = isFilmMaterial(material);
+  const availableVariants = WIDE_FORMAT_VARIANTS_BY_CATEGORY[category];
   const parsedWidth = Number(width);
   const canShowWelding = Number.isFinite(parsedWidth) && parsedWidth > WIDE_FORMAT_PRICING_CONFIG.maxWidth;
+
+  const handleCategoryChange = (nextCategory: WideFormatCategory) => {
+    setCategory(nextCategory);
+    const nextMaterial = WIDE_FORMAT_VARIANTS_BY_CATEGORY[nextCategory][0]?.id;
+    if (nextMaterial) {
+      setMaterial(nextMaterial);
+    }
+  };
+
+  useEffect(() => {
+    setCategory(getWideFormatCategoryByMaterial(material));
+  }, [material]);
 
   const quoteRequest = useMemo(() => ({
     material,
@@ -306,44 +323,44 @@ export default function WideFormatPricingCalculator() {
       <section className="card p-5 md:p-6 space-y-4">
         <h2 className="text-xl font-semibold">Параметры заказа</h2>
 
-        <div className="space-y-2">
-          <label htmlFor="material-search" className="text-sm font-medium">Материал</label>
-          <Select value={material} onValueChange={(value) => setMaterial(value as WideFormatMaterialType)}>
-            <SelectTrigger className="h-[46px]">
-              <SelectValue placeholder="Выберите материал">
-                {getWideFormatMaterialLabel(material)}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <div className="p-2">
-                <input
-                  id="material-search"
-                  type="text"
-                  value={materialSearchTerm}
-                  onChange={(event) => setMaterialSearchTerm(event.target.value)}
-                  placeholder="Поиск материала..."
-                  className="h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-red-500/20 dark:border-neutral-700 dark:bg-neutral-900"
-                />
-              </div>
-              <div className="max-h-64 overflow-y-auto">
-                {WIDE_FORMAT_MATERIAL_GROUPS.map((group) => {
-                  const filteredItems = group.items.filter((item) => item.label.toLowerCase().includes(materialSearchTerm.trim().toLowerCase()));
-                  if (filteredItems.length === 0) return null;
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <label htmlFor="material-category" className="text-sm font-medium">Категория</label>
+            <Select value={category} onValueChange={(value) => handleCategoryChange(value as WideFormatCategory)}>
+              <SelectTrigger id="material-category" className="h-[46px]">
+                <SelectValue placeholder="Выберите категорию" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Категории</SelectLabel>
+                  {WIDE_FORMAT_CATEGORY_OPTIONS.map((option) => (
+                    <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
 
-                  return (
-                    <SelectGroup key={group.label}>
-                      <SelectLabel>{group.label}</SelectLabel>
-                      {filteredItems.map((item) => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  );
-                })}
-              </div>
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <label htmlFor="material-variant" className="text-sm font-medium">Вариант</label>
+            <Select value={material} onValueChange={(value) => setMaterial(value as WideFormatMaterialType)}>
+              <SelectTrigger id="material-variant" className="h-[46px]">
+                <SelectValue placeholder="Выберите вариант">
+                  {getWideFormatMaterialLabel(material)}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>{WIDE_FORMAT_CATEGORY_OPTIONS.find((option) => option.id === category)?.label}</SelectLabel>
+                  {availableVariants.map((variant) => (
+                    <SelectItem key={variant.id} value={variant.id}>
+                      {variant.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

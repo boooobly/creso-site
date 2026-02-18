@@ -45,60 +45,63 @@ export const WIDE_FORMAT_MATERIAL_OPTIONS = [
   { value: 'customer_roll_smooth', label: 'Свой материал (гладкий)' },
 ] as const;
 
-export const WIDE_FORMAT_MATERIAL_GROUPS: ReadonlyArray<{
-  label: string;
-  items: ReadonlyArray<{ id: WideFormatMaterialType; label: string }>;
-}> = [
-  {
-    label: 'Баннер',
-    items: [
-      { id: 'banner_240_gloss_3_2m', label: 'Баннер 240 г/м² глянец, 3.2 м' },
-      { id: 'banner_330', label: 'Баннер 330 г/м²' },
-      { id: 'banner_440', label: 'Баннер 440 г/м²' },
-      { id: 'banner_460_cast_3_2m', label: 'Баннер 460 г/м² литой, 3.2 м' },
-      { id: 'banner_mesh_380_3_2m', label: 'Баннерная сетка 380 г/м², 3.2 м' },
-      { id: 'banner_510_cast_3_2m', label: 'Баннер 510 г/м² литой, 3.2 м' },
-    ],
-  },
-  {
-    label: 'Плёнка',
-    items: [
-      { id: 'self_adhesive_film_gloss', label: 'Самоклеящаяся плёнка глянец' },
-      { id: 'perforated_film_1_37', label: 'Перфорированная плёнка 1.37 м' },
-      { id: 'trans_film_1_27', label: 'Транслюцентная плёнка 1.27 м' },
-      { id: 'backlit_1_07', label: 'Бэклит 1.07 м' },
-    ],
-  },
-  {
-    label: 'Бумага',
-    items: [
-      { id: 'paper_dupaper_blue_120', label: 'Бумага Dupaper Blue 120 г/м²' },
-      { id: 'paper_trans_skylight', label: 'Бумага транслюцентная Skylight' },
-      { id: 'photo_paper_220', label: 'Фотобумага 220 г/м²' },
-    ],
-  },
-  {
-    label: 'Ткань',
-    items: [
-      { id: 'polyester_fabric_140', label: 'Полиэстеровая ткань 140 г/м²' },
-      { id: 'flag_fabric_with_liner', label: 'Флажная ткань с подложкой' },
-    ],
-  },
-  {
-    label: 'Холст',
-    items: [
-      { id: 'canvas_cotton_350', label: 'Холст хлопковый 350 г/м²' },
-      { id: 'canvas_poly_260', label: 'Холст полиэстеровый 260 г/м²' },
-    ],
-  },
-  {
-    label: 'Свой материал',
-    items: [
-      { id: 'customer_roll_textured', label: 'Свой материал (текстурный)' },
-      { id: 'customer_roll_smooth', label: 'Свой материал (гладкий)' },
-    ],
-  },
+export type WideFormatCategory =
+  | 'banner'
+  | 'film'
+  | 'paper'
+  | 'fabric'
+  | 'canvas'
+  | 'customer';
+
+export const WIDE_FORMAT_CATEGORY_OPTIONS: ReadonlyArray<{ id: WideFormatCategory; label: string }> = [
+  { id: 'banner', label: 'Баннер' },
+  { id: 'film', label: 'Плёнка' },
+  { id: 'paper', label: 'Бумага' },
+  { id: 'fabric', label: 'Ткань' },
+  { id: 'canvas', label: 'Холст' },
+  { id: 'customer', label: 'Свой материал' },
 ];
+
+export const WIDE_FORMAT_VARIANTS_BY_CATEGORY: Record<WideFormatCategory, Array<{ id: WideFormatMaterialType; label: string }>> = {
+  banner: [
+    { id: 'banner_240_gloss_3_2m', label: '240 г/м² глянец, 3.2 м' },
+    { id: 'banner_330', label: '330 г/м²' },
+    { id: 'banner_440', label: '440 г/м²' },
+    { id: 'banner_460_cast_3_2m', label: '460 г/м² литой, 3.2 м' },
+    { id: 'banner_mesh_380_3_2m', label: 'Баннерная сетка 380 г/м², 3.2 м' },
+    { id: 'banner_510_cast_3_2m', label: '510 г/м² литой, 3.2 м' },
+  ],
+  film: [
+    { id: 'self_adhesive_film_gloss', label: 'Самоклейка глянец' },
+    { id: 'perforated_film_1_37', label: 'Перфорированная 1.37 м' },
+    { id: 'trans_film_1_27', label: 'Транслюцентная 1.27 м' },
+    { id: 'backlit_1_07', label: 'Бэклит 1.07 м' },
+  ],
+  paper: [
+    { id: 'paper_dupaper_blue_120', label: 'Dupaper Blue 120 г/м²' },
+    { id: 'paper_trans_skylight', label: 'Транслюцентная Skylight' },
+    { id: 'photo_paper_220', label: 'Фотобумага 220 г/м²' },
+  ],
+  fabric: [
+    { id: 'polyester_fabric_140', label: 'Полиэстер 140 г/м²' },
+    { id: 'flag_fabric_with_liner', label: 'Флажная с подложкой' },
+  ],
+  canvas: [
+    { id: 'canvas_cotton_350', label: 'Хлопковый 350 г/м²' },
+    { id: 'canvas_poly_260', label: 'Полиэстеровый 260 г/м²' },
+  ],
+  customer: [
+    { id: 'customer_roll_textured', label: 'Фактурный' },
+    { id: 'customer_roll_smooth', label: 'Гладкий' },
+  ],
+};
+
+export function getWideFormatCategoryByMaterial(material: WideFormatMaterialType): WideFormatCategory {
+  const matchedCategory = (Object.keys(WIDE_FORMAT_VARIANTS_BY_CATEGORY) as WideFormatCategory[])
+    .find((category) => WIDE_FORMAT_VARIANTS_BY_CATEGORY[category].some((variant) => variant.id === material));
+
+  return matchedCategory ?? 'banner';
+}
 
 const WIDE_FORMAT_MATERIAL_LABELS: Record<WideFormatMaterialType, string> = Object.fromEntries(
   WIDE_FORMAT_MATERIAL_OPTIONS.map((option) => [option.value, option.label]),
