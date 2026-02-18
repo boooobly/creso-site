@@ -14,8 +14,18 @@ import {
   getWideFormatMaterialLabel,
   isBannerMaterial,
   isFilmMaterial,
+  WIDE_FORMAT_MATERIAL_GROUPS,
   WIDE_FORMAT_PRICING_CONFIG,
 } from '@/lib/pricing-config/wideFormat';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type WideFormatQuote = {
   width: number;
@@ -85,6 +95,7 @@ export default function WideFormatPricingCalculator() {
   const [width, setWidth] = useState<string>('1.2');
   const [height, setHeight] = useState<string>('1');
   const [quantity, setQuantity] = useState<string>('1');
+  const [materialSearchTerm, setMaterialSearchTerm] = useState('');
 
   const [edgeGluing, setEdgeGluing] = useState(false);
   const [imageWelding, setImageWelding] = useState(false);
@@ -296,20 +307,43 @@ export default function WideFormatPricingCalculator() {
         <h2 className="text-xl font-semibold">Параметры заказа</h2>
 
         <div className="space-y-2">
-          <label htmlFor="material" className="text-sm font-medium">Материал</label>
-          <div className="relative">
-            <select
-              id="material"
-              value={material}
-              onChange={(e) => setMaterial(e.target.value as WideFormatMaterialType)}
-              className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
-            >
-              {engineUiCatalog.wideFormat.materialOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <SelectArrow />
-          </div>
+          <label htmlFor="material-search" className="text-sm font-medium">Материал</label>
+          <Select value={material} onValueChange={(value) => setMaterial(value as WideFormatMaterialType)}>
+            <SelectTrigger className="h-[46px]">
+              <SelectValue placeholder="Выберите материал">
+                {getWideFormatMaterialLabel(material)}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <div className="p-2">
+                <input
+                  id="material-search"
+                  type="text"
+                  value={materialSearchTerm}
+                  onChange={(event) => setMaterialSearchTerm(event.target.value)}
+                  placeholder="Поиск материала..."
+                  className="h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-red-500/20 dark:border-neutral-700 dark:bg-neutral-900"
+                />
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {WIDE_FORMAT_MATERIAL_GROUPS.map((group) => {
+                  const filteredItems = group.items.filter((item) => item.label.toLowerCase().includes(materialSearchTerm.trim().toLowerCase()));
+                  if (filteredItems.length === 0) return null;
+
+                  return (
+                    <SelectGroup key={group.label}>
+                      <SelectLabel>{group.label}</SelectLabel>
+                      {filteredItems.map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  );
+                })}
+              </div>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -465,19 +499,6 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <span className="mx-3 flex-1 border-b border-dashed border-neutral-300 dark:border-neutral-700" />
       <b>{value}</b>
     </p>
-  );
-}
-
-function SelectArrow() {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-      className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500"
-    >
-      <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }
 
