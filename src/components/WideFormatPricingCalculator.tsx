@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  engineParsers,
   engineUiCatalog,
   type BannerDensity,
   type WideFormatMaterialType,
@@ -21,6 +20,7 @@ type WideFormatQuote = {
   positiveInputs: boolean;
   widthWarningCode: WideFormatWidthWarningCode;
   areaPerUnit: number;
+  billableAreaPerUnit: number;
   perimeterPerUnit: number;
   basePrintCost: number;
   edgeGluingCost: number;
@@ -45,6 +45,7 @@ const EMPTY_QUOTE: WideFormatQuote = {
   positiveInputs: false,
   widthWarningCode: null,
   areaPerUnit: 0,
+  billableAreaPerUnit: 0,
   perimeterPerUnit: 0,
   basePrintCost: 0,
   edgeGluingCost: 0,
@@ -54,8 +55,8 @@ const EMPTY_QUOTE: WideFormatQuote = {
 };
 
 export default function WideFormatPricingCalculator() {
-  const [material, setMaterial] = useState<WideFormatMaterialType>('banner');
-  const [bannerDensity, setBannerDensity] = useState<BannerDensity>(300);
+  const [material, setMaterial] = useState<WideFormatMaterialType>('banner_240_gloss_3_2m');
+  const [bannerDensity] = useState<BannerDensity>(300);
   const [width, setWidth] = useState<string>('1.2');
   const [height, setHeight] = useState<string>('1');
   const [quantity, setQuantity] = useState<string>('1');
@@ -160,7 +161,7 @@ export default function WideFormatPricingCalculator() {
   const handleSendCalculation = () => {
     const calcSummary = [
       `Материал: ${material}`,
-      `Плотность: ${material === 'banner' ? `${bannerDensity}g` : '—'}`,
+      `Плотность: —`,
       `Ширина: ${width}`,
       `Высота: ${height}`,
       `Количество: ${quantity}`,
@@ -200,24 +201,6 @@ ${calcSummary}`,
           </div>
         </div>
 
-        {material === 'banner' && (
-          <div className="space-y-2">
-            <label htmlFor="density" className="text-sm font-medium">Плотность</label>
-            <div className="relative">
-              <select
-                id="density"
-                value={bannerDensity}
-                onChange={(e) => setBannerDensity(engineParsers.parseIntegerInput(e.target.value, 300) as BannerDensity)}
-                className="w-full appearance-none rounded-xl border border-neutral-300 bg-white p-3 pr-10 dark:border-neutral-700 dark:bg-neutral-900"
-              >
-                {[220, 300, 440].map((density) => (
-                  <option key={density} value={density}>{density}g</option>
-                ))}
-              </select>
-              <SelectArrow />
-            </div>
-          </div>
-        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -296,7 +279,10 @@ ${calcSummary}`,
       <aside className="card h-fit p-5 md:p-6 space-y-4 lg:sticky lg:top-24">
         <h2 className="text-xl font-semibold">Расчёт</h2>
         <div className="space-y-2 text-sm">
-          <SummaryRow label="Площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
+          <SummaryRow label="Фактическая площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
+          {quote.parsedValuesValid && quote.billableAreaPerUnit !== quote.areaPerUnit && (
+            <SummaryRow label="Тарифицируемая площадь" value={`${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²`} />
+          )}
           <SummaryRow label="Базовая печать" value={`${quote.basePrintCost.toLocaleString('ru-RU')} ₽`} />
           <SummaryRow label="Доп. услуги" value={`${quote.extrasCost.toLocaleString('ru-RU')} ₽`} />
         </div>
