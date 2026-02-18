@@ -20,14 +20,24 @@ export const WIDE_FORMAT_MATERIAL_OPTIONS = [
   { value: 'canvas_poly_260', label: 'Холст полиэстеровый 260 г/м²' },
   { value: 'backlit_1_07', label: 'Бэклит 1.07 м' },
   { value: 'photo_paper_220', label: 'Фотобумага 220 г/м²' },
+  { value: 'customer_roll_textured', label: 'Материал заказчика (текстурный)' },
+  { value: 'customer_roll_smooth', label: 'Материал заказчика (гладкий)' },
 ] as const;
 
 export const WIDE_FORMAT_PRICING_CONFIG = {
   maxWidth: 3.2,
   bannerWidthRange: { min: 1.2, max: 3 },
   sheetWidthRange: { min: 1.06, max: 1.6 },
-  edgeGluingPerimeterPrice: 40,
-  grommetPrice: 5,
+  edgeGluingPerimeterPrice: 50,
+  imageWeldingPerimeterPrice: 150,
+  plotterCutPerimeterPrice: 25,
+  manualContourCutPerimeterPrice: 10,
+  positioningMarksCutPercent: 0.3,
+  passesStandard: 6,
+  customerRollPerPass: {
+    textured: 100,
+    smooth: 60,
+  },
   pricesRUBPerM2: {
     banner_240_gloss_3_2m: 450,
     banner_240_matt_3_2m: 294,
@@ -48,5 +58,7 @@ export const WIDE_FORMAT_PRICING_CONFIG = {
     canvas_poly_260: 1000,
     backlit_1_07: 1300,
     photo_paper_220: 510,
+    customer_roll_textured: 0,
+    customer_roll_smooth: 0,
   } as Record<WideFormatMaterialType, number>,
 };

@@ -24,13 +24,18 @@ const wideFormatQuoteSchema = z.object({
     'canvas_poly_260',
     'backlit_1_07',
     'photo_paper_220',
+    'customer_roll_textured',
+    'customer_roll_smooth',
   ]),
   bannerDensity: z.union([z.literal(220), z.literal(300), z.literal(440)]),
   widthInput: z.string(),
   heightInput: z.string(),
   quantityInput: z.string(),
-  grommetsInput: z.string(),
   edgeGluing: z.boolean(),
+  imageWelding: z.boolean(),
+  plotterCutByRegistrationMarks: z.boolean(),
+  manualContourCut: z.boolean(),
+  cutByPositioningMarks: z.boolean(),
 });
 
 export async function POST(req: Request) {
@@ -53,8 +58,11 @@ export async function POST(req: Request) {
         widthInput: input.widthInput,
         heightInput: input.heightInput,
         quantityInput: input.quantityInput,
-        grommetsInput: input.grommetsInput,
         edgeGluing: input.edgeGluing,
+        imageWelding: input.imageWelding,
+        plotterCutByRegistrationMarks: input.plotterCutByRegistrationMarks,
+        manualContourCut: input.manualContourCut,
+        cutByPositioningMarks: input.cutByPositioningMarks,
       },
       calculatedPrice: quote.totalCost,
     });

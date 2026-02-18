@@ -21,7 +21,9 @@ export type WideFormatMaterialType =
   | 'canvas_cotton_350'
   | 'canvas_poly_260'
   | 'backlit_1_07'
-  | 'photo_paper_220';
+  | 'photo_paper_220'
+  | 'customer_roll_textured'
+  | 'customer_roll_smooth';
 
 export type BannerDensity = 220 | 300 | 440;
 
