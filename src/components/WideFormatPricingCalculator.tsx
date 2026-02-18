@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   engineUiCatalog,
   type BannerDensity,
@@ -31,6 +32,13 @@ type WideFormatQuote = {
   totalCost: number;
 };
 
+type TransferredBagetImagePayload = {
+  dataUrl: string;
+  fileName: string;
+};
+
+const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
+
 const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
   invalid_width: 'Введите корректную ширину.',
   max_width_exceeded: `Максимальная ширина — ${engineUiCatalog.wideFormat.maxWidth} м.`,
@@ -58,7 +66,18 @@ const EMPTY_QUOTE: WideFormatQuote = {
   totalCost: 0,
 };
 
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(new Error('failed_to_read_file'));
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function WideFormatPricingCalculator() {
+  const router = useRouter();
+
   const [material, setMaterial] = useState<WideFormatMaterialType>('banner_240_gloss_3_2m');
   const [bannerDensity] = useState<BannerDensity>(300);
   const [width, setWidth] = useState<string>('1.2');
@@ -71,10 +90,14 @@ export default function WideFormatPricingCalculator() {
   const [manualContourCut, setManualContourCut] = useState(false);
   const [cutByPositioningMarks, setCutByPositioningMarks] = useState(false);
 
+  const [canvasImageFile, setCanvasImageFile] = useState<File | null>(null);
+
   const [quote, setQuote] = useState<WideFormatQuote>(EMPTY_QUOTE);
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState('');
   const [pricePulse, setPricePulse] = useState(false);
+
+  const isCanvasMaterial = material.includes('canvas');
 
   const quoteRequest = useMemo(() => ({
     material,
@@ -217,6 +240,30 @@ ${calcSummary}`,
     });
   };
 
+  const handleFrameInBaget = async () => {
+    if (canvasImageFile) {
+      try {
+        const dataUrl = await fileToDataUrl(canvasImageFile);
+        const payload: TransferredBagetImagePayload = {
+          dataUrl,
+          fileName: canvasImageFile.name,
+        };
+        localStorage.setItem(BAGET_TRANSFER_IMAGE_KEY, JSON.stringify(payload));
+      } catch {
+        localStorage.removeItem(BAGET_TRANSFER_IMAGE_KEY);
+      }
+    } else {
+      localStorage.removeItem(BAGET_TRANSFER_IMAGE_KEY);
+    }
+
+    const params = new URLSearchParams();
+    if (width.trim()) params.set('width', width.trim());
+    if (height.trim()) params.set('height', height.trim());
+    const query = params.toString();
+
+    router.push(query ? `/baget?${query}` : '/baget');
+  };
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <section className="card p-5 md:p-6 space-y-4">
@@ -289,6 +336,32 @@ ${calcSummary}`,
           <CheckboxRow label="Ручная контурная резка (+10 ₽ за пог. метр)" checked={manualContourCut} onChange={setManualContourCut} />
           <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
         </div>
+
+        {isCanvasMaterial && (
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
+            <h3 className="text-base font-semibold">Печать на холсте</h3>
+            <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
+              Для последующего оформления в багет можно сразу передать размеры и изображение в конфигуратор.
+            </p>
+
+            <label htmlFor="canvas-image-file" className="mt-3 block text-sm font-medium">Изображение (опционально)</label>
+            <input
+              id="canvas-image-file"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setCanvasImageFile(e.target.files?.[0] ?? null)}
+              className="mt-1 block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-200 file:px-3 file:py-2 file:font-medium dark:file:bg-neutral-700"
+            />
+
+            <button
+              type="button"
+              onClick={handleFrameInBaget}
+              className="mt-4 w-full rounded-xl bg-red-600 px-5 py-3 text-center text-sm font-semibold text-white transition-all hover:scale-[1.02] md:w-auto"
+            >
+              Оформить в багет
+            </button>
+          </div>
+        )}
 
         {widthWarning && (
           <p className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
