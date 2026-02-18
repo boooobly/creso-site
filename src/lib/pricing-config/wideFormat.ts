@@ -2,8 +2,6 @@ import type { WideFormatMaterialType } from '@/lib/calculations/types';
 
 const BANNER_MATERIALS: ReadonlySet<WideFormatMaterialType> = new Set([
   'banner_240_gloss_3_2m',
-  'banner_240_matt_3_2m',
-  'banner_280',
   'banner_330',
   'banner_440',
   'banner_460_cast_3_2m',
@@ -27,8 +25,6 @@ export function isFilmMaterial(material: WideFormatMaterialType): boolean {
 
 export const WIDE_FORMAT_MATERIAL_OPTIONS = [
   { value: 'banner_240_gloss_3_2m', label: 'Баннер 240 г/м² глянец, 3.2 м' },
-  { value: 'banner_240_matt_3_2m', label: 'Баннер 240 г/м² матовый, 3.2 м' },
-  { value: 'banner_280', label: 'Баннер 280 г/м²' },
   { value: 'banner_330', label: 'Баннер 330 г/м²' },
   { value: 'banner_440', label: 'Баннер 440 г/м²' },
   { value: 'banner_460_cast_3_2m', label: 'Баннер 460 г/м² литой, 3.2 м' },
@@ -45,16 +41,23 @@ export const WIDE_FORMAT_MATERIAL_OPTIONS = [
   { value: 'canvas_poly_260', label: 'Холст полиэстеровый 260 г/м²' },
   { value: 'backlit_1_07', label: 'Бэклит 1.07 м' },
   { value: 'photo_paper_220', label: 'Фотобумага 220 г/м²' },
-  { value: 'customer_roll_textured', label: 'Материал заказчика (текстурный)' },
-  { value: 'customer_roll_smooth', label: 'Материал заказчика (гладкий)' },
+  { value: 'customer_roll_textured', label: 'Свой материал (текстурный)' },
+  { value: 'customer_roll_smooth', label: 'Свой материал (гладкий)' },
 ] as const;
+
+const WIDE_FORMAT_MATERIAL_LABELS: Record<WideFormatMaterialType, string> = Object.fromEntries(
+  WIDE_FORMAT_MATERIAL_OPTIONS.map((option) => [option.value, option.label]),
+) as Record<WideFormatMaterialType, string>;
+
+export function getWideFormatMaterialLabel(material: WideFormatMaterialType): string {
+  return WIDE_FORMAT_MATERIAL_LABELS[material] ?? material;
+}
 
 export const WIDE_FORMAT_PRICING_CONFIG = {
   maxWidth: 3.2,
   edgeGluingPerimeterPrice: 50,
   imageWeldingPerimeterPrice: 150,
   plotterCutPerimeterPrice: 25,
-  manualContourCutPerimeterPrice: 10,
   positioningMarksCutPercent: 0.3,
   passesStandard: 6,
   customerRollPerPass: {
@@ -63,8 +66,6 @@ export const WIDE_FORMAT_PRICING_CONFIG = {
   },
   pricesRUBPerM2: {
     banner_240_gloss_3_2m: 450,
-    banner_240_matt_3_2m: 294,
-    banner_280: 336,
     banner_330: 450,
     banner_440: 500,
     banner_460_cast_3_2m: 550,
