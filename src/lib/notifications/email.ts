@@ -5,7 +5,16 @@ export type EmailLeadPayload = {
   html: string;
 };
 
-function getSmtpConfig() {
+export type SmtpConfig = {
+  host: string;
+  port: number;
+  user: string;
+  pass: string;
+  to: string;
+  from: string;
+};
+
+export function getSmtpConfig(): SmtpConfig | null {
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT || 0);
   const user = process.env.SMTP_USER;
@@ -20,11 +29,16 @@ function getSmtpConfig() {
   return { host, port, user, pass, to, from };
 }
 
-export async function sendEmailLead(payload: EmailLeadPayload): Promise<void> {
+export async function sendSmtpEmail(params: {
+  to: string;
+  subject: string;
+  html?: string;
+  text?: string;
+}): Promise<void> {
   const config = getSmtpConfig();
 
   if (!config) {
-    console.warn('[leads] SMTP is not configured. Skip email sending.');
+    console.warn('[email] SMTP is not configured. Skip email sending.');
     return;
   }
 
@@ -40,6 +54,22 @@ export async function sendEmailLead(payload: EmailLeadPayload): Promise<void> {
 
   await transporter.sendMail({
     from: config.from,
+    to: params.to,
+    subject: params.subject,
+    html: params.html,
+    text: params.text,
+  });
+}
+
+export async function sendEmailLead(payload: EmailLeadPayload): Promise<void> {
+  const config = getSmtpConfig();
+
+  if (!config) {
+    console.warn('[leads] SMTP is not configured. Skip email sending.');
+    return;
+  }
+
+  await sendSmtpEmail({
     to: config.to,
     subject: payload.subject,
     html: payload.html,
