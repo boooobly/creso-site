@@ -44,8 +44,10 @@ export default function OrderWideFormatForm() {
   const [isSending, setIsSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
+  const [isScrollHighlighted, setIsScrollHighlighted] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const highlightTimeoutRef = useRef<number | null>(null);
   const isFileTooLargeForTelegram = Boolean(file && file.size > 50 * 1024 * 1024);
 
   useEffect(() => {
@@ -60,10 +62,23 @@ export default function OrderWideFormatForm() {
         quantity: detail?.quantity ?? prev.quantity,
         material: detail?.material ?? prev.material,
       }));
+
+      setIsScrollHighlighted(true);
+      if (highlightTimeoutRef.current) {
+        window.clearTimeout(highlightTimeoutRef.current);
+      }
+      highlightTimeoutRef.current = window.setTimeout(() => {
+        setIsScrollHighlighted(false);
+      }, 1800);
     };
 
     window.addEventListener('wideFormatPrefill', handler);
-    return () => window.removeEventListener('wideFormatPrefill', handler);
+    return () => {
+      window.removeEventListener('wideFormatPrefill', handler);
+      if (highlightTimeoutRef.current) {
+        window.clearTimeout(highlightTimeoutRef.current);
+      }
+    };
   }, []);
 
   const formatFileSize = (size: number) => {
@@ -163,7 +178,7 @@ export default function OrderWideFormatForm() {
   }`;
 
   return (
-    <div id="wide-format-form" className="card p-6 shadow-sm md:p-8">
+    <div id="wide-format-form" className={`card p-6 shadow-sm transition-all duration-300 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
       <div className="mb-6">
         <h2 className="text-2xl font-semibold">Рассчитать стоимость</h2>
         <p className="mt-2 text-sm text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
