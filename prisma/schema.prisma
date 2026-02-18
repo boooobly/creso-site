@@ -17,10 +17,15 @@ model Order {
   email          String?
   comment        String?
   total          Int
-  prepayRequired Boolean  @default(false)
-  prepayAmount   Int?
-  payloadJson    Json
-  quoteJson      Json
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  prepayRequired  Boolean  @default(false)
+  prepayAmount    Int?
+  paymentStatus   String   @default("unpaid")
+  paymentProvider String?
+  paymentRef      String?
+  paidAmount      Int?
+  paidAt          DateTime?
+  payloadJson     Json
+  quoteJson       Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
