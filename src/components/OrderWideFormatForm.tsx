@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useRef, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 type FormValues = {
@@ -41,13 +41,7 @@ export default function OrderWideFormatForm() {
     return `${(size / (1024 * 1024)).toFixed(1)} МБ`;
   };
 
-  const bagetHref = useMemo(() => {
-    const params = new URLSearchParams();
-    if (values.width.trim()) params.set('width', values.width.trim());
-    if (values.height.trim()) params.set('height', values.height.trim());
-    const query = params.toString();
-    return query ? `/baget?${query}` : '/baget';
-  }, [values.height, values.width]);
+
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -239,9 +233,6 @@ export default function OrderWideFormatForm() {
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
-          <a href={bagetHref} className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] md:min-w-[180px]">
-            Оформить в багет
-          </a>
         </div>
 
         {formError && <p className="text-sm text-red-600">{formError}</p>}

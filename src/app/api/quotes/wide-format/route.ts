@@ -4,13 +4,38 @@ import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getWideFormatQuote, type WideFormatPricingInput } from '@/lib/engine';
 
 const wideFormatQuoteSchema = z.object({
-  material: z.enum(['banner', 'selfAdhesiveFilm', 'backlit', 'perforatedFilm', 'posterPaper']),
+  material: z.enum([
+    'banner_240_gloss_3_2m',
+    'banner_240_matt_3_2m',
+    'banner_280',
+    'banner_330',
+    'banner_440',
+    'banner_460_cast_3_2m',
+    'banner_mesh_380_3_2m',
+    'banner_510_cast_3_2m',
+    'self_adhesive_film_gloss',
+    'perforated_film_1_37',
+    'paper_dupaper_blue_120',
+    'paper_trans_skylight',
+    'trans_film_1_27',
+    'polyester_fabric_140',
+    'flag_fabric_with_liner',
+    'canvas_cotton_350',
+    'canvas_poly_260',
+    'backlit_1_07',
+    'photo_paper_220',
+    'customer_roll_textured',
+    'customer_roll_smooth',
+  ]),
   bannerDensity: z.union([z.literal(220), z.literal(300), z.literal(440)]),
   widthInput: z.string(),
   heightInput: z.string(),
   quantityInput: z.string(),
-  grommetsInput: z.string(),
   edgeGluing: z.boolean(),
+  imageWelding: z.boolean(),
+  plotterCutByRegistrationMarks: z.boolean(),
+  manualContourCut: z.boolean(),
+  cutByPositioningMarks: z.boolean(),
 });
 
 export async function POST(req: Request) {
@@ -33,8 +58,11 @@ export async function POST(req: Request) {
         widthInput: input.widthInput,
         heightInput: input.heightInput,
         quantityInput: input.quantityInput,
-        grommetsInput: input.grommetsInput,
         edgeGluing: input.edgeGluing,
+        imageWelding: input.imageWelding,
+        plotterCutByRegistrationMarks: input.plotterCutByRegistrationMarks,
+        manualContourCut: input.manualContourCut,
+        cutByPositioningMarks: input.cutByPositioningMarks,
       },
       calculatedPrice: quote.totalCost,
     });
