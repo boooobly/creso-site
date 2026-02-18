@@ -20,3 +20,20 @@ a { @apply underline-offset-4; }
 .btn-secondary { @apply inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-neutral-900 font-medium hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800; }
 
 .card { @apply rounded-2xl border border-neutral-300 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900; }
+
+.highlight-on-scroll {
+  animation: form-highlight-pulse 1.8s ease-out;
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+@keyframes form-highlight-pulse {
+  0% {
+    background-color: rgba(254, 242, 242, 0.9);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.22);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
