@@ -8,7 +8,6 @@ import {
   type WideFormatMaterialType,
   type WideFormatWidthWarningCode,
 } from '@/lib/engine';
-import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import { isBannerMaterial, isFilmMaterial, WIDE_FORMAT_PRICING_CONFIG } from '@/lib/pricing-config/wideFormat';
@@ -39,6 +38,7 @@ type TransferredBagetImagePayload = {
 };
 
 const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
+const SCROLL_OFFSET_PX = 90;
 
 const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
   invalid_width: 'Введите корректную ширину.',
@@ -239,29 +239,6 @@ export default function WideFormatPricingCalculator() {
 
   const formatRubles = (value: number) => `${Math.round(value).toLocaleString('ru-RU')} ₽`;
 
-  const handleSendCalculation = () => {
-    const calcSummary = [
-      `Материал: ${material}`,
-      `Ширина: ${width}`,
-      `Высота: ${height}`,
-      `Количество: ${quantity}`,
-      `Проклейка края: ${edgeGluing ? 'Да' : 'Нет'}`,
-      `Сварка изображения: ${imageWelding ? 'Да' : 'Нет'}`,
-      `Плоттерная резка по меткам: ${plotterCutByRegistrationMarks ? 'Да' : 'Нет'}`,
-      `Ручная контурная резка: ${manualContourCut ? 'Да' : 'Нет'}`,
-      `Резка по меткам позиционирования (+30%): ${cutByPositioningMarks ? 'Да' : 'Нет'}`,
-      `Итого: ${Math.round(quote.totalCost)} ₽`,
-    ].join('; ');
-
-    trackEvent('send_calculation_clicked', { calculator: 'wide_format' });
-
-    openLeadFormWithCalculation({
-      service: 'Широкоформатная печать',
-      message: `Расчёт:
-${calcSummary}`,
-    });
-  };
-
   const handleFrameInBaget = async () => {
     if (canvasImageFile) {
       try {
@@ -287,6 +264,8 @@ ${calcSummary}`,
   };
 
   const handleOrderClick = () => {
+    trackEvent('order_button_clicked', { calculator: 'wide_format' });
+
     window.dispatchEvent(new CustomEvent('wideFormatPrefill', {
       detail: {
         width,
@@ -296,9 +275,10 @@ ${calcSummary}`,
       },
     }));
 
-    const formSection = document.getElementById('wide-format-form');
-    if (formSection) {
-      formSection.scrollIntoView({ behavior: 'smooth' });
+    const formTitle = document.getElementById('wide-format-form-title');
+    if (formTitle) {
+      const y = formTitle.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET_PX;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
 
@@ -445,7 +425,6 @@ ${calcSummary}`,
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
           <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
           <Button variant="primary" className="mt-4 w-full" onClick={handleOrderClick}>Заказать печать</Button>
-          <button type="button" onClick={handleSendCalculation} className="btn-secondary mt-3 w-full justify-center">Отправить этот расчёт</button>
         </div>
 
         <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">

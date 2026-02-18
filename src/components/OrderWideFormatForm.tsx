@@ -180,7 +180,7 @@ export default function OrderWideFormatForm() {
   return (
     <div id="wide-format-form" className={`card p-6 shadow-sm transition-all duration-300 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold">Рассчитать стоимость</h2>
+        <h2 id="wide-format-form-title" className="text-2xl font-semibold">Рассчитать стоимость</h2>
         <p className="mt-2 text-sm text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
       </div>
 
