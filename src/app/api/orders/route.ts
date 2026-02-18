@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bagetData from '../../../../data/baget.json';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
-import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
+import { getPrismaClient } from '@/lib/db/prisma';
 import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
+import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
 
 const bagetItemSchema = z.object({
   id: z.string(),
@@ -50,6 +51,57 @@ function normalizePhone(phone: string): string | null {
   return digits;
 }
 
+async function createOrderWithRetry(data: {
+  inputPayload: z.infer<typeof orderSchema>;
+  quote: ReturnType<typeof bagetQuote>;
+  prepayRequired: boolean;
+  prepayAmount: number | null;
+  customer: {
+    name: string;
+    phone: string;
+    email?: string;
+    comment?: string;
+  };
+}): Promise<string> {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const orderNumber = generateOrderNumber();
+
+    try {
+      await (getPrismaClient() as any).order.create({
+        data: {
+          number: orderNumber,
+          source: 'baget',
+          status: 'new',
+          customerName: data.customer.name,
+          phone: data.customer.phone,
+          email: data.customer.email,
+          comment: data.customer.comment,
+          total: data.quote.total,
+          prepayRequired: data.prepayRequired,
+          prepayAmount: data.prepayAmount,
+          payloadJson: data.inputPayload,
+          quoteJson: data.quote,
+        },
+      });
+
+      return orderNumber;
+    } catch (error) {
+      if (
+        typeof error === 'object'
+        && error !== null
+        && 'code' in error
+        && (error as { code?: string }).code === 'P2002'
+        && attempt < 1
+      ) {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw new Error('Failed to create unique order number');
+}
+
 export async function POST(request: NextRequest) {
   try {
     const payload = await request.json().catch(() => null);
@@ -84,9 +136,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Не удалось рассчитать стоимость заказа.' }, { status: 400 });
     }
 
-    const orderNumber = generateOrderNumber();
     const prepayRequired = parsed.data.fulfillmentType === 'pickup' || parsed.data.fulfillmentType === 'selfPickup';
     const prepayAmount = prepayRequired ? Math.round(quote.total * 0.5) : null;
+
+    const orderNumber = await createOrderWithRetry({
+      inputPayload: parsed.data,
+      quote,
+      prepayRequired,
+      prepayAmount,
+      customer: {
+        ...parsed.data.customer,
+        phone: normalizedPhone,
+      },
+    });
 
     await notifyNewOrder({
       orderNumber,
