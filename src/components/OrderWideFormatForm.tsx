@@ -241,7 +241,20 @@ export default function OrderWideFormatForm() {
               value={file}
               onChange={setFile}
               title="Загрузка файла"
-              helperText="JPG, PNG, WEBP, TIFF. 1 файл, до 50 МБ."
+              accept=".jpg,.jpeg,.png,.webp,.tif,.tiff,.pdf,.cdr,.ai,.psd"
+              helperText="JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD. 1 файл, до 50 МБ."
+              allowedMimeTypes={[
+                'image/jpeg',
+                'image/png',
+                'image/webp',
+                'image/tiff',
+                'application/pdf',
+                'application/postscript',
+                'application/illustrator',
+                'application/vnd.adobe.photoshop',
+              ]}
+              allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
+              invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
               className="border-2 border-dashed rounded-xl p-6 bg-muted/30 hover:border-red-400 transition"
               helperTextClassName="text-xs text-muted-foreground mt-2"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}

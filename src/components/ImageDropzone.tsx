@@ -14,6 +14,9 @@ type ImageDropzoneProps = {
   className?: string;
   helperTextClassName?: string;
   icon?: ReactNode;
+  allowedMimeTypes?: string[];
+  allowedExtensions?: string[];
+  invalidTypeMessage?: string;
 };
 
 function formatFileSize(size: number): string {
@@ -34,6 +37,9 @@ export default function ImageDropzone({
   className = '',
   helperTextClassName = 'mt-3 text-xs text-neutral-500',
   icon,
+  allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/tiff'],
+  allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff'],
+  invalidTypeMessage = 'Можно загрузить только изображения JPG, PNG, WEBP или TIFF.',
 }: ImageDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState('');
@@ -57,8 +63,12 @@ export default function ImageDropzone({
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
-      setError('Можно загрузить только изображение.');
+    const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase() ?? ''}` : '';
+    const isMimeAllowed = Boolean(file.type) && allowedMimeTypes.includes(file.type.toLowerCase());
+    const isExtensionAllowed = Boolean(extension) && allowedExtensions.includes(extension);
+
+    if (!isMimeAllowed && !isExtensionAllowed) {
+      setError(invalidTypeMessage);
       return;
     }
 
