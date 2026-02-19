@@ -1,18 +1,6 @@
 import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
-import ReviewCard from '@/components/ReviewCard';
-import ReviewSubmitForm from '@/components/ReviewSubmitForm';
-
-type ReviewListItem = {
-  id: string;
-  name: string;
-  isAnonymous: boolean;
-  rating: number;
-  text: string;
-  createdAt: string;
-};
-
-const reviewsStub: ReviewListItem[] = [];
+import ReviewsClient from '@/components/ReviewsClient';
 
 const trustPoints = [
   'Собственное производство, 15+ лет опыта',
@@ -31,37 +19,7 @@ export default function ReviewsPage() {
         </p>
       </section>
 
-      <section>
-        {reviewsStub.length > 0 ? (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-            {reviewsStub.map((review) => (
-              <RevealOnScroll key={review.id}>
-                <ReviewCard
-                  name={review.isAnonymous ? 'Анонимный клиент' : review.name.trim() || 'Клиент'}
-                  rating={review.rating}
-                  text={review.text}
-                  createdAt={review.createdAt}
-                />
-              </RevealOnScroll>
-            ))}
-          </div>
-        ) : (
-          <RevealOnScroll>
-            <div className="card rounded-2xl p-6 text-center md:p-8">
-              <p className="text-base font-medium text-neutral-900 dark:text-neutral-100">No reviews yet</p>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
-                Будьте первым — оставьте отзыв о нашей работе.
-              </p>
-            </div>
-          </RevealOnScroll>
-        )}
-      </section>
-
-      <section>
-        <RevealOnScroll>
-          <ReviewSubmitForm />
-        </RevealOnScroll>
-      </section>
+      <ReviewsClient />
 
       <section className="card rounded-2xl p-6 md:p-8">
         <RevealOnScroll>
