@@ -2,8 +2,17 @@ import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import ReviewCard from '@/components/ReviewCard';
 import ReviewSubmitForm from '@/components/ReviewSubmitForm';
-import { prisma } from '@/lib/db/prisma';
-import { REVIEW_STATUSES } from '@/lib/reviews/constants';
+
+type ReviewListItem = {
+  id: string;
+  name: string;
+  isAnonymous: boolean;
+  rating: number;
+  text: string;
+  createdAt: string;
+};
+
+const reviewsStub: ReviewListItem[] = [];
 
 const trustPoints = [
   'Собственное производство, 15+ лет опыта',
@@ -12,20 +21,7 @@ const trustPoints = [
   'Собственная монтажная бригада',
 ];
 
-export default async function ReviewsPage() {
-  const reviews = await prisma.review.findMany({
-    where: { status: REVIEW_STATUSES.approved },
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      name: true,
-      isAnonymous: true,
-      rating: true,
-      text: true,
-      createdAt: true,
-    },
-  });
-
+export default function ReviewsPage() {
   return (
     <div className="space-y-12 md:space-y-16">
       <section className="space-y-4 text-center">
@@ -36,18 +32,29 @@ export default async function ReviewsPage() {
       </section>
 
       <section>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-          {reviews.map((review) => (
-            <RevealOnScroll key={review.id}>
-              <ReviewCard
-                name={review.isAnonymous ? 'Анонимный клиент' : review.name?.trim() || 'Клиент'}
-                rating={review.rating}
-                text={review.text}
-                createdAt={review.createdAt.toISOString()}
-              />
-            </RevealOnScroll>
-          ))}
-        </div>
+        {reviewsStub.length > 0 ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
+            {reviewsStub.map((review) => (
+              <RevealOnScroll key={review.id}>
+                <ReviewCard
+                  name={review.isAnonymous ? 'Анонимный клиент' : review.name.trim() || 'Клиент'}
+                  rating={review.rating}
+                  text={review.text}
+                  createdAt={review.createdAt}
+                />
+              </RevealOnScroll>
+            ))}
+          </div>
+        ) : (
+          <RevealOnScroll>
+            <div className="card rounded-2xl p-6 text-center md:p-8">
+              <p className="text-base font-medium text-neutral-900 dark:text-neutral-100">No reviews yet</p>
+              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
+                Будьте первым — оставьте отзыв о нашей работе.
+              </p>
+            </div>
+          </RevealOnScroll>
+        )}
       </section>
 
       <section>

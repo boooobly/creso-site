@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
-import { getClientIp } from '@/lib/utils/request';
-import { hashIp } from '@/lib/reviews/hash';
 import { REVIEW_STATUSES } from '@/lib/reviews/constants';
 
 export const runtime = 'nodejs';
@@ -15,21 +12,29 @@ const createReviewSchema = z.object({
   company: z.string().optional(),
 });
 
-export async function GET() {
-  const reviews = await prisma.review.findMany({
-    where: { status: REVIEW_STATUSES.approved },
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      name: true,
-      isAnonymous: true,
-      rating: true,
-      text: true,
-      createdAt: true,
-    },
-  });
+type ReviewsListResponse = {
+  items: Array<{
+    id: string;
+    name: string;
+    isAnonymous: boolean;
+    rating: number;
+    text: string;
+    createdAt: string;
+  }>;
+  totalApproved: number;
+  averageRating: number | null;
+  nextCursor: string | null;
+};
 
-  return NextResponse.json({ reviews });
+const EMPTY_REVIEWS_RESPONSE: ReviewsListResponse = {
+  items: [],
+  totalApproved: 0,
+  averageRating: null,
+  nextCursor: null,
+};
+
+export async function GET() {
+  return NextResponse.json(EMPTY_REVIEWS_RESPONSE);
 }
 
 export async function POST(request: NextRequest) {
@@ -44,20 +49,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  const ip = getClientIp(request);
-  const userAgent = request.headers.get('user-agent')?.trim() || null;
-
-  await prisma.review.create({
-    data: {
-      name: parsed.data.name?.trim() || null,
-      isAnonymous: parsed.data.isAnonymous,
-      rating: parsed.data.rating,
-      text: parsed.data.text,
-      status: REVIEW_STATUSES.pending,
-      ipHash: hashIp(ip),
-      userAgent,
-    },
+  return NextResponse.json({
+    ok: true,
+    status: REVIEW_STATUSES.pending,
+    message: 'Отзыв принят и ожидает модерации.',
   });
-
-  return NextResponse.json({ ok: true, status: REVIEW_STATUSES.pending });
 }
