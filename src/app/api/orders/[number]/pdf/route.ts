@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPrismaClient } from '@/lib/db/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { buildOrderPdf } from '@/lib/pdf/buildOrderPdf';
+
+export const runtime = 'nodejs';
 
 type Params = {
   params: {
@@ -10,7 +12,7 @@ type Params = {
 
 export async function GET(_request: NextRequest, { params }: Params) {
   try {
-    const order = await (getPrismaClient() as any).order.findUnique({
+    const order = await prisma.order.findUnique({
       where: {
         number: params.number,
       },

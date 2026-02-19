@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramLead } from '@/lib/notifications/telegram';
+import { buildEmailHtmlFromText } from '@/lib/utils/email';
+import { normalizePhone } from '@/lib/utils/phone';
+import { getClientIp } from '@/lib/utils/request';
+import { sourceTitle } from '@/lib/utils/sourceTitle';
+
+export const runtime = 'nodejs';
 
 type RateRecord = { count: number; resetAt: number };
 
@@ -17,23 +23,9 @@ const leadSchema = z.object({
   widthMm: z.number().positive().optional(),
   heightMm: z.number().positive().optional(),
   comment: z.string().trim().optional(),
-  extras: z.record(z.any()).optional(),
+  extras: z.record(z.unknown()).optional(),
   company: z.string().optional(),
 });
-
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown';
-  return request.headers.get('x-real-ip')?.trim() || 'unknown';
-}
-
-function normalizePhone(phone: string): string | null {
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length !== 11 || !digits.startsWith('7')) {
-    return null;
-  }
-  return digits;
-}
 
 function isRateLimited(ip: string, now = Date.now()) {
   const current = ipRequests.get(ip);
@@ -47,20 +39,6 @@ function isRateLimited(ip: string, now = Date.now()) {
   current.count += 1;
   ipRequests.set(ip, current);
   return false;
-}
-
-function sourceTitle(source: string): string {
-  const dictionary: Record<string, string> = {
-    wideformat: 'Широкоформатная печать',
-    baget: 'Багет',
-    contacts: 'Контакты',
-    outdoor: 'Наружная реклама',
-    'heat-transfer': 'Термоперенос',
-    'plotter-cutting': 'Плоттерная резка',
-    main: 'Главная страница',
-  };
-
-  return dictionary[source] || source;
 }
 
 function formatValue(value?: string | number | null): string {
@@ -100,13 +78,6 @@ function buildText(params: {
   ]
     .filter(Boolean)
     .join('\n');
-}
-
-function buildHtml(text: string) {
-  return `<div style="font-family:Arial,sans-serif;white-space:pre-wrap;line-height:1.5;">${text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')}</div>`;
 }
 
 export async function POST(request: NextRequest) {
@@ -150,7 +121,7 @@ export async function POST(request: NextRequest) {
       }),
       sendEmailLead({
         subject: `Новая заявка: ${sourceTitle(parsed.data.source)}`,
-        html: buildHtml(text),
+        html: buildEmailHtmlFromText(text),
       }).catch((error) => {
         console.error('[leads] Email send failed', error);
       }),

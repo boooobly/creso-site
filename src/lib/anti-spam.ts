@@ -1,3 +1,7 @@
+import { getClientIp } from '@/lib/utils/request';
+
+export { getClientIp };
+
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS_PER_WINDOW = 5;
 
@@ -7,16 +11,6 @@ type RateLimitRecord = {
 };
 
 const requestCounters = new Map<string, RateLimitRecord>();
-
-export function getClientIp(request: Request): string {
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    return forwardedFor.split(',')[0]?.trim() || 'unknown';
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  return realIp?.trim() || 'unknown';
-}
 
 export function hasUserAgent(request: Request): boolean {
   return Boolean(request.headers.get('user-agent')?.trim());
