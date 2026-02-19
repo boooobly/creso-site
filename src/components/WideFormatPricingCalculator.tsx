@@ -285,6 +285,7 @@ export default function WideFormatPricingCalculator() {
   const pricePerM2 = canShowPricingDetails && quote.billableAreaPerUnit > 0 && quote.quantity > 0
     ? quote.basePrintCost / (quote.billableAreaPerUnit * quote.quantity)
     : null;
+  const totalPerUnit = quote.quantity > 0 ? quote.totalCost / quote.quantity : null;
 
   const formatRubles = (value: number) => `${Math.round(value).toLocaleString('ru-RU')} ₽`;
 
@@ -506,10 +507,17 @@ export default function WideFormatPricingCalculator() {
           )}
         </div>
 
-        <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
-          <div className="mb-3 border-t border-neutral-200 pt-3 dark:border-neutral-700" />
-          <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-          <p className={`mt-1 text-5xl font-extrabold transition-transform duration-300 md:text-6xl ${pricePulse ? 'scale-105' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
+        <div className="rounded-2xl border-2 border-red-500/30 bg-white p-5 shadow-xl dark:bg-neutral-900">
+          <div className="border-t border-neutral-200 pt-3 dark:border-neutral-700">
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
+            <p className={`mt-1 text-5xl font-semibold tracking-tight transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Цена за 1 шт: {totalPerUnit ? totalPerUnit.toLocaleString('ru-RU') : '—'} ₽
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              ≈ {pricePerM2 ? Math.round(pricePerM2).toLocaleString('ru-RU') : '—'} ₽ / м²
+            </p>
+          </div>
           <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>

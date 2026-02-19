@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { Upload } from 'lucide-react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import ImageDropzone from '@/components/ImageDropzone';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
@@ -226,7 +227,9 @@ export default function OrderWideFormatForm() {
             />
             {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
           </label>
+        </div>
 
+        <div className="grid gap-6 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-medium">Email</span>
             <input className={inputClass('email')} type="email" value={values.email} onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))} />
@@ -238,10 +241,29 @@ export default function OrderWideFormatForm() {
               value={file}
               onChange={setFile}
               title="Загрузка файла"
-              helperText="JPG, PNG, WEBP, TIFF. 1 файл, до 50 МБ."
+              accept=".jpg,.jpeg,.png,.webp,.tif,.tiff,.pdf,.cdr,.ai,.psd"
+              helperText="JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD. 1 файл, до 50 МБ."
+              allowedMimeTypes={[
+                'image/jpeg',
+                'image/png',
+                'image/webp',
+                'image/tiff',
+                'application/pdf',
+                'application/postscript',
+                'application/illustrator',
+                'application/vnd.adobe.photoshop',
+              ]}
+              allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
+              invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
+              className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
+              helperTextClassName="mt-1 text-xs text-muted-foreground"
+              icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
+            <p className="text-xs text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
           </div>
+        </div>
 
+        <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-medium">Ширина (мм)</span>
             <input className={inputClass('width')} inputMode="numeric" value={values.width} onChange={(e) => setValues((prev) => ({ ...prev, width: e.target.value }))} />
