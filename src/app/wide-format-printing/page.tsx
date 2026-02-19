@@ -8,23 +8,33 @@ export default function WideFormatPrintingPage() {
     '720 dpi, 6 проходов',
     'Ширина рулона до 3.2 м',
     'Срок изготовления от 1 рабочего дня',
-    'Работаем с НДС',
+    'Агентствам -10% (по запросу)',
   ];
 
   return (
     <div>
-      <Section className="pb-8">
-        <div className="card p-8 md:p-10">
-          <h1 className="text-3xl font-bold md:text-4xl">Широкоформатная печать до 3.2 м</h1>
-          <p className="mt-3 text-neutral-600">Материалы, интерьерная/уличная печать, варианты постобработки.</p>
+      <Section className="bg-muted/30 py-16">
+        <div className="grid items-center gap-8 lg:grid-cols-2">
+          <div>
+            <h1 className="text-4xl font-semibold tracking-tight lg:text-5xl">Широкоформатная печать до 3.2 м</h1>
+            <p className="text-muted-foreground mt-4 text-lg">Материалы, интерьерная/уличная печать, варианты постобработки.</p>
 
-          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-neutral-600">
-            {trustMarkers.map((marker) => (
-              <p key={marker} className="inline-flex items-center gap-2">
-                <span className="text-emerald-600" aria-hidden="true">✔</span>
-                <span>{marker}</span>
-              </p>
-            ))}
+            <div className="mt-6 flex flex-wrap gap-4 text-sm text-neutral-600">
+              {trustMarkers.map((marker) => (
+                <p key={marker} className="inline-flex items-center gap-2">
+                  <span className="text-emerald-600" aria-hidden="true">✔</span>
+                  <span>{marker}</span>
+                </p>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl border bg-white p-6 shadow-md">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Онлайн-расчёт</p>
+            <h2 className="mt-2 text-2xl font-semibold">Быстро и без скрытых платежей</h2>
+            <p className="mt-4 text-3xl font-bold">От 450 ₽ / м²</p>
+            <p className="mt-2 text-sm text-neutral-500">Срок изготовления от 1 рабочего дня</p>
+            <Link href="#wide-format-form" className="btn-primary mt-4 block w-full text-center no-underline">Рассчитать стоимость</Link>
           </div>
         </div>
       </Section>
