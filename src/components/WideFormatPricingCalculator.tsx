@@ -45,6 +45,8 @@ type WideFormatQuote = {
   basePrintCost: number;
   edgeGluingCost: number;
   imageWeldingCost: number;
+  grommetsCount: number;
+  grommetsCost: number;
   plotterCutCost: number;
   positioningMarksCutCost: number;
   extrasCost: number;
@@ -77,6 +79,8 @@ const EMPTY_QUOTE: WideFormatQuote = {
   basePrintCost: 0,
   edgeGluingCost: 0,
   imageWeldingCost: 0,
+  grommetsCount: 0,
+  grommetsCost: 0,
   plotterCutCost: 0,
   positioningMarksCutCost: 0,
   extrasCost: 0,
@@ -105,6 +109,7 @@ export default function WideFormatPricingCalculator() {
 
   const [edgeGluing, setEdgeGluing] = useState(false);
   const [imageWelding, setImageWelding] = useState(false);
+  const [grommets, setGrommets] = useState(false);
   const [plotterCutByRegistrationMarks, setPlotterCutByRegistrationMarks] = useState(false);
   const [cutByPositioningMarks, setCutByPositioningMarks] = useState(false);
 
@@ -144,6 +149,7 @@ export default function WideFormatPricingCalculator() {
     quantityInput: quantity,
     edgeGluing,
     imageWelding,
+    grommets,
     plotterCutByRegistrationMarks,
     cutByPositioningMarks,
   }), [
@@ -152,6 +158,7 @@ export default function WideFormatPricingCalculator() {
     edgeGluing,
     height,
     imageWelding,
+    grommets,
     material,
     plotterCutByRegistrationMarks,
     quantity,
@@ -174,6 +181,7 @@ export default function WideFormatPricingCalculator() {
       quantity,
       edgeGluing,
       imageWelding,
+      grommets,
       plotterCutByRegistrationMarks,
       cutByPositioningMarks,
     });
@@ -183,6 +191,7 @@ export default function WideFormatPricingCalculator() {
     edgeGluing,
     height,
     imageWelding,
+    grommets,
     material,
     plotterCutByRegistrationMarks,
     quantity,
@@ -197,7 +206,8 @@ export default function WideFormatPricingCalculator() {
 
   useEffect(() => {
     if (!isBanner && edgeGluing) setEdgeGluing(false);
-  }, [edgeGluing, isBanner]);
+    if (!isBanner && grommets) setGrommets(false);
+  }, [edgeGluing, grommets, isBanner]);
 
   useEffect(() => {
     if (!canShowWelding && imageWelding) setImageWelding(false);
@@ -211,6 +221,7 @@ export default function WideFormatPricingCalculator() {
     if (!isExtrasAllowed) {
       setEdgeGluing(false);
       setImageWelding(false);
+      setGrommets(false);
       setPlotterCutByRegistrationMarks(false);
       setCutByPositioningMarks(false);
     }
@@ -318,6 +329,7 @@ export default function WideFormatPricingCalculator() {
         materialLabel: getWideFormatMaterialLabel(material),
         edgeGluing,
         imageWelding,
+        grommets,
         plotterCutByRegistrationMarks,
         cutByPositioningMarks,
       },
@@ -421,6 +433,7 @@ export default function WideFormatPricingCalculator() {
           <div className="space-y-2 pt-1">
             <p className="text-sm font-medium">Дополнительные услуги</p>
             {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
+            {isBanner && <CheckboxRow label={`Люверсы (${WIDE_FORMAT_PRICING_CONFIG.grommetPrice} ₽/шт${quote.grommetsCount > 0 ? `, ~${quote.grommetsCount} шт` : ""})`} checked={grommets} onChange={setGrommets} />}
             {canShowWelding && <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />}
             {isFilm && <CheckboxRow label="Плоттерная резка по меткам (+25 ₽ за пог. метр)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
             <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
@@ -484,6 +497,7 @@ export default function WideFormatPricingCalculator() {
           {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.imageWeldingCost > 0 && <SummaryRow label="— Сварка изображения" value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.plotterCutCost > 0 && <SummaryRow label="— Плоттерная резка" value={`${quote.plotterCutCost.toLocaleString('ru-RU')} ₽`} />}
+          {quote.grommetsCost > 0 && <SummaryRow label={`— Люверсы (${quote.grommetsCount} шт)`} value={`${quote.grommetsCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.positioningMarksCutCost > 0 && <SummaryRow label="— Метки позиционирования" value={`${quote.positioningMarksCutCost.toLocaleString('ru-RU')} ₽`} />}
         </div>
 

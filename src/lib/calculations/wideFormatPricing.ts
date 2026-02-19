@@ -30,6 +30,7 @@ export type WideFormatPricingInput = {
   quantityInput: string;
   edgeGluing: boolean;
   imageWelding: boolean;
+  grommets: boolean;
   plotterCutByRegistrationMarks: boolean;
   cutByPositioningMarks: boolean;
 };
@@ -47,6 +48,8 @@ export type WideFormatCalculationResult = {
   basePrintCost: number;
   edgeGluingCost: number;
   imageWeldingCost: number;
+  grommetsCount: number;
+  grommetsCost: number;
   plotterCutCost: number;
   positioningMarksCutCost: number;
   extrasCost: number;
@@ -103,11 +106,17 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.plotterCutPerimeterPrice
     : 0;
 
+  const grommetsCount = input.grommets && isBannerMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
+    ? Math.ceil(perimeterPerUnit / WIDE_FORMAT_PRICING_CONFIG.grommetStepM)
+    : 0;
+
+  const grommetsCost = grommetsCount * WIDE_FORMAT_PRICING_CONFIG.grommetPrice * quantity;
+
   const positioningMarksCutCost = input.cutByPositioningMarks && basePrintCost > 0
     ? basePrintCost * WIDE_FORMAT_PRICING_CONFIG.positioningMarksCutPercent
     : 0;
 
-  const extrasCost = edgeGluingCost + imageWeldingCost + plotterCutCost + positioningMarksCutCost;
+  const extrasCost = edgeGluingCost + imageWeldingCost + plotterCutCost + grommetsCost + positioningMarksCutCost;
 
   return {
     width,
@@ -122,6 +131,8 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     basePrintCost,
     edgeGluingCost,
     imageWeldingCost,
+    grommetsCount,
+    grommetsCost,
     plotterCutCost,
     positioningMarksCutCost,
     extrasCost,
