@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPrismaClient } from '@/lib/db/prisma';
+import { prisma } from '@/lib/db/prisma';
+
+import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
 
 type Params = {
   params: {
@@ -9,7 +12,7 @@ type Params = {
 
 export async function GET(_request: NextRequest, { params }: Params) {
   try {
-    const order = await (getPrismaClient() as any).order.findUnique({
+    const order = await prisma.order.findUnique({
       where: {
         number: params.number,
       },
@@ -39,7 +42,8 @@ export async function GET(_request: NextRequest, { params }: Params) {
     }
 
     return NextResponse.json(order);
-  } catch {
+  } catch (error) {
+    logger.error('orders.get.failed', { error, orderNumber: params.number });
     return NextResponse.json({ ok: false, error: 'Ошибка получения заказа.' }, { status: 500 });
   }
 }

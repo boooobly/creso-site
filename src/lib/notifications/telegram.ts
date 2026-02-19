@@ -1,3 +1,4 @@
+import { env } from '@/lib/env';
 const TELEGRAM_API_BASE = 'https://api.telegram.org';
 
 function escapeMarkdownV2(value: string): string {
@@ -5,8 +6,8 @@ function escapeMarkdownV2(value: string): string {
 }
 
 export async function sendTelegramLead(text: string): Promise<void> {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const token = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
     console.warn('[leads] Telegram is not configured. Skip sending.');

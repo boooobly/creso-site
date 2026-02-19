@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPrismaClient } from '@/lib/db/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { buildOrderPdf } from '@/lib/pdf/buildOrderPdf';
+
+import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
 
 type Params = {
   params: {
@@ -10,7 +13,7 @@ type Params = {
 
 export async function GET(_request: NextRequest, { params }: Params) {
   try {
-    const order = await (getPrismaClient() as any).order.findUnique({
+    const order = await prisma.order.findUnique({
       where: {
         number: params.number,
       },
@@ -55,7 +58,8 @@ export async function GET(_request: NextRequest, { params }: Params) {
         'Cache-Control': 'no-store',
       },
     });
-  } catch {
+  } catch (error) {
+    logger.error('orders.pdf.failed', { error, orderNumber: params.number });
     return NextResponse.json({ ok: false, error: 'Ошибка генерации PDF.' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getPrintQuote, type PrintPricingInput } from '@/lib/engine';
 
+import { logger } from '@/lib/logger';
 const printQuoteSchema = z.object({
   productType: z.enum(['cards', 'flyers']),
   size: z.string().min(1),
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
     const parsed = printQuoteSchema.safeParse(payload);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Некорректные параметры расчёта.' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Некорректные параметры расчёта.' }, { status: 400 });
     }
 
     const input: PrintPricingInput = parsed.data;
@@ -39,7 +40,8 @@ export async function POST(req: Request) {
       calculatedPrice: quote.totalPrice,
     });
     return NextResponse.json({ quote });
-  } catch {
-    return NextResponse.json({ error: 'Ошибка расчёта.' }, { status: 500 });
+  } catch (error) {
+    logger.error('quotes.calculate.failed', { error });
+    return NextResponse.json({ ok: false, error: 'Ошибка расчёта.' }, { status: 500 });
   }
 }

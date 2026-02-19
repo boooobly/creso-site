@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import bagetData from '../../../../data/baget.json';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
-import { getPrismaClient } from '@/lib/db/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
 import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
 import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
+import { normalizePhone } from '@/lib/utils/phone';
+
+import { logger } from '@/lib/logger';
+import { env } from '@/lib/env';
+export const runtime = 'nodejs';
 
 const bagetItemSchema = z.object({
   id: z.string(),
@@ -45,14 +51,6 @@ const orderSchema = z.object({
   company: z.string().optional(),
 });
 
-function normalizePhone(phone: string): string | null {
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length !== 11 || !digits.startsWith('7')) {
-    return null;
-  }
-  return digits;
-}
-
 async function createOrderWithRetry(data: {
   inputPayload: z.infer<typeof orderSchema>;
   quote: ReturnType<typeof bagetQuote>;
@@ -69,7 +67,7 @@ async function createOrderWithRetry(data: {
     const orderNumber = generateOrderNumber();
 
     try {
-      await (getPrismaClient() as any).order.create({
+      await prisma.order.create({
         data: {
           number: orderNumber,
           source: 'baget',
@@ -81,8 +79,8 @@ async function createOrderWithRetry(data: {
           total: data.quote.total,
           prepayRequired: data.prepayRequired,
           prepayAmount: data.prepayAmount,
-          payloadJson: data.inputPayload,
-          quoteJson: data.quote,
+          payloadJson: data.inputPayload as Prisma.InputJsonValue,
+          quoteJson: data.quote as unknown as Prisma.InputJsonValue,
         },
       });
 
@@ -165,7 +163,7 @@ export async function POST(request: NextRequest) {
     });
 
 
-    const shouldSendCustomerEmail = process.env.SEND_CUSTOMER_EMAILS === 'true';
+    const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS === 'true';
     const customerEmail = parsed.data.customer.email?.trim();
     const pdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf`;
 
@@ -188,7 +186,8 @@ export async function POST(request: NextRequest) {
       prepayRequired,
       prepayAmount,
     });
-  } catch {
+  } catch (error) {
+    logger.error('orders.post.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заказа.' }, { status: 500 });
   }
 }

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getPrismaClient } from '@/lib/db/prisma';
+import { prisma } from '@/lib/db/prisma';
+
+import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
 
 const createPaymentSchema = z.object({
   orderNumber: z.string().trim().min(1),
@@ -20,7 +23,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Invalid request payload.' }, { status: 400 });
     }
 
-    const order = await (getPrismaClient() as any).order.findUnique({
+    const order = await prisma.order.findUnique({
       where: { number: parsed.data.orderNumber },
       select: {
         number: true,
@@ -42,7 +45,7 @@ export async function POST(request: NextRequest) {
     const amount = order.prepayRequired ? Number(order.prepayAmount ?? 0) : Number(order.total);
     const paymentRef = generatePaymentRef();
 
-    await (getPrismaClient() as any).order.update({
+    await prisma.order.update({
       where: { number: order.number },
       data: {
         paymentStatus: 'pending',
@@ -59,7 +62,8 @@ export async function POST(request: NextRequest) {
       amount,
       redirectUrl: `/pay/mock?ref=${encodeURIComponent(paymentRef)}&order=${encodeURIComponent(order.number)}`,
     });
-  } catch {
+  } catch (error) {
+    logger.error('payments.create.failed', { error });
     return NextResponse.json({ ok: false, error: 'Payment session creation failed.' }, { status: 500 });
   }
 }
