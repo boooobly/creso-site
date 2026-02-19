@@ -31,6 +31,7 @@ const wideFormatQuoteSchema = z.object({
   quantityInput: z.string(),
   edgeGluing: z.boolean(),
   imageWelding: z.boolean(),
+  grommets: z.boolean(),
   plotterCutByRegistrationMarks: z.boolean(),
   cutByPositioningMarks: z.boolean(),
 });
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
         quantityInput: input.quantityInput,
         edgeGluing: input.edgeGluing,
         imageWelding: input.imageWelding,
+        grommets: input.grommets,
         plotterCutByRegistrationMarks: input.plotterCutByRegistrationMarks,
         cutByPositioningMarks: input.cutByPositioningMarks,
       },

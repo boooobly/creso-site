@@ -30,6 +30,7 @@ export type WideFormatPricingInput = {
   quantityInput: string;
   edgeGluing: boolean;
   imageWelding: boolean;
+  grommets: boolean;
   plotterCutByRegistrationMarks: boolean;
   cutByPositioningMarks: boolean;
 };
@@ -47,7 +48,9 @@ export type WideFormatCalculationResult = {
   basePrintCost: number;
   edgeGluingCost: number;
   imageWeldingCost: number;
-  plotterCutCost: number;
+  grommetsCount: number;
+  grommetsCost: number;
+  plotterCutEstimatedCost: number;
   positioningMarksCutCost: number;
   extrasCost: number;
   totalCost: number;
@@ -62,6 +65,8 @@ export function getWideFormatWidthWarningCode(_material: WideFormatMaterialType,
 
 function getMaterialPricePerM2(material: WideFormatMaterialType): number {
   if (material === 'customer_roll_textured' || material === 'customer_roll_smooth') {
+    // Для "Свой материал" стоимость задаётся за м² за 1 проход,
+    // поэтому переводим в эффективную цену за м² с учётом стандартных 6 проходов.
     const customerRollPerPass = material === 'customer_roll_textured'
       ? WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured
       : WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth;
@@ -99,15 +104,24 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.imageWeldingPerimeterPrice
     : 0;
 
-  const plotterCutCost = input.plotterCutByRegistrationMarks && isFilmMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
-    ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.plotterCutPerimeterPrice
+  const plotterCutEstimatedCost = input.plotterCutByRegistrationMarks && isFilmMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
+    ? Math.max(
+      WIDE_FORMAT_PRICING_CONFIG.plotterCutMinimumFee,
+      perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.plotterCutPerimeterPrice,
+    )
     : 0;
+
+  const grommetsCount = input.grommets && isBannerMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
+    ? Math.ceil(perimeterPerUnit / WIDE_FORMAT_PRICING_CONFIG.grommetStepM)
+    : 0;
+
+  const grommetsCost = grommetsCount * WIDE_FORMAT_PRICING_CONFIG.grommetPrice * quantity;
 
   const positioningMarksCutCost = input.cutByPositioningMarks && basePrintCost > 0
     ? basePrintCost * WIDE_FORMAT_PRICING_CONFIG.positioningMarksCutPercent
     : 0;
 
-  const extrasCost = edgeGluingCost + imageWeldingCost + plotterCutCost + positioningMarksCutCost;
+  const extrasCost = edgeGluingCost + imageWeldingCost + grommetsCost + positioningMarksCutCost;
 
   return {
     width,
@@ -122,7 +136,9 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     basePrintCost,
     edgeGluingCost,
     imageWeldingCost,
-    plotterCutCost,
+    grommetsCount,
+    grommetsCost,
+    plotterCutEstimatedCost,
     positioningMarksCutCost,
     extrasCost,
     totalCost: basePrintCost + extrasCost,
