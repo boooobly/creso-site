@@ -15,6 +15,7 @@ const envSchema = z.object({
   LEADS_FROM_EMAIL: z.string().trim().optional(),
   TELEGRAM_BOT_TOKEN: z.string().trim().optional(),
   TELEGRAM_CHAT_ID: z.string().trim().optional(),
+  REVIEW_MODERATION_TOKEN: z.string().trim().optional(),
 }).superRefine((value, ctx) => {
   const hasAnySmtp = Boolean(value.SMTP_HOST || value.SMTP_PORT || value.SMTP_USER || value.SMTP_PASS);
   if (hasAnySmtp) {

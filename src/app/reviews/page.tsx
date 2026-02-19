@@ -1,104 +1,89 @@
 import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
-import ReviewCard from '@/components/ReviewCard';
+import ReviewsClient from '@/components/ReviewsClient';
 
-type ReviewItem = {
-  id: number;
-  businessType: string;
-  clientName: string;
-  rating: number;
-  reviewText: string;
-  reviewDate?: string;
-  photoSrc: string;
+type TrustItem = {
+  icon: string;
+  title: string;
+  description: string;
 };
 
-const reviews: ReviewItem[] = [
+const trustPoints: TrustItem[] = [
   {
-    id: 1,
-    businessType: 'Клиент',
-    clientName: 'Наталья Ш.',
-    rating: 5,
-    reviewText:
-      'Очень довольна работой компании: помогли с макетом, быстро согласовали размеры и изготовили вывеску точно в срок. Монтаж выполнили аккуратно, смотрится дорого и аккуратно.',
-    reviewDate: 'Яндекс Карты • июль 2024',
-    photoSrc: '/images/reviews/client-1.svg',
+    icon: '🏭',
+    title: 'Собственное производство',
+    description: 'Контролируем качество и соблюдаем сроки на каждом этапе.',
   },
   {
-    id: 2,
-    businessType: 'Магазин',
-    clientName: 'Игорь М.',
-    rating: 5,
-    reviewText:
-      'Заказывали наружную рекламу для магазина. Подсказали оптимальный вариант по бюджету, все прописали в договоре и сделали без задержек. По качеству материалов вопросов нет.',
-    reviewDate: 'Яндекс Карты • май 2024',
-    photoSrc: '/images/reviews/client-2.svg',
+    icon: '📝',
+    title: 'Работа по договору',
+    description: 'Фиксируем условия, стоимость и сроки до старта проекта.',
   },
   {
-    id: 3,
-    businessType: 'Кафе',
-    clientName: 'Екатерина П.',
-    rating: 5,
-    reviewText:
-      'Обращались за оформлением фасада и меню-бордов. Приятно, что команда предлагает решения, а не просто печатает по ТЗ. В итоге получили очень аккуратный и заметный результат.',
-    reviewDate: 'Яндекс Карты • март 2024',
-    photoSrc: '/images/reviews/client-3.svg',
+    icon: '🛡️',
+    title: 'Гарантия на конструкции',
+    description: 'Даём гарантийные обязательства на выполненные работы.',
   },
   {
-    id: 4,
-    businessType: 'Салон красоты',
-    clientName: 'Алина К.',
-    rating: 5,
-    reviewText:
-      'Сделали брендирование входной группы и таблички внутри салона. Все размеры соблюдены, цвета переданы точно, монтажная бригада приехала вовремя. Спасибо за профессиональный подход.',
-    reviewDate: 'Яндекс Карты • январь 2024',
-    photoSrc: '/images/reviews/client-4.svg',
-  },
-  {
-    id: 5,
-    businessType: 'Клиент',
-    clientName: 'Сергей В.',
-    rating: 5,
-    reviewText:
-      'Не первый раз заказываю здесь печать и конструкции. Всегда на связи, сроки реальные, качество стабильное. Рекомендую тем, кому нужно без лишней суеты и с гарантией.',
-    reviewDate: 'Яндекс Карты • декабрь 2023',
-    photoSrc: '/images/reviews/client-5.svg',
+    icon: '🧰',
+    title: 'Своя монтажная бригада',
+    description: 'Монтаж выполняют штатные специалисты с профильным опытом.',
   },
 ];
 
-const trustPoints = [
-  'Собственное производство, 15+ лет опыта',
-  'Работаем по договору',
-  'Гарантия на конструкции',
-  'Собственная монтажная бригада',
-];
+const yandexReviewsUrl = 'https://yandex.com/maps/org/credomir/162252059264/reviews/?ll=41.959534%2C44.623058&z=17';
+const yandexEmbedUrl = 'https://yandex.com/map-widget/v1/?ll=41.959534%2C44.623058&mode=search&oid=162252059264&z=17';
 
 export default function ReviewsPage() {
   return (
     <div className="space-y-12 md:space-y-16">
       <section className="space-y-4 text-center">
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Отзывы реальных клиентов</h1>
-        <p className="mx-auto max-w-3xl text-base text-neutral-600 dark:text-neutral-300 md:text-lg">
-          Отзывы о нашей работе в Невинномысске и Ставропольском крае
-        </p>
       </section>
 
-      <section>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-          {reviews.map((review) => (
-            <RevealOnScroll key={review.id}>
-              <ReviewCard {...review} />
-            </RevealOnScroll>
-          ))}
-        </div>
+      <ReviewsClient />
+
+      <section className="card rounded-2xl p-6 md:p-8">
+        <RevealOnScroll>
+          <div className="mb-4 flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
+            <h2 className="text-xl font-semibold md:text-2xl">Отзывы на Яндекс Картах</h2>
+            <a
+              href={yandexReviewsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-primary inline-flex items-center no-underline"
+            >
+              Смотреть отзывы
+            </a>
+          </div>
+
+          <div className="relative w-full overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 pb-[56.25%] dark:border-neutral-700 dark:bg-neutral-900">
+            <iframe
+              src={yandexEmbedUrl}
+              className="absolute inset-0 h-full w-full"
+              loading="lazy"
+              title="Credomir на Яндекс Картах"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </RevealOnScroll>
       </section>
 
       <section className="card rounded-2xl p-6 md:p-8">
         <RevealOnScroll>
           <h2 className="mb-4 text-xl font-semibold md:text-2xl">Почему нам доверяют</h2>
-          <ul className="grid grid-cols-1 gap-3 text-sm text-neutral-700 dark:text-neutral-300 md:grid-cols-2 md:text-base">
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {trustPoints.map((point) => (
-              <li key={point} className="rounded-xl bg-neutral-50 px-4 py-3 dark:bg-neutral-800/60">
-                {point}
+              <li key={point.title} className="rounded-xl bg-neutral-50 p-4 dark:bg-neutral-800/60">
+                <div className="flex items-start gap-3">
+                  <span className="text-lg leading-none" aria-hidden>
+                    {point.icon}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 md:text-base">{point.title}</p>
+                    <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300 md:text-sm">{point.description}</p>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
