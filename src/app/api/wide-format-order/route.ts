@@ -96,6 +96,7 @@ export async function POST(request: NextRequest) {
     const website = toStringValue(formData.get('website'));
     const edgeGluing = toBooleanValue(formData.get('edgeGluing'));
     const imageWelding = toBooleanValue(formData.get('imageWelding'));
+    const grommets = toBooleanValue(formData.get('grommets'));
     const plotterCutByRegistrationMarks = toBooleanValue(formData.get('plotterCutByRegistrationMarks'));
     const cutByPositioningMarks = toBooleanValue(formData.get('cutByPositioningMarks'));
     const fileRaw = formData.get('file');
@@ -138,6 +139,7 @@ export async function POST(request: NextRequest) {
       quantityInput: String(parsedQuantity),
       edgeGluing,
       imageWelding,
+      grommets,
       plotterCutByRegistrationMarks,
       cutByPositioningMarks,
     });
@@ -147,6 +149,7 @@ export async function POST(request: NextRequest) {
     const extras = [
       { enabled: edgeGluing, label: 'Проклейка края', cost: calculated.edgeGluingCost },
       { enabled: imageWelding, label: 'Сварка изображения', cost: calculated.imageWeldingCost },
+      { enabled: grommets, label: `Люверсы: да, ${calculated.grommetsCount} шт`, cost: calculated.grommetsCost },
       { enabled: plotterCutByRegistrationMarks, label: 'Плоттерная резка по меткам', cost: calculated.plotterCutCost },
       { enabled: cutByPositioningMarks, label: 'Резка по меткам позиционирования (+30%)', cost: calculated.positioningMarksCutCost },
     ].filter((item) => item.enabled && item.cost > 0);

@@ -119,6 +119,8 @@ export const WIDE_FORMAT_PRICING_CONFIG = {
   maxWidth: 3.2,
   edgeGluingPerimeterPrice: 50,
   imageWeldingPerimeterPrice: 150,
+  grommetPrice: 20,
+  grommetStepM: 0.30,
   plotterCutPerimeterPrice: 25,
   positioningMarksCutPercent: 0.3,
   passesStandard: 6,
