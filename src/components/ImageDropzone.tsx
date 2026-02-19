@@ -35,7 +35,7 @@ export default function ImageDropzone({
   buttonText = 'Загрузить макет',
   helperText = 'JPG, PNG, WEBP, TIFF. До 50 МБ.',
   className = '',
-  helperTextClassName = 'mt-3 text-xs text-neutral-500',
+  helperTextClassName = 'mt-1 text-xs text-neutral-500',
   icon,
   allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/tiff'],
   allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff'],
@@ -110,29 +110,34 @@ export default function ImageDropzone({
         onChange={(event) => validateAndSetFile(event.target.files?.[0] ?? null)}
       />
 
-      <p className="text-sm font-medium">{title}</p>
-      <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">{description}</p>
+      <div className="flex min-h-[120px] flex-col justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            {icon}
+            <p className="text-sm font-medium">{title}</p>
+          </div>
+          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">{description}</p>
+        </div>
 
-      {icon && <div className="mt-3">{icon}</div>}
-
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="btn-secondary rounded-lg px-4 py-2 text-sm"
-        >
-          {buttonText}
-        </button>
-        {!value && <span className="text-sm text-neutral-500">Файл не выбран</span>}
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[220px] sm:items-end">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="btn-secondary w-full rounded-lg px-4 py-2 text-sm sm:w-auto"
+          >
+            {buttonText}
+          </button>
+          {!value && <span className="text-xs text-neutral-500 sm:text-right">Файл не выбран</span>}
+        </div>
       </div>
 
       {value && (
-        <div className="mt-3 flex items-center gap-3 rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="mt-2 flex items-center gap-2 rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900">
           {previewUrl && (
             <img
               src={previewUrl}
               alt="Предпросмотр макета"
-              className="h-20 w-20 rounded-md object-cover"
+              className="h-12 w-12 shrink-0 rounded-md object-cover"
             />
           )}
           <div className="min-w-0 flex-1">
@@ -145,7 +150,7 @@ export default function ImageDropzone({
               if (fileInputRef.current) fileInputRef.current.value = '';
               validateAndSetFile(null);
             }}
-            className="text-xs font-medium text-neutral-500 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+            className="shrink-0 text-xs font-medium text-neutral-500 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
           >
             Удалить
           </button>
