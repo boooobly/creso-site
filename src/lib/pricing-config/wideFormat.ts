@@ -53,6 +53,7 @@ export type WideFormatCategory =
   | 'banner'
   | 'film'
   | 'paper'
+  | 'backlit'
   | 'fabric'
   | 'canvas'
   | 'customer';
@@ -61,6 +62,7 @@ export const WIDE_FORMAT_CATEGORY_OPTIONS: ReadonlyArray<{ id: WideFormatCategor
   { id: 'banner', label: 'Баннер' },
   { id: 'film', label: 'Плёнка' },
   { id: 'paper', label: 'Бумага' },
+  { id: 'backlit', label: 'Светорассеивающие материалы' },
   { id: 'fabric', label: 'Ткань' },
   { id: 'canvas', label: 'Холст' },
   { id: 'customer', label: 'Свой материал' },
@@ -79,6 +81,8 @@ export const WIDE_FORMAT_VARIANTS_BY_CATEGORY: Record<WideFormatCategory, Array<
     { id: 'self_adhesive_film_gloss', label: 'Самоклейка глянец' },
     { id: 'perforated_film_1_37', label: 'Перфорированная 1.37 м' },
     { id: 'trans_film_1_27', label: 'Транслюцентная 1.27 м' },
+  ],
+  backlit: [
     { id: 'backlit_1_07', label: 'Бэклит 1.07 м' },
   ],
   paper: [
@@ -122,6 +126,7 @@ export const WIDE_FORMAT_PRICING_CONFIG = {
   grommetPrice: 20,
   grommetStepM: 0.30,
   plotterCutPerimeterPrice: 25,
+  plotterCutMinimumFee: 250,
   positioningMarksCutPercent: 0.3,
   passesStandard: 6,
   customerRollPerPass: {

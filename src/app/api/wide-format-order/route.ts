@@ -150,7 +150,6 @@ export async function POST(request: NextRequest) {
       { enabled: edgeGluing, label: 'Проклейка края', cost: calculated.edgeGluingCost },
       { enabled: imageWelding, label: 'Сварка изображения', cost: calculated.imageWeldingCost },
       { enabled: grommets, label: `Люверсы: да, ${calculated.grommetsCount} шт`, cost: calculated.grommetsCost },
-      { enabled: plotterCutByRegistrationMarks, label: 'Плоттерная резка по меткам', cost: calculated.plotterCutCost },
       { enabled: cutByPositioningMarks, label: 'Резка по меткам позиционирования (+30%)', cost: calculated.positioningMarksCutCost },
     ].filter((item) => item.enabled && item.cost > 0);
 
@@ -173,6 +172,9 @@ export async function POST(request: NextRequest) {
       '',
       'Доп. услуги:',
       extrasText,
+      `Резка по меткам: ${plotterCutByRegistrationMarks ? 'да' : 'нет'}`,
+      `Оценочно (минимум): ${formatRub(calculated.plotterCutEstimatedCost || 250)}`,
+      'Финальная стоимость резки по меткам — после проверки и утверждения макета менеджером.',
       '',
       'Стоимость:',
       `Материал: ${formatRub(calculated.basePrintCost)}`,
