@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { CheckCircle2 } from 'lucide-react';
 import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 import OrderWideFormatForm from '@/components/OrderWideFormatForm';
@@ -8,7 +9,26 @@ export default function WideFormatPrintingPage() {
     '720 dpi, 6 проходов',
     'Ширина рулона до 3.2 м',
     'Срок изготовления от 1 рабочего дня',
-    'Агентствам -10% (по запросу)',
+    'Рекламным агентствам -10% (по запросу)',
+    'Юрлицам - оплата по счету',
+  ];
+  const features = [
+    {
+      title: 'Собственное производство',
+      description: 'Полный цикл печати без посредников',
+    },
+    {
+      title: 'Проверка макета',
+      description: 'Проверяем файлы перед запуском в печать',
+    },
+    {
+      title: 'Контроль цвета',
+      description: 'Калиброванное оборудование и точность передачи',
+    },
+    {
+      title: 'Работа по договору',
+      description: 'Заключаем официальный договор при необходимости',
+    },
   ];
 
   return (
@@ -45,15 +65,18 @@ export default function WideFormatPrintingPage() {
         </div>
       </Section>
 
-      <Section className="pt-0 pb-16">
+      <Section className="py-12">
         <div className="mb-5 rounded-xl border border-neutral-200/80 bg-neutral-50 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/50">
           <h3 className="text-lg font-semibold">📌 Почему выбирают нас</h3>
-          <ul className="mt-3 space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
-            <li>• Собственное производство</li>
-            <li>• Проверка макета перед печатью</li>
-            <li>• Контроль цвета</li>
-            <li>• Работаем по договору</li>
-          </ul>
+          <div className="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature) => (
+              <div key={feature.title} className="rounded-xl border bg-white p-6 shadow-sm transition hover:shadow-md">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+                <h3 className="mt-3 text-lg font-semibold">{feature.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
         <OrderWideFormatForm />
       </Section>
