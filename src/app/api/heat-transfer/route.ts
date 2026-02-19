@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
+export const runtime = 'nodejs';
+
 type HeatTransferPayload = {
   productType: 'mug' | 'tshirt' | 'film';
   configuration: {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getPrismaClient } from '@/lib/db/prisma';
+import { prisma } from '@/lib/db/prisma';
+
+export const runtime = 'nodejs';
 
 const webhookSchema = z.object({
   paymentRef: z.string().trim().min(1),
@@ -17,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Invalid webhook payload.' }, { status: 400 });
     }
 
-    const order = await (getPrismaClient() as any).order.findFirst({
+    const order = await prisma.order.findFirst({
       where: { paymentRef: parsed.data.paymentRef },
       select: {
         id: true,
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     if (parsed.data.status === 'paid') {
       const computedAmount = order.prepayRequired ? Number(order.prepayAmount ?? 0) : Number(order.total);
-      await (getPrismaClient() as any).order.update({
+      await prisma.order.update({
         where: { id: order.id },
         data: {
           paymentStatus: 'paid',
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    await (getPrismaClient() as any).order.update({
+    await prisma.order.update({
       where: { id: order.id },
       data: {
         paymentStatus: 'failed',

@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramLead } from '@/lib/notifications/telegram';
 
+export const runtime = 'nodejs';
+
 type RateRecord = { count: number; resetAt: number };
 
 const RATE_WINDOW_MS = 10 * 60 * 1000;
