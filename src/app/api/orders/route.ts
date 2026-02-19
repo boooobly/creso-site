@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import bagetData from '../../../../data/baget.json';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
-import { getPrismaClient } from '@/lib/db/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
 import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
 import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
+
+export const runtime = 'nodejs';
 
 const bagetItemSchema = z.object({
   id: z.string(),
@@ -69,7 +72,7 @@ async function createOrderWithRetry(data: {
     const orderNumber = generateOrderNumber();
 
     try {
-      await (getPrismaClient() as any).order.create({
+      await prisma.order.create({
         data: {
           number: orderNumber,
           source: 'baget',
@@ -81,8 +84,8 @@ async function createOrderWithRetry(data: {
           total: data.quote.total,
           prepayRequired: data.prepayRequired,
           prepayAmount: data.prepayAmount,
-          payloadJson: data.inputPayload,
-          quoteJson: data.quote,
+          payloadJson: data.inputPayload as Prisma.InputJsonValue,
+          quoteJson: data.quote as unknown as Prisma.InputJsonValue,
         },
       });
 
