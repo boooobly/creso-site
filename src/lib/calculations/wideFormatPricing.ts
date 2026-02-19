@@ -65,6 +65,8 @@ export function getWideFormatWidthWarningCode(_material: WideFormatMaterialType,
 
 function getMaterialPricePerM2(material: WideFormatMaterialType): number {
   if (material === 'customer_roll_textured' || material === 'customer_roll_smooth') {
+    // Для "Свой материал" стоимость задаётся за м² за 1 проход,
+    // поэтому переводим в эффективную цену за м² с учётом стандартных 6 проходов.
     const customerRollPerPass = material === 'customer_roll_textured'
       ? WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured
       : WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth;

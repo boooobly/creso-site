@@ -519,7 +519,6 @@ export default function WideFormatPricingCalculator() {
         <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
           <p>Срок изготовления: <b>1–2 рабочих дня</b></p>
           <p>Максимальная ширина печати: <b>3.2 м</b></p>
-          <p>Работаем с <b>НДС</b></p>
         </div>
         <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
       </aside>
