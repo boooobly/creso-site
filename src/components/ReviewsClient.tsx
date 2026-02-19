@@ -22,8 +22,22 @@ type ReviewsResponse = {
 };
 
 const PAGE_LIMIT = 9;
+const MAX_RETRIES = 1;
 
 type LoadState = 'loading' | 'error' | 'success';
+
+function isReviewsResponse(value: unknown): value is ReviewsResponse {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  return Array.isArray(candidate.items)
+    && typeof candidate.totalApproved === 'number'
+    && (typeof candidate.averageRating === 'number' || candidate.averageRating === null)
+    && (typeof candidate.nextCursor === 'string' || candidate.nextCursor === null);
+}
 
 function SummarySkeleton() {
   return (
@@ -66,6 +80,31 @@ export default function ReviewsClient() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [state, setState] = useState<LoadState>('loading');
 
+  async function requestPage(cursor?: string, retry = 0): Promise<ReviewsResponse> {
+    const params = new URLSearchParams({ limit: String(PAGE_LIMIT) });
+    if (cursor) {
+      params.set('cursor', cursor);
+    }
+
+    const response = await fetch(`/api/reviews?${params.toString()}`, { cache: 'no-store' });
+    if (!response.ok) {
+      if (retry < MAX_RETRIES) {
+        return requestPage(cursor, retry + 1);
+      }
+      throw new Error('Не удалось загрузить отзывы.');
+    }
+
+    const rawData: unknown = await response.json().catch(() => null);
+    if (!isReviewsResponse(rawData)) {
+      if (retry < MAX_RETRIES) {
+        return requestPage(cursor, retry + 1);
+      }
+      throw new Error('Некорректный формат ответа.');
+    }
+
+    return rawData;
+  }
+
   async function fetchPage(cursor?: string) {
     if (cursor) {
       setIsLoadingMore(true);
@@ -74,18 +113,7 @@ export default function ReviewsClient() {
     }
 
     try {
-      const params = new URLSearchParams({ limit: String(PAGE_LIMIT) });
-      if (cursor) {
-        params.set('cursor', cursor);
-      }
-
-      const response = await fetch(`/api/reviews?${params.toString()}`, { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error('Не удалось загрузить отзывы.');
-      }
-
-      const data = (await response.json()) as ReviewsResponse;
-
+      const data = await requestPage(cursor);
       setItems((prev) => (cursor ? [...prev, ...data.items] : data.items));
       setNextCursor(data.nextCursor);
       setTotalApproved(data.totalApproved);
@@ -189,7 +217,7 @@ export default function ReviewsClient() {
             ) : (
               <RevealOnScroll>
                 <div className="card rounded-2xl p-6 text-center md:p-8">
-                  <p className="text-base font-medium text-neutral-900 dark:text-neutral-100">Пока нет отзывов</p>
+                  <p className="text-base font-medium text-neutral-900 dark:text-neutral-100">No reviews yet</p>
                   <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
                     Будьте первым — оставьте отзыв о нашей работе.
                   </p>
