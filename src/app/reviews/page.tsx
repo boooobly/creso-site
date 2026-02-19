@@ -2,11 +2,33 @@ import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import ReviewsClient from '@/components/ReviewsClient';
 
-const trustPoints = [
-  'Собственное производство, 15+ лет опыта',
-  'Работаем по договору',
-  'Гарантия на конструкции',
-  'Собственная монтажная бригада',
+type TrustItem = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+const trustPoints: TrustItem[] = [
+  {
+    icon: '🏭',
+    title: 'Собственное производство',
+    description: 'Контролируем качество и соблюдаем сроки на каждом этапе.',
+  },
+  {
+    icon: '📝',
+    title: 'Работа по договору',
+    description: 'Фиксируем условия, стоимость и сроки до старта проекта.',
+  },
+  {
+    icon: '🛡️',
+    title: 'Гарантия на конструкции',
+    description: 'Даём гарантийные обязательства на выполненные работы.',
+  },
+  {
+    icon: '🧰',
+    title: 'Своя монтажная бригада',
+    description: 'Монтаж выполняют штатные специалисты с профильным опытом.',
+  },
 ];
 
 export default function ReviewsPage() {
@@ -24,10 +46,18 @@ export default function ReviewsPage() {
       <section className="card rounded-2xl p-6 md:p-8">
         <RevealOnScroll>
           <h2 className="mb-4 text-xl font-semibold md:text-2xl">Почему нам доверяют</h2>
-          <ul className="grid grid-cols-1 gap-3 text-sm text-neutral-700 dark:text-neutral-300 md:grid-cols-2 md:text-base">
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {trustPoints.map((point) => (
-              <li key={point} className="rounded-xl bg-neutral-50 px-4 py-3 dark:bg-neutral-800/60">
-                {point}
+              <li key={point.title} className="rounded-xl bg-neutral-50 p-4 dark:bg-neutral-800/60">
+                <div className="flex items-start gap-3">
+                  <span className="text-lg leading-none" aria-hidden>
+                    {point.icon}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 md:text-base">{point.title}</p>
+                    <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300 md:text-sm">{point.description}</p>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>

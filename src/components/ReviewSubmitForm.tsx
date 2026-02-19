@@ -72,7 +72,7 @@ export default function ReviewSubmitForm({ onSubmitted }: ReviewSubmitFormProps)
       setRating(5);
       setSubmitState({
         type: 'success',
-        message: 'Thanks! Your review will appear after moderation.',
+        message: 'Спасибо! Ваш отзыв появится после модерации.',
       });
       onSubmitted?.();
     } catch {
@@ -88,7 +88,7 @@ export default function ReviewSubmitForm({ onSubmitted }: ReviewSubmitFormProps)
   return (
     <>
       <button type="button" className="btn-primary" onClick={() => setIsOpen(true)}>
-        Leave a review
+        Оставить отзыв
       </button>
 
       {isOpen ? (
