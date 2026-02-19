@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 
 type ImageDropzoneProps = {
   value?: File | null;
@@ -45,17 +45,6 @@ export default function ImageDropzone({
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const previewUrl = useMemo(() => {
-    if (!value || !value.type.startsWith('image/')) return '';
-    return URL.createObjectURL(value);
-  }, [value]);
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
   const validateAndSetFile = (file: File | null) => {
     if (!file) {
       setError('');
@@ -83,7 +72,7 @@ export default function ImageDropzone({
 
   return (
     <div
-      className={`rounded-xl border-2 border-dashed p-4 transition-colors ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/20' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700 dark:bg-neutral-900/50'} ${className}`.trim()}
+      className={`min-h-[120px] rounded-xl border-2 border-dashed p-3 transition-colors md:p-4 ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/20' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700 dark:bg-neutral-900/50'} ${className}`.trim()}
       onDragEnter={(event) => {
         event.preventDefault();
         setIsDragging(true);
@@ -110,16 +99,16 @@ export default function ImageDropzone({
         onChange={(event) => validateAndSetFile(event.target.files?.[0] ?? null)}
       />
 
-      <div className="flex min-h-[120px] flex-col justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
+      <div className="flex min-h-[120px] flex-wrap items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             {icon}
             <p className="text-sm font-medium">{title}</p>
           </div>
-          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">{description}</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{description}</p>
         </div>
 
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[220px] sm:items-end">
+        <div className="ml-auto flex w-full flex-col items-end gap-2 sm:w-auto sm:min-w-[220px]">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -127,34 +116,27 @@ export default function ImageDropzone({
           >
             {buttonText}
           </button>
-          {!value && <span className="text-xs text-neutral-500 sm:text-right">Файл не выбран</span>}
+          {!value && <span className="mt-1 text-right text-xs text-neutral-500">Файл не выбран</span>}
+          {value && (
+            <div className="mt-1 text-right">
+              <p className="max-w-[200px] truncate text-xs font-medium">{value.name}</p>
+              <p className="text-xs text-neutral-500">{formatFileSize(value.size)}</p>
+            </div>
+          )}
         </div>
       </div>
 
       {value && (
-        <div className="mt-2 flex items-center gap-2 rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900">
-          {previewUrl && (
-            <img
-              src={previewUrl}
-              alt="Предпросмотр макета"
-              className="h-12 w-12 shrink-0 rounded-md object-cover"
-            />
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">{value.name}</p>
-            <p className="text-xs text-neutral-500">{formatFileSize(value.size)}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (fileInputRef.current) fileInputRef.current.value = '';
-              validateAndSetFile(null);
-            }}
-            className="shrink-0 text-xs font-medium text-neutral-500 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
-          >
-            Удалить
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            validateAndSetFile(null);
+          }}
+          className="mt-2 text-xs font-medium text-neutral-500 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+        >
+          Удалить
+        </button>
       )}
 
       <p className={helperTextClassName}>{helperText}</p>
