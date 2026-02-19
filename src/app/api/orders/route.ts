@@ -10,8 +10,8 @@ import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
 import { normalizePhone } from '@/lib/utils/phone';
 
-export const runtime = 'nodejs';
-
+import { logger } from '@/lib/logger';
+import { env } from '@/lib/env';
 export const runtime = 'nodejs';
 
 const bagetItemSchema = z.object({
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
     });
 
 
-    const shouldSendCustomerEmail = process.env.SEND_CUSTOMER_EMAILS === 'true';
+    const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS === 'true';
     const customerEmail = parsed.data.customer.email?.trim();
     const pdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf`;
 
@@ -186,7 +186,8 @@ export async function POST(request: NextRequest) {
       prepayRequired,
       prepayAmount,
     });
-  } catch {
+  } catch (error) {
+    logger.error('orders.post.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заказа.' }, { status: 500 });
   }
 }

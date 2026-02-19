@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getClientIp, hasUserAgent, isEmptyPayload, isHoneypotTriggered, isRateLimited } from '@/lib/anti-spam';
 
+import { logger } from '@/lib/logger';
 const leadSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -40,7 +41,8 @@ export async function POST(req: Request) {
     const calculationDetails = parsed.data.message?.includes('Расчёт:') ? parsed.data.message : undefined;
 
     return NextResponse.json({ ok: true, calculationDetails });
-  } catch {
+  } catch (error) {
+    logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }
 }

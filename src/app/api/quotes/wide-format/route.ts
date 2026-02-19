@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getWideFormatQuote, type WideFormatPricingInput } from '@/lib/engine';
 
+import { logger } from '@/lib/logger';
 const wideFormatQuoteSchema = z.object({
   material: z.enum([
     'banner_240_gloss_3_2m',
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
     const parsed = wideFormatQuoteSchema.safeParse(payload);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Некорректные параметры расчёта.' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Некорректные параметры расчёта.' }, { status: 400 });
     }
 
     const input: WideFormatPricingInput = parsed.data;
@@ -65,7 +66,8 @@ export async function POST(req: Request) {
       calculatedPrice: quote.totalCost,
     });
     return NextResponse.json({ quote });
-  } catch {
-    return NextResponse.json({ error: 'Ошибка расчёта.' }, { status: 500 });
+  } catch (error) {
+    logger.error('quotes.calculate.failed', { error });
+    return NextResponse.json({ ok: false, error: 'Ошибка расчёта.' }, { status: 500 });
   }
 }

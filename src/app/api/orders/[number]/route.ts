@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 type Params = {
@@ -41,7 +42,8 @@ export async function GET(_request: NextRequest, { params }: Params) {
     }
 
     return NextResponse.json(order);
-  } catch {
+  } catch (error) {
+    logger.error('orders.get.failed', { error, orderNumber: params.number });
     return NextResponse.json({ ok: false, error: 'Ошибка получения заказа.' }, { status: 500 });
   }
 }

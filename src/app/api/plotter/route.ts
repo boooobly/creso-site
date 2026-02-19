@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
+import { logger } from '@/lib/logger';
+import { env } from '@/lib/env';
 export const runtime = 'nodejs';
 
 type PlotterPayload = {
@@ -40,8 +42,8 @@ function formatExtras(extras: PlotterPayload['calculator']['extras']) {
 }
 
 async function sendTelegramMessage(payload: PlotterPayload) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
   if (!botToken || !chatId) return false;
 
   const extras = formatExtras(payload.calculator.extras);
@@ -76,11 +78,11 @@ async function sendTelegramMessage(payload: PlotterPayload) {
 }
 
 async function sendEmail(payload: PlotterPayload) {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 0);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const to = process.env.MAIL_TO;
+  const host = env.SMTP_HOST;
+  const port = Number(env.SMTP_PORT || 0);
+  const user = env.SMTP_USER;
+  const pass = env.SMTP_PASS;
+  const to = env.MAIL_TO;
 
   if (!host || !port || !user || !pass || !to) return false;
 
@@ -143,7 +145,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }
 }

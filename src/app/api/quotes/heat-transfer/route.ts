@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getHeatTransferQuote, type HeatTransferPricingInput } from '@/lib/engine';
 
+import { logger } from '@/lib/logger';
 const heatTransferQuoteSchema = z.object({
   productType: z.enum(['mug', 'tshirt', 'film']),
   mugType: z.enum(['white330', 'chameleon']),
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
     const parsed = heatTransferQuoteSchema.safeParse(payload);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Некорректные параметры расчёта.' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Некорректные параметры расчёта.' }, { status: 400 });
     }
 
     const input: HeatTransferPricingInput = parsed.data;
@@ -43,7 +44,8 @@ export async function POST(req: Request) {
       calculatedPrice: quote.total,
     });
     return NextResponse.json({ quote });
-  } catch {
-    return NextResponse.json({ error: 'Ошибка расчёта.' }, { status: 500 });
+  } catch (error) {
+    logger.error('quotes.calculate.failed', { error });
+    return NextResponse.json({ ok: false, error: 'Ошибка расчёта.' }, { status: 500 });
   }
 }

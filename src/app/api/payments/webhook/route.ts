@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 const webhookSchema = z.object({
@@ -55,7 +56,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    logger.error('payments.webhook.failed', { error });
     return NextResponse.json({ ok: false, error: 'Webhook handling failed.' }, { status: 500 });
   }
 }

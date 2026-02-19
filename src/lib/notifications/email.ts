@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { env } from '@/lib/env';
 
 export type EmailLeadPayload = {
   subject: string;
@@ -15,12 +16,12 @@ export type SmtpConfig = {
 };
 
 export function getSmtpConfig(): SmtpConfig | null {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 0);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const to = process.env.LEADS_TO_EMAIL;
-  const from = process.env.LEADS_FROM_EMAIL;
+  const host = env.SMTP_HOST;
+  const port = Number(env.SMTP_PORT || 0);
+  const user = env.SMTP_USER;
+  const pass = env.SMTP_PASS;
+  const to = env.LEADS_TO_EMAIL;
+  const from = env.LEADS_FROM_EMAIL;
 
   if (!host || !port || !user || !pass || !to || !from) {
     return null;

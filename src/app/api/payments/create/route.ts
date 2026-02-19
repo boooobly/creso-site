@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 const createPaymentSchema = z.object({
@@ -61,7 +62,8 @@ export async function POST(request: NextRequest) {
       amount,
       redirectUrl: `/pay/mock?ref=${encodeURIComponent(paymentRef)}&order=${encodeURIComponent(order.number)}`,
     });
-  } catch {
+  } catch (error) {
+    logger.error('payments.create.failed', { error });
     return NextResponse.json({ ok: false, error: 'Payment session creation failed.' }, { status: 500 });
   }
 }

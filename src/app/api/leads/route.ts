@@ -7,8 +7,7 @@ import { normalizePhone } from '@/lib/utils/phone';
 import { getClientIp } from '@/lib/utils/request';
 import { sourceTitle } from '@/lib/utils/sourceTitle';
 
-export const runtime = 'nodejs';
-
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 type RateRecord = { count: number; resetAt: number };
@@ -130,7 +129,8 @@ export async function POST(request: NextRequest) {
     ]);
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }
 }
