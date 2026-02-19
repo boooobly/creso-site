@@ -9,7 +9,17 @@ import { getWideFormatMaterialLabel, WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = 50 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/tiff']);
+const ALLOWED_UPLOAD_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/tiff',
+  'application/pdf',
+  'application/postscript',
+  'application/vnd.adobe.photoshop',
+  'application/illustrator',
+]);
+const ALLOWED_UPLOAD_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']);
 
 function toStringValue(value: FormDataEntryValue | null) {
   return typeof value === 'string' ? value.trim() : '';
@@ -25,6 +35,13 @@ function formatRub(value: number): string {
 
 function isWideFormatMaterialType(value: string): value is WideFormatMaterialType {
   return WIDE_FORMAT_MATERIAL_OPTIONS.some((option) => option.value === value);
+}
+
+
+function isAllowedUploadFile(file: File): boolean {
+  const mime = (file.type || '').toLowerCase();
+  const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase() ?? ''}` : '';
+  return ALLOWED_UPLOAD_MIME_TYPES.has(mime) || ALLOWED_UPLOAD_EXTENSIONS.has(extension);
 }
 
 async function sendTelegramMessage(text: string) {
@@ -159,8 +176,12 @@ export async function POST(request: NextRequest) {
 
     const file = fileRaw instanceof File ? fileRaw : undefined;
 
-    if (file && !ALLOWED_IMAGE_TYPES.has(file.type)) {
-      return NextResponse.json({ ok: false, error: 'Допустимы только изображения (JPG, PNG, WEBP, TIFF).' }, { status: 400 });
+    if (file && !isAllowedUploadFile(file)) {
+      return NextResponse.json({ ok: false, error: 'Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD.' }, { status: 400 });
+    }
+
+    if (file && file.size > MAX_TELEGRAM_FILE_SIZE_BYTES) {
+      return NextResponse.json({ ok: false, error: 'Размер файла не должен превышать 50 МБ.' }, { status: 400 });
     }
 
     const message = [
