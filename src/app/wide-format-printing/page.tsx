@@ -63,10 +63,13 @@ export default function WideFormatPrintingPage() {
             </div>
           </div>
 
-          <section className="rounded-2xl border bg-muted/30 p-6 md:p-8">
+          <section className="mt-10 rounded-2xl border-2 border-muted-foreground/20 bg-muted/40 p-6 shadow-sm md:p-8">
+            <div className="mb-4 h-1 w-16 rounded-full bg-red-500/80" />
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <h3 className="text-lg font-semibold">📌 Почему выбирают нас</h3>
-              <p className="text-sm text-muted-foreground">4 причины, почему с нами удобно</p>
+              <h3 className="text-xl font-semibold md:text-2xl">📌 Почему выбирают нас</h3>
+              <p className="inline-flex items-center rounded-full border bg-white/70 px-3 py-1 text-xs text-muted-foreground">
+                4 причины
+              </p>
             </div>
             <div className="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {features.map((feature) => (
