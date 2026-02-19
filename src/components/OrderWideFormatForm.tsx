@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { Upload } from 'lucide-react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import ImageDropzone from '@/components/ImageDropzone';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
@@ -226,7 +227,9 @@ export default function OrderWideFormatForm() {
             />
             {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
           </label>
+        </div>
 
+        <div className="grid gap-6 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-medium">Email</span>
             <input className={inputClass('email')} type="email" value={values.email} onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))} />
@@ -239,9 +242,15 @@ export default function OrderWideFormatForm() {
               onChange={setFile}
               title="Загрузка файла"
               helperText="JPG, PNG, WEBP, TIFF. 1 файл, до 50 МБ."
+              className="border-2 border-dashed rounded-xl p-6 bg-muted/30 hover:border-red-400 transition"
+              helperTextClassName="text-xs text-muted-foreground mt-2"
+              icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
+            <p className="text-xs text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
           </div>
+        </div>
 
+        <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-medium">Ширина (мм)</span>
             <input className={inputClass('width')} inputMode="numeric" value={values.width} onChange={(e) => setValues((prev) => ({ ...prev, width: e.target.value }))} />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 type ImageDropzoneProps = {
   value?: File | null;
@@ -11,6 +11,9 @@ type ImageDropzoneProps = {
   description?: string;
   buttonText?: string;
   helperText?: string;
+  className?: string;
+  helperTextClassName?: string;
+  icon?: ReactNode;
 };
 
 function formatFileSize(size: number): string {
@@ -28,6 +31,9 @@ export default function ImageDropzone({
   description = 'Перетащите файл сюда или загрузите вручную.',
   buttonText = 'Загрузить макет',
   helperText = 'JPG, PNG, WEBP, TIFF. До 50 МБ.',
+  className = '',
+  helperTextClassName = 'mt-3 text-xs text-neutral-500',
+  icon,
 }: ImageDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState('');
@@ -67,7 +73,7 @@ export default function ImageDropzone({
 
   return (
     <div
-      className={`rounded-xl border-2 border-dashed p-4 transition-colors ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/20' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700 dark:bg-neutral-900/50'}`}
+      className={`rounded-xl border-2 border-dashed p-4 transition-colors ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/20' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700 dark:bg-neutral-900/50'} ${className}`.trim()}
       onDragEnter={(event) => {
         event.preventDefault();
         setIsDragging(true);
@@ -96,6 +102,8 @@ export default function ImageDropzone({
 
       <p className="text-sm font-medium">{title}</p>
       <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">{description}</p>
+
+      {icon && <div className="mt-3">{icon}</div>}
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
@@ -134,7 +142,7 @@ export default function ImageDropzone({
         </div>
       )}
 
-      <p className="mt-3 text-xs text-neutral-500">{helperText}</p>
+      <p className={helperTextClassName}>{helperText}</p>
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
     </div>
   );
