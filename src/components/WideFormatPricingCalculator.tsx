@@ -45,7 +45,9 @@ type WideFormatQuote = {
   basePrintCost: number;
   edgeGluingCost: number;
   imageWeldingCost: number;
-  plotterCutCost: number;
+  grommetsCount: number;
+  grommetsCost: number;
+  plotterCutEstimatedCost: number;
   positioningMarksCutCost: number;
   extrasCost: number;
   totalCost: number;
@@ -77,7 +79,9 @@ const EMPTY_QUOTE: WideFormatQuote = {
   basePrintCost: 0,
   edgeGluingCost: 0,
   imageWeldingCost: 0,
-  plotterCutCost: 0,
+  grommetsCount: 0,
+  grommetsCost: 0,
+  plotterCutEstimatedCost: 0,
   positioningMarksCutCost: 0,
   extrasCost: 0,
   totalCost: 0,
@@ -105,6 +109,7 @@ export default function WideFormatPricingCalculator() {
 
   const [edgeGluing, setEdgeGluing] = useState(false);
   const [imageWelding, setImageWelding] = useState(false);
+  const [grommets, setGrommets] = useState(false);
   const [plotterCutByRegistrationMarks, setPlotterCutByRegistrationMarks] = useState(false);
   const [cutByPositioningMarks, setCutByPositioningMarks] = useState(false);
 
@@ -144,6 +149,7 @@ export default function WideFormatPricingCalculator() {
     quantityInput: quantity,
     edgeGluing,
     imageWelding,
+    grommets,
     plotterCutByRegistrationMarks,
     cutByPositioningMarks,
   }), [
@@ -152,6 +158,7 @@ export default function WideFormatPricingCalculator() {
     edgeGluing,
     height,
     imageWelding,
+    grommets,
     material,
     plotterCutByRegistrationMarks,
     quantity,
@@ -174,6 +181,7 @@ export default function WideFormatPricingCalculator() {
       quantity,
       edgeGluing,
       imageWelding,
+      grommets,
       plotterCutByRegistrationMarks,
       cutByPositioningMarks,
     });
@@ -183,6 +191,7 @@ export default function WideFormatPricingCalculator() {
     edgeGluing,
     height,
     imageWelding,
+    grommets,
     material,
     plotterCutByRegistrationMarks,
     quantity,
@@ -197,7 +206,8 @@ export default function WideFormatPricingCalculator() {
 
   useEffect(() => {
     if (!isBanner && edgeGluing) setEdgeGluing(false);
-  }, [edgeGluing, isBanner]);
+    if (!isBanner && grommets) setGrommets(false);
+  }, [edgeGluing, grommets, isBanner]);
 
   useEffect(() => {
     if (!canShowWelding && imageWelding) setImageWelding(false);
@@ -211,6 +221,7 @@ export default function WideFormatPricingCalculator() {
     if (!isExtrasAllowed) {
       setEdgeGluing(false);
       setImageWelding(false);
+      setGrommets(false);
       setPlotterCutByRegistrationMarks(false);
       setCutByPositioningMarks(false);
     }
@@ -318,6 +329,7 @@ export default function WideFormatPricingCalculator() {
         materialLabel: getWideFormatMaterialLabel(material),
         edgeGluing,
         imageWelding,
+        grommets,
         plotterCutByRegistrationMarks,
         cutByPositioningMarks,
       },
@@ -421,8 +433,9 @@ export default function WideFormatPricingCalculator() {
           <div className="space-y-2 pt-1">
             <p className="text-sm font-medium">Дополнительные услуги</p>
             {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
+            {isBanner && <CheckboxRow label={`Люверсы (${WIDE_FORMAT_PRICING_CONFIG.grommetPrice} ₽/шт${quote.grommetsCount > 0 ? `, ~${quote.grommetsCount} шт` : ""})`} checked={grommets} onChange={setGrommets} />}
             {canShowWelding && <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />}
-            {isFilm && <CheckboxRow label="Плоттерная резка по меткам (+25 ₽ за пог. метр)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
+            {isFilm && <CheckboxRow label="Резка по меткам (от 250 ₽, точно после утверждения макета)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
             <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
           </div>
         )}
@@ -483,8 +496,14 @@ export default function WideFormatPricingCalculator() {
           </div>
           {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.imageWeldingCost > 0 && <SummaryRow label="— Сварка изображения" value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
-          {quote.plotterCutCost > 0 && <SummaryRow label="— Плоттерная резка" value={`${quote.plotterCutCost.toLocaleString('ru-RU')} ₽`} />}
+          {plotterCutByRegistrationMarks && <SummaryRow label="— Резка по меткам" value={`от ${WIDE_FORMAT_PRICING_CONFIG.plotterCutMinimumFee.toLocaleString('ru-RU')} ₽ (оценочно, рассчитает менеджер)`} />}
+          {quote.grommetsCost > 0 && <SummaryRow label={`— Люверсы (${quote.grommetsCount} шт)`} value={`${quote.grommetsCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.positioningMarksCutCost > 0 && <SummaryRow label="— Метки позиционирования" value={`${quote.positioningMarksCutCost.toLocaleString('ru-RU')} ₽`} />}
+          {isFilm && (
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              Стоимость резки по меткам рассчитывается менеджером после проверки и утверждения макета.
+            </p>
+          )}
         </div>
 
         <div className="rounded-2xl border-2 border-red-500/30 bg-white p-6 shadow-xl dark:bg-neutral-900">
@@ -494,7 +513,6 @@ export default function WideFormatPricingCalculator() {
           <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
-          <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
           <Button variant="primary" className="mt-4 w-full" onClick={handleOrderClick}>Заказать печать</Button>
         </div>
 

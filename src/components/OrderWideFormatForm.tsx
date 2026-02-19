@@ -16,6 +16,7 @@ type FormValues = {
   materialId: WideFormatMaterialType | '';
   edgeGluing: boolean;
   imageWelding: boolean;
+  grommets: boolean;
   plotterCutByRegistrationMarks: boolean;
   cutByPositioningMarks: boolean;
   comment: string;
@@ -35,6 +36,7 @@ const defaultValues: FormValues = {
   materialId: '',
   edgeGluing: false,
   imageWelding: false,
+  grommets: false,
   plotterCutByRegistrationMarks: false,
   cutByPositioningMarks: false,
   comment: '',
@@ -51,6 +53,7 @@ type WideFormatPrefillDetail = {
   materialLabel?: string;
   edgeGluing?: boolean;
   imageWelding?: boolean;
+  grommets?: boolean;
   plotterCutByRegistrationMarks?: boolean;
   cutByPositioningMarks?: boolean;
 };
@@ -81,6 +84,7 @@ export default function OrderWideFormatForm() {
         materialId: detail?.materialId ?? prev.materialId,
         edgeGluing: detail?.edgeGluing ?? prev.edgeGluing,
         imageWelding: detail?.imageWelding ?? prev.imageWelding,
+        grommets: detail?.grommets ?? prev.grommets,
         plotterCutByRegistrationMarks: detail?.plotterCutByRegistrationMarks ?? prev.plotterCutByRegistrationMarks,
         cutByPositioningMarks: detail?.cutByPositioningMarks ?? prev.cutByPositioningMarks,
       }));
@@ -158,6 +162,7 @@ export default function OrderWideFormatForm() {
       formData.set('materialId', values.materialId);
       formData.set('edgeGluing', String(values.edgeGluing));
       formData.set('imageWelding', String(values.imageWelding));
+      formData.set('grommets', String(values.grommets));
       formData.set('plotterCutByRegistrationMarks', String(values.plotterCutByRegistrationMarks));
       formData.set('cutByPositioningMarks', String(values.cutByPositioningMarks));
       formData.set('comment', values.comment.trim());
