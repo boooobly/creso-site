@@ -1,6 +1,7 @@
 import type { BagetQuoteResult } from '@/lib/calculations/bagetQuote';
 import { sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramLead } from '@/lib/notifications/telegram';
+import { buildEmailHtmlFromText } from '@/lib/utils/email';
 
 type NotifyNewOrderPayload = {
   orderNumber: string;
@@ -49,13 +50,6 @@ function buildNotificationText(payload: NotifyNewOrderPayload): string {
   ].join('\n');
 }
 
-function buildHtml(text: string) {
-  return `<div style="font-family:Arial,sans-serif;white-space:pre-wrap;line-height:1.5;">${text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')}</div>`;
-}
-
 export async function notifyNewOrder(payload: NotifyNewOrderPayload): Promise<void> {
   const text = buildNotificationText(payload);
 
@@ -65,7 +59,7 @@ export async function notifyNewOrder(payload: NotifyNewOrderPayload): Promise<vo
     }),
     sendEmailLead({
       subject: `Новый заказ багета: ${payload.orderNumber}`,
-      html: buildHtml(text),
+      html: buildEmailHtmlFromText(text),
     }).catch((error) => {
       console.error('[orders] Email send failed', error);
     }),

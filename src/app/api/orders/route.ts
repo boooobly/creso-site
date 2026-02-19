@@ -8,6 +8,9 @@ import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
 import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
 import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
+import { normalizePhone } from '@/lib/utils/phone';
+
+export const runtime = 'nodejs';
 
 export const runtime = 'nodejs';
 
@@ -47,14 +50,6 @@ const orderSchema = z.object({
   fulfillmentType: z.enum(['pickup', 'selfPickup', 'delivery']).default('pickup'),
   company: z.string().optional(),
 });
-
-function normalizePhone(phone: string): string | null {
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length !== 11 || !digits.startsWith('7')) {
-    return null;
-  }
-  return digits;
-}
 
 async function createOrderWithRetry(data: {
   inputPayload: z.infer<typeof orderSchema>;
