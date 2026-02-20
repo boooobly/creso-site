@@ -1,0 +1,76 @@
+'use client';
+
+import { useId, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import type { MillingMaterialGroup } from '@/lib/pricing-config/milling';
+
+type MillingMaterialsAccordionProps = {
+  groups: MillingMaterialGroup[];
+};
+
+export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAccordionProps) {
+  const [openId, setOpenId] = useState<string | null>(groups[0]?.id ?? null);
+  const baseId = useId();
+
+  return (
+    <div className="space-y-3">
+      {groups.map((group) => {
+        const isOpen = openId === group.id;
+        const panelId = `${baseId}-${group.id}-panel`;
+        const buttonId = `${baseId}-${group.id}-button`;
+
+        return (
+          <div key={group.id} className="overflow-hidden rounded-xl border border-neutral-300 bg-white shadow-sm transition-colors dark:border-neutral-700 dark:bg-neutral-900">
+            <h3>
+              <button
+                id={buttonId}
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setOpenId((prev) => (prev === group.id ? null : group.id))}
+                className="flex min-h-16 w-full items-center justify-between gap-4 bg-neutral-50 px-5 py-4 text-left transition-colors hover:border-neutral-400 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:bg-neutral-800/70 dark:hover:bg-neutral-800"
+              >
+                <span className="text-base font-semibold md:text-lg">{group.title}</span>
+                <ChevronDown
+                  className={`h-5 w-5 shrink-0 text-neutral-500 transition-transform duration-300 motion-reduce:duration-0 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+                  aria-hidden="true"
+                />
+              </button>
+            </h3>
+
+            <div
+              id={panelId}
+              role="region"
+              aria-labelledby={buttonId}
+              className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+            >
+              <div className="overflow-hidden">
+                <div className="border-t border-neutral-300 p-4 dark:border-neutral-700">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-300">{group.description}</p>
+                  <div className="mt-3 overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-neutral-50 dark:bg-neutral-800/60">
+                        <tr>
+                          <th className="px-4 py-2 font-medium">Толщина</th>
+                          <th className="px-4 py-2 font-medium">Цена</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {group.rows.map((row) => (
+                          <tr key={row.thickness} className="border-t border-neutral-200 dark:border-neutral-800">
+                            <td className="px-4 py-2">{row.thickness}</td>
+                            <td className="px-4 py-2">{row.price}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
