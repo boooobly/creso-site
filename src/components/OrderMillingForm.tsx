@@ -62,7 +62,6 @@ export default function OrderMillingForm() {
 
     if (!values.material.trim()) nextErrors.material = 'Выберите материал';
     if (!values.thickness.trim()) nextErrors.thickness = 'Выберите толщину';
-    if (!file) nextErrors.file = 'Загрузите векторный файл';
 
     return nextErrors;
   };
@@ -197,7 +196,7 @@ export default function OrderMillingForm() {
           <ImageDropzone
             value={file}
             onChange={setFile}
-            title="Загрузка файла *"
+            title="Загрузка файла"
             accept={MILLING_ALLOWED_EXTENSIONS.join(',')}
             helperText={`Допустимые форматы: PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MILLING_MAX_UPLOAD_SIZE_MB} МБ.`}
             allowedMimeTypes={[...MILLING_ALLOWED_MIME_TYPES]}
@@ -209,6 +208,7 @@ export default function OrderMillingForm() {
             icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
           />
           {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
         </div>
 
         <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />

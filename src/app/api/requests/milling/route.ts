@@ -88,15 +88,12 @@ export async function POST(request: NextRequest) {
     }
 
     const file = fileValue instanceof File ? fileValue : null;
-    if (!file) {
-      return NextResponse.json({ ok: false, error: 'Загрузите файл с макетом.' }, { status: 400 });
-    }
 
-    if (!isAllowedFile(file)) {
+    if (file && !isAllowedFile(file)) {
       return NextResponse.json({ ok: false, error: 'Разрешены только PDF, CDR, AI, EPS, DXF, SVG.' }, { status: 400 });
     }
 
-    if (file.size <= 0 || file.size > MILLING_MAX_UPLOAD_SIZE_MB * 1024 * 1024) {
+    if (file && (file.size <= 0 || file.size > MILLING_MAX_UPLOAD_SIZE_MB * 1024 * 1024)) {
       return NextResponse.json({ ok: false, error: `Размер файла должен быть от 1 байта до ${MILLING_MAX_UPLOAD_SIZE_MB} МБ.` }, { status: 400 });
     }
 
@@ -122,9 +119,9 @@ export async function POST(request: NextRequest) {
       `Толщина: ${parsed.data.thickness}`,
       `Нужна помощь с подготовкой файла: ${parsed.data.helpWithPrep ? 'Да' : 'Нет'}`,
       `Комментарий: ${parsed.data.comment || '—'}`,
-      `Файл: ${file.name}`,
-      `Размер файла: ${formatFileSize(file.size)}`,
-      `MIME: ${file.type || 'не указан'}`,
+      `Файл: ${file ? file.name : 'не прикреплён'}`,
+      `Размер файла: ${file ? formatFileSize(file.size) : '—'}`,
+      `MIME: ${file?.type || '—'}`,
       `Страница: ${request.headers.get('referer') || request.headers.get('origin') || '—'}`,
       `IP: ${getClientIp(request)}`,
     ].join('\n');
