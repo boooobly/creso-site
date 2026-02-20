@@ -6,6 +6,12 @@ import {
   MILLING_MATERIAL_GROUPS,
 } from '@/lib/pricing-config/milling';
 
+const quickInfo = [
+  'Минимальный заказ - 450 ₽',
+  'Цены без учета материала',
+  'По вашим векторным файлам',
+];
+
 const rules = [
   'Минимальная сумма заказа — 450 ₽.',
   'Цены указаны без стоимости материала.',
@@ -24,7 +30,12 @@ export default function MillingPage() {
       </Section>
 
       <Section className="pt-0">
-        <div className="card p-6 md:p-8">
+        <div id="milling-prices" className="card p-6 md:p-8 scroll-mt-24">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {quickInfo.map((item) => (
+              <span key={item} className="rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-200">{item}</span>
+            ))}
+          </div>
           <h2 className="mb-5 text-2xl font-semibold">Прайс по материалам</h2>
           <MillingMaterialsAccordion groups={MILLING_MATERIAL_GROUPS} />
         </div>

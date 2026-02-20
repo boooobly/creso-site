@@ -67,6 +67,16 @@ export default function OrderMillingForm() {
     return nextErrors;
   };
 
+
+  const handleViewPrices = () => {
+    const pricesSection = document.getElementById('milling-prices');
+    pricesSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    window.dispatchEvent(new CustomEvent('milling:open-material', {
+      detail: { material: values.material },
+    }));
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSuccessMessage('');
@@ -136,7 +146,16 @@ export default function OrderMillingForm() {
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2">
-            <span className="text-sm font-medium">Материал</span>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-medium">Материал</span>
+              <button
+                type="button"
+                onClick={handleViewPrices}
+                className="text-xs font-medium text-red-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+              >
+                Посмотреть цены
+              </button>
+            </div>
             <select className={inputClass('material')} value={values.material} onChange={(e) => setValues((prev) => ({ ...prev, material: e.target.value, thickness: '' }))}>
               {MILLING_MATERIAL_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
