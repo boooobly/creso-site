@@ -140,23 +140,64 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
   },
 ];
 
-export const MILLING_ADDITIONAL_SERVICES: Array<{ title: string; price: string }> = [
-  { title: 'Срочность (день в день)', price: '+30%, не менее 350 ₽' },
-  { title: 'Заказ при вас (от 30 мин)', price: '+50%, не менее 700 ₽' },
-  { title: 'Компоновка деталей на материале', price: 'от 300 ₽' },
-  { title: 'Фрезеровка из кусков материала заказчика', price: '+10% за каждый последующий кусок' },
-  { title: 'Подготовка макета', price: 'от 300 ₽' },
+export type MillingAdditionalServiceGroup = {
+  id: string;
+  title: string;
+  items: Array<{
+    label: string;
+    details: string;
+    badges?: string[];
+  }>;
+};
+
+export const MILLING_ADDITIONAL_SERVICE_GROUPS: MillingAdditionalServiceGroup[] = [
   {
-    title: 'Фрезеровка малых деталей до 50 мм, множества отверстий, тонких форм',
-    price: '+50%',
+    id: 'urgency',
+    title: 'Срочность',
+    items: [
+      {
+        label: 'День в день',
+        details: '30%, минимум 350 ₽',
+        badges: ['+30%', 'минимум 350 ₽'],
+      },
+      {
+        label: 'Заказ при вас (от 30 мин)',
+        details: '50%, минимум 700 ₽',
+        badges: ['+50%', 'минимум 700 ₽'],
+      },
+    ],
   },
-  { title: 'Погрузка или выгрузка материала заказчика', price: '100 ₽/лист' },
   {
-    title: 'Хранение материала клиента',
-    price: 'бесплатно 3 суток до фрезеровки, бесплатно 3 суток после, далее 150 ₽/сутки',
+    id: 'preparation-and-complexity',
+    title: 'Подготовка и сложность',
+    items: [
+      { label: 'Подготовка макета', details: 'от 300 ₽' },
+      { label: 'Компоновка деталей', details: 'от 300 ₽' },
+      {
+        label: 'Фрезеровка малых деталей до 50 мм, множества отверстий, тонких форм',
+        details: '50%',
+        badges: ['+50%'],
+      },
+      { label: 'Полировка торцов прозрачного оргстекла', details: '90 ₽/м.п.' },
+    ],
   },
-  { title: 'Доставка отфрезерованных деталей по городу', price: 'от 500 ₽' },
-  { title: 'Полировка торцов прозрачного оргстекла', price: '90 ₽/м.п.' },
+  {
+    id: 'customer-material-logistics-storage',
+    title: 'Материал заказчика, логистика и хранение',
+    items: [
+      {
+        label: 'Фрезеровка из кусков материала заказчика',
+        details: '10% за каждый последующий кусок',
+        badges: ['+10%'],
+      },
+      { label: 'Погрузка/выгрузка материалов заказчика', details: '100 ₽/лист' },
+      {
+        label: 'Хранение материалов клиента',
+        details: 'бесплатно 3 суток до фрезеровки и 3 суток после, далее 150 ₽/сутки',
+      },
+      { label: 'Доставка отфрезерованных деталей по городу', details: 'от 500 ₽' },
+    ],
+  },
 ];
 
 export const MILLING_MATERIAL_OPTIONS = MILLING_MATERIAL_GROUPS.map((group) => ({
