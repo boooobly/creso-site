@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
 import { env } from '@/lib/env';
-import { PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
+import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
 import { logger } from '@/lib/logger';
 import { EmailAttachment, sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramLead } from '@/lib/notifications/telegram';
@@ -60,6 +60,7 @@ function buildMugsText(params: {
   comment?: string;
   file: File | null;
   preview: File | null;
+  layout: File | null;
   referer: string;
   ip: string;
 }): string {
@@ -74,9 +75,10 @@ function buildMugsText(params: {
     `Комментарий: ${params.comment || '—'}`,
     `Файл: ${params.file ? params.file.name : 'не прикреплён'}`,
     `Размер файла: ${params.file ? formatFileSize(params.file.size) : '—'}`,
-    `MIME: ${params.file?.type || '—'}`,
     `Preview: ${params.preview ? params.preview.name : 'не сгенерирован'}`,
     `Размер preview: ${params.preview ? formatFileSize(params.preview.size) : '—'}`,
+    `Layout JSON: ${params.layout ? params.layout.name : 'не сгенерирован'}`,
+    `Размер layout JSON: ${params.layout ? `${(params.layout.size / 1024).toFixed(1)} КБ` : '—'}`,
     `Страница: ${params.referer || '—'}`,
     `IP: ${params.ip}`,
   ].join('\n');
@@ -86,6 +88,7 @@ async function sendMugsTelegramNotification(params: {
   text: string;
   file: File | null;
   preview: File | null;
+  layout: File | null;
   name: string;
   phone: string;
   quantity: number;
@@ -113,26 +116,35 @@ async function sendMugsTelegramNotification(params: {
     await sendTelegramLead(params.text);
 
     if (params.file) {
-      const bytes = Buffer.from(await params.file.arrayBuffer());
       await sendTelegramDocumentBuffer({
         chatId,
         token,
         caption,
-        bytes,
+        bytes: Buffer.from(await params.file.arrayBuffer()),
         filename: params.file.name || 'upload.bin',
         contentType: params.file.type || 'application/octet-stream',
       });
     }
 
     if (params.preview) {
-      const previewBytes = Buffer.from(await params.preview.arrayBuffer());
       await sendTelegramDocumentBuffer({
         chatId,
         token,
         caption: `${caption}\nPreview: generated`,
-        bytes: previewBytes,
-        filename: params.preview.name || 'mug-preview.png',
+        bytes: Buffer.from(await params.preview.arrayBuffer()),
+        filename: params.preview.name || 'mug-wrap-preview.png',
         contentType: 'image/png',
+      });
+    }
+
+    if (params.layout) {
+      await sendTelegramDocumentBuffer({
+        chatId,
+        token,
+        caption: `${caption}\nLayout JSON: generated`,
+        bytes: Buffer.from(await params.layout.arrayBuffer()),
+        filename: params.layout.name || 'mug-layout.json',
+        contentType: 'application/json',
       });
     }
 
@@ -156,6 +168,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const fileValue = formData.get('file');
     const previewValue = formData.get('preview');
+    const layoutValue = formData.get('layout');
 
     const parsed = mugsRequestSchema.safeParse({
       name: toText(formData.get('name')),
@@ -176,6 +189,7 @@ export async function POST(request: NextRequest) {
 
     const file = fileValue instanceof File ? fileValue : null;
     const preview = previewValue instanceof File ? previewValue : null;
+    const layout = layoutValue instanceof File ? layoutValue : null;
 
     if (file && !isAllowedFile(file)) {
       return NextResponse.json({ ok: false, error: 'Разрешены png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg.' }, { status: 400 });
@@ -191,6 +205,15 @@ export async function POST(request: NextRequest) {
       }
       if (preview.size <= 0 || preview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
         return NextResponse.json({ ok: false, error: `Размер preview должен быть от 1 байта до ${PREVIEW_MAX_SIZE_MB} МБ.` }, { status: 400 });
+      }
+    }
+
+    if (layout) {
+      if (layout.type !== 'application/json') {
+        return NextResponse.json({ ok: false, error: 'Layout должен быть в формате JSON.' }, { status: 400 });
+      }
+      if (layout.size <= 0 || layout.size > LAYOUT_MAX_SIZE_KB * 1024) {
+        return NextResponse.json({ ok: false, error: `Размер layout JSON должен быть от 1 байта до ${LAYOUT_MAX_SIZE_KB} КБ.` }, { status: 400 });
       }
     }
 
@@ -213,11 +236,13 @@ export async function POST(request: NextRequest) {
       comment: parsed.data.comment,
       file,
       preview,
+      layout,
       referer: request.headers.get('referer') || request.headers.get('origin') || '',
       ip: getClientIp(request),
     });
 
     const attachments: EmailAttachment[] = [];
+
     if (file) {
       attachments.push({
         filename: file.name,
@@ -225,11 +250,20 @@ export async function POST(request: NextRequest) {
         contentType: file.type || 'application/octet-stream',
       });
     }
+
     if (preview) {
       attachments.push({
-        filename: preview.name || 'mug-preview.png',
+        filename: preview.name || 'mug-wrap-preview.png',
         content: Buffer.from(await preview.arrayBuffer()),
         contentType: 'image/png',
+      });
+    }
+
+    if (layout) {
+      attachments.push({
+        filename: layout.name || 'mug-layout.json',
+        content: Buffer.from(await layout.arrayBuffer()),
+        contentType: 'application/json',
       });
     }
 
@@ -238,6 +272,7 @@ export async function POST(request: NextRequest) {
         text,
         file,
         preview,
+        layout,
         name: parsed.data.name,
         phone: normalizedPhone,
         quantity: parsed.data.quantity,

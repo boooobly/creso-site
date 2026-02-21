@@ -1,25 +1,30 @@
 'use client';
 
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { Group, Image as KonvaImage, Layer, Rect, Stage, Text, Transformer } from 'react-konva';
+import { Group, Image as KonvaImage, Layer, Rect, Stage, Transformer } from 'react-konva';
 import type Konva from 'konva';
 import {
-  HANDLE_ZONE_WIDTH,
+  HANDLE_BAND_WIDTH,
   MAX_IMAGE_SCALE,
   MIN_IMAGE_SIDE,
   MIN_INSIDE_RATIO,
   MUG_WRAP,
   PREVIEW_MAX_SIZE_MB,
-  PRINT_ZONE,
   SAFE_ZONE_INSET,
 } from '@/lib/mugDesigner/constants';
 import { dataUrlToFile } from '@/lib/mugDesigner/exportPreview';
 
-type DesignerTransform = {
+type TransformState = {
   x: number;
   y: number;
-  scale: number;
+  scaleX: number;
+  scaleY: number;
   rotation: number;
+};
+
+export type MugDesignerExport = {
+  preview: File;
+  layout: File;
 };
 
 type Props = {
@@ -28,50 +33,88 @@ type Props = {
   allowedExtensions: readonly string[];
   allowedMimeTypes: readonly string[];
   maxUploadMb: number;
-  onExportReady: (handler: (() => Promise<File | null>) | null) => void;
+  onExportReady: (handler: (() => Promise<MugDesignerExport | null>) | null) => void;
+  onHandleOverlapChange: (value: boolean) => void;
 };
 
-const defaultTransform: DesignerTransform = {
-  x: PRINT_ZONE.x + PRINT_ZONE.width / 2,
-  y: PRINT_ZONE.y + PRINT_ZONE.height / 2,
-  scale: 1,
-  rotation: 0,
-};
+const wrapCenterX = MUG_WRAP.width / 2;
+const wrapCenterY = MUG_WRAP.height / 2;
+const wrapLeft = 0;
+const wrapTop = 0;
+const wrapRight = MUG_WRAP.width;
+const wrapBottom = MUG_WRAP.height;
 
 function fitScale(imgW: number, imgH: number): number {
-  return Math.min(PRINT_ZONE.width / imgW, PRINT_ZONE.height / imgH);
+  const safeWidth = MUG_WRAP.width - SAFE_ZONE_INSET * 2;
+  const safeHeight = MUG_WRAP.height - SAFE_ZONE_INSET * 2;
+  return Math.min(safeWidth / imgW, safeHeight / imgH);
 }
 
-export default function MugDesigner({ file, onFileChange, allowedExtensions, allowedMimeTypes, maxUploadMb, onExportReady }: Props) {
+function isInsideBand(x: number, width: number): boolean {
+  const left = x - width / 2;
+  const right = x + width / 2;
+  return left < HANDLE_BAND_WIDTH || right > MUG_WRAP.width - HANDLE_BAND_WIDTH;
+}
+
+export default function MugDesigner({ file, onFileChange, allowedExtensions, allowedMimeTypes, maxUploadMb, onExportReady, onHandleOverlapChange }: Props) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<Konva.Stage | null>(null);
   const imageRef = useRef<Konva.Image | null>(null);
   const transformerRef = useRef<Konva.Transformer | null>(null);
 
-  const [canvasWidth, setCanvasWidth] = useState(960);
+  const [canvasWidth, setCanvasWidth] = useState(1120);
   const [error, setError] = useState('');
   const [img, setImg] = useState<HTMLImageElement | null>(null);
-  const [transform, setTransform] = useState<DesignerTransform>(defaultTransform);
+  const [transform, setTransform] = useState<TransformState>({
+    x: wrapCenterX,
+    y: wrapCenterY,
+    scaleX: 1,
+    scaleY: 1,
+    rotation: 0,
+  });
 
-  const scale = canvasWidth / MUG_WRAP.width;
-  const stageHeight = MUG_WRAP.height * scale;
+  const stageScale = canvasWidth / MUG_WRAP.width;
+  const canvasHeight = MUG_WRAP.height * stageScale;
 
   useEffect(() => {
     onExportReady(async () => {
-      if (!stageRef.current) return null;
+      if (!stageRef.current || !img || !file) return null;
+
       const dataUrl = stageRef.current.toDataURL({ mimeType: 'image/png', pixelRatio: 1 });
-      return dataUrlToFile(dataUrl, 'mug-preview.png', 'image/png');
+      const preview = await dataUrlToFile(dataUrl, 'mug-wrap-preview.png', 'image/png');
+
+      const layoutPayload = {
+        wrapWidth: MUG_WRAP.width,
+        wrapHeight: MUG_WRAP.height,
+        handleBandWidth: HANDLE_BAND_WIDTH,
+        safeInset: SAFE_ZONE_INSET,
+        image: {
+          x: transform.x,
+          y: transform.y,
+          scaleX: transform.scaleX,
+          scaleY: transform.scaleY,
+          rotation: transform.rotation,
+          width: img.width,
+          height: img.height,
+        },
+        originalFileName: file.name,
+      };
+
+      const layoutBlob = new Blob([JSON.stringify(layoutPayload, null, 2)], { type: 'application/json' });
+      const layout = new File([layoutBlob], 'mug-layout.json', { type: 'application/json' });
+      return { preview, layout };
     });
+
     return () => onExportReady(null);
-  }, [onExportReady]);
+  }, [file, img, onExportReady, transform]);
 
   useEffect(() => {
     const node = wrapperRef.current;
     if (!node) return;
 
     const observer = new ResizeObserver((entries) => {
-      const width = entries[0]?.contentRect.width ?? 960;
-      setCanvasWidth(Math.min(width, 960));
+      const width = entries[0]?.contentRect.width ?? 1120;
+      setCanvasWidth(Math.min(width, 1120));
     });
 
     observer.observe(node);
@@ -81,7 +124,8 @@ export default function MugDesigner({ file, onFileChange, allowedExtensions, all
   useEffect(() => {
     if (!file) {
       setImg(null);
-      setTransform(defaultTransform);
+      setTransform({ x: wrapCenterX, y: wrapCenterY, scaleX: 1, scaleY: 1, rotation: 0 });
+      onHandleOverlapChange(false);
       return;
     }
 
@@ -90,17 +134,13 @@ export default function MugDesigner({ file, onFileChange, allowedExtensions, all
     nextImage.onload = () => {
       const nextScale = fitScale(nextImage.width, nextImage.height);
       setImg(nextImage);
-      setTransform({
-        x: PRINT_ZONE.x + PRINT_ZONE.width / 2,
-        y: PRINT_ZONE.y + PRINT_ZONE.height / 2,
-        scale: nextScale,
-        rotation: 0,
-      });
+      setTransform({ x: wrapCenterX, y: wrapCenterY, scaleX: nextScale, scaleY: nextScale, rotation: 0 });
+      onHandleOverlapChange(isInsideBand(wrapCenterX, nextImage.width * nextScale));
     };
     nextImage.src = objectUrl;
 
     return () => URL.revokeObjectURL(objectUrl);
-  }, [file]);
+  }, [file, onHandleOverlapChange]);
 
   useEffect(() => {
     if (!transformerRef.current || !imageRef.current || !img) return;
@@ -116,21 +156,22 @@ export default function MugDesigner({ file, onFileChange, allowedExtensions, all
     [allowedExtensions, allowedMimeTypes],
   );
 
-  const clampPosition = (x: number, y: number, width: number, height: number) => {
-    const minX = PRINT_ZONE.x - width * (1 - MIN_INSIDE_RATIO);
-    const maxX = PRINT_ZONE.x + PRINT_ZONE.width - width * MIN_INSIDE_RATIO;
-    const minY = PRINT_ZONE.y - height * (1 - MIN_INSIDE_RATIO);
-    const maxY = PRINT_ZONE.y + PRINT_ZONE.height - height * MIN_INSIDE_RATIO;
+  const clampPosition = (centerX: number, centerY: number, width: number, height: number) => {
+    const minX = wrapLeft - width * (0.5 - MIN_INSIDE_RATIO);
+    const maxX = wrapRight + width * (0.5 - MIN_INSIDE_RATIO);
+    const minY = wrapTop - height * (0.5 - MIN_INSIDE_RATIO);
+    const maxY = wrapBottom + height * (0.5 - MIN_INSIDE_RATIO);
 
     return {
-      x: Math.min(Math.max(x, minX), maxX),
-      y: Math.min(Math.max(y, minY), maxY),
+      x: Math.min(Math.max(centerX, minX), maxX),
+      y: Math.min(Math.max(centerY, minY), maxY),
     };
   };
 
   const onUpload = (event: ChangeEvent<HTMLInputElement>) => {
     setError('');
     const next = event.target.files?.[0] ?? null;
+
     if (!next) {
       onFileChange(null);
       return;
@@ -151,103 +192,150 @@ export default function MugDesigner({ file, onFileChange, allowedExtensions, all
     onFileChange(next);
   };
 
-  const onFit = () => {
+  const onFitToWrap = () => {
     if (!img) return;
-    setTransform((prev) => ({
-      ...prev,
-      x: PRINT_ZONE.x + PRINT_ZONE.width / 2,
-      y: PRINT_ZONE.y + PRINT_ZONE.height / 2,
-      scale: fitScale(img.width, img.height),
-    }));
+    const nextScale = fitScale(img.width, img.height);
+    setTransform({ x: wrapCenterX, y: wrapCenterY, scaleX: nextScale, scaleY: nextScale, rotation: transform.rotation });
+    onHandleOverlapChange(isInsideBand(wrapCenterX, img.width * nextScale));
   };
 
   const onReset = () => {
     if (!img) return;
     const nextScale = fitScale(img.width, img.height);
-    setTransform({ x: PRINT_ZONE.x + PRINT_ZONE.width / 2, y: PRINT_ZONE.y + PRINT_ZONE.height / 2, scale: nextScale, rotation: 0 });
+    setTransform({ x: wrapCenterX, y: wrapCenterY, scaleX: nextScale, scaleY: nextScale, rotation: 0 });
+    onHandleOverlapChange(isInsideBand(wrapCenterX, img.width * nextScale));
   };
-
-  const imageWidth = img ? img.width * transform.scale : 0;
-  const imageHeight = img ? img.height * transform.scale : 0;
 
   return (
     <div className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm md:p-6">
       <h3 className="text-xl font-semibold">Конструктор макета кружки</h3>
+
       <div className="flex flex-wrap items-center gap-2">
-        <label className="inline-flex cursor-pointer items-center rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-50">
+        <label className="inline-flex cursor-pointer items-center rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50">
           Upload image
           <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
         </label>
-        <button type="button" onClick={onReset} className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-50" disabled={!img}>Reset position</button>
-        <button type="button" onClick={onFit} className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-50" disabled={!img}>Fit to print zone</button>
+
+        <button type="button" onClick={onFitToWrap} disabled={!img} className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50">
+          Fit to wrap
+        </button>
+        <button type="button" onClick={onReset} disabled={!img} className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50">
+          Reset
+        </button>
+
+        <label className="ml-0 flex min-w-[220px] items-center gap-3 text-sm text-neutral-600 md:ml-2">
+          Rotate
+          <input
+            type="range"
+            min={0}
+            max={360}
+            disabled={!img}
+            value={transform.rotation}
+            onChange={(event) => {
+              const nextRotation = Number(event.target.value);
+              setTransform((prev) => ({ ...prev, rotation: nextRotation }));
+            }}
+            className="w-full"
+          />
+        </label>
       </div>
-      <label className="block space-y-2">
-        <span className="text-sm text-neutral-600">Rotate: {Math.round(transform.rotation)}°</span>
-        <input type="range" min={0} max={360} value={transform.rotation} disabled={!img} onChange={(event) => setTransform((prev) => ({ ...prev, rotation: Number(event.target.value) }))} className="w-full" />
-      </label>
+
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <div ref={wrapperRef} className="w-full overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50">
-        <Stage ref={stageRef} width={canvasWidth} height={stageHeight}>
-          <Layer>
-            <Group scaleX={scale} scaleY={scale}>
-              <Rect x={0} y={0} width={MUG_WRAP.width} height={MUG_WRAP.height} fill="#ffffff" />
-              <Rect x={PRINT_ZONE.x} y={PRINT_ZONE.y} width={PRINT_ZONE.width} height={PRINT_ZONE.height} stroke="#ef4444" strokeWidth={4} dash={[20, 10]} />
-              <Rect x={PRINT_ZONE.x + SAFE_ZONE_INSET} y={PRINT_ZONE.y + SAFE_ZONE_INSET} width={PRINT_ZONE.width - SAFE_ZONE_INSET * 2} height={PRINT_ZONE.height - SAFE_ZONE_INSET * 2} stroke="#f97316" strokeWidth={2} dash={[12, 8]} />
-              <Rect x={PRINT_ZONE.x} y={PRINT_ZONE.y} width={HANDLE_ZONE_WIDTH} height={PRINT_ZONE.height} fill="rgba(71,85,105,0.12)" />
-              <Rect x={PRINT_ZONE.x + PRINT_ZONE.width - HANDLE_ZONE_WIDTH} y={PRINT_ZONE.y} width={HANDLE_ZONE_WIDTH} height={PRINT_ZONE.height} fill="rgba(71,85,105,0.12)" />
-              <Text x={PRINT_ZONE.x + 12} y={PRINT_ZONE.y + 10} text="NO-PRINT / HANDLE" fill="#334155" fontSize={24} />
-              <Text x={PRINT_ZONE.x + PRINT_ZONE.width - HANDLE_ZONE_WIDTH + 8} y={PRINT_ZONE.y + 10} text="NO-PRINT" fill="#334155" fontSize={24} />
-              <Text x={PRINT_ZONE.x + 20} y={PRINT_ZONE.y + PRINT_ZONE.height - 40} text="PRINT ZONE" fill="#dc2626" fontSize={28} />
-              <Text x={PRINT_ZONE.x + SAFE_ZONE_INSET + 16} y={PRINT_ZONE.y + SAFE_ZONE_INSET + 10} text="SAFE ZONE" fill="#ea580c" fontSize={24} />
-              {img && (
-                <KonvaImage
-                  ref={imageRef}
-                  image={img}
-                  x={transform.x}
-                  y={transform.y}
-                  offsetX={img.width / 2}
-                  offsetY={img.height / 2}
-                  width={img.width}
-                  height={img.height}
-                  scaleX={transform.scale}
-                  scaleY={transform.scale}
-                  rotation={transform.rotation}
-                  draggable
-                  onDragMove={(event) => {
-                    const nextPos = clampPosition(event.target.x(), event.target.y(), imageWidth, imageHeight);
-                    event.target.x(nextPos.x);
-                    event.target.y(nextPos.y);
-                  }}
-                  onDragEnd={(event) => setTransform((prev) => ({ ...prev, x: event.target.x(), y: event.target.y() }))}
+
+      <div className="rounded-2xl border border-neutral-200 bg-[linear-gradient(0deg,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:24px_24px] p-3">
+        <div ref={wrapperRef} className="mx-auto aspect-[20/9] w-full max-w-[1120px] overflow-hidden rounded-xl shadow-[0_12px_36px_-20px_rgba(15,23,42,0.45)]">
+          <Stage ref={stageRef} width={canvasWidth} height={canvasHeight}>
+            <Layer>
+              <Group scaleX={stageScale} scaleY={stageScale}>
+                <Rect x={0} y={0} width={MUG_WRAP.width} height={MUG_WRAP.height} fill="#ffffff" cornerRadius={24} stroke="#e5e7eb" strokeWidth={2} />
+
+                <Rect x={HANDLE_BAND_WIDTH} y={0} width={MUG_WRAP.width - HANDLE_BAND_WIDTH * 2} height={MUG_WRAP.height} fill="rgba(59,130,246,0.03)" />
+                <Rect x={0} y={0} width={HANDLE_BAND_WIDTH} height={MUG_WRAP.height} fill="rgba(100,116,139,0.12)" />
+                <Rect x={MUG_WRAP.width - HANDLE_BAND_WIDTH} y={0} width={HANDLE_BAND_WIDTH} height={MUG_WRAP.height} fill="rgba(100,116,139,0.12)" />
+
+                <Rect
+                  x={SAFE_ZONE_INSET}
+                  y={SAFE_ZONE_INSET}
+                  width={MUG_WRAP.width - SAFE_ZONE_INSET * 2}
+                  height={MUG_WRAP.height - SAFE_ZONE_INSET * 2}
+                  stroke="#94a3b8"
+                  strokeWidth={2}
+                  dash={[10, 8]}
+                  cornerRadius={16}
                 />
-              )}
-              {img && (
-                <Transformer
-                  ref={transformerRef}
-                  rotateEnabled={false}
-                  keepRatio
-                  enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
-                  boundBoxFunc={(oldBox, newBox) => {
-                    if (newBox.width < MIN_IMAGE_SIDE || newBox.height < MIN_IMAGE_SIDE) return oldBox;
-                    if (newBox.width > PRINT_ZONE.width * MAX_IMAGE_SCALE || newBox.height > PRINT_ZONE.height * MAX_IMAGE_SCALE) return oldBox;
-                    return newBox;
-                  }}
-                  onTransformEnd={() => {
-                    const node = imageRef.current;
-                    if (!node || !img) return;
-                    const nextScale = Math.max(node.scaleX(), fitScale(img.width, img.height) * 0.2);
-                    node.scaleX(nextScale);
-                    node.scaleY(nextScale);
-                    setTransform((prev) => ({ ...prev, x: node.x(), y: node.y(), scale: nextScale }));
-                  }}
-                />
-              )}
-            </Group>
-          </Layer>
-        </Stage>
+
+                {img && (
+                  <KonvaImage
+                    ref={imageRef}
+                    image={img}
+                    x={transform.x}
+                    y={transform.y}
+                    offsetX={img.width / 2}
+                    offsetY={img.height / 2}
+                    width={img.width}
+                    height={img.height}
+                    scaleX={transform.scaleX}
+                    scaleY={transform.scaleY}
+                    rotation={transform.rotation}
+                    draggable
+                    onDragMove={(event) => {
+                      const width = img.width * transform.scaleX;
+                      const height = img.height * transform.scaleY;
+                      const nextPos = clampPosition(event.target.x(), event.target.y(), width, height);
+                      event.target.x(nextPos.x);
+                      event.target.y(nextPos.y);
+                    }}
+                    onDragEnd={(event) => {
+                      const width = img.width * transform.scaleX;
+                      setTransform((prev) => ({ ...prev, x: event.target.x(), y: event.target.y() }));
+                      onHandleOverlapChange(isInsideBand(event.target.x(), width));
+                    }}
+                  />
+                )}
+
+                {img && (
+                  <Transformer
+                    ref={transformerRef}
+                    keepRatio
+                    enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
+                    rotateEnabled={false}
+                    boundBoxFunc={(oldBox, newBox) => {
+                      if (newBox.width < MIN_IMAGE_SIDE || newBox.height < MIN_IMAGE_SIDE) return oldBox;
+                      if (newBox.width > MUG_WRAP.width * MAX_IMAGE_SCALE || newBox.height > MUG_WRAP.height * MAX_IMAGE_SCALE) return oldBox;
+                      return newBox;
+                    }}
+                    onTransformEnd={() => {
+                      const node = imageRef.current;
+                      if (!node || !img) return;
+
+                      const nextScaleX = node.scaleX();
+                      const nextScaleY = node.scaleY();
+                      const width = img.width * nextScaleX;
+                      const height = img.height * nextScaleY;
+                      const clamped = clampPosition(node.x(), node.y(), width, height);
+
+                      node.x(clamped.x);
+                      node.y(clamped.y);
+
+                      setTransform((prev) => ({
+                        ...prev,
+                        x: clamped.x,
+                        y: clamped.y,
+                        scaleX: nextScaleX,
+                        scaleY: nextScaleY,
+                      }));
+                      onHandleOverlapChange(isInsideBand(clamped.x, width));
+                    }}
+                  />
+                )}
+              </Group>
+            </Layer>
+          </Stage>
+        </div>
       </div>
+
       <p className="text-sm text-neutral-600">Это превью. Итоговую печать подтверждаем после проверки макета.</p>
-      <p className="text-xs text-neutral-500">Preview PNG при отправке ограничен {PREVIEW_MAX_SIZE_MB} МБ.</p>
+      <p className="text-xs text-neutral-500">Файлы экспорта: mug-wrap-preview.png и mug-layout.json. PNG до {PREVIEW_MAX_SIZE_MB} МБ.</p>
     </div>
   );
 }

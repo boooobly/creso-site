@@ -5,14 +5,14 @@ import dynamic from 'next/dynamic';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
-import { PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
-
+import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
   MUGS_COVERING_OPTIONS,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
+import type { MugDesignerExport } from '@/components/mug-designer/MugDesigner';
 
 const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner'), { ssr: false });
 
@@ -41,7 +41,8 @@ export default function OrderMugsForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
   const [isSending, setIsSending] = useState(false);
-  const [exportPreview, setExportPreview] = useState<(() => Promise<File | null>) | null>(null);
+  const [exportLayout, setExportLayout] = useState<(() => Promise<MugDesignerExport | null>) | null>(null);
+  const [hasHandleOverlap, setHasHandleOverlap] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
 
@@ -94,14 +95,22 @@ export default function OrderMugsForm() {
       formData.set('website', values.website);
       if (file) formData.set('file', file, file.name);
 
-      const preview = exportPreview ? await exportPreview() : null;
-      if (preview) {
-        if (preview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
+      const exported = exportLayout ? await exportLayout() : null;
+      if (exported) {
+        if (exported.preview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
           setFormError(`Превью слишком большое. Максимум ${PREVIEW_MAX_SIZE_MB} МБ.`);
           setIsSending(false);
           return;
         }
-        formData.set('preview', preview, preview.name);
+
+        if (exported.layout.size > LAYOUT_MAX_SIZE_KB * 1024) {
+          setFormError(`JSON состояния слишком большой. Максимум ${LAYOUT_MAX_SIZE_KB} КБ.`);
+          setIsSending(false);
+          return;
+        }
+
+        formData.set('preview', exported.preview, exported.preview.name);
+        formData.set('layout', exported.layout, exported.layout.name);
       }
 
       const response = await fetch('/api/requests/mugs', {
@@ -119,6 +128,7 @@ export default function OrderMugsForm() {
       setSuccessMessage('Спасибо! Мы свяжемся с вами в ближайшее время.');
       setValues(defaultValues);
       setFile(null);
+      setHasHandleOverlap(false);
       setErrors({});
     } catch {
       setFormError('Не удалось отправить заявку. Попробуйте позже.');
@@ -135,8 +145,10 @@ export default function OrderMugsForm() {
         allowedExtensions={MUGS_ALLOWED_EXTENSIONS}
         allowedMimeTypes={MUGS_ALLOWED_MIME_TYPES}
         maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
-        onExportReady={setExportPreview}
+        onExportReady={setExportLayout}
+        onHandleOverlapChange={setHasHandleOverlap}
       />
+      {hasHandleOverlap && <p className="text-sm text-amber-600">Часть изображения попадает в зону у ручки.</p>}
 
       <div className="card p-6 md:p-8">
         <div className="mb-6">
@@ -211,7 +223,7 @@ export default function OrderMugsForm() {
           <button
             type="submit"
             disabled={isSending}
-            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
+            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all motion-reduce:transition-none hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
