@@ -16,6 +16,8 @@ import type { MugDesignerExport } from '@/components/mug-designer/MugDesigner';
 
 const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner'), { ssr: false });
 
+const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner'), { ssr: false });
+
 type FormValues = {
   name: string;
   phone: string;
