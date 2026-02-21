@@ -38,12 +38,12 @@ const pricingCards = [
 ] as const;
 
 const galleryCards = [
-  { title: 'Логотип на груди', tag: 'A4', align: 'left' },
-  { title: 'Спина A4', tag: 'спина', align: 'center' },
-  { title: 'Надпись термоплёнкой', tag: 'термоплёнка', align: 'right' },
-  { title: 'Парные футболки', tag: 'пара', align: 'left' },
-  { title: 'Мерч для команды', tag: 'мерч', align: 'center' },
-  { title: 'Индивидуальный принт', tag: 'кастом', align: 'right' },
+  { title: 'Логотип на груди', tag: 'A4', printClass: 'h-[26%] w-[38%] bg-sky-500', printPosition: 'left-6 top-6' },
+  { title: 'Спина A4', tag: 'СПИНА', printClass: 'h-[52%] w-[56%] bg-indigo-500', printPosition: 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' },
+  { title: 'Надпись термоплёнкой', tag: 'ТЕРМОПЛЁНКА', printClass: 'h-[18%] w-[64%] bg-emerald-500', printPosition: 'left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2' },
+  { title: 'Парные футболки', tag: 'ПАРА', printClass: 'h-[34%] w-[28%] bg-rose-500', printPosition: 'left-[18%] top-[34%]' },
+  { title: 'Мерч для команды', tag: 'МЕРЧ', printClass: 'h-[40%] w-[48%] bg-violet-500', printPosition: 'left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2' },
+  { title: 'Индивидуальный принт', tag: 'КАСТОМ', printClass: 'h-[30%] w-[50%] bg-amber-500', printPosition: 'left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2' },
 ] as const;
 
 const steps = ['Пришлите макет или опишите задачу', 'Мы уточним детали и подтвердим стоимость', 'Печать и выдача/доставка'];
@@ -142,22 +142,17 @@ function AnimatedCard({ index, reveal, className, children }: { index: number; r
   );
 }
 
-function ExampleMockup({ tag, align }: { tag: string; align: 'left' | 'center' | 'right' }) {
-  const alignmentClass = align === 'left' ? 'items-start' : align === 'right' ? 'items-end' : 'items-center';
-
+function ExampleMockup({ tag, printClass, printPosition }: { tag: string; printClass: string; printPosition: string }) {
   return (
-    <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl border-b border-black/5 bg-gradient-to-br from-neutral-100 via-white to-neutral-200 p-4 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-950">
-      <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_1px_1px,rgba(38,38,38,0.45)_1px,transparent_0)] [background-size:10px_10px] dark:opacity-30" />
-      <div className={`relative flex h-full justify-center ${alignmentClass}`}>
-        <div className="relative mt-4 h-[78%] w-[66%] rounded-[2rem] bg-neutral-900/90 shadow-inner shadow-black/30 dark:bg-neutral-950">
-          <div className="absolute left-1/2 top-[-12%] h-[22%] w-[40%] -translate-x-1/2 rounded-b-3xl bg-neutral-900/90 dark:bg-neutral-950" />
-          <div className="absolute inset-x-[18%] top-[30%] h-[32%] rounded-xl border border-white/20 bg-white/85 dark:border-white/10 dark:bg-white/10" />
-        </div>
-      </div>
-      <span className="absolute left-4 top-4 rounded-full border border-red-300/70 bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-red-700 dark:border-red-900 dark:bg-neutral-900/90 dark:text-red-200">
+    <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl border-b border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 p-4 dark:border-neutral-800 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:radial-gradient(circle_at_1px_1px,rgba(115,115,115,0.5)_1px,transparent_0)] [background-size:12px_12px] dark:opacity-[0.12]" />
+      <span className="absolute left-4 top-4 rounded-full border border-red-300 bg-white/95 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-red-700 dark:border-red-900 dark:bg-neutral-900 dark:text-red-200">
         {tag}
       </span>
-      <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10 motion-reduce:transition-none" />
+      <div className="relative mx-auto mt-8 h-[66%] w-[72%] rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+        <div className={`absolute rounded-md ${printClass} ${printPosition}`} />
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/[0.06] motion-reduce:transition-none" />
     </div>
   );
 }
@@ -244,9 +239,9 @@ export default function TshirtsLanding() {
                 key={card.title}
                 index={index}
                 reveal={reveal}
-                className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm hover:-translate-y-1 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
+                className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg motion-reduce:transition-none dark:border-neutral-800 dark:bg-neutral-900"
               >
-                <ExampleMockup tag={card.tag} align={card.align} />
+                <ExampleMockup tag={card.tag} printClass={card.printClass} printPosition={card.printPosition} />
                 <div className="p-4">
                   <p className="text-sm font-semibold transition-colors duration-300 group-hover:text-red-600 dark:group-hover:text-red-300">{card.title}</p>
                 </div>
