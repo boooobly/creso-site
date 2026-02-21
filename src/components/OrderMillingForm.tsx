@@ -200,7 +200,7 @@ export default function OrderMillingForm() {
   };
 
   return (
-    <div className="card p-6 md:p-8">
+    <div id="milling-request" className="card p-6 md:p-8">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold">Заявка на фрезеровку</h2>
         <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Принимаем только векторные файлы: PDF, CDR, AI, EPS, DXF, SVG.</p>
