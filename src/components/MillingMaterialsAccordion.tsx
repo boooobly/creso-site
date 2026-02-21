@@ -47,7 +47,7 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
   }, [groups]);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {groups.map((group) => {
         const isOpen = openId === group.id;
         const panelId = `${baseId}-${group.id}-panel`;
@@ -85,7 +85,7 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
               <div className="overflow-hidden">
                 <div className="border-t border-neutral-300 p-4 dark:border-neutral-700">
                   <p className="text-sm text-neutral-600 dark:text-neutral-300">{group.description}</p>
-                  <div className="mt-3 overflow-hidden rounded-lg border border-zinc-300 dark:border-neutral-800">
+                  <div className="mt-4 overflow-hidden rounded-lg border border-zinc-300 dark:border-neutral-800">
                     <table className="w-full table-fixed text-left text-sm">
                       <thead className="bg-neutral-50 dark:bg-neutral-800/60">
                         <tr>
@@ -97,10 +97,10 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
                         {group.rows.map((row, rowIndex) => (
                           <tr
                             key={row.thickness}
-                            className={`border-t border-zinc-200 dark:border-neutral-800 transition-colors hover:bg-zinc-100/70 dark:hover:bg-neutral-800/70 ${rowIndex % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-zinc-50 dark:bg-neutral-800/50'}`}
+                            className={`border-t border-zinc-200 dark:border-neutral-800 transition-colors hover:bg-zinc-100 dark:hover:bg-neutral-800/80 ${rowIndex % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-zinc-50 dark:bg-neutral-800/50'}`}
                           >
-                            <td className={`px-4 py-2 align-top ${rowIndex % 2 !== 0 ? 'border-l-2 border-l-zinc-200 dark:border-l-transparent' : ''}`}>{row.thickness}</td>
-                            <td className="px-4 py-2 text-right font-medium align-top">{row.price}</td>
+                            <td className={`px-4 py-3 align-top ${rowIndex % 2 !== 0 ? 'border-l-2 border-l-zinc-200 dark:border-l-transparent' : ''}`}>{row.thickness}</td>
+                            <td className="px-4 py-3 text-right font-medium align-top">{row.price}</td>
                           </tr>
                         ))}
                       </tbody>

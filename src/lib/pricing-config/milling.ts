@@ -85,6 +85,16 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     ],
   },
   {
+    id: 'polyamide-polyethylene-polypropylene',
+    title: 'Полиамид / Полиэтилен / Полипропилен',
+    description: 'Фрезеровка инженерных и конструкционных полимерных листов.',
+    rows: [
+      { thickness: 'до 10 мм', price: '80 ₽/м.п.' },
+      { thickness: 'до 20 мм', price: '160 ₽/м.п.' },
+      { thickness: 'до 30 мм', price: '240 ₽/м.п.' },
+    ],
+  },
+  {
     id: 'xps',
     title: 'XPS пенополистирол (экструдированный)',
     description: 'Резка листов XPS по контуру.',
@@ -130,12 +140,64 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
   },
 ];
 
-export const MILLING_ADDITIONAL_SERVICES: Array<{ title: string; price: string }> = [
-  { title: 'Подготовка макета к фрезеровке', price: 'от 600 ₽' },
-  { title: 'Перезапуск/перенастройка станка (малые тиражи)', price: 'от 350 ₽' },
-  { title: 'Снятие фаски / скругление кромки', price: 'от 25 ₽/м.п.' },
-  { title: 'Маркировка/нумерация деталей', price: 'от 20 ₽/шт' },
-  { title: 'Упаковка деталей', price: 'от 150 ₽' },
+export type MillingAdditionalServiceGroup = {
+  id: string;
+  title: string;
+  items: Array<{
+    label: string;
+    details: string;
+    badges?: string[];
+  }>;
+};
+
+export const MILLING_ADDITIONAL_SERVICE_GROUPS: MillingAdditionalServiceGroup[] = [
+  {
+    id: 'urgency',
+    title: 'Срочность',
+    items: [
+      {
+        label: 'День в день',
+        details: '30%, минимум 350 ₽',
+        badges: ['+30%', 'минимум 350 ₽'],
+      },
+      {
+        label: 'Заказ при вас (от 30 мин)',
+        details: '50%, минимум 700 ₽',
+        badges: ['+50%', 'минимум 700 ₽'],
+      },
+    ],
+  },
+  {
+    id: 'preparation-and-complexity',
+    title: 'Подготовка и сложность',
+    items: [
+      { label: 'Подготовка макета', details: 'от 300 ₽' },
+      { label: 'Компоновка деталей', details: 'от 300 ₽' },
+      {
+        label: 'Фрезеровка малых деталей до 50 мм, множества отверстий, тонких форм',
+        details: '50%',
+        badges: ['+50%'],
+      },
+      { label: 'Полировка торцов прозрачного оргстекла', details: '90 ₽/м.п.' },
+    ],
+  },
+  {
+    id: 'customer-material-logistics-storage',
+    title: 'Материал заказчика, логистика и хранение',
+    items: [
+      {
+        label: 'Фрезеровка из кусков материала заказчика',
+        details: '10% за каждый последующий кусок',
+        badges: ['+10%'],
+      },
+      { label: 'Погрузка/выгрузка материалов заказчика', details: '100 ₽/лист' },
+      {
+        label: 'Хранение материалов клиента',
+        details: 'бесплатно 3 суток до фрезеровки и 3 суток после, далее 150 ₽/сутки',
+      },
+      { label: 'Доставка отфрезерованных деталей по городу', details: 'от 500 ₽' },
+    ],
+  },
 ];
 
 export const MILLING_MATERIAL_OPTIONS = MILLING_MATERIAL_GROUPS.map((group) => ({

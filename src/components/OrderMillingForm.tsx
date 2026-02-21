@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
@@ -24,6 +24,36 @@ type FormValues = {
 
 type FormErrors = Partial<Record<keyof FormValues | 'file', string>>;
 
+
+
+type RequirementsSection = {
+  title: string;
+  description: string;
+};
+
+const requirementsSections: RequirementsSection[] = [
+  {
+    title: 'Форматы файлов',
+    description: 'CDR, AI, EPS, PDF (вектор), DXF, SVG.',
+  },
+  {
+    title: 'Общее',
+    description: 'Масштаб 1:1, все шрифты перевести в кривые.',
+  },
+  {
+    title: 'Контуры',
+    description: 'Замкнутые, без эффектов, прозрачностей и градиентов, без пересечений и незамкнутых линий.',
+  },
+  {
+    title: 'Рекомендации по минимумам',
+    description: 'Минимальный размер элементов ~5 мм, расстояние между объектами ~2 мм, минимальная толщина элементов ~1.5 мм (лучше 2–3 мм).',
+  },
+  {
+    title: 'Если не уверены',
+    description: 'Отметьте «Нужна помощь с подготовкой файла» — поможем.',
+  },
+];
+
 const defaultValues: FormValues = {
   name: '',
   phone: '',
@@ -41,6 +71,10 @@ export default function OrderMillingForm() {
   const [isSending, setIsSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
+  const [isRequirementsOpen, setIsRequirementsOpen] = useState(false);
+  const requirementsTitleId = useId();
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const thicknessOptions = useMemo(() => MILLING_THICKNESS_BY_MATERIAL[values.material] ?? [], [values.material]);
 
@@ -121,8 +155,52 @@ export default function OrderMillingForm() {
     }
   };
 
+  useEffect(() => {
+    if (!isRequirementsOpen) return;
+
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsRequirementsOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isRequirementsOpen]);
+
+  const trapFocus = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Tab') return;
+
+    const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+
+    if (!focusableElements?.length) return;
+
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+    const active = document.activeElement;
+
+    if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus();
+    }
+  };
+
   return (
-    <div className="card p-6 md:p-8">
+    <div id="milling-request" className="card p-6 md:p-8">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold">Заявка на фрезеровку</h2>
         <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Принимаем только векторные файлы: PDF, CDR, AI, EPS, DXF, SVG.</p>
@@ -209,7 +287,16 @@ export default function OrderMillingForm() {
             icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
           />
           {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
+          <div className="flex flex-wrap items-center gap-3 text-xs">
+            <p className="text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
+            <button
+              type="button"
+              onClick={() => setIsRequirementsOpen(true)}
+              className="font-medium text-red-600 underline underline-offset-2 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+            >
+              Требования к макету
+            </button>
+          </div>
         </div>
 
         <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
@@ -225,6 +312,51 @@ export default function OrderMillingForm() {
         {formError && <p className="text-sm text-red-600">{formError}</p>}
         {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
       </form>
+
+      {isRequirementsOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setIsRequirementsOpen(false);
+            }
+          }}
+        >
+          <div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={requirementsTitleId}
+            onKeyDown={trapFocus}
+            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 shadow-xl dark:bg-neutral-900 md:p-6"
+          >
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <h3 id={requirementsTitleId} className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+                Требования к макету для фрезеровки
+              </h3>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                onClick={() => setIsRequirementsOpen(false)}
+                className="rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                aria-label="Закрыть модальное окно"
+              >
+                Закрыть
+              </button>
+            </div>
+
+            <div className="space-y-3 text-sm text-neutral-700 dark:text-neutral-300">
+              {requirementsSections.map((section) => (
+                <div key={section.title} className="rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+                  <p className="font-semibold text-neutral-900 dark:text-neutral-100">{section.title}</p>
+                  <p className="mt-1 leading-relaxed">{section.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
