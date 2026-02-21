@@ -1,7 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Building2, CheckCircle2, Layers3, ShieldCheck, Sparkles, Truck, Wrench, Zap } from 'lucide-react';
+import {
+  CheckCircle2,
+  ClipboardCheck,
+  Layers3,
+  Maximize,
+  ShieldCheck,
+  Sparkles,
+  Truck,
+  Wrench,
+  Zap,
+} from 'lucide-react';
 import Section from '@/components/Section';
 import OrderMillingForm from '@/components/OrderMillingForm';
 import MillingMaterialsAccordion from '@/components/MillingMaterialsAccordion';
@@ -23,13 +33,6 @@ const heroKpi = [
   'Работаем с материалом заказчика',
 ];
 
-const advantages = [
-  { title: 'Собственная производственная база', icon: Building2 },
-  { title: 'Помогаем подготовить макет', icon: Sparkles },
-  { title: 'Работаем с материалом клиента', icon: Layers3 },
-  { title: 'Контроль качества на каждом этапе', icon: ShieldCheck },
-];
-
 const steps = [
   'Отправляете макет',
   'Проверяем и подтверждаем стоимость',
@@ -42,12 +45,18 @@ const galleryItems = [
   { title: 'ПВХ 10 мм', bg: 'from-violet-500/35 via-fuchsia-500/20 to-transparent' },
 ];
 
-const rules = [
-  'Минимальная сумма заказа — 450 ₽.',
-  'Цены указаны без стоимости материала.',
-  'Подготовительные и постобрабатывающие работы согласовываются отдельно.',
-  'Для рекламных агентств и постоянных клиентов действуют индивидуальные скидки.',
-  'Максимальный размер заготовки: 2×4 м.',
+const workConditions = [
+  { title: 'Минимальный заказ — 450 ₽', icon: ClipboardCheck },
+  { title: 'Цены указаны без стоимости материала', icon: Layers3 },
+  { title: 'Максимальный размер заготовки — 2×4 м', icon: Maximize },
+  { title: 'Подготовительные и постобрабатывающие работы согласовываются отдельно', icon: Wrench },
+];
+
+const whyChooseUs = [
+  { title: 'Собственная производственная база', icon: CheckCircle2 },
+  { title: 'Помогаем подготовить макет', icon: Sparkles },
+  { title: 'Работаем с материалом клиента', icon: Truck },
+  { title: 'Контроль качества на каждом этапе', icon: ShieldCheck },
 ];
 
 const revealBase =
@@ -57,7 +66,6 @@ export default function MillingPage() {
   const [heroVisible, setHeroVisible] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
 
-  const advantagesReveal = useRevealOnScroll<HTMLDivElement>();
   const howReveal = useRevealOnScroll<HTMLDivElement>();
   const servicesReveal = useRevealOnScroll<HTMLDivElement>();
   const galleryReveal = useRevealOnScroll<HTMLDivElement>();
@@ -110,28 +118,6 @@ export default function MillingPage() {
       </Section>
 
       <Section className="pt-0">
-        <div ref={advantagesReveal.ref} className={revealClass(advantagesReveal.isVisible)}>
-          <h2 className="mb-4 text-2xl font-semibold">Почему выбирают нас</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {advantages.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.title}
-                  className="card flex items-start gap-3 p-5 transition-transform duration-300 hover:-translate-y-1"
-                >
-                  <span className="rounded-lg bg-red-50 p-2 text-red-600 dark:bg-red-500/15 dark:text-red-300">
-                    <Icon className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <p className="text-sm font-medium text-neutral-800 dark:text-neutral-100">{item.title}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </Section>
-
-      <Section className="pt-0">
         <div id="milling-prices" className="card p-6 md:p-8 scroll-mt-24">
           <div className="mb-4 flex flex-wrap gap-2">
             {quickInfo.map((item) => (
@@ -161,16 +147,46 @@ export default function MillingPage() {
       </Section>
 
       <Section className="pt-0">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="card p-6 md:p-8">
-            <h2 className="mb-4 text-2xl font-semibold">Условия и правила</h2>
-            <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
-              {rules.map((rule) => (
-                <li key={rule} className="flex items-start gap-2"><span className="mt-1 text-red-500">•</span><span>{rule}</span></li>
-              ))}
-            </ul>
-            <p className="mt-4 text-xs text-neutral-500">Информация на странице не является публичной офертой.</p>
-          </div>
+        <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
+          <aside className="lg:sticky lg:top-[120px] lg:self-start">
+            <div className="card p-6 md:p-8">
+              <section>
+                <h2 className="text-xl font-semibold">Условия работы</h2>
+                <ul className="mt-4 space-y-3.5 text-sm text-neutral-700 dark:text-neutral-300">
+                  {workConditions.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.title} className="flex items-start gap-3">
+                        <span className="mt-0.5 rounded-md bg-red-50 p-1.5 text-red-600 dark:bg-red-500/15 dark:text-red-300">
+                          <Icon className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <span className="leading-relaxed">{item.title}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+
+              <div className="my-6 h-px bg-neutral-200 dark:bg-neutral-800" />
+
+              <section>
+                <h3 className="text-xl font-semibold">Почему выбирают нас</h3>
+                <ul className="mt-4 space-y-3.5 text-sm text-neutral-700 dark:text-neutral-300">
+                  {whyChooseUs.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.title} className="flex items-start gap-3">
+                        <span className="mt-0.5 rounded-md bg-red-50 p-1.5 text-red-600 dark:bg-red-500/15 dark:text-red-300">
+                          <Icon className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <span className="leading-relaxed">{item.title}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            </div>
+          </aside>
 
           <div ref={servicesReveal.ref} className={`card p-6 md:p-8 ${revealClass(servicesReveal.isVisible)}`}>
             <h2 className="mb-4 text-2xl font-semibold">Дополнительные услуги</h2>
