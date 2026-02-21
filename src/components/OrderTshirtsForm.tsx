@@ -222,7 +222,7 @@ export default function OrderTshirtsForm() {
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
             {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">Файл не обязателен — можно описать задачу в комментарии.</p>
           </div>
 
           <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
