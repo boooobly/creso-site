@@ -2,7 +2,7 @@ import Section from '@/components/Section';
 import OrderMillingForm from '@/components/OrderMillingForm';
 import MillingMaterialsAccordion from '@/components/MillingMaterialsAccordion';
 import {
-  MILLING_ADDITIONAL_SERVICES,
+  MILLING_ADDITIONAL_SERVICE_GROUPS,
   MILLING_MATERIAL_GROUPS,
 } from '@/lib/pricing-config/milling';
 
@@ -56,23 +56,32 @@ export default function MillingPage() {
 
           <div className="card p-6 md:p-8">
             <h2 className="mb-4 text-2xl font-semibold">Дополнительные услуги</h2>
-            <div className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-neutral-50 dark:bg-neutral-800/60">
-                  <tr>
-                    <th className="px-4 py-2 font-medium">Услуга</th>
-                    <th className="px-4 py-2 font-medium">Стоимость</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {MILLING_ADDITIONAL_SERVICES.map((service) => (
-                    <tr key={service.title} className="border-t border-neutral-200 dark:border-neutral-800">
-                      <td className="px-4 py-2">{service.title}</td>
-                      <td className="px-4 py-2">{service.price}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="space-y-4">
+              {MILLING_ADDITIONAL_SERVICE_GROUPS.map((group) => (
+                <section key={group.id} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+                  <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{group.title}</h3>
+                  <ul className="mt-3 space-y-3">
+                    {group.items.map((item) => (
+                      <li key={item.label} className="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-800/50">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                          <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200 sm:max-w-[62%]">{item.label}</p>
+                          <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                            {item.badges?.map((badge) => (
+                              <span
+                                key={badge}
+                                className="rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300"
+                              >
+                                {badge}
+                              </span>
+                            ))}
+                            <span className="text-sm font-medium text-neutral-800 dark:text-neutral-100">{item.details}</span>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
             </div>
           </div>
         </div>
