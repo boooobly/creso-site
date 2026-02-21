@@ -136,17 +136,18 @@ export default function PlotterCuttingPage() {
   };
 
   return (
-    <div className="pb-14">
-      <Section className="pb-0 pt-10 md:pt-14">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-10">
-          <div className="space-y-8 md:space-y-10">
-            <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/40 p-7 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 md:p-10 ${revealBase}`}>
-              <div className="space-y-4">
-                <h1 className="max-w-4xl text-4xl font-bold leading-tight md:text-6xl md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
-                <p className="max-w-2xl text-base text-neutral-700 dark:text-neutral-300 md:text-lg">Точная контурная резка, выборка, монтаж. Работаем с короткими и серийными тиражами, аккуратно соблюдая размеры и геометрию линии реза.</p>
+    <div className="pb-16 md:pb-20">
+      <Section className="pb-0 pt-12 md:pt-16">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-12">
+          <div className="space-y-10 md:space-y-12">
+            <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/40 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-11 ${revealBase}`}>
+              <div className="space-y-5">
+                <h1 className="max-w-4xl text-[2.65rem] font-bold leading-tight md:text-[4.25rem] md:leading-[1.02]">Плоттерная резка самоклеящейся пленки и оракала</h1>
+                <p className="max-w-2xl text-base text-neutral-700 dark:text-neutral-300 md:text-lg">Точная контурная резка, выборка, монтаж.</p>
               </div>
+              <p className="mt-3 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Работаем с короткими и серийными тиражами. Точная геометрия линии реза.</p>
 
-              <div className="mt-6 flex flex-wrap gap-2.5">
+              <div className="mt-7 flex flex-wrap gap-2.5">
                 {heroBadges.map((badge, index) => (
                   <span
                     key={badge}
@@ -178,7 +179,7 @@ export default function PlotterCuttingPage() {
               </div>
             </div>
 
-            <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200 p-7 dark:border-neutral-800 md:p-8 ${revealBase}`}>
+            <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200 border-l-4 border-l-red-500 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:border-l-red-500 dark:shadow-none md:p-8 ${revealBase}`}>
               <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
                 <div>
                   <h2 className="text-2xl font-semibold">Технические возможности</h2>
@@ -195,9 +196,9 @@ export default function PlotterCuttingPage() {
                       key={item.label}
                       style={specsReveal.getStaggerStyle(index * 90)}
                       data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
-                      className={`rounded-xl border border-neutral-200 bg-neutral-50/80 p-3.5 dark:border-neutral-700 dark:bg-neutral-900/80 ${revealBase}`}
+                      className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5 ${revealBase}`}
                     >
-                      <p className="text-xl font-bold text-neutral-900 dark:text-neutral-100">{item.key}</p>
+                      <p className="text-[1.9rem] font-bold leading-none text-neutral-900 dark:text-neutral-100">{item.key}</p>
                       <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{item.label}</p>
                     </article>
                   ))}
@@ -212,7 +213,7 @@ export default function PlotterCuttingPage() {
                 {pricingRows.map((item, index) => (
                   <div
                     key={item.label}
-                    className="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 text-sm transition-colors duration-300 odd:bg-white even:bg-neutral-50 hover:bg-red-50/70 dark:odd:bg-neutral-950 dark:even:bg-neutral-900 dark:hover:bg-red-500/10 md:px-5 md:py-3.5 md:text-base"
+                    className="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 text-sm transition-colors duration-300 odd:bg-white even:bg-neutral-100/80 hover:bg-red-50/80 dark:odd:bg-neutral-950 dark:even:bg-neutral-900 dark:hover:bg-red-500/10 md:px-5 md:py-3.5 md:text-base"
                   >
                     <span className="text-neutral-700 dark:text-neutral-200">{item.label}</span>
                     <span className="text-right font-semibold text-neutral-900 dark:text-neutral-100">{item.value}</span>
@@ -223,10 +224,11 @@ export default function PlotterCuttingPage() {
 
             <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`card border border-neutral-200 p-7 dark:border-neutral-800 md:p-8 ${revealBase}`}>
               <h2 className="text-2xl font-semibold">Что влияет на цену</h2>
-              <ul className="mt-4 grid gap-2.5 md:grid-cols-2">
+              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Чем сложнее контур и постобработка, тем выше итоговая стоимость заказа.</p>
+              <ul className="mt-5 grid gap-3.5 md:grid-cols-2">
                 {priceFactors.map((factor, index) => (
-                  <li key={factor} style={factorsReveal.getStaggerStyle(index * 80)} data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'} className={`flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-sm text-neutral-700 transition-colors hover:border-neutral-200 hover:bg-neutral-50 dark:text-neutral-200 dark:hover:border-neutral-800 dark:hover:bg-neutral-900 ${revealBase}`}>
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-100 text-[10px] font-bold text-red-700 dark:bg-red-500/20 dark:text-red-300">•</span>
+                  <li key={factor} style={factorsReveal.getStaggerStyle(index * 80)} data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'} className={`flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-sm text-neutral-700 transition-colors hover:border-neutral-200 hover:bg-neutral-50 dark:text-neutral-200 dark:hover:border-neutral-800 dark:hover:bg-neutral-900 ${revealBase}`}>
+                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-200 text-[11px] font-bold text-red-700 dark:bg-red-500/25 dark:text-red-300">•</span>
                     {factor}
                   </li>
                 ))}
@@ -242,14 +244,15 @@ export default function PlotterCuttingPage() {
                     key={item.title}
                     style={examplesReveal.getStaggerStyle(index * 100)}
                     data-reveal={examplesReveal.isVisible || examplesReveal.prefersReducedMotion ? 'in' : 'out'}
-                    className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
+                    className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
                       <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none`} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/15 via-transparent to-transparent" />
                     </div>
                     <div className="flex items-center justify-between px-4 py-3">
                       <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{item.title}</p>
-                      <span className="rounded-full border border-neutral-300 px-2 py-0.5 text-[11px] text-neutral-600 dark:border-neutral-700 dark:text-neutral-300">{item.tag}</span>
+                      <span className="rounded-full border border-neutral-300 bg-white/80 px-2 py-0.5 text-[11px] text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300">{item.tag}</span>
                     </div>
                   </article>
                 ))}
@@ -266,7 +269,7 @@ export default function PlotterCuttingPage() {
           </div>
 
           <aside className="lg:sticky lg:top-24 lg:h-fit">
-            <form onSubmit={onSubmit} className="card space-y-5 border border-neutral-200 p-6 dark:border-neutral-800 md:p-7" id="plotter-request">
+            <form onSubmit={onSubmit} className="card space-y-6 border border-neutral-200 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:shadow-none md:p-7" id="plotter-request">
               <div>
                 <h2 className="text-2xl font-semibold">Заявка на плоттерную резку</h2>
                 <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Стоимость подтверждает менеджер после проверки макета. Без скрытых доплат.</p>
@@ -344,9 +347,10 @@ export default function PlotterCuttingPage() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center disabled:opacity-60">
+                <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center py-3 text-[15px] tracking-[0.01em] disabled:opacity-60">
                   {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
                 </button>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">Менеджер уточнит длину реза и сложность бесплатно.</p>
                 {submitError && <p className="text-sm text-red-600">{submitError}</p>}
                 {submitSuccess && <p className="text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
               </div>
