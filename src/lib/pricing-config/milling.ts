@@ -85,6 +85,16 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     ],
   },
   {
+    id: 'polyamide-polyethylene-polypropylene',
+    title: 'Полиамид / Полиэтилен / Полипропилен',
+    description: 'Фрезеровка инженерных и конструкционных полимерных листов.',
+    rows: [
+      { thickness: 'до 10 мм', price: '80 ₽/м.п.' },
+      { thickness: 'до 20 мм', price: '160 ₽/м.п.' },
+      { thickness: 'до 30 мм', price: '240 ₽/м.п.' },
+    ],
+  },
+  {
     id: 'xps',
     title: 'XPS пенополистирол (экструдированный)',
     description: 'Резка листов XPS по контуру.',
@@ -131,11 +141,22 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
 ];
 
 export const MILLING_ADDITIONAL_SERVICES: Array<{ title: string; price: string }> = [
-  { title: 'Подготовка макета к фрезеровке', price: 'от 600 ₽' },
-  { title: 'Перезапуск/перенастройка станка (малые тиражи)', price: 'от 350 ₽' },
-  { title: 'Снятие фаски / скругление кромки', price: 'от 25 ₽/м.п.' },
-  { title: 'Маркировка/нумерация деталей', price: 'от 20 ₽/шт' },
-  { title: 'Упаковка деталей', price: 'от 150 ₽' },
+  { title: 'Срочность (день в день)', price: '+30%, не менее 350 ₽' },
+  { title: 'Заказ при вас (от 30 мин)', price: '+50%, не менее 700 ₽' },
+  { title: 'Компоновка деталей на материале', price: 'от 300 ₽' },
+  { title: 'Фрезеровка из кусков материала заказчика', price: '+10% за каждый последующий кусок' },
+  { title: 'Подготовка макета', price: 'от 300 ₽' },
+  {
+    title: 'Фрезеровка малых деталей до 50 мм, множества отверстий, тонких форм',
+    price: '+50%',
+  },
+  { title: 'Погрузка или выгрузка материала заказчика', price: '100 ₽/лист' },
+  {
+    title: 'Хранение материала клиента',
+    price: 'бесплатно 3 суток до фрезеровки, бесплатно 3 суток после, далее 150 ₽/сутки',
+  },
+  { title: 'Доставка отфрезерованных деталей по городу', price: 'от 500 ₽' },
+  { title: 'Полировка торцов прозрачного оргстекла', price: '90 ₽/м.п.' },
 ];
 
 export const MILLING_MATERIAL_OPTIONS = MILLING_MATERIAL_GROUPS.map((group) => ({

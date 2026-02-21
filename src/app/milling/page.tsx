@@ -21,6 +21,40 @@ const rules = [
 ];
 
 export default function MillingPage() {
+  const renderServicePrice = (price: string) => {
+    const percentMatch = price.match(/^(\+\d+%)(.*)$/);
+    if (!percentMatch) {
+      return <span className="whitespace-normal break-words">{price}</span>;
+    }
+
+    const [, percent, remainder] = percentMatch;
+    const rest = remainder.replace(/^,\s*/, '').trim();
+
+    return (
+      <span className="inline-flex flex-wrap items-start justify-end gap-2 whitespace-normal break-words">
+        <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-500/15 dark:text-red-300">
+          {percent}
+        </span>
+        {rest ? <span>{rest}</span> : null}
+      </span>
+    );
+  };
+
+  const renderServiceTitle = (title: string) => (
+    <span className="whitespace-normal break-words">{title}</span>
+  );
+
+  const renderStoragePrice = (price: string) => {
+    const points = price.split(',').map((item) => item.trim()).filter(Boolean);
+    return (
+      <ul className="ml-auto list-disc space-y-1 pl-5 text-left">
+        {points.map((point) => (
+          <li key={point}>{point}</li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
     <div>
       <Section className="pb-8">
@@ -61,14 +95,20 @@ export default function MillingPage() {
                 <thead className="bg-neutral-50 dark:bg-neutral-800/60">
                   <tr>
                     <th className="px-4 py-2 font-medium">Услуга</th>
-                    <th className="px-4 py-2 font-medium">Стоимость</th>
+                    <th className="px-4 py-2 text-right font-medium">Стоимость</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {MILLING_ADDITIONAL_SERVICES.map((service) => (
+                  {MILLING_ADDITIONAL_SERVICES.map((service, index) => (
                     <tr key={service.title} className="border-t border-neutral-200 dark:border-neutral-800">
-                      <td className="px-4 py-2">{service.title}</td>
-                      <td className="px-4 py-2">{service.price}</td>
+                      <td className={`px-4 py-3 align-top ${index % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-zinc-50 dark:bg-neutral-800/40'}`}>
+                        {renderServiceTitle(service.title)}
+                      </td>
+                      <td className={`px-4 py-3 text-right font-medium align-top ${index % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-zinc-50 dark:bg-neutral-800/40'}`}>
+                        {service.title === 'Хранение материала клиента'
+                          ? renderStoragePrice(service.price)
+                          : renderServicePrice(service.price)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
