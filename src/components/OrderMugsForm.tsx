@@ -43,6 +43,8 @@ export default function OrderMugsForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [exportLayout, setExportLayout] = useState<(() => Promise<MugDesignerExport | null>) | null>(null);
+  const [hasHandleOverlap, setHasHandleOverlap] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
 
@@ -133,6 +135,7 @@ export default function OrderMugsForm() {
       setSuccessMessage('Спасибо! Мы свяжемся с вами в ближайшее время.');
       setValues(defaultValues);
       setFile(null);
+      setHasHandleOverlap(false);
       setErrors({});
     } catch {
       setFormError('Не удалось отправить заявку. Попробуйте позже.');

@@ -184,6 +184,24 @@ export async function POST(request: NextRequest) {
       if (layout.size <= 0 || layout.size > LAYOUT_MAX_SIZE_KB * 1024) return NextResponse.json({ ok: false, error: `Размер layout JSON должен быть от 1 байта до ${LAYOUT_MAX_SIZE_KB} КБ.` }, { status: 400 });
     }
 
+    if (preview) {
+      if (preview.type !== 'image/png') {
+        return NextResponse.json({ ok: false, error: 'Preview должен быть в формате PNG.' }, { status: 400 });
+      }
+      if (preview.size <= 0 || preview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
+        return NextResponse.json({ ok: false, error: `Размер preview должен быть от 1 байта до ${PREVIEW_MAX_SIZE_MB} МБ.` }, { status: 400 });
+      }
+    }
+
+    if (layout) {
+      if (layout.type !== 'application/json') {
+        return NextResponse.json({ ok: false, error: 'Layout должен быть в формате JSON.' }, { status: 400 });
+      }
+      if (layout.size <= 0 || layout.size > LAYOUT_MAX_SIZE_KB * 1024) {
+        return NextResponse.json({ ok: false, error: `Размер layout JSON должен быть от 1 байта до ${LAYOUT_MAX_SIZE_KB} КБ.` }, { status: 400 });
+      }
+    }
+
     const normalizedPhone = normalizePhone(parsed.data.phone);
     if (!normalizedPhone) return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
     if (!isKnownCovering(parsed.data.covering)) return NextResponse.json({ ok: false, error: 'Выберите корректное покрытие.' }, { status: 400 });
