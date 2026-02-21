@@ -1,9 +1,16 @@
 import nodemailer from 'nodemailer';
 import { env } from '@/lib/env';
 
+export type EmailAttachment = {
+  filename: string;
+  content: Buffer;
+  contentType: string;
+};
+
 export type EmailLeadPayload = {
   subject: string;
   html: string;
+  attachments?: EmailAttachment[];
 };
 
 export type SmtpConfig = {
@@ -35,6 +42,7 @@ export async function sendSmtpEmail(params: {
   subject: string;
   html?: string;
   text?: string;
+  attachments?: EmailAttachment[];
 }): Promise<void> {
   const config = getSmtpConfig();
 
@@ -59,6 +67,7 @@ export async function sendSmtpEmail(params: {
     subject: params.subject,
     html: params.html,
     text: params.text,
+    attachments: params.attachments,
   });
 }
 
@@ -74,5 +83,6 @@ export async function sendEmailLead(payload: EmailLeadPayload): Promise<void> {
     to: config.to,
     subject: payload.subject,
     html: payload.html,
+    attachments: payload.attachments,
   });
 }
