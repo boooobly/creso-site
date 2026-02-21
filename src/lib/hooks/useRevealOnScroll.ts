@@ -1,11 +1,10 @@
 'use client';
 
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MutableRefObject } from 'react';
 
 type RevealOptions = {
   threshold?: number;
   rootMargin?: string;
-  once?: boolean;
 };
 
 type RevealResult<T extends HTMLElement> = {
@@ -14,54 +13,55 @@ type RevealResult<T extends HTMLElement> = {
   prefersReducedMotion: boolean;
 };
 
-export function useRevealOnScroll<T extends HTMLElement>(options: RevealOptions = {}): RevealResult<T> {
-  const { threshold = 0.2, rootMargin = '0px', once = true } = options;
-  const ref = useRef<T>(null);
+export function useRevealOnScroll<T extends HTMLElement>({
+  threshold = 0.2,
+  rootMargin = '0px 0px -10% 0px',
+}: RevealOptions = {}): RevealResult<T> {
+  const ref = useRef<T | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
 
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const onChange = () => setPrefersReducedMotion(media.matches);
+    setPrefersReducedMotion(mediaQuery.matches);
 
-    onChange();
-    media.addEventListener('change', onChange);
-
-    return () => media.removeEventListener('change', onChange);
-  }, []);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    if (prefersReducedMotion) {
+    if (mediaQuery.matches) {
       setIsVisible(true);
-      return;
+      mediaQuery.addEventListener('change', onChange);
+      return () => {
+        mediaQuery.removeEventListener('change', onChange);
+      };
     }
 
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      setIsVisible(true);
-      return;
+    const element = ref.current;
+    if (!element) {
+      mediaQuery.addEventListener('change', onChange);
+      return () => {
+        mediaQuery.removeEventListener('change', onChange);
+      };
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          if (once) observer.disconnect();
-        } else if (!once) {
-          setIsVisible(false);
-        }
+        if (!entry.isIntersecting) return;
+        setIsVisible(true);
+        observer.disconnect();
       },
       { threshold, rootMargin },
     );
 
     observer.observe(element);
+    mediaQuery.addEventListener('change', onChange);
 
-    return () => observer.disconnect();
-  }, [once, prefersReducedMotion, rootMargin, threshold]);
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', onChange);
+    };
+  }, [threshold, rootMargin]);
 
   return { ref, isVisible, prefersReducedMotion };
 }
