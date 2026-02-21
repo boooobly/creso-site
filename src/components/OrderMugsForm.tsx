@@ -1,15 +1,20 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
+
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
   MUGS_COVERING_OPTIONS,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
+
+const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner'), { ssr: false });
 
 type FormValues = {
   name: string;
@@ -36,6 +41,7 @@ export default function OrderMugsForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [exportPreview, setExportPreview] = useState<(() => Promise<File | null>) | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
 
@@ -88,6 +94,16 @@ export default function OrderMugsForm() {
       formData.set('website', values.website);
       if (file) formData.set('file', file, file.name);
 
+      const preview = exportPreview ? await exportPreview() : null;
+      if (preview) {
+        if (preview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
+          setFormError(`Превью слишком большое. Максимум ${PREVIEW_MAX_SIZE_MB} МБ.`);
+          setIsSending(false);
+          return;
+        }
+        formData.set('preview', preview, preview.name);
+      }
+
       const response = await fetch('/api/requests/mugs', {
         method: 'POST',
         body: formData,
@@ -112,87 +128,98 @@ export default function OrderMugsForm() {
   };
 
   return (
-    <div className="card p-6 md:p-8">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold">Заявка на печать кружек</h2>
-      </div>
+    <div className="space-y-5">
+      <MugDesigner
+        file={file}
+        onFileChange={setFile}
+        allowedExtensions={MUGS_ALLOWED_EXTENSIONS}
+        allowedMimeTypes={MUGS_ALLOWED_MIME_TYPES}
+        maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
+        onExportReady={setExportPreview}
+      />
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Имя *</span>
-            <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-            {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Телефон *</span>
-            <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
-            {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
-          </label>
+      <div className="card p-6 md:p-8">
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold">Заявка на печать кружек</h2>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Количество *</span>
-            <input
-              type="number"
-              min={1}
-              className={inputClass('quantity')}
-              value={values.quantity}
-              onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))}
+        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Имя *</span>
+              <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
+              {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Телефон *</span>
+              <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
+              {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
+            </label>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Количество *</span>
+              <input
+                type="number"
+                min={1}
+                className={inputClass('quantity')}
+                value={values.quantity}
+                onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))}
+              />
+              {errors.quantity && <span className="text-xs text-red-600">{errors.quantity}</span>}
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Покрытие *</span>
+              <select className={inputClass('covering')} value={values.covering} onChange={(e) => setValues((prev) => ({ ...prev, covering: e.target.value }))}>
+                {MUGS_COVERING_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              {errors.covering && <span className="text-xs text-red-600">{errors.covering}</span>}
+            </label>
+          </div>
+
+          <label className="space-y-2 block">
+            <span className="text-sm font-medium">Комментарий</span>
+            <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
+          </label>
+
+          <div className="space-y-2">
+            <ImageDropzone
+              value={file}
+              onChange={setFile}
+              title="Файл (необязательно)"
+              accept={MUGS_ALLOWED_EXTENSIONS.join(',')}
+              helperText={`Растровые: PNG, JPG, JPEG, WEBP. Векторные: PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`}
+              allowedMimeTypes={[...MUGS_ALLOWED_MIME_TYPES]}
+              allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
+              invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
+              maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
+              className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
+              helperTextClassName="mt-1 text-xs text-muted-foreground"
+              icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
-            {errors.quantity && <span className="text-xs text-red-600">{errors.quantity}</span>}
-          </label>
+            {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
+          </div>
 
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Покрытие *</span>
-            <select className={inputClass('covering')} value={values.covering} onChange={(e) => setValues((prev) => ({ ...prev, covering: e.target.value }))}>
-              {MUGS_COVERING_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            {errors.covering && <span className="text-xs text-red-600">{errors.covering}</span>}
-          </label>
-        </div>
+          <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
 
-        <label className="space-y-2 block">
-          <span className="text-sm font-medium">Комментарий</span>
-          <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
-        </label>
+          <button
+            type="submit"
+            disabled={isSending}
+            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
+          >
+            {isSending ? 'Отправка…' : 'Отправить заявку'}
+          </button>
 
-        <div className="space-y-2">
-          <ImageDropzone
-            value={file}
-            onChange={setFile}
-            title="Файл (необязательно)"
-            accept={MUGS_ALLOWED_EXTENSIONS.join(',')}
-            helperText={`Растровые: PNG, JPG, JPEG, WEBP. Векторные: PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`}
-            allowedMimeTypes={[...MUGS_ALLOWED_MIME_TYPES]}
-            allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
-            invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
-            maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
-            className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
-            helperTextClassName="mt-1 text-xs text-muted-foreground"
-            icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
-          />
-          {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
-        </div>
-
-        <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
-
-        <button
-          type="submit"
-          disabled={isSending}
-          className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
-        >
-          {isSending ? 'Отправка…' : 'Отправить заявку'}
-        </button>
-
-        {formError && <p className="text-sm text-red-600">{formError}</p>}
-        {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
-      </form>
+          {formError && <p className="text-sm text-red-600">{formError}</p>}
+          {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
+        </form>
+      </div>
     </div>
   );
 }
