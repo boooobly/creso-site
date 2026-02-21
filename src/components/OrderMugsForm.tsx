@@ -1,20 +1,22 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
+import { dataUrlToFile } from '@/lib/mugDesigner/exportPreview';
+import type { MugDesignerExport } from '@/components/mug-designer/MugDesigner';
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
   MUGS_COVERING_OPTIONS,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
-import type { MugDesignerExport } from '@/components/mug-designer/MugDesigner';
+import type { MugDesigner2DHandle } from '@/components/mug-designer/MugDesigner2D';
 
-const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner'), { ssr: false });
+const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner2D'), { ssr: false });
 
 type FormValues = {
   name: string;
@@ -37,6 +39,7 @@ const defaultValues: FormValues = {
 };
 
 export default function OrderMugsForm() {
+  const designerRef = useRef<MugDesigner2DHandle | null>(null);
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
@@ -95,22 +98,27 @@ export default function OrderMugsForm() {
       formData.set('website', values.website);
       if (file) formData.set('file', file, file.name);
 
-      const exported = exportLayout ? await exportLayout() : null;
+      const exported = await designerRef.current?.exportDesign();
       if (exported) {
-        if (exported.preview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
-          setFormError(`Превью слишком большое. Максимум ${PREVIEW_MAX_SIZE_MB} МБ.`);
+        const mockPreview = await dataUrlToFile(exported.mockPngDataUrl, 'mug-mock-preview.png');
+        const printPreview = await dataUrlToFile(exported.printPngDataUrl, 'mug-print-preview.png');
+        const layout = new File([exported.layoutJson], 'mug-layout.json', { type: 'application/json' });
+
+        if (mockPreview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024 || printPreview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
+          setFormError(`Файл превью слишком большой. Максимум ${PREVIEW_MAX_SIZE_MB} МБ.`);
           setIsSending(false);
           return;
         }
 
-        if (exported.layout.size > LAYOUT_MAX_SIZE_KB * 1024) {
+        if (layout.size > LAYOUT_MAX_SIZE_KB * 1024) {
           setFormError(`JSON состояния слишком большой. Максимум ${LAYOUT_MAX_SIZE_KB} КБ.`);
           setIsSending(false);
           return;
         }
 
-        formData.set('preview', exported.preview, exported.preview.name);
-        formData.set('layout', exported.layout, exported.layout.name);
+        formData.set('mockPreview', mockPreview, mockPreview.name);
+        formData.set('printPreview', printPreview, printPreview.name);
+        formData.set('layout', layout, layout.name);
       }
 
       const response = await fetch('/api/requests/mugs', {
@@ -140,15 +148,13 @@ export default function OrderMugsForm() {
   return (
     <div className="space-y-5">
       <MugDesigner
+        ref={designerRef}
         file={file}
         onFileChange={setFile}
         allowedExtensions={MUGS_ALLOWED_EXTENSIONS}
         allowedMimeTypes={MUGS_ALLOWED_MIME_TYPES}
         maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
-        onExportReady={setExportLayout}
-        onHandleOverlapChange={setHasHandleOverlap}
       />
-      {hasHandleOverlap && <p className="text-sm text-amber-600">Часть изображения попадает в зону у ручки.</p>}
 
       <div className="card p-6 md:p-8">
         <div className="mb-6">
@@ -173,13 +179,7 @@ export default function OrderMugsForm() {
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
               <span className="text-sm font-medium">Количество *</span>
-              <input
-                type="number"
-                min={1}
-                className={inputClass('quantity')}
-                value={values.quantity}
-                onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))}
-              />
+              <input type="number" min={1} className={inputClass('quantity')} value={values.quantity} onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))} />
               {errors.quantity && <span className="text-xs text-red-600">{errors.quantity}</span>}
             </label>
 

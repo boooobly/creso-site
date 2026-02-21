@@ -1,6 +1,7 @@
 import Section from '@/components/Section';
 import OrderMugsForm from '@/components/OrderMugsForm';
 import Link from 'next/link';
+import MugPrintAreaCalibrator from '@/components/mug-designer/MugPrintAreaCalibrator';
 
 const complexityLevels = [
   { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
@@ -105,6 +106,17 @@ export default function MugsServicePage() {
       <Section id="mugs-request" className="pt-0 pb-12">
         <OrderMugsForm />
       </Section>
+
+      {process.env.NODE_ENV !== 'production' && (
+        <Section className="pt-0 pb-6">
+          <details className="card p-4 md:p-6">
+            <summary className="cursor-pointer text-sm font-semibold text-neutral-700">Print area calibrator</summary>
+            <div className="mt-4">
+              <MugPrintAreaCalibrator />
+            </div>
+          </details>
+        </Section>
+      )}
     </div>
   );
 }
