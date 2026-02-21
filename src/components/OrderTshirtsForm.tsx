@@ -136,104 +136,109 @@ export default function OrderTshirtsForm() {
   };
 
   return (
-    <div className="card p-6 md:p-8">
-      <h2 className="mb-6 text-2xl font-semibold">Заявка на печать на футболках</h2>
+    <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900 md:p-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(220,38,38,0.08),transparent_45%)]" aria-hidden="true" />
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Имя *</span>
-            <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-            {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+      <div className="relative">
+        <h2 className="text-2xl font-bold md:text-3xl">Оставьте заявку</h2>
+        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Заполните форму — менеджер уточнит детали, стоимость и сроки после проверки макета.</p>
+
+        <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Имя *</span>
+              <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
+              {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Телефон *</span>
+              <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
+              {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
+            </label>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Размер (32–60)</span>
+              <select className={inputClass('size')} value={values.size} onChange={(e) => setValues((prev) => ({ ...prev, size: e.target.value }))}>
+                <option value="">Не выбрано</option>
+                {sizes.map((size) => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Футболка</span>
+              <select className={inputClass('tshirtSource')} value={values.tshirtSource} onChange={(e) => setValues((prev) => ({ ...prev, tshirtSource: e.target.value }))}>
+                {tshirtSourceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Тип переноса *</span>
+              <select className={inputClass('transferType')} value={values.transferType} onChange={(e) => setValues((prev) => ({ ...prev, transferType: e.target.value }))}>
+                {transferTypeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              {errors.transferType && <span className="text-xs text-red-600">{errors.transferType}</span>}
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Сторона</span>
+              <select className={inputClass('side')} value={values.side} onChange={(e) => setValues((prev) => ({ ...prev, side: e.target.value }))}>
+                <option value="">Не выбрано</option>
+                {sideOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <label className="block space-y-2">
+            <span className="text-sm font-semibold">Комментарий</span>
+            <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
           </label>
 
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Телефон *</span>
-            <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
-            {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
-          </label>
-        </div>
+          <div className="space-y-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-800">
+            <ImageDropzone
+              value={file}
+              onChange={setFile}
+              title="Файл (необязательно)"
+              accept={MUGS_ALLOWED_EXTENSIONS.join(',')}
+              helperText={helperText}
+              allowedMimeTypes={[...MUGS_ALLOWED_MIME_TYPES]}
+              allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
+              invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
+              maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
+              className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
+              helperTextClassName="mt-1 text-xs text-muted-foreground"
+              icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
+            />
+            {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
+          </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Размер (32–60)</span>
-            <select className={inputClass('size')} value={values.size} onChange={(e) => setValues((prev) => ({ ...prev, size: e.target.value }))}>
-              <option value="">Не выбрано</option>
-              {sizes.map((size) => (
-                <option key={size} value={size}>{size}</option>
-              ))}
-            </select>
-          </label>
+          <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
 
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Футболка</span>
-            <select className={inputClass('tshirtSource')} value={values.tshirtSource} onChange={(e) => setValues((prev) => ({ ...prev, tshirtSource: e.target.value }))}>
-              {tshirtSourceOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </label>
-        </div>
+          <button
+            type="submit"
+            disabled={isSending}
+            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[200px]"
+          >
+            {isSending ? 'Отправка…' : 'Отправить заявку'}
+          </button>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Тип переноса *</span>
-            <select className={inputClass('transferType')} value={values.transferType} onChange={(e) => setValues((prev) => ({ ...prev, transferType: e.target.value }))}>
-              {transferTypeOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            {errors.transferType && <span className="text-xs text-red-600">{errors.transferType}</span>}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Сторона</span>
-            <select className={inputClass('side')} value={values.side} onChange={(e) => setValues((prev) => ({ ...prev, side: e.target.value }))}>
-              <option value="">Не выбрано</option>
-              {sideOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <label className="block space-y-2">
-          <span className="text-sm font-medium">Комментарий</span>
-          <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
-        </label>
-
-        <div className="space-y-2">
-          <ImageDropzone
-            value={file}
-            onChange={setFile}
-            title="Файл (необязательно)"
-            accept={MUGS_ALLOWED_EXTENSIONS.join(',')}
-            helperText={helperText}
-            allowedMimeTypes={[...MUGS_ALLOWED_MIME_TYPES]}
-            allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
-            invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
-            maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
-            className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
-            helperTextClassName="mt-1 text-xs text-muted-foreground"
-            icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
-          />
-          {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
-        </div>
-
-        <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
-
-        <button
-          type="submit"
-          disabled={isSending}
-          className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
-        >
-          {isSending ? 'Отправка…' : 'Отправить заявку'}
-        </button>
-
-        {formError && <p className="text-sm text-red-600">{formError}</p>}
-        {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
-      </form>
+          {formError && <p className="text-sm text-red-600">{formError}</p>}
+          {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
+        </form>
+      </div>
     </div>
   );
 }
