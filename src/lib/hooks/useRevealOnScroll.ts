@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type MutableRefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type MutableRefObject } from 'react';
 
 type RevealOptions = {
   threshold?: number;
@@ -11,6 +11,8 @@ type RevealResult<T extends HTMLElement> = {
   ref: MutableRefObject<T | null>;
   isVisible: boolean;
   prefersReducedMotion: boolean;
+  revealProps: { 'data-reveal': 'in' | 'out' };
+  getStaggerStyle: (delayMs: number) => CSSProperties;
 };
 
 export function useRevealOnScroll<T extends HTMLElement>({
@@ -25,6 +27,9 @@ export function useRevealOnScroll<T extends HTMLElement>({
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const onChange = (event: MediaQueryListEvent) => {
       setPrefersReducedMotion(event.matches);
+      if (event.matches) {
+        setIsVisible(true);
+      }
     };
 
     setPrefersReducedMotion(mediaQuery.matches);
@@ -63,5 +68,15 @@ export function useRevealOnScroll<T extends HTMLElement>({
     };
   }, [threshold, rootMargin]);
 
-  return { ref, isVisible, prefersReducedMotion };
+  const revealProps = useMemo<{ 'data-reveal': 'in' | 'out' }>(
+    () => ({ 'data-reveal': isVisible || prefersReducedMotion ? 'in' : 'out' }),
+    [isVisible, prefersReducedMotion],
+  );
+
+  const getStaggerStyle = (delayMs: number): CSSProperties => {
+    if (prefersReducedMotion) return {};
+    return { transitionDelay: `${delayMs}ms` };
+  };
+
+  return { ref, isVisible, prefersReducedMotion, revealProps, getStaggerStyle };
 }
