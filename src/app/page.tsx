@@ -30,8 +30,10 @@ export default async function Home() {
     if (isWideFormatService) return '/wide-format-printing';
     const isPlotterService = service?.id === 'plotter' || service?.title === 'Плоттерная резка';
     if (isPlotterService) return '/plotter-cutting';
-    const isHeatTransferService = service?.id === 'thermo' || service?.title === 'Термоперенос на футболки и кружки';
+    const isHeatTransferService = service?.id === 'thermo' || service?.title === 'Печать на футболках' || service?.title === 'Термоперенос на футболки и кружки';
     if (isHeatTransferService) return '/heat-transfer';
+    const isMugsService = service?.id === 'mugs' || service?.title === 'Печать на кружках';
+    if (isMugsService) return '/services/mugs';
     const isOutdoorService = service?.id === 'outdoor' || service?.title === 'Наружная реклама';
     if (isOutdoorService) return '/outdoor-advertising';
     return `/${service.slug}`;

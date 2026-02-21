@@ -6,9 +6,9 @@ export default function HeatTransferPage() {
     <div>
       <Section className="pb-8">
         <div className="card p-6 md:p-8">
-          <h1 className="text-3xl font-bold md:text-4xl">Термоперенос на кружки и футболки</h1>
+          <h1 className="text-3xl font-bold md:text-4xl">Печать на футболках</h1>
           <p className="mt-3 text-neutral-700 dark:text-neutral-300">
-            Рассчитайте стоимость для кружек, футболок или термоплёнки и отправьте заявку в один клик.
+            Рассчитайте стоимость термопереноса на футболки или термоплёнку и отправьте заявку в один клик.
           </p>
         </div>
       </Section>
