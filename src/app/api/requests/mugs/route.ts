@@ -28,6 +28,8 @@ const mugsRequestSchema = z.object({
   covering: z.string().trim().min(1),
   comment: z.string().trim().optional(),
   website: z.string().trim().optional(),
+  rawImageDataUrl: z.string().optional().nullable(),
+  mockPngDataUrl: z.string().optional().nullable(),
 });
 
 function toText(value: FormDataEntryValue | null): string {
@@ -40,14 +42,25 @@ function toBoolean(value: FormDataEntryValue | null): boolean {
   return value.trim().toLowerCase() === 'true';
 }
 
+
+function dataUrlToBuffer(dataUrl: string): { buffer: Buffer; mime: string } | null {
+  try {
+    const match = dataUrl.match(/^data:(.+);base64,(.*)$/);
+    if (!match) return null;
+    const mime = match[1];
+    const base64 = match[2];
+    const buffer = Buffer.from(base64, 'base64');
+    if (!buffer.length) return null;
+    return { buffer, mime };
+  } catch {
+    return null;
+  }
+}
+
 function isAllowedFile(file: File): boolean {
   const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase() ?? ''}` : '';
   const mime = file.type.toLowerCase();
   return allowedExtensionsSet.has(extension) || allowedMimeTypesSet.has(mime);
-}
-
-function formatFileSize(size: number): string {
-  return `${(size / 1024 / 1024).toFixed(2)} МБ`;
 }
 
 function isKnownCovering(value: string): boolean {
@@ -64,31 +77,28 @@ function buildMugsText(params: {
   quantity: number;
   coveringLabel: string;
   comment?: string;
-  file: File | null;
-  mockPreview: File | null;
-  printPreview: File | null;
-  layout: File | null;
-  referer: string;
-  ip: string;
   needsDesign: boolean;
+  rawAttached: boolean;
+  mockAttached: boolean;
 }): string {
   return [
-    '🆕 Новая заявка — Печать на кружках',
-    '',
     'Услуга: Печать на кружках',
-    `Имя: ${params.name}`,
-    `Телефон: ${params.phone}`,
-    `Количество: ${params.quantity}`,
-    `Покрытие: ${params.coveringLabel}`,
+    `Имя: ${params.name || '—'}`,
+    `Телефон: ${params.phone || '—'}`,
+    `Количество: ${params.quantity || 1}`,
+    `Покрытие: ${params.coveringLabel || '—'}`,
     `Комментарий: ${params.comment || '—'}`,
     `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`,
-    `Оригинал: ${params.file ? `${params.file.name} (${formatFileSize(params.file.size)})` : 'не прикреплён'}`,
-    `Mock preview: ${params.mockPreview ? `${params.mockPreview.name} (${formatFileSize(params.mockPreview.size)})` : 'не сгенерирован'}`,
-    `Print preview: ${params.printPreview ? `${params.printPreview.name} (${formatFileSize(params.printPreview.size)})` : 'не сгенерирован'}`,
-    `Layout JSON: ${params.layout ? `${params.layout.name} (${(params.layout.size / 1024).toFixed(1)} КБ)` : 'не сгенерирован'}`,
-    `Страница: ${params.referer || '—'}`,
-    `IP: ${params.ip}`,
+    `Исходник клиента: ${params.rawAttached ? 'прикреплен' : 'не прикреплен'}`,
+    `Макет на кружке: ${params.mockAttached ? 'прикреплен' : 'не прикреплен'}`,
   ].join('\n');
+}
+
+function extensionFromMime(mime?: string | null): string {
+  if (!mime) return '.png';
+  if (mime === 'image/jpeg') return '.jpg';
+  if (mime === 'image/png') return '.png';
+  return '.png';
 }
 
 async function sendMugsTelegramNotification(params: {
@@ -97,6 +107,7 @@ async function sendMugsTelegramNotification(params: {
   mockPreview: File | null;
   printPreview: File | null;
   layout: File | null;
+  rawImageDataUrl: string | null;
   mockPngDataUrl: string | null;
   name: string;
   phone: string;
@@ -113,49 +124,50 @@ async function sendMugsTelegramNotification(params: {
     return false;
   }
 
-  const caption = [
-    'Услуга: Печать на кружках',
-    `Имя: ${params.name}`,
-    `Телефон: ${params.phone}`,
-    `Количество: ${params.quantity}`,
-    `Покрытие: ${params.coveringLabel}`,
-    `Комментарий: ${params.comment || '—'}`,
-    `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`,
-  ].join('\n');
+  const mockImageFromDataUrl = params.mockPngDataUrl ? dataUrlToBuffer(params.mockPngDataUrl) : null;
+  const rawImageFromDataUrl = params.rawImageDataUrl ? dataUrlToBuffer(params.rawImageDataUrl) : null;
+
+  const rawFileBuffer = params.file ? Buffer.from(await params.file.arrayBuffer()) : null;
+  const rawFileMime = params.file?.type || null;
+  const hasRaw = Boolean(rawImageFromDataUrl || rawFileBuffer);
+  const hasMock = Boolean(mockImageFromDataUrl);
+
+  const caption = buildMugsText({
+    name: params.name,
+    phone: params.phone,
+    quantity: params.quantity,
+    coveringLabel: params.coveringLabel,
+    comment: params.comment,
+    needsDesign: params.needsDesign,
+    rawAttached: hasRaw,
+    mockAttached: hasMock,
+  });
 
   try {
-    await sendTelegramLead(params.text);
-
-    if (params.mockPngDataUrl) {
-      const prefix = 'data:image/png;base64,';
-      if (params.mockPngDataUrl.startsWith(prefix)) {
-        const bytes = Buffer.from(params.mockPngDataUrl.slice(prefix.length), 'base64');
-        await sendTelegramPhotoBuffer({
-          chatId,
-          token,
-          bytes,
-          caption: `${caption}\nФинальный мокап: прикреплён`,
-          filename: 'mug-mock-preview.png',
-        });
-      }
+    if (mockImageFromDataUrl) {
+      await sendTelegramPhotoBuffer({
+        chatId,
+        token,
+        bytes: mockImageFromDataUrl.buffer,
+        mime: mockImageFromDataUrl.mime,
+        caption,
+        filename: 'mug-mock-preview.png',
+      });
+    } else {
+      await sendTelegramLead(caption);
     }
 
-    const docs: Array<{ file: File | null; name: string; contentType: string; tag: string }> = [
-      { file: params.file, name: 'original-upload', contentType: params.file?.type || 'application/octet-stream', tag: 'Original file' },
-      { file: params.mockPreview, name: 'mug-mock-preview.png', contentType: 'image/png', tag: 'Mock preview (file)' },
-      { file: params.printPreview, name: 'mug-print-preview.png', contentType: 'image/png', tag: 'Print preview' },
-      { file: params.layout, name: 'mug-layout.json', contentType: 'application/json', tag: 'Layout JSON' },
-    ];
-
-    for (const doc of docs) {
-      if (!doc.file) continue;
+    if (rawImageFromDataUrl || rawFileBuffer) {
+      const rawBuffer = rawImageFromDataUrl?.buffer ?? rawFileBuffer;
+      const rawMime = rawImageFromDataUrl?.mime ?? rawFileMime ?? 'application/octet-stream';
+      const ext = extensionFromMime(rawMime);
       await sendTelegramDocumentBuffer({
         chatId,
         token,
-        caption: `${caption}\n${doc.tag}: attached`,
-        bytes: Buffer.from(await doc.file.arrayBuffer()),
-        filename: doc.file.name || doc.name,
-        contentType: doc.contentType,
+        caption: 'Исходник клиента (без сжатия)',
+        bytes: rawBuffer as Buffer,
+        filename: `original-client-upload${ext}`,
+        contentType: rawMime,
       });
     }
 
@@ -176,6 +188,7 @@ export async function POST(request: NextRequest) {
     const mockPreviewValue = formData.get('mockPreview');
     const printPreviewValue = formData.get('printPreview') ?? formData.get('preview');
     const layoutValue = formData.get('layout');
+    const rawImageDataUrl = toText(formData.get('rawImageDataUrl')) || null;
     const mockPngDataUrl = toText(formData.get('mockPngDataUrl')) || null;
 
     const needsDesign = toBoolean(formData.get('needsDesign'));
@@ -187,6 +200,8 @@ export async function POST(request: NextRequest) {
       covering: toText(formData.get('covering')),
       comment: toText(formData.get('comment')),
       website: toText(formData.get('website')),
+      rawImageDataUrl,
+      mockPngDataUrl,
     });
 
     if (!parsed.success) return NextResponse.json({ ok: false, error: 'Проверьте заполнение обязательных полей.' }, { status: 400 });
@@ -218,23 +233,15 @@ export async function POST(request: NextRequest) {
 
     const coveringLabel = getCoveringLabel(parsed.data.covering);
 
-    if (mockPngDataUrl && !mockPngDataUrl.startsWith('data:image/png;base64,')) {
-      return NextResponse.json({ ok: false, error: 'Некорректный формат mockPngDataUrl.' }, { status: 400 });
-    }
-
     const text = buildMugsText({
       name: parsed.data.name,
       phone: normalizedPhone,
       quantity: parsed.data.quantity,
       coveringLabel,
       comment: parsed.data.comment,
-      file,
-      mockPreview,
-      printPreview,
-      layout,
-      referer: request.headers.get('referer') || request.headers.get('origin') || '',
-      ip: getClientIp(request),
       needsDesign,
+      rawAttached: Boolean(rawImageDataUrl || file),
+      mockAttached: Boolean(mockPngDataUrl),
     });
 
     const attachments: EmailAttachment[] = [];
@@ -244,7 +251,7 @@ export async function POST(request: NextRequest) {
     if (layout) attachments.push({ filename: layout.name || 'mug-layout.json', content: Buffer.from(await layout.arrayBuffer()), contentType: 'application/json' });
 
     const [telegramSent, emailSent] = await Promise.all([
-      sendMugsTelegramNotification({ text, file, mockPreview, printPreview, layout, mockPngDataUrl, name: parsed.data.name, phone: normalizedPhone, quantity: parsed.data.quantity, coveringLabel, comment: parsed.data.comment, needsDesign }),
+      sendMugsTelegramNotification({ text, file, mockPreview, printPreview, layout, rawImageDataUrl, mockPngDataUrl, name: parsed.data.name, phone: normalizedPhone, quantity: parsed.data.quantity, coveringLabel, comment: parsed.data.comment, needsDesign }),
       sendEmailLead({ subject: 'Новая заявка — Печать на кружках', html: buildEmailHtmlFromText(text), attachments })
         .then(() => true)
         .catch((error) => {
