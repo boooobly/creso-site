@@ -188,8 +188,11 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       pixelRatio: 1,
     });
 
-    const targetWidth = Math.min(TARGET_MOCK_EXPORT_WIDTH, MOCKUP_WIDTH);
-    const targetHeight = Math.round((MOCKUP_HEIGHT * targetWidth) / MOCKUP_WIDTH);
+    const shouldDownscale = sourceCanvas.width > 2000;
+    const targetWidth = shouldDownscale ? Math.min(TARGET_MOCK_EXPORT_WIDTH, sourceCanvas.width) : sourceCanvas.width;
+    const targetHeight = shouldDownscale
+      ? Math.round((sourceCanvas.height * targetWidth) / sourceCanvas.width)
+      : sourceCanvas.height;
     const exportCanvas = document.createElement('canvas');
     exportCanvas.width = targetWidth;
     exportCanvas.height = targetHeight;
@@ -201,7 +204,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     exportContext.fillRect(0, 0, targetWidth, targetHeight);
     exportContext.drawImage(sourceCanvas, 0, 0, targetWidth, targetHeight);
 
-    const mockPngDataUrl = exportCanvas.toDataURL('image/png');
+    const mockPngDataUrl = exportCanvas.toDataURL('image/png', 1.0);
 
     const printPngDataUrl = printLayerRef.current.toDataURL({
       x: PRINT_RECT.x,
