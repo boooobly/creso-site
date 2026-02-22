@@ -5,7 +5,7 @@ import { env } from '@/lib/env';
 import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
 import { logger } from '@/lib/logger';
 import { EmailAttachment, sendEmailLead } from '@/lib/notifications/email';
-import { sendTelegramLead, sendTelegramPhotoBuffer } from '@/lib/notifications/telegram';
+import { sendTelegramLead, sendTelegramPhotoAlbumBuffer, sendTelegramPhotoBuffer } from '@/lib/notifications/telegram';
 import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram/sendDocumentWithCaption';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
