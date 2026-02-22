@@ -24,6 +24,16 @@ const complexityLevels = [
   { title: 'III', description: 'Сложный коллаж, много элементов, детальная допечатная подготовка.' },
 ];
 
+
+async function fileToDataUrl(file: File): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error('Не удалось прочитать файл.'));
+    reader.readAsDataURL(file);
+  });
+}
+
 const checklist = [
   'Нужна цветокоррекция/чистка исходника',
   'Несколько изображений в одном макете',
@@ -135,7 +145,11 @@ export default function OrderMugsForm() {
       formData.set('comment', values.comment.trim());
       formData.set('website', values.website);
       formData.set('needsDesign', needsDesign ? 'true' : 'false');
-      if (file) formData.set('file', file, file.name);
+      if (file) {
+        formData.set('file', file, file.name);
+        const rawImageDataUrl = await fileToDataUrl(file);
+        formData.set('rawImageDataUrl', rawImageDataUrl);
+      }
 
       const exported = await designerRef.current?.exportDesign();
       if (exported) {
