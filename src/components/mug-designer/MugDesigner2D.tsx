@@ -72,7 +72,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const [error, setError] = useState('');
   const [mockupImage, setMockupImage] = useState<HTMLImageElement | null>(null);
   const [userImage, setUserImage] = useState<HTMLImageElement | null>(null);
-  const [canvasWidth, setCanvasWidth] = useState(1100);
+  const [canvasWidth, setCanvasWidth] = useState(900);
   const [transform, setTransform] = useState<TransformState>(defaultTransform);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedElement, setSelectedElement] = useState<SelectedElement>(null);
@@ -80,41 +80,45 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const [removeWhiteBgLevel, setRemoveWhiteBgLevel] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  useImperativeHandle(ref, () => ({
-    exportDesign: async () => {
-      if (!stageRef.current || !printLayerRef.current || !userImage || !file) return null;
+  useImperativeHandle(
+    ref,
+    () => ({
+      exportDesign: async () => {
+        if (!stageRef.current || !printLayerRef.current || !userImage || !file) return null;
 
-      const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 2, mimeType: 'image/png' });
-      const printPngDataUrl = printLayerRef.current.toDataURL({
-        x: PRINT_RECT.x,
-        y: PRINT_RECT.y,
-        width: PRINT_RECT.width,
-        height: PRINT_RECT.height,
-        pixelRatio: 2,
-        mimeType: 'image/png',
-      });
+        const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 2, mimeType: 'image/png' });
+        const printPngDataUrl = printLayerRef.current.toDataURL({
+          x: PRINT_RECT.x,
+          y: PRINT_RECT.y,
+          width: PRINT_RECT.width,
+          height: PRINT_RECT.height,
+          pixelRatio: 1,
+          mimeType: 'image/png',
+        });
 
-      const layoutJson = JSON.stringify(
-        {
-          fileName: file.name,
-          printRect: PRINT_RECT,
-          image: {
-            x: transform.x,
-            y: transform.y,
-            scaleX: transform.scaleX,
-            scaleY: transform.scaleY,
-            rotation: transform.rotation,
-            width: userImage.width,
-            height: userImage.height,
+        const layoutJson = JSON.stringify(
+          {
+            fileName: file.name,
+            printRect: PRINT_RECT,
+            image: {
+              x: transform.x,
+              y: transform.y,
+              scaleX: transform.scaleX,
+              scaleY: transform.scaleY,
+              rotation: transform.rotation,
+              width: userImage.width,
+              height: userImage.height,
+            },
           },
-        },
-        null,
-        2,
-      );
+          null,
+          2,
+        );
 
-      return { mockPngDataUrl, printPngDataUrl, layoutJson };
-    },
-  }), [file, transform, userImage]);
+        return { mockPngDataUrl, printPngDataUrl, layoutJson };
+      },
+    }),
+    [file, transform, userImage],
+  );
 
   useEffect(() => {
     const image = new window.Image();
@@ -127,8 +131,8 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     if (!node) return;
 
     const observer = new ResizeObserver((entries) => {
-      const width = entries[0]?.contentRect.width ?? 1100;
-      setCanvasWidth(Math.min(width, 1100));
+      const width = entries[0]?.contentRect.width ?? 900;
+      setCanvasWidth(Math.min(width, 900));
     });
     observer.observe(node);
     return () => observer.disconnect();
@@ -201,28 +205,44 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const onFitToPrint = () => {
     if (!userImage) return;
     const nextScale = fitScale(userImage.width, userImage.height);
-    setTransform((prev) => ({ ...prev, x: PRINT_RECT.x + PRINT_RECT.width / 2, y: PRINT_RECT.y + PRINT_RECT.height / 2, scaleX: nextScale, scaleY: nextScale }));
+    setTransform((prev) => ({
+      ...prev,
+      x: PRINT_RECT.x + PRINT_RECT.width / 2,
+      y: PRINT_RECT.y + PRINT_RECT.height / 2,
+      scaleX: nextScale,
+      scaleY: nextScale,
+    }));
   };
 
   const onReset = () => {
     if (!userImage) return;
     const nextScale = fitScale(userImage.width, userImage.height);
-    setTransform({ x: PRINT_RECT.x + PRINT_RECT.width / 2, y: PRINT_RECT.y + PRINT_RECT.height / 2, scaleX: nextScale, scaleY: nextScale, rotation: 0 });
+    setTransform({
+      x: PRINT_RECT.x + PRINT_RECT.width / 2,
+      y: PRINT_RECT.y + PRINT_RECT.height / 2,
+      scaleX: nextScale,
+      scaleY: nextScale,
+      rotation: 0,
+    });
   };
 
-  const smallButtonClass = 'rounded-md border border-neutral-300 px-3 py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50';
+  const primaryButtonClass = 'rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700';
+  const secondaryButtonClass =
+    'rounded-md border border-neutral-200 bg-white px-4 py-2 text-sm transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50';
+  const toolButtonClass =
+    'rounded-md border border-neutral-200 bg-white px-3 py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50';
 
   if (!mockupImage) {
-    return <div className="rounded-xl border border-neutral-200 bg-white p-4 text-sm text-neutral-600">Загрузка конструктора…</div>;
+    return <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm text-sm text-neutral-600">Загрузка конструктора…</div>;
   }
 
   const stageScale = canvasWidth / mockupImage.width;
   const stageHeight = mockupImage.height * stageScale;
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-      <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-        <div ref={wrapperRef} className="mx-auto flex w-full max-w-[900px] justify-center overflow-hidden rounded-xl border border-neutral-200 bg-white p-4">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
+      <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div ref={wrapperRef} className="mx-auto flex w-full max-w-[900px] justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4">
           <Stage ref={stageRef} width={canvasWidth} height={stageHeight}>
             <Layer>
               <Group scaleX={stageScale} scaleY={stageScale}>
@@ -235,11 +255,24 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
             <Layer ref={printLayerRef}>
               <Group scaleX={stageScale} scaleY={stageScale}>
-                <Rect x={0} y={0} width={mockupImage.width} height={PRINT_RECT.y} fill="rgba(15,23,42,0.07)" />
-                <Rect x={0} y={PRINT_RECT.y + PRINT_RECT.height} width={mockupImage.width} height={mockupImage.height - (PRINT_RECT.y + PRINT_RECT.height)} fill="rgba(15,23,42,0.07)" />
-                <Rect x={0} y={PRINT_RECT.y} width={PRINT_RECT.x} height={PRINT_RECT.height} fill="rgba(15,23,42,0.07)" />
-                <Rect x={PRINT_RECT.x + PRINT_RECT.width} y={PRINT_RECT.y} width={mockupImage.width - (PRINT_RECT.x + PRINT_RECT.width)} height={PRINT_RECT.height} fill="rgba(15,23,42,0.07)" />
+                <Rect x={0} y={0} width={mockupImage.width} height={PRINT_RECT.y} fill="rgba(23,23,23,0.08)" />
+                <Rect
+                  x={0}
+                  y={PRINT_RECT.y + PRINT_RECT.height}
+                  width={mockupImage.width}
+                  height={mockupImage.height - (PRINT_RECT.y + PRINT_RECT.height)}
+                  fill="rgba(23,23,23,0.08)"
+                />
+                <Rect x={0} y={PRINT_RECT.y} width={PRINT_RECT.x} height={PRINT_RECT.height} fill="rgba(23,23,23,0.08)" />
+                <Rect
+                  x={PRINT_RECT.x + PRINT_RECT.width}
+                  y={PRINT_RECT.y}
+                  width={mockupImage.width - (PRINT_RECT.x + PRINT_RECT.width)}
+                  height={PRINT_RECT.height}
+                  fill="rgba(23,23,23,0.08)"
+                />
               </Group>
+
               <Group scaleX={stageScale} scaleY={stageScale} clipX={PRINT_RECT.x} clipY={PRINT_RECT.y} clipWidth={PRINT_RECT.width} clipHeight={PRINT_RECT.height}>
                 {userImage && (
                   <KonvaImage
@@ -281,25 +314,27 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                   />
                 )}
               </Group>
+
               <Group scaleX={stageScale} scaleY={stageScale}>
-                <Rect x={PRINT_RECT.x} y={PRINT_RECT.y} width={PRINT_RECT.width} height={PRINT_RECT.height} stroke="#2563eb" dash={[9, 6]} strokeWidth={2} />
+                <Rect x={PRINT_RECT.x} y={PRINT_RECT.y} width={PRINT_RECT.width} height={PRINT_RECT.height} stroke="#dc2626" dash={[6, 6]} strokeWidth={2} />
                 {isDragging && (
                   <>
-                    <Rect x={PRINT_RECT.x + PRINT_RECT.width / 2} y={PRINT_RECT.y} width={1} height={PRINT_RECT.height} fill="rgba(37,99,235,0.5)" dash={[6, 6]} />
-                    <Rect x={PRINT_RECT.x} y={PRINT_RECT.y + PRINT_RECT.height / 2} width={PRINT_RECT.width} height={1} fill="rgba(37,99,235,0.5)" dash={[6, 6]} />
+                    <Rect x={PRINT_RECT.x + PRINT_RECT.width / 2} y={PRINT_RECT.y} width={1} height={PRINT_RECT.height} fill="rgba(220,38,38,0.4)" />
+                    <Rect x={PRINT_RECT.x} y={PRINT_RECT.y + PRINT_RECT.height / 2} width={PRINT_RECT.width} height={1} fill="rgba(220,38,38,0.4)" />
                   </>
                 )}
               </Group>
+
               {userImage && selectedElement === 'image' && (
                 <Transformer
                   ref={transformerRef}
                   keepRatio
                   rotateEnabled
                   enabledAnchors={['top-left', 'top-center', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right']}
-                  anchorStroke="#ef4444"
-                  anchorFill="#ef4444"
+                  anchorStroke="#dc2626"
+                  anchorFill="#dc2626"
+                  borderStroke="#dc2626"
                   anchorSize={8}
-                  borderStroke="#ef4444"
                   boundBoxFunc={(oldBox, newBox) => {
                     if (newBox.width < MIN_IMAGE_SIDE || newBox.height < MIN_IMAGE_SIDE) return oldBox;
                     if (newBox.width > PRINT_RECT.width * MAX_IMAGE_SCALE || newBox.height > PRINT_RECT.height * MAX_IMAGE_SCALE) return oldBox;
@@ -316,7 +351,14 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                     node.x(next.x);
                     node.y(next.y);
 
-                    setTransform((prev) => ({ ...prev, x: next.x, y: next.y, scaleX: node.scaleX(), scaleY: node.scaleY(), rotation: node.rotation() }));
+                    setTransform((prev) => ({
+                      ...prev,
+                      x: next.x,
+                      y: next.y,
+                      scaleX: node.scaleX(),
+                      scaleY: node.scaleY(),
+                      rotation: node.rotation(),
+                    }));
                   }}
                 />
               )}
@@ -325,73 +367,99 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         </div>
       </section>
 
-      <aside className="space-y-4 rounded-xl border border-neutral-200 bg-white p-5 lg:sticky lg:top-6 lg:h-fit">
+      <aside className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm space-y-6">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Add content</p>
-          <button type="button" className="w-full rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700" onClick={() => undefined}>Add Text</button>
-          <label className="block w-full cursor-pointer rounded-md bg-sky-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-sky-700">
-            Upload Image
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
+          <button type="button" className={`w-full ${primaryButtonClass}`} onClick={() => undefined}>
+            Добавить текст
+          </button>
+          <label className={`block w-full cursor-pointer text-center ${primaryButtonClass}`}>
+            Загрузить изображение
             <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
           </label>
-          <button type="button" className="w-full rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700" onClick={() => undefined}>Add Clipart</button>
+          <button type="button" className={`w-full ${primaryButtonClass}`} onClick={() => undefined}>
+            Добавить клипарт
+          </button>
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
 
         {selectedElement === 'image' && userImage && (
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Edit controls</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Редактирование</p>
             <div className="grid grid-cols-2 gap-2">
-              <button type="button" className={smallButtonClass} onClick={() => onFileChange(null)}>Delete</button>
-              <button
-                type="button"
-                className={smallButtonClass}
-                onClick={() => {
-                  if (!userImage) return;
-                  setTransform((prev) => ({ ...prev, x: prev.x + 12, y: prev.y + 12 }));
-                }}
-              >
-                Duplicate
+              <button type="button" className={toolButtonClass} onClick={() => onFileChange(null)}>
+                Удалить
               </button>
-              <button type="button" className={smallButtonClass} onClick={() => setTransform((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }))}>Rotate 90°</button>
-              <button type="button" className={smallButtonClass} onClick={() => setTransform((prev) => ({ ...prev, scaleX: prev.scaleX * -1 }))}>Flip Horizontal</button>
-              <button type="button" className={smallButtonClass} onClick={() => setTransform((prev) => ({ ...prev, scaleY: prev.scaleY * -1 }))}>Flip Vertical</button>
-              <button type="button" className={smallButtonClass} onClick={onFitToPrint}>Fit to zone</button>
+              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, x: prev.x + 12, y: prev.y + 12 }))}>
+                Дублировать
+              </button>
+              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }))}>
+                Повернуть 90°
+              </button>
+              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, scaleX: prev.scaleX * -1 }))}>
+                Отразить по X
+              </button>
+              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, scaleY: prev.scaleY * -1 }))}>
+                Отразить по Y
+              </button>
+              <button type="button" className={toolButtonClass} onClick={onFitToPrint}>
+                Вписать в зону
+              </button>
             </div>
           </div>
         )}
 
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Image adjustments</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Настройки изображения</p>
           <label className="space-y-1 text-sm text-neutral-700">
-            <span>Opacity: {imageOpacity}%</span>
-            <input type="range" min={0} max={100} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))} className="w-full" />
+            <span>Непрозрачность: {imageOpacity}%</span>
+            <input type="range" min={0} max={100} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))} className="w-full accent-red-600" />
           </label>
           <label className="space-y-1 text-sm text-neutral-700">
-            <span>Remove white background (preview): {removeWhiteBgLevel}%</span>
-            <input type="range" min={0} max={100} value={removeWhiteBgLevel} onChange={(event) => setRemoveWhiteBgLevel(Number(event.target.value))} className="w-full" />
+            <span>Удалить белый фон (предпросмотр): {removeWhiteBgLevel}%</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={removeWhiteBgLevel}
+              onChange={(event) => setRemoveWhiteBgLevel(Number(event.target.value))}
+              className="w-full accent-red-600"
+            />
           </label>
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Product options</p>
-          <select className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm">
-            <option>330ml</option>
-          </select>
-          <div className="flex items-center justify-between rounded-md border border-neutral-300 px-2 py-1">
-            <button type="button" className="rounded px-3 py-1 text-lg text-neutral-600 hover:bg-neutral-100" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>-</button>
-            <span className="text-sm font-medium">{quantity}</span>
-            <button type="button" className="rounded px-3 py-1 text-lg text-neutral-600 hover:bg-neutral-100" onClick={() => setQuantity((prev) => prev + 1)}>+</button>
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Параметры</p>
+          <label className="space-y-1 text-sm text-neutral-700">
+            <span>Размер</span>
+            <select className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm">
+              <option>330 мл</option>
+            </select>
+          </label>
+          <div className="space-y-1">
+            <p className="text-sm text-neutral-700">Количество</p>
+            <div className="flex items-center justify-between rounded-md border border-neutral-200 bg-white px-2 py-1">
+              <button type="button" className={secondaryButtonClass} onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>
+                -
+              </button>
+              <span className="text-sm font-medium">{quantity}</span>
+              <button type="button" className={secondaryButtonClass} onClick={() => setQuantity((prev) => prev + 1)}>
+                +
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="space-y-3 border-t border-neutral-200 pt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Price</p>
-          <p className="text-3xl font-semibold">₴399</p>
-          <button type="button" className="w-full rounded-lg bg-gradient-to-r from-orange-400 to-orange-500 py-3 font-semibold text-white shadow-md transition hover:brightness-110">Add to Cart</button>
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Стоимость</p>
+          <p className="text-3xl font-semibold">490 ₽</p>
+          <button type="button" className={`w-full ${primaryButtonClass}`}>
+            Добавить в заказ
+          </button>
         </div>
 
-        <button type="button" onClick={onReset} disabled={!userImage} className="w-full rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50">
-          Reset design
+        <button type="button" onClick={onReset} disabled={!userImage} className={`w-full ${secondaryButtonClass}`}>
+          Сбросить макет
         </button>
       </aside>
     </div>
