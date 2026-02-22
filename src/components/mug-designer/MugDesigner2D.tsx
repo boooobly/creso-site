@@ -117,29 +117,6 @@ function parseDraft(raw: string | null): DesignerDraft | null {
 
 
 
-async function downscalePngDataUrl(dataUrl: string, targetWidth: number, targetHeight: number): Promise<string> {
-  const image = new window.Image();
-
-  await new Promise<void>((resolve, reject) => {
-    image.onload = () => resolve();
-    image.onerror = () => reject(new Error('Не удалось подготовить изображение для экспорта.'));
-    image.src = dataUrl;
-  });
-
-  const canvas = document.createElement('canvas');
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
-
-  const context = canvas.getContext('2d');
-  if (!context) return dataUrl;
-
-  context.fillStyle = '#ffffff';
-  context.fillRect(0, 0, targetWidth, targetHeight);
-  context.drawImage(image, 0, 0, targetWidth, targetHeight);
-
-  return canvas.toDataURL('image/png');
-}
-
 const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigner2D(
   { file, onFileChange, allowedExtensions, allowedMimeTypes, maxUploadMb, onExportChange },
   ref,
@@ -203,20 +180,28 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     if (!stageRef.current || !printLayerRef.current || (!userImage && !textLayer)) return null;
 
     const stage = stageRef.current;
-    const rawMockPngDataUrl = stage.toDataURL({
+    const sourceCanvas = stage.toCanvas({
       x: 0,
       y: 0,
       width: MOCKUP_WIDTH,
       height: MOCKUP_HEIGHT,
       pixelRatio: 1,
-      mimeType: 'image/png',
     });
 
     const targetWidth = Math.min(TARGET_MOCK_EXPORT_WIDTH, MOCKUP_WIDTH);
     const targetHeight = Math.round((MOCKUP_HEIGHT * targetWidth) / MOCKUP_WIDTH);
-    const mockPngDataUrl = targetWidth < MOCKUP_WIDTH
-      ? await downscalePngDataUrl(rawMockPngDataUrl, targetWidth, targetHeight)
-      : rawMockPngDataUrl;
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = targetWidth;
+    exportCanvas.height = targetHeight;
+
+    const exportContext = exportCanvas.getContext('2d');
+    if (!exportContext) return null;
+
+    exportContext.fillStyle = '#ffffff';
+    exportContext.fillRect(0, 0, targetWidth, targetHeight);
+    exportContext.drawImage(sourceCanvas, 0, 0, targetWidth, targetHeight);
+
+    const mockPngDataUrl = exportCanvas.toDataURL('image/png');
 
     const printPngDataUrl = printLayerRef.current.toDataURL({
       x: PRINT_RECT.x,
