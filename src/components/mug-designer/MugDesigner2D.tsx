@@ -35,8 +35,10 @@ type TextLayerState = {
   fontSize: number;
 };
 
+export type MugDesigner2DExport = { mockPngDataUrl: string; printPngDataUrl: string; layoutJson: string };
+
 export type MugDesigner2DHandle = {
-  exportDesign: () => Promise<{ mockPngDataUrl: string; printPngDataUrl: string; layoutJson: string } | null>;
+  exportDesign: () => Promise<MugDesigner2DExport | null>;
   hasRestorableDraft: () => boolean;
   restoreDraft: () => boolean;
   clearDraft: () => void;
@@ -48,6 +50,7 @@ type Props = {
   allowedExtensions: readonly string[];
   allowedMimeTypes: readonly string[];
   maxUploadMb: number;
+  onExportChange?: (next: MugDesigner2DExport | null) => void;
 };
 
 function fitScale(imgW: number, imgH: number): number {
@@ -112,7 +115,7 @@ function parseDraft(raw: string | null): DesignerDraft | null {
 }
 
 const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigner2D(
-  { file, onFileChange, allowedExtensions, allowedMimeTypes, maxUploadMb },
+  { file, onFileChange, allowedExtensions, allowedMimeTypes, maxUploadMb, onExportChange },
   ref,
 ) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -169,6 +172,24 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     2,
   );
 
+
+  const buildExport = (): MugDesigner2DExport | null => {
+    if (!stageRef.current || !printLayerRef.current || (!userImage && !textLayer)) return null;
+
+    const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 1, mimeType: 'image/png' });
+    const printPngDataUrl = printLayerRef.current.toDataURL({
+      x: PRINT_RECT.x,
+      y: PRINT_RECT.y,
+      width: PRINT_RECT.width,
+      height: PRINT_RECT.height,
+      pixelRatio: 1,
+      mimeType: 'image/png',
+    });
+
+    const layoutJson = buildLayoutJson();
+    return { mockPngDataUrl, printPngDataUrl, layoutJson };
+  };
+
   const applyLayoutJson = (layoutJson: string) => {
     try {
       const parsed = JSON.parse(layoutJson) as {
@@ -211,23 +232,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   useImperativeHandle(
     ref,
     () => ({
-      exportDesign: async () => {
-        if (!stageRef.current || !printLayerRef.current || (!userImage && !textLayer)) return null;
-
-        const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 1, mimeType: 'image/png' });
-        const printPngDataUrl = printLayerRef.current.toDataURL({
-          x: PRINT_RECT.x,
-          y: PRINT_RECT.y,
-          width: PRINT_RECT.width,
-          height: PRINT_RECT.height,
-          pixelRatio: 1,
-          mimeType: 'image/png',
-        });
-
-        const layoutJson = buildLayoutJson();
-
-        return { mockPngDataUrl, printPngDataUrl, layoutJson };
-      },
+      exportDesign: async () => buildExport(),
       hasRestorableDraft: () => Boolean(parseDraft(window.localStorage.getItem(DRAFT_KEY))),
       restoreDraft: () => {
         const draft = parseDraft(window.localStorage.getItem(DRAFT_KEY));
@@ -242,7 +247,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         window.localStorage.removeItem(DRAFT_KEY);
       },
     }),
-    [file, textLayer, transform, userImage],
+    [buildExport, file, textLayer, transform, userImage],
   );
 
   useEffect(() => {
@@ -354,6 +359,18 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
     return () => window.clearTimeout(timeoutId);
   }, [buildLayoutJson, quantity, textLayer, transform, userImage]);
+
+
+
+  useEffect(() => {
+    if (!onExportChange) return;
+
+    const timeoutId = window.setTimeout(() => {
+      onExportChange(buildExport());
+    }, 400);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [buildExport, onExportChange, textLayer, transform, userImage]);
 
   const isAllowed = useMemo(
     () => (candidate: File) => {

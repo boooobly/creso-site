@@ -14,7 +14,7 @@ import {
   MUGS_COVERING_OPTIONS,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
-import type { MugDesigner2DHandle } from '@/components/mug-designer/MugDesigner2D';
+import type { MugDesigner2DExport, MugDesigner2DHandle } from '@/components/mug-designer/MugDesigner2D';
 
 const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner2D'), { ssr: false });
 
@@ -77,6 +77,7 @@ export default function OrderMugsForm() {
   const [formError, setFormError] = useState('');
   const [needsDesign, setNeedsDesign] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
+  const [designerExport, setDesignerExport] = useState<MugDesigner2DExport | null>(null);
 
 
   useEffect(() => {
@@ -151,11 +152,17 @@ export default function OrderMugsForm() {
         formData.set('rawImageDataUrl', rawImageDataUrl);
       }
 
-      const exported = await designerRef.current?.exportDesign();
-      if (exported) {
-        const mockPreview = await dataUrlToFile(exported.mockPngDataUrl, 'mug-mock-preview.png');
-        const printPreview = await dataUrlToFile(exported.printPngDataUrl, 'mug-print-preview.png');
-        const layout = new File([exported.layoutJson], 'mug-layout.json', { type: 'application/json' });
+      const exportedAtSubmit = await designerRef.current?.exportDesign();
+      const latestExport = exportedAtSubmit ?? designerExport;
+
+      if (latestExport?.mockPngDataUrl) {
+        formData.set('mockPngDataUrl', latestExport.mockPngDataUrl);
+      }
+
+      if (latestExport) {
+        const mockPreview = await dataUrlToFile(latestExport.mockPngDataUrl, 'mug-mock-preview.png');
+        const printPreview = await dataUrlToFile(latestExport.printPngDataUrl, 'mug-print-preview.png');
+        const layout = new File([latestExport.layoutJson], 'mug-layout.json', { type: 'application/json' });
 
         if (mockPreview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024 || printPreview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
           setFormError(`Файл превью слишком большой. Максимум ${PREVIEW_MAX_SIZE_MB} МБ.`);
@@ -172,7 +179,6 @@ export default function OrderMugsForm() {
         formData.set('mockPreview', mockPreview, mockPreview.name);
         formData.set('printPreview', printPreview, printPreview.name);
         formData.set('layout', layout, layout.name);
-        formData.set('mockPngDataUrl', exported.mockPngDataUrl);
       }
 
       const response = await fetch('/api/requests/mugs', {
@@ -209,6 +215,7 @@ export default function OrderMugsForm() {
         allowedExtensions={MUGS_ALLOWED_EXTENSIONS}
         allowedMimeTypes={MUGS_ALLOWED_MIME_TYPES}
         maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
+        onExportChange={setDesignerExport}
       />
 
       {hasDraft && (
