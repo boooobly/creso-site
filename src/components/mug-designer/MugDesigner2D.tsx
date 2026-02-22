@@ -246,19 +246,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       clearDraft: () => {
         window.localStorage.removeItem(DRAFT_KEY);
       },
-      hasRestorableDraft: () => Boolean(parseDraft(window.localStorage.getItem(DRAFT_KEY))),
-      restoreDraft: () => {
-        const draft = parseDraft(window.localStorage.getItem(DRAFT_KEY));
-        if (!draft) return false;
-        applyLayoutJson(draft.layoutJson);
-        if (typeof draft.quantity === 'number' && Number.isFinite(draft.quantity)) {
-          setQuantity(Math.max(1, Math.round(draft.quantity)));
-        }
-        return true;
-      },
-      clearDraft: () => {
-        window.localStorage.removeItem(DRAFT_KEY);
-      },
     }),
     [buildExport, file, textLayer, transform, userImage],
   );
