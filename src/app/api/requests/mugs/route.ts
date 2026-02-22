@@ -5,7 +5,7 @@ import { env } from '@/lib/env';
 import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
 import { logger } from '@/lib/logger';
 import { EmailAttachment, sendEmailLead } from '@/lib/notifications/email';
-import { sendTelegramLead } from '@/lib/notifications/telegram';
+import { sendTelegramLead, sendTelegramPhotoBuffer } from '@/lib/notifications/telegram';
 import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram/sendDocumentWithCaption';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
@@ -32,6 +32,12 @@ const mugsRequestSchema = z.object({
 
 function toText(value: FormDataEntryValue | null): string {
   return typeof value === 'string' ? value.trim() : '';
+}
+
+
+function toBoolean(value: FormDataEntryValue | null): boolean {
+  if (typeof value !== 'string') return false;
+  return value.trim().toLowerCase() === 'true';
 }
 
 function isAllowedFile(file: File): boolean {
@@ -64,6 +70,7 @@ function buildMugsText(params: {
   layout: File | null;
   referer: string;
   ip: string;
+  needsDesign: boolean;
 }): string {
   return [
     '🆕 Новая заявка — Печать на кружках',
@@ -74,6 +81,7 @@ function buildMugsText(params: {
     `Количество: ${params.quantity}`,
     `Покрытие: ${params.coveringLabel}`,
     `Комментарий: ${params.comment || '—'}`,
+    `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`,
     `Оригинал: ${params.file ? `${params.file.name} (${formatFileSize(params.file.size)})` : 'не прикреплён'}`,
     `Mock preview: ${params.mockPreview ? `${params.mockPreview.name} (${formatFileSize(params.mockPreview.size)})` : 'не сгенерирован'}`,
     `Print preview: ${params.printPreview ? `${params.printPreview.name} (${formatFileSize(params.printPreview.size)})` : 'не сгенерирован'}`,
@@ -89,11 +97,13 @@ async function sendMugsTelegramNotification(params: {
   mockPreview: File | null;
   printPreview: File | null;
   layout: File | null;
+  mockPngDataUrl: string | null;
   name: string;
   phone: string;
   quantity: number;
   coveringLabel: string;
   comment?: string;
+  needsDesign: boolean;
 }): Promise<boolean> {
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
@@ -110,14 +120,29 @@ async function sendMugsTelegramNotification(params: {
     `Количество: ${params.quantity}`,
     `Покрытие: ${params.coveringLabel}`,
     `Комментарий: ${params.comment || '—'}`,
+    `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`,
   ].join('\n');
 
   try {
     await sendTelegramLead(params.text);
 
+    if (params.mockPngDataUrl) {
+      const prefix = 'data:image/png;base64,';
+      if (params.mockPngDataUrl.startsWith(prefix)) {
+        const bytes = Buffer.from(params.mockPngDataUrl.slice(prefix.length), 'base64');
+        await sendTelegramPhotoBuffer({
+          chatId,
+          token,
+          bytes,
+          caption: `${caption}\nФинальный мокап: прикреплён`,
+          filename: 'mug-mock-preview.png',
+        });
+      }
+    }
+
     const docs: Array<{ file: File | null; name: string; contentType: string; tag: string }> = [
       { file: params.file, name: 'original-upload', contentType: params.file?.type || 'application/octet-stream', tag: 'Original file' },
-      { file: params.mockPreview, name: 'mug-mock-preview.png', contentType: 'image/png', tag: 'Mock preview' },
+      { file: params.mockPreview, name: 'mug-mock-preview.png', contentType: 'image/png', tag: 'Mock preview (file)' },
       { file: params.printPreview, name: 'mug-print-preview.png', contentType: 'image/png', tag: 'Print preview' },
       { file: params.layout, name: 'mug-layout.json', contentType: 'application/json', tag: 'Layout JSON' },
     ];
@@ -151,6 +176,9 @@ export async function POST(request: NextRequest) {
     const mockPreviewValue = formData.get('mockPreview');
     const printPreviewValue = formData.get('printPreview') ?? formData.get('preview');
     const layoutValue = formData.get('layout');
+    const mockPngDataUrl = toText(formData.get('mockPngDataUrl')) || null;
+
+    const needsDesign = toBoolean(formData.get('needsDesign'));
 
     const parsed = mugsRequestSchema.safeParse({
       name: toText(formData.get('name')),
@@ -190,6 +218,10 @@ export async function POST(request: NextRequest) {
 
     const coveringLabel = getCoveringLabel(parsed.data.covering);
 
+    if (mockPngDataUrl && !mockPngDataUrl.startsWith('data:image/png;base64,')) {
+      return NextResponse.json({ ok: false, error: 'Некорректный формат mockPngDataUrl.' }, { status: 400 });
+    }
+
     const text = buildMugsText({
       name: parsed.data.name,
       phone: normalizedPhone,
@@ -202,6 +234,7 @@ export async function POST(request: NextRequest) {
       layout,
       referer: request.headers.get('referer') || request.headers.get('origin') || '',
       ip: getClientIp(request),
+      needsDesign,
     });
 
     const attachments: EmailAttachment[] = [];
@@ -211,7 +244,7 @@ export async function POST(request: NextRequest) {
     if (layout) attachments.push({ filename: layout.name || 'mug-layout.json', content: Buffer.from(await layout.arrayBuffer()), contentType: 'application/json' });
 
     const [telegramSent, emailSent] = await Promise.all([
-      sendMugsTelegramNotification({ text, file, mockPreview, printPreview, layout, name: parsed.data.name, phone: normalizedPhone, quantity: parsed.data.quantity, coveringLabel, comment: parsed.data.comment }),
+      sendMugsTelegramNotification({ text, file, mockPreview, printPreview, layout, mockPngDataUrl, name: parsed.data.name, phone: normalizedPhone, quantity: parsed.data.quantity, coveringLabel, comment: parsed.data.comment, needsDesign }),
       sendEmailLead({ subject: 'Новая заявка — Печать на кружках', html: buildEmailHtmlFromText(text), attachments })
         .then(() => true)
         .catch((error) => {
