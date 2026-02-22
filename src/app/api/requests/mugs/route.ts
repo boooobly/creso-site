@@ -63,10 +63,6 @@ function isAllowedFile(file: File): boolean {
   return allowedExtensionsSet.has(extension) || allowedMimeTypesSet.has(mime);
 }
 
-function formatFileSize(size: number): string {
-  return `${(size / 1024 / 1024).toFixed(2)} МБ`;
-}
-
 function isKnownCovering(value: string): boolean {
   return MUGS_COVERING_OPTIONS.some((option) => option.value === value);
 }
@@ -81,31 +77,28 @@ function buildMugsText(params: {
   quantity: number;
   coveringLabel: string;
   comment?: string;
-  file: File | null;
-  mockPreview: File | null;
-  printPreview: File | null;
-  layout: File | null;
-  referer: string;
-  ip: string;
   needsDesign: boolean;
+  rawAttached: boolean;
+  mockAttached: boolean;
 }): string {
   return [
-    '🆕 Новая заявка — Печать на кружках',
-    '',
     'Услуга: Печать на кружках',
-    `Имя: ${params.name}`,
-    `Телефон: ${params.phone}`,
-    `Количество: ${params.quantity}`,
-    `Покрытие: ${params.coveringLabel}`,
+    `Имя: ${params.name || '—'}`,
+    `Телефон: ${params.phone || '—'}`,
+    `Количество: ${params.quantity || 1}`,
+    `Покрытие: ${params.coveringLabel || '—'}`,
     `Комментарий: ${params.comment || '—'}`,
     `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`,
-    `Оригинал: ${params.file ? `${params.file.name} (${formatFileSize(params.file.size)})` : 'не прикреплён'}`,
-    `Mock preview: ${params.mockPreview ? `${params.mockPreview.name} (${formatFileSize(params.mockPreview.size)})` : 'не сгенерирован'}`,
-    `Print preview: ${params.printPreview ? `${params.printPreview.name} (${formatFileSize(params.printPreview.size)})` : 'не сгенерирован'}`,
-    `Layout JSON: ${params.layout ? `${params.layout.name} (${(params.layout.size / 1024).toFixed(1)} КБ)` : 'не сгенерирован'}`,
-    `Страница: ${params.referer || '—'}`,
-    `IP: ${params.ip}`,
+    `Исходник клиента: ${params.rawAttached ? 'прикреплен' : 'не прикреплен'}`,
+    `Макет на кружке: ${params.mockAttached ? 'прикреплен' : 'не прикреплен'}`,
   ].join('\n');
+}
+
+function extensionFromMime(mime?: string | null): string {
+  if (!mime) return '.png';
+  if (mime === 'image/jpeg') return '.jpg';
+  if (mime === 'image/png') return '.png';
+  return '.png';
 }
 
 async function sendMugsTelegramNotification(params: {
@@ -131,96 +124,50 @@ async function sendMugsTelegramNotification(params: {
     return false;
   }
 
-  const caption = [
-    'Услуга: Печать на кружках',
-    `Имя: ${params.name}`,
-    `Телефон: ${params.phone}`,
-    `Количество: ${params.quantity}`,
-    `Покрытие: ${params.coveringLabel}`,
-    `Комментарий: ${params.comment || '—'}`,
-    `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`,
-  ].join('\n');
+  const mockImageFromDataUrl = params.mockPngDataUrl ? dataUrlToBuffer(params.mockPngDataUrl) : null;
+  const rawImageFromDataUrl = params.rawImageDataUrl ? dataUrlToBuffer(params.rawImageDataUrl) : null;
+
+  const rawFileBuffer = params.file ? Buffer.from(await params.file.arrayBuffer()) : null;
+  const rawFileMime = params.file?.type || null;
+  const hasRaw = Boolean(rawImageFromDataUrl || rawFileBuffer);
+  const hasMock = Boolean(mockImageFromDataUrl);
+
+  const caption = buildMugsText({
+    name: params.name,
+    phone: params.phone,
+    quantity: params.quantity,
+    coveringLabel: params.coveringLabel,
+    comment: params.comment,
+    needsDesign: params.needsDesign,
+    rawAttached: hasRaw,
+    mockAttached: hasMock,
+  });
 
   try {
-    await sendTelegramLead(params.text);
-
-    const mockImageFromDataUrl = params.mockPngDataUrl ? dataUrlToBuffer(params.mockPngDataUrl) : null;
-    const rawImageFromDataUrl = params.rawImageDataUrl ? dataUrlToBuffer(params.rawImageDataUrl) : null;
-
-    const imageStatusCaption = `${caption}
-Исходник клиента: ${rawImageFromDataUrl ? 'прикреплен' : 'не прикреплен'}
-Макет на кружке: ${mockImageFromDataUrl ? 'прикреплен' : 'не прикреплен'}`;
-
-    const mockItem = mockImageFromDataUrl
-      ? { bytes: mockImageFromDataUrl.buffer, mime: mockImageFromDataUrl.mime, filename: 'mug-mock-preview.png' }
-      : null;
-    const rawItem = rawImageFromDataUrl
-      ? { bytes: rawImageFromDataUrl.buffer, mime: rawImageFromDataUrl.mime, filename: 'mug-raw-upload.png' }
-      : null;
-
-    if (mockItem && rawItem) {
-      try {
-        await sendTelegramPhotoAlbumBuffer({
-          chatId,
-          token,
-          items: [mockItem, rawItem],
-          caption: imageStatusCaption,
-        });
-      } catch {
-        await sendTelegramPhotoBuffer({
-          chatId,
-          token,
-          bytes: mockItem.bytes,
-          mime: mockItem.mime,
-          caption: imageStatusCaption,
-          filename: mockItem.filename,
-        });
-        await sendTelegramPhotoBuffer({
-          chatId,
-          token,
-          bytes: rawItem.bytes,
-          mime: rawItem.mime,
-          caption: 'Исходник клиента',
-          filename: rawItem.filename,
-        });
-      }
-    } else if (mockItem) {
+    if (mockImageFromDataUrl) {
       await sendTelegramPhotoBuffer({
         chatId,
         token,
-        bytes: mockItem.bytes,
-        mime: mockItem.mime,
-        caption: imageStatusCaption,
-        filename: mockItem.filename,
+        bytes: mockImageFromDataUrl.buffer,
+        mime: mockImageFromDataUrl.mime,
+        caption,
+        filename: 'mug-mock-preview.png',
       });
-    } else if (rawItem) {
-      await sendTelegramPhotoBuffer({
-        chatId,
-        token,
-        bytes: rawItem.bytes,
-        mime: rawItem.mime,
-        caption: imageStatusCaption,
-        filename: rawItem.filename,
-      });
+    } else {
+      await sendTelegramLead(caption);
     }
 
-
-    const docs: Array<{ file: File | null; name: string; contentType: string; tag: string }> = [
-      { file: params.file, name: 'original-upload', contentType: params.file?.type || 'application/octet-stream', tag: 'Original file' },
-      { file: params.mockPreview, name: 'mug-mock-preview.png', contentType: 'image/png', tag: 'Mock preview (file)' },
-      { file: params.printPreview, name: 'mug-print-preview.png', contentType: 'image/png', tag: 'Print preview' },
-      { file: params.layout, name: 'mug-layout.json', contentType: 'application/json', tag: 'Layout JSON' },
-    ];
-
-    for (const doc of docs) {
-      if (!doc.file) continue;
+    if (rawImageFromDataUrl || rawFileBuffer) {
+      const rawBuffer = rawImageFromDataUrl?.buffer ?? rawFileBuffer;
+      const rawMime = rawImageFromDataUrl?.mime ?? rawFileMime ?? 'application/octet-stream';
+      const ext = extensionFromMime(rawMime);
       await sendTelegramDocumentBuffer({
         chatId,
         token,
-        caption: `${caption}\n${doc.tag}: attached`,
-        bytes: Buffer.from(await doc.file.arrayBuffer()),
-        filename: doc.file.name || doc.name,
-        contentType: doc.contentType,
+        caption: 'Исходник клиента (без сжатия)',
+        bytes: rawBuffer as Buffer,
+        filename: `original-client-upload${ext}`,
+        contentType: rawMime,
       });
     }
 
@@ -292,13 +239,9 @@ export async function POST(request: NextRequest) {
       quantity: parsed.data.quantity,
       coveringLabel,
       comment: parsed.data.comment,
-      file,
-      mockPreview,
-      printPreview,
-      layout,
-      referer: request.headers.get('referer') || request.headers.get('origin') || '',
-      ip: getClientIp(request),
       needsDesign,
+      rawAttached: Boolean(rawImageDataUrl || file),
+      mockAttached: Boolean(mockPngDataUrl),
     });
 
     const attachments: EmailAttachment[] = [];
