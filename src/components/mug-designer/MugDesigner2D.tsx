@@ -45,13 +45,13 @@ function clampScale(value: number): number {
 }
 
 function clampPosition(x: number, y: number, width: number, height: number): { x: number; y: number } {
-  const minVisibleX = Math.min(width * 0.25, PRINT_RECT.width * 0.35);
-  const minVisibleY = Math.min(height * 0.25, PRINT_RECT.height * 0.35);
+  const requiredOverlapX = Math.min(width * 0.1, PRINT_RECT.width * 0.2);
+  const requiredOverlapY = Math.min(height * 0.1, PRINT_RECT.height * 0.2);
 
-  const minX = PRINT_RECT.x - width / 2 + minVisibleX;
-  const maxX = PRINT_RECT.x + PRINT_RECT.width + width / 2 - minVisibleX;
-  const minY = PRINT_RECT.y - height / 2 + minVisibleY;
-  const maxY = PRINT_RECT.y + PRINT_RECT.height + height / 2 - minVisibleY;
+  const minX = PRINT_RECT.x - width / 2 + requiredOverlapX;
+  const maxX = PRINT_RECT.x + PRINT_RECT.width + width / 2 - requiredOverlapX;
+  const minY = PRINT_RECT.y - height / 2 + requiredOverlapY;
+  const maxY = PRINT_RECT.y + PRINT_RECT.height + height / 2 - requiredOverlapY;
 
   return {
     x: Math.min(Math.max(x, minX), maxX),
@@ -263,7 +263,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
             </Layer>
 
             <Layer ref={printLayerRef}>
-              <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0.10)" />
+              <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0.10)" listening={false} />
               <Rect
                 x={PRINT_RECT.x}
                 y={PRINT_RECT.y}
@@ -272,6 +272,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                 cornerRadius={8}
                 fill="black"
                 globalCompositeOperation="destination-out"
+                listening={false}
               />
 
               <Group clipX={PRINT_RECT.x} clipY={PRINT_RECT.y} clipWidth={PRINT_RECT.width} clipHeight={PRINT_RECT.height}>
@@ -289,7 +290,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                     scaleY={transform.scaleY}
                     rotation={transform.rotation}
                     opacity={imageOpacity / 100}
-                    draggable
+                    draggable={true}
                     dragBoundFunc={(position) => {
                       const width = userImage.width * Math.abs(transform.scaleX);
                       const height = userImage.height * Math.abs(transform.scaleY);
@@ -325,12 +326,13 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                 stroke="#dc2626"
                 dash={[10, 8]}
                 strokeWidth={4}
+                listening={false}
               />
 
               {isDragging && (
                 <>
-                  <Rect x={PRINT_RECT.x + PRINT_RECT.width / 2} y={PRINT_RECT.y} width={2} height={PRINT_RECT.height} fill="rgba(220,38,38,0.35)" />
-                  <Rect x={PRINT_RECT.x} y={PRINT_RECT.y + PRINT_RECT.height / 2} width={PRINT_RECT.width} height={2} fill="rgba(220,38,38,0.35)" />
+                  <Rect x={PRINT_RECT.x + PRINT_RECT.width / 2} y={PRINT_RECT.y} width={2} height={PRINT_RECT.height} fill="rgba(220,38,38,0.35)" listening={false} />
+                  <Rect x={PRINT_RECT.x} y={PRINT_RECT.y + PRINT_RECT.height / 2} width={PRINT_RECT.width} height={2} fill="rgba(220,38,38,0.35)" listening={false} />
                 </>
               )}
 
