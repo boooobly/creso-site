@@ -18,6 +18,23 @@ import type { MugDesigner2DHandle } from '@/components/mug-designer/MugDesigner2
 
 const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner2D'), { ssr: false });
 
+const complexityLevels = [
+  { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
+  { title: 'II', description: 'Комбинация текста и графики, умеренная подготовка и правки.' },
+  { title: 'III', description: 'Сложный коллаж, много элементов, детальная допечатная подготовка.' },
+];
+
+const checklist = [
+  'Нужна цветокоррекция/чистка исходника',
+  'Несколько изображений в одном макете',
+  'Сложная типографика или много текста',
+  'Нестандартная композиция по кругу кружки',
+  'Подготовка варианта для глянца и мата',
+  'Замена фона/ретушь',
+  'Подбор фирменных цветов по брендбуку',
+  'Срочная подготовка макета',
+];
+
 type FormValues = {
   name: string;
   phone: string;
@@ -48,6 +65,7 @@ export default function OrderMugsForm() {
   const [hasHandleOverlap, setHasHandleOverlap] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
+  const [needsDesign, setNeedsDesign] = useState(false);
 
   const inputClass = (name: keyof FormValues) => [
     'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
@@ -96,6 +114,7 @@ export default function OrderMugsForm() {
       formData.set('covering', values.covering);
       formData.set('comment', values.comment.trim());
       formData.set('website', values.website);
+      formData.set('needsDesign', needsDesign ? 'true' : 'false');
       if (file) formData.set('file', file, file.name);
 
       const exported = await designerRef.current?.exportDesign();
@@ -119,6 +138,7 @@ export default function OrderMugsForm() {
         formData.set('mockPreview', mockPreview, mockPreview.name);
         formData.set('printPreview', printPreview, printPreview.name);
         formData.set('layout', layout, layout.name);
+        formData.set('mockPngDataUrl', exported.mockPngDataUrl);
       }
 
       const response = await fetch('/api/requests/mugs', {
@@ -136,6 +156,7 @@ export default function OrderMugsForm() {
       setSuccessMessage('Спасибо! Мы свяжемся с вами в ближайшее время.');
       setValues(defaultValues);
       setFile(null);
+      setNeedsDesign(false);
       setHasHandleOverlap(false);
       setErrors({});
     } catch {
@@ -162,6 +183,60 @@ export default function OrderMugsForm() {
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={needsDesign}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  setNeedsDesign(checked);
+                  if (checked) {
+                    requestAnimationFrame(() => {
+                      document.getElementById('mug-design-info')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                  }
+                }}
+                className="mt-1 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500"
+              />
+              <span>
+                <span className="text-sm font-medium text-neutral-900">Нужен дизайн макета для кружки</span>
+                <span className="mt-1 block text-xs text-neutral-600">Если отметите, покажем варианты сложности и что входит в подготовку.</span>
+              </span>
+            </label>
+
+            <div
+              id="mug-design-info"
+              className={needsDesign
+                ? 'mt-4 overflow-hidden transition-all duration-300 ease-out opacity-100 max-h-[2000px]'
+                : 'mt-0 overflow-hidden transition-all duration-300 ease-out opacity-0 max-h-0 pointer-events-none'}
+            >
+              <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4">
+                <h3 className="text-xl font-semibold">Дизайн</h3>
+                <p className="text-sm text-neutral-700">3 макета входит в стоимость.</p>
+
+                <div>
+                  <h4 className="text-lg font-medium">Категории сложности I/II/III</h4>
+                  <ul className="mt-3 space-y-2 text-sm text-neutral-700">
+                    {complexityLevels.map((level) => (
+                      <li key={level.title}><span className="font-semibold">{level.title}:</span> {level.description}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-medium">Чек-лист (+1 за каждый пункт)</h4>
+                  <ul className="mt-3 grid gap-2 text-sm text-neutral-700 md:grid-cols-2">
+                    {checklist.map((item) => (
+                      <li key={item}>• {item}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-4 text-sm text-neutral-700">Интерпретация: 0–2 → I, 3–5 → II, 6–8 → III.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
               <span className="text-sm font-medium">Имя *</span>
