@@ -55,7 +55,11 @@ const defaultValues: FormValues = {
   website: '',
 };
 
-export default function OrderMugsForm() {
+type Props = {
+  needsDesign?: boolean;
+};
+
+export default function OrderMugsForm({ needsDesign = false }: Props) {
   const designerRef = useRef<MugDesigner2DHandle | null>(null);
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
