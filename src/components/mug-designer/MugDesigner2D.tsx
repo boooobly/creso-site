@@ -487,14 +487,14 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const stageScale = viewportWidth / MOCKUP_WIDTH;
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-md sm:p-8">
+    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
       <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Соберите макет</h2>
         <p className="mt-2 text-sm text-neutral-600 sm:text-base">Загрузите изображение или добавьте текст. Итоговый макет мы проверим перед печатью.</p>
         <p className="mt-2 text-xs text-neutral-500">Подсказка: выделите объект, чтобы изменить размер и поворот.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_360px]">
         <section className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
           <div className="mb-3 flex items-center justify-between text-xs text-neutral-500">
             <span>Область печати</span>
