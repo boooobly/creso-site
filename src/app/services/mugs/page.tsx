@@ -70,9 +70,7 @@ export default function MugsServicePage() {
         </div>
       </Section>
 
-      <Section id="mugs-request" className="pt-0 pb-12">
-        <OrderMugsForm />
-      </Section>
+      <MugsDesignAndOrderSection complexityLevels={complexityLevels} checklist={checklist} />
 
       {process.env.NODE_ENV !== 'production' && (
         <Section className="pt-0 pb-6">
