@@ -55,3 +55,37 @@ export async function sendTelegramPhotoBuffer(params: {
     throw new Error(`Telegram photo send failed: ${response.status} ${details}`);
   }
 }
+
+
+export async function sendTelegramPhotoAlbumBuffer(params: {
+  token: string;
+  chatId: string;
+  items: Array<{ bytes: Buffer; mime?: string; filename?: string }>;
+  caption?: string;
+}): Promise<void> {
+  const formData = new FormData();
+  formData.set('chat_id', params.chatId);
+
+  const media = params.items.map((item, index) => ({
+    type: 'photo' as const,
+    media: `attach://photo${index}`,
+    ...(index === 0 && params.caption ? { caption: params.caption.slice(0, 1024) } : {}),
+  }));
+
+  formData.set('media', JSON.stringify(media));
+
+  params.items.forEach((item, index) => {
+    const photoBlob = new Blob([new Uint8Array(item.bytes)], { type: item.mime || 'image/png' });
+    formData.set(`photo${index}`, photoBlob, item.filename || `photo-${index + 1}.png`);
+  });
+
+  const response = await fetch(`${TELEGRAM_API_BASE}/bot${params.token}/sendMediaGroup`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const details = await response.text().catch(() => '');
+    throw new Error(`Telegram media group send failed: ${response.status} ${details}`);
+  }
+}

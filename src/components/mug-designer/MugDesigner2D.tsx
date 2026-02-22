@@ -37,6 +37,9 @@ type TextLayerState = {
 
 export type MugDesigner2DHandle = {
   exportDesign: () => Promise<{ mockPngDataUrl: string; printPngDataUrl: string; layoutJson: string } | null>;
+  hasRestorableDraft: () => boolean;
+  restoreDraft: () => boolean;
+  clearDraft: () => void;
 };
 
 type Props = {
@@ -81,6 +84,33 @@ const defaultTransform: TransformState = {
   rotation: 0,
 };
 
+
+const DRAFT_KEY = 'mugsDesignerDraft:v1';
+const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+type DesignerDraft = {
+  version: 1;
+  savedAt: string;
+  layoutJson: string;
+  quantity?: number;
+  needsDesign?: boolean;
+  mockPngDataUrl?: string;
+  printPngDataUrl?: string;
+};
+
+function parseDraft(raw: string | null): DesignerDraft | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<DesignerDraft>;
+    if (parsed.version !== 1 || typeof parsed.layoutJson !== 'string' || typeof parsed.savedAt !== 'string') return null;
+    const savedTime = Date.parse(parsed.savedAt);
+    if (!Number.isFinite(savedTime) || Date.now() - savedTime > DRAFT_MAX_AGE_MS) return null;
+    return parsed as DesignerDraft;
+  } catch {
+    return null;
+  }
+}
+
 const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigner2D(
   { file, onFileChange, allowedExtensions, allowedMimeTypes, maxUploadMb },
   ref,
@@ -105,6 +135,79 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const [quantity, setQuantity] = useState(1);
   const [textLayer, setTextLayer] = useState<TextLayerState | null>(null);
 
+
+  const buildLayoutJson = () => JSON.stringify(
+    {
+      fileName: file?.name ?? null,
+      printRect: PRINT_RECT,
+      image: userImage
+        ? {
+            x: transform.x,
+            y: transform.y,
+            scaleX: transform.scaleX,
+            scaleY: transform.scaleY,
+            rotation: transform.rotation,
+            width: userImage.width,
+            height: userImage.height,
+          }
+        : null,
+      text: textLayer
+        ? {
+            text: textLayer.text,
+            x: textLayer.x,
+            y: textLayer.y,
+            rotation: textLayer.rotation,
+            width: textLayer.width,
+            height: textLayer.height,
+            scaleX: textLayer.scaleX,
+            scaleY: textLayer.scaleY,
+            fontSize: textLayer.fontSize,
+          }
+        : null,
+    },
+    null,
+    2,
+  );
+
+  const applyLayoutJson = (layoutJson: string) => {
+    try {
+      const parsed = JSON.parse(layoutJson) as {
+        image?: Partial<TransformState> | null;
+        text?: Partial<TextLayerState> | null;
+      };
+
+      if (parsed.image && userImage) {
+        setTransform((prev) => ({
+          ...prev,
+          x: typeof parsed.image?.x === 'number' ? parsed.image.x : prev.x,
+          y: typeof parsed.image?.y === 'number' ? parsed.image.y : prev.y,
+          scaleX: typeof parsed.image?.scaleX === 'number' ? parsed.image.scaleX : prev.scaleX,
+          scaleY: typeof parsed.image?.scaleY === 'number' ? parsed.image.scaleY : prev.scaleY,
+          rotation: typeof parsed.image?.rotation === 'number' ? parsed.image.rotation : prev.rotation,
+        }));
+      }
+
+      if (parsed.text) {
+        setTextLayer((prev) => {
+          if (!prev && typeof parsed.text?.text !== 'string') return prev;
+          return {
+            text: typeof parsed.text?.text === 'string' ? parsed.text.text : prev?.text ?? 'Текст на кружке',
+            x: typeof parsed.text?.x === 'number' ? parsed.text.x : prev?.x ?? PRINT_RECT.x + PRINT_RECT.width / 2,
+            y: typeof parsed.text?.y === 'number' ? parsed.text.y : prev?.y ?? PRINT_RECT.y + PRINT_RECT.height / 2,
+            rotation: typeof parsed.text?.rotation === 'number' ? parsed.text.rotation : prev?.rotation ?? 0,
+            width: typeof parsed.text?.width === 'number' ? parsed.text.width : prev?.width ?? 260,
+            height: typeof parsed.text?.height === 'number' ? parsed.text.height : prev?.height ?? 40,
+            scaleX: typeof parsed.text?.scaleX === 'number' ? parsed.text.scaleX : prev?.scaleX ?? 1,
+            scaleY: typeof parsed.text?.scaleY === 'number' ? parsed.text.scaleY : prev?.scaleY ?? 1,
+            fontSize: typeof parsed.text?.fontSize === 'number' ? parsed.text.fontSize : prev?.fontSize ?? 36,
+          };
+        });
+      }
+    } catch {
+      // ignore corrupted layout
+    }
+  };
+
   useImperativeHandle(
     ref,
     () => ({
@@ -121,40 +224,22 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
           mimeType: 'image/png',
         });
 
-        const layoutJson = JSON.stringify(
-          {
-            fileName: file?.name ?? null,
-            printRect: PRINT_RECT,
-            image: userImage
-              ? {
-                  x: transform.x,
-                  y: transform.y,
-                  scaleX: transform.scaleX,
-                  scaleY: transform.scaleY,
-                  rotation: transform.rotation,
-                  width: userImage.width,
-                  height: userImage.height,
-                }
-              : null,
-            text: textLayer
-              ? {
-                  text: textLayer.text,
-                  x: textLayer.x,
-                  y: textLayer.y,
-                  rotation: textLayer.rotation,
-                  width: textLayer.width,
-                  height: textLayer.height,
-                  scaleX: textLayer.scaleX,
-                  scaleY: textLayer.scaleY,
-                  fontSize: textLayer.fontSize,
-                }
-              : null,
-          },
-          null,
-          2,
-        );
+        const layoutJson = buildLayoutJson();
 
         return { mockPngDataUrl, printPngDataUrl, layoutJson };
+      },
+      hasRestorableDraft: () => Boolean(parseDraft(window.localStorage.getItem(DRAFT_KEY))),
+      restoreDraft: () => {
+        const draft = parseDraft(window.localStorage.getItem(DRAFT_KEY));
+        if (!draft) return false;
+        applyLayoutJson(draft.layoutJson);
+        if (typeof draft.quantity === 'number' && Number.isFinite(draft.quantity)) {
+          setQuantity(Math.max(1, Math.round(draft.quantity)));
+        }
+        return true;
+      },
+      clearDraft: () => {
+        window.localStorage.removeItem(DRAFT_KEY);
       },
     }),
     [file, textLayer, transform, userImage],
@@ -230,6 +315,45 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       transformerRef.current.getLayer()?.batchDraw();
     }
   }, [selectedElement, textLayer, userImage]);
+
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      if (!userImage && !textLayer) return;
+
+      const payload: DesignerDraft = {
+        version: 1,
+        savedAt: new Date().toISOString(),
+        layoutJson: buildLayoutJson(),
+        quantity,
+      };
+
+      if (stageRef.current && printLayerRef.current) {
+        try {
+          const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 1, mimeType: 'image/png' });
+          const printPngDataUrl = printLayerRef.current.toDataURL({
+            x: PRINT_RECT.x,
+            y: PRINT_RECT.y,
+            width: PRINT_RECT.width,
+            height: PRINT_RECT.height,
+            pixelRatio: 1,
+            mimeType: 'image/png',
+          });
+          const maxPreviewLength = 1_200_000;
+          if (mockPngDataUrl.length <= maxPreviewLength && printPngDataUrl.length <= maxPreviewLength) {
+            payload.mockPngDataUrl = mockPngDataUrl;
+            payload.printPngDataUrl = printPngDataUrl;
+          }
+        } catch {
+          // preview export is optional for autosave
+        }
+      }
+
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+    }, 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [buildLayoutJson, quantity, textLayer, transform, userImage]);
 
   const isAllowed = useMemo(
     () => (candidate: File) => {
