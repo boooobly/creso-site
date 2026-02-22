@@ -89,6 +89,7 @@ const defaultTransform: TransformState = {
 
 
 const DRAFT_KEY = 'mugsDesignerDraft:v1';
+const TARGET_MOCK_EXPORT_WIDTH = 1800;
 const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 type DesignerDraft = {
@@ -112,6 +113,31 @@ function parseDraft(raw: string | null): DesignerDraft | null {
   } catch {
     return null;
   }
+}
+
+
+
+async function downscalePngDataUrl(dataUrl: string, targetWidth: number, targetHeight: number): Promise<string> {
+  const image = new window.Image();
+
+  await new Promise<void>((resolve, reject) => {
+    image.onload = () => resolve();
+    image.onerror = () => reject(new Error('Не удалось подготовить изображение для экспорта.'));
+    image.src = dataUrl;
+  });
+
+  const canvas = document.createElement('canvas');
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+
+  const context = canvas.getContext('2d');
+  if (!context) return dataUrl;
+
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, targetWidth, targetHeight);
+  context.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+  return canvas.toDataURL('image/png');
 }
 
 const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigner2D(
@@ -173,10 +199,25 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   );
 
 
-  const buildExport = (): MugDesigner2DExport | null => {
+  const buildExport = async (): Promise<MugDesigner2DExport | null> => {
     if (!stageRef.current || !printLayerRef.current || (!userImage && !textLayer)) return null;
 
-    const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 1, mimeType: 'image/png' });
+    const stage = stageRef.current;
+    const rawMockPngDataUrl = stage.toDataURL({
+      x: 0,
+      y: 0,
+      width: MOCKUP_WIDTH,
+      height: MOCKUP_HEIGHT,
+      pixelRatio: 1,
+      mimeType: 'image/png',
+    });
+
+    const targetWidth = Math.min(TARGET_MOCK_EXPORT_WIDTH, MOCKUP_WIDTH);
+    const targetHeight = Math.round((MOCKUP_HEIGHT * targetWidth) / MOCKUP_WIDTH);
+    const mockPngDataUrl = targetWidth < MOCKUP_WIDTH
+      ? await downscalePngDataUrl(rawMockPngDataUrl, targetWidth, targetHeight)
+      : rawMockPngDataUrl;
+
     const printPngDataUrl = printLayerRef.current.toDataURL({
       x: PRINT_RECT.x,
       y: PRINT_RECT.y,
@@ -366,7 +407,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     if (!onExportChange) return;
 
     const timeoutId = window.setTimeout(() => {
-      onExportChange(buildExport());
+      void buildExport()
+        .then((nextExport) => onExportChange(nextExport))
+        .catch(() => onExportChange(null));
     }, 400);
 
     return () => window.clearTimeout(timeoutId);
@@ -486,6 +529,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                 }}
               >
                 <Layer>
+                  <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="#ffffff" listening={false} />
                   <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
                 </Layer>
 
