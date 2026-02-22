@@ -2,24 +2,7 @@ import Section from '@/components/Section';
 import Link from 'next/link';
 import Image from 'next/image';
 import MugPrintAreaCalibrator from '@/components/mug-designer/MugPrintAreaCalibrator';
-import MugsDesignAndOrderSection from '@/components/mug-designer/MugsDesignAndOrderSection';
-
-const complexityLevels = [
-  { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
-  { title: 'II', description: 'Комбинация текста и графики, умеренная подготовка и правки.' },
-  { title: 'III', description: 'Сложный коллаж, много элементов, детальная допечатная подготовка.' },
-];
-
-const checklist = [
-  'Нужна цветокоррекция/чистка исходника',
-  'Несколько изображений в одном макете',
-  'Сложная типографика или много текста',
-  'Нестандартная композиция по кругу кружки',
-  'Подготовка варианта для глянца и мата',
-  'Замена фона/ретушь',
-  'Подбор фирменных цветов по брендбуку',
-  'Срочная подготовка макета',
-];
+import OrderMugsForm from '@/components/OrderMugsForm';
 
 export default function MugsServicePage() {
   const heroBenefits = ['3–5 рабочих дней', '3 макета включены', 'Скидка от 10 шт', 'Проверка перед печатью'];
