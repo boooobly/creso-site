@@ -1,7 +1,7 @@
 import Section from '@/components/Section';
-import OrderMugsForm from '@/components/OrderMugsForm';
 import Link from 'next/link';
 import MugPrintAreaCalibrator from '@/components/mug-designer/MugPrintAreaCalibrator';
+import MugsDesignAndOrderSection from '@/components/mug-designer/MugsDesignAndOrderSection';
 
 const complexityLevels = [
   { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
@@ -77,35 +77,7 @@ export default function MugsServicePage() {
         </div>
       </Section>
 
-      <Section className="pt-0">
-        <div className="card space-y-5 p-6 md:p-8">
-          <h2 className="text-2xl font-semibold">Дизайн</h2>
-          <p className="text-sm text-neutral-700 dark:text-neutral-300">3 макета входит в стоимость.</p>
-
-          <div>
-            <h3 className="text-lg font-medium">Категории сложности I/II/III</h3>
-            <ul className="mt-3 space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
-              {complexityLevels.map((level) => (
-                <li key={level.title}><span className="font-semibold">{level.title}:</span> {level.description}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-medium">Чек-лист (+1 за каждый пункт)</h3>
-            <ul className="mt-3 grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 md:grid-cols-2">
-              {checklist.map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
-            <p className="mt-4 text-sm text-neutral-700 dark:text-neutral-300">Интерпретация: 0–2 → I, 3–5 → II, 6–8 → III.</p>
-          </div>
-        </div>
-      </Section>
-
-      <Section id="mugs-request" className="pt-0 pb-12">
-        <OrderMugsForm />
-      </Section>
+      <MugsDesignAndOrderSection complexityLevels={complexityLevels} checklist={checklist} />
 
       {process.env.NODE_ENV !== 'production' && (
         <Section className="pt-0 pb-6">
