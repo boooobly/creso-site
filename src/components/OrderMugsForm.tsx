@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
@@ -66,6 +66,26 @@ export default function OrderMugsForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
   const [needsDesign, setNeedsDesign] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
+
+
+  useEffect(() => {
+    setHasDraft(designerRef.current?.hasRestorableDraft() ?? false);
+  }, []);
+
+  const handleRestoreDraft = () => {
+    const restored = designerRef.current?.restoreDraft() ?? false;
+    if (!restored) {
+      setHasDraft(false);
+      return;
+    }
+    setHasDraft(false);
+  };
+
+  const handleDeleteDraft = () => {
+    designerRef.current?.clearDraft();
+    setHasDraft(false);
+  };
 
   const inputClass = (name: keyof FormValues) => [
     'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
@@ -177,6 +197,18 @@ export default function OrderMugsForm() {
         maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
       />
 
+      {hasDraft && (
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-neutral-800">Найден черновик макета. Восстановить?</p>
+            <div className="flex gap-2">
+              <button type="button" onClick={handleRestoreDraft} className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-700">Восстановить</button>
+              <button type="button" onClick={handleDeleteDraft} className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100">Удалить</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div id="mug-order-form" className="card p-6 md:p-8">
         <div className="mb-6">
           <h2 className="text-2xl font-semibold">Заявка на печать кружек</h2>
@@ -241,13 +273,13 @@ export default function OrderMugsForm() {
             <label className="space-y-2">
               <span className="text-sm font-medium">Имя *</span>
               <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-              {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+              {errors.name && <span className="mt-1 text-xs text-red-600">{errors.name}</span>}
             </label>
 
             <label className="space-y-2">
               <span className="text-sm font-medium">Телефон *</span>
               <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
-              {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
+              {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
             </label>
           </div>
 
@@ -255,7 +287,7 @@ export default function OrderMugsForm() {
             <label className="space-y-2">
               <span className="text-sm font-medium">Количество *</span>
               <input type="number" min={1} className={inputClass('quantity')} value={values.quantity} onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))} />
-              {errors.quantity && <span className="text-xs text-red-600">{errors.quantity}</span>}
+              {errors.quantity && <span className="mt-1 text-xs text-red-600">{errors.quantity}</span>}
             </label>
 
             <label className="space-y-2">
@@ -265,7 +297,7 @@ export default function OrderMugsForm() {
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
-              {errors.covering && <span className="text-xs text-red-600">{errors.covering}</span>}
+              {errors.covering && <span className="mt-1 text-xs text-red-600">{errors.covering}</span>}
             </label>
           </div>
 
@@ -289,7 +321,7 @@ export default function OrderMugsForm() {
               helperTextClassName="mt-1 text-xs text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
-            {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
+            {errors.file && <p className="mt-1 text-xs text-red-600">{errors.file}</p>}
             <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
           </div>
 
