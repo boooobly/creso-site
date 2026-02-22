@@ -156,7 +156,7 @@ export default function OrderMugsForm() {
         maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
       />
 
-      <div className="card p-6 md:p-8">
+      <div id="mug-order-form" className="card p-6 md:p-8">
         <div className="mb-6">
           <h2 className="text-2xl font-semibold">Заявка на печать кружек</h2>
         </div>
