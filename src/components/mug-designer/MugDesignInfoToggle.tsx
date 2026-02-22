@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 
 type ComplexityLevel = {
   title: string;
@@ -10,13 +9,13 @@ type ComplexityLevel = {
 type Props = {
   complexityLevels: ComplexityLevel[];
   checklist: string[];
+  needsDesign: boolean;
+  onNeedsDesignChange: (value: boolean) => void;
 };
 
-export default function MugDesignInfoToggle({ complexityLevels, checklist }: Props) {
-  const [needsDesign, setNeedsDesign] = useState(false);
-
+export default function MugDesignInfoToggle({ complexityLevels, checklist, needsDesign, onNeedsDesignChange }: Props) {
   const onToggle = (checked: boolean) => {
-    setNeedsDesign(checked);
+    onNeedsDesignChange(checked);
 
     if (checked) {
       requestAnimationFrame(() => {

@@ -38,7 +38,11 @@ const defaultValues: FormValues = {
   website: '',
 };
 
-export default function OrderMugsForm() {
+type Props = {
+  needsDesign?: boolean;
+};
+
+export default function OrderMugsForm({ needsDesign = false }: Props) {
   const designerRef = useRef<MugDesigner2DHandle | null>(null);
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -96,6 +100,7 @@ export default function OrderMugsForm() {
       formData.set('covering', values.covering);
       formData.set('comment', values.comment.trim());
       formData.set('website', values.website);
+      formData.set('needsDesign', needsDesign ? 'true' : 'false');
       if (file) formData.set('file', file, file.name);
 
       const exported = await designerRef.current?.exportDesign();
