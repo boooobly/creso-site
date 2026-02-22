@@ -71,6 +71,8 @@ function clampPosition(x: number, y: number, width: number, height: number): { x
   };
 }
 
+const SAFE_INSET = 16;
+
 const defaultTransform: TransformState = {
   x: PRINT_RECT.x + PRINT_RECT.width / 2,
   y: PRINT_RECT.y + PRINT_RECT.height / 2,
@@ -302,11 +304,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     setSelectedElement('text');
   };
 
-  const primaryButtonClass = 'rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700';
-  const secondaryButtonClass =
-    'rounded-md border border-neutral-200 bg-white px-4 py-2 text-sm transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50';
-  const toolButtonClass =
-    'rounded-md border border-neutral-200 bg-white px-3 py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50';
+  const primaryButtonClass = 'w-full rounded-md bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700';
+  const secondaryButtonClass = 'w-full rounded-md border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-50';
+  const toolButtonClass = 'rounded-md border border-neutral-200 bg-white px-3 py-2 text-xs font-medium hover:bg-neutral-50 transition';
 
   if (!mockupImage) {
     return <div className="rounded-2xl border border-neutral-200 bg-white p-6 text-sm text-neutral-600 shadow-sm">Загрузка конструктора…</div>;
@@ -315,304 +315,359 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const stageScale = viewportWidth / MOCKUP_WIDTH;
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
-      <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <div ref={wrapperRef} className="mx-auto flex w-full max-w-[1100px] justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4">
-          <Stage
-            width={MOCKUP_WIDTH}
-            height={MOCKUP_HEIGHT}
-            scaleX={stageScale}
-            scaleY={stageScale}
-            ref={stageRef}
-            style={{ width: viewportWidth, height: viewportHeight }}
-            onMouseDown={(event) => {
-              if (event.target === event.target.getStage()) setSelectedElement(null);
-            }}
-            onTouchStart={(event) => {
-              if (event.target === event.target.getStage()) setSelectedElement(null);
-            }}
-          >
-            <Layer>
-              <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
-            </Layer>
+    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-md sm:p-8">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Соберите макет</h2>
+        <p className="mt-2 text-sm text-neutral-600 sm:text-base">Загрузите изображение или добавьте текст. Итоговый макет мы проверим перед печатью.</p>
+        <p className="mt-2 text-xs text-neutral-500">Подсказка: выделите объект, чтобы изменить размер и поворот.</p>
+      </div>
 
-            <Layer ref={printLayerRef}>
-              <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0.10)" listening={false} />
-              <Rect
-                x={PRINT_RECT.x}
-                y={PRINT_RECT.y}
-                width={PRINT_RECT.width}
-                height={PRINT_RECT.height}
-                cornerRadius={8}
-                fill="black"
-                globalCompositeOperation="destination-out"
-                listening={false}
-              />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+        <section className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
+          <div className="mb-3 flex items-center justify-between text-xs text-neutral-500">
+            <span>Область печати</span>
+            <span>Перетащите объект внутрь рамки</span>
+          </div>
+          <div className="rounded-xl border border-neutral-200 bg-white p-3 sm:p-4">
+            <div ref={wrapperRef} className="mx-auto flex w-full max-w-[1100px] justify-center overflow-hidden rounded-xl border border-neutral-200 bg-white p-2">
+              <Stage
+                width={MOCKUP_WIDTH}
+                height={MOCKUP_HEIGHT}
+                scaleX={stageScale}
+                scaleY={stageScale}
+                ref={stageRef}
+                style={{ width: viewportWidth, height: viewportHeight }}
+                onMouseDown={(event) => {
+                  if (event.target === event.target.getStage()) setSelectedElement(null);
+                }}
+                onTouchStart={(event) => {
+                  if (event.target === event.target.getStage()) setSelectedElement(null);
+                }}
+              >
+                <Layer>
+                  <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
+                </Layer>
 
-              <Group clipX={PRINT_RECT.x} clipY={PRINT_RECT.y} clipWidth={PRINT_RECT.width} clipHeight={PRINT_RECT.height}>
-                {userImage && (
-                  <KonvaImage
-                    ref={userImageRef}
-                    image={userImage}
-                    x={transform.x}
-                    y={transform.y}
-                    offsetX={userImage.width / 2}
-                    offsetY={userImage.height / 2}
-                    width={userImage.width}
-                    height={userImage.height}
-                    scaleX={transform.scaleX}
-                    scaleY={transform.scaleY}
-                    rotation={transform.rotation}
-                    opacity={imageOpacity / 100}
-                    draggable={true}
-                    dragBoundFunc={(position) => {
-                      const width = userImage.width * Math.abs(transform.scaleX);
-                      const height = userImage.height * Math.abs(transform.scaleY);
-                      return clampPosition(position.x, position.y, width, height);
-                    }}
-                    onClick={() => setSelectedElement('image')}
-                    onTap={() => setSelectedElement('image')}
-                    onDragStart={() => {
-                      setIsDragging(true);
-                      setSelectedElement('image');
-                    }}
-                    onDragMove={(event) => {
-                      const width = userImage.width * Math.abs(transform.scaleX);
-                      const height = userImage.height * Math.abs(transform.scaleY);
-                      const next = clampPosition(event.target.x(), event.target.y(), width, height);
-                      event.target.x(next.x);
-                      event.target.y(next.y);
-                    }}
-                    onDragEnd={(event) => {
-                      setIsDragging(false);
-                      setTransform((prev) => ({ ...prev, x: event.target.x(), y: event.target.y() }));
-                    }}
+                <Layer ref={printLayerRef}>
+                  <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0.08)" listening={false} />
+                  <Rect
+                    x={PRINT_RECT.x}
+                    y={PRINT_RECT.y}
+                    width={PRINT_RECT.width}
+                    height={PRINT_RECT.height}
+                    cornerRadius={8}
+                    fill="black"
+                    globalCompositeOperation="destination-out"
+                    listening={false}
                   />
-                )}
 
-                {textLayer && (
-                  <KonvaText
-                    ref={textNodeRef}
-                    text={textLayer.text}
-                    x={textLayer.x}
-                    y={textLayer.y}
-                    offsetX={textLayer.width / 2}
-                    offsetY={textLayer.height / 2}
-                    width={textLayer.width}
-                    height={textLayer.height}
-                    fontSize={textLayer.fontSize}
-                    align="center"
-                    verticalAlign="middle"
-                    fill="#dc2626"
-                    rotation={textLayer.rotation}
-                    scaleX={textLayer.scaleX}
-                    scaleY={textLayer.scaleY}
-                    draggable
-                    onClick={() => setSelectedElement('text')}
-                    onTap={() => setSelectedElement('text')}
-                    onDragStart={() => setSelectedElement('text')}
-                    onDragEnd={(event) => {
-                      setTextLayer((prev) => (prev ? { ...prev, x: event.target.x(), y: event.target.y() } : prev));
-                    }}
+                  <Group clipX={PRINT_RECT.x} clipY={PRINT_RECT.y} clipWidth={PRINT_RECT.width} clipHeight={PRINT_RECT.height}>
+                    {userImage && (
+                      <KonvaImage
+                        ref={userImageRef}
+                        image={userImage}
+                        x={transform.x}
+                        y={transform.y}
+                        offsetX={userImage.width / 2}
+                        offsetY={userImage.height / 2}
+                        width={userImage.width}
+                        height={userImage.height}
+                        scaleX={transform.scaleX}
+                        scaleY={transform.scaleY}
+                        rotation={transform.rotation}
+                        opacity={imageOpacity / 100}
+                        shadowEnabled={selectedElement === 'image'}
+                        shadowColor="rgba(220,38,38,0.35)"
+                        shadowBlur={selectedElement === 'image' ? 16 : 0}
+                        shadowOpacity={selectedElement === 'image' ? 0.5 : 0}
+                        draggable={true}
+                        dragBoundFunc={(position) => {
+                          const width = userImage.width * Math.abs(transform.scaleX);
+                          const height = userImage.height * Math.abs(transform.scaleY);
+                          return clampPosition(position.x, position.y, width, height);
+                        }}
+                        onClick={() => setSelectedElement('image')}
+                        onTap={() => setSelectedElement('image')}
+                        onDragStart={() => {
+                          setIsDragging(true);
+                          setSelectedElement('image');
+                        }}
+                        onDragMove={(event) => {
+                          const width = userImage.width * Math.abs(transform.scaleX);
+                          const height = userImage.height * Math.abs(transform.scaleY);
+                          const next = clampPosition(event.target.x(), event.target.y(), width, height);
+                          event.target.x(next.x);
+                          event.target.y(next.y);
+                        }}
+                        onDragEnd={(event) => {
+                          setIsDragging(false);
+                          setTransform((prev) => ({ ...prev, x: event.target.x(), y: event.target.y() }));
+                        }}
+                      />
+                    )}
+
+                    {textLayer && (
+                      <KonvaText
+                        ref={textNodeRef}
+                        text={textLayer.text}
+                        x={textLayer.x}
+                        y={textLayer.y}
+                        offsetX={textLayer.width / 2}
+                        offsetY={textLayer.height / 2}
+                        width={textLayer.width}
+                        height={textLayer.height}
+                        fontSize={textLayer.fontSize}
+                        align="center"
+                        verticalAlign="middle"
+                        fill="#dc2626"
+                        rotation={textLayer.rotation}
+                        scaleX={textLayer.scaleX}
+                        scaleY={textLayer.scaleY}
+                        shadowEnabled={selectedElement === 'text'}
+                        shadowColor="rgba(220,38,38,0.35)"
+                        shadowBlur={selectedElement === 'text' ? 14 : 0}
+                        shadowOpacity={selectedElement === 'text' ? 0.45 : 0}
+                        draggable
+                        onClick={() => setSelectedElement('text')}
+                        onTap={() => setSelectedElement('text')}
+                        onDragStart={() => setSelectedElement('text')}
+                        onDragEnd={(event) => {
+                          setTextLayer((prev) => (prev ? { ...prev, x: event.target.x(), y: event.target.y() } : prev));
+                        }}
+                      />
+                    )}
+                  </Group>
+
+                  <Rect
+                    x={PRINT_RECT.x}
+                    y={PRINT_RECT.y}
+                    width={PRINT_RECT.width}
+                    height={PRINT_RECT.height}
+                    cornerRadius={8}
+                    stroke="#dc2626"
+                    dash={[10, 8]}
+                    strokeWidth={4}
+                    listening={false}
                   />
-                )}
-              </Group>
+                  <Rect
+                    x={PRINT_RECT.x + SAFE_INSET}
+                    y={PRINT_RECT.y + SAFE_INSET}
+                    width={PRINT_RECT.width - SAFE_INSET * 2}
+                    height={PRINT_RECT.height - SAFE_INSET * 2}
+                    cornerRadius={6}
+                    stroke="rgba(220,38,38,0.35)"
+                    dash={[6, 8]}
+                    strokeWidth={2}
+                    listening={false}
+                  />
 
-              <Rect
-                x={PRINT_RECT.x}
-                y={PRINT_RECT.y}
-                width={PRINT_RECT.width}
-                height={PRINT_RECT.height}
-                cornerRadius={8}
-                stroke="#dc2626"
-                dash={[10, 8]}
-                strokeWidth={4}
-                listening={false}
-              />
+                  {isDragging && (
+                    <>
+                      <Rect x={PRINT_RECT.x + PRINT_RECT.width / 2} y={PRINT_RECT.y} width={2} height={PRINT_RECT.height} fill="rgba(220,38,38,0.35)" listening={false} />
+                      <Rect x={PRINT_RECT.x} y={PRINT_RECT.y + PRINT_RECT.height / 2} width={PRINT_RECT.width} height={2} fill="rgba(220,38,38,0.35)" listening={false} />
+                    </>
+                  )}
 
-              {isDragging && (
-                <>
-                  <Rect x={PRINT_RECT.x + PRINT_RECT.width / 2} y={PRINT_RECT.y} width={2} height={PRINT_RECT.height} fill="rgba(220,38,38,0.35)" listening={false} />
-                  <Rect x={PRINT_RECT.x} y={PRINT_RECT.y + PRINT_RECT.height / 2} width={PRINT_RECT.width} height={2} fill="rgba(220,38,38,0.35)" listening={false} />
-                </>
-              )}
+                  {selectedElement && (
+                    <Transformer
+                      ref={transformerRef}
+                      keepRatio={selectedElement === 'image'}
+                      rotateEnabled
+                      enabledAnchors={['top-left', 'top-center', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right']}
+                      anchorStroke="#dc2626"
+                      anchorFill="#dc2626"
+                      borderStroke="#dc2626"
+                      anchorSize={14}
+                      boundBoxFunc={(oldBox, newBox) => {
+                        if (!Number.isFinite(newBox.width) || !Number.isFinite(newBox.height) || newBox.width <= 0 || newBox.height <= 0) {
+                          return oldBox;
+                        }
+                        if (selectedElement === 'text') return newBox;
+                        if (newBox.width < MIN_IMAGE_SIDE || newBox.height < MIN_IMAGE_SIDE) return oldBox;
+                        if (newBox.width > PRINT_RECT.width * MAX_IMAGE_SCALE || newBox.height > PRINT_RECT.height * MAX_IMAGE_SCALE) return oldBox;
+                        return newBox;
+                      }}
+                      onTransformEnd={() => {
+                        if (selectedElement === 'text') {
+                          const node = textNodeRef.current;
+                          if (!node) return;
 
-              {selectedElement && (
-                <Transformer
-                  ref={transformerRef}
-                  keepRatio={selectedElement === 'image'}
-                  rotateEnabled
-                  enabledAnchors={['top-left', 'top-center', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right']}
-                  anchorStroke="#dc2626"
-                  anchorFill="#dc2626"
-                  borderStroke="#dc2626"
-                  anchorSize={14}
-                  boundBoxFunc={(oldBox, newBox) => {
-                    if (!Number.isFinite(newBox.width) || !Number.isFinite(newBox.height) || newBox.width <= 0 || newBox.height <= 0) {
-                      return oldBox;
-                    }
-                    if (selectedElement === 'text') return newBox;
-                    if (newBox.width < MIN_IMAGE_SIDE || newBox.height < MIN_IMAGE_SIDE) return oldBox;
-                    if (newBox.width > PRINT_RECT.width * MAX_IMAGE_SCALE || newBox.height > PRINT_RECT.height * MAX_IMAGE_SCALE) return oldBox;
-                    return newBox;
+                          setTextLayer((prev) => (
+                            prev
+                              ? {
+                                  ...prev,
+                                  x: node.x(),
+                                  y: node.y(),
+                                  rotation: node.rotation(),
+                                  scaleX: clampScale(node.scaleX()),
+                                  scaleY: clampScale(node.scaleY()),
+                                  width: Math.max(40, node.width()),
+                                  height: Math.max(20, node.height()),
+                                }
+                              : prev
+                          ));
+                          return;
+                        }
+
+                        const node = userImageRef.current;
+                        if (!node || !userImage) return;
+
+                        const nextScaleX = clampScale(node.scaleX());
+                        const nextScaleY = clampScale(node.scaleY());
+                        const width = userImage.width * Math.abs(nextScaleX);
+                        const height = userImage.height * Math.abs(nextScaleY);
+                        const next = clampPosition(node.x(), node.y(), width, height);
+
+                        node.x(next.x);
+                        node.y(next.y);
+
+                        setTransform((prev) => ({
+                          ...prev,
+                          x: next.x,
+                          y: next.y,
+                          scaleX: nextScaleX,
+                          scaleY: nextScaleY,
+                          rotation: node.rotation(),
+                        }));
+                      }}
+                    />
+                  )}
+                </Layer>
+              </Stage>
+            </div>
+          </div>
+        </section>
+
+        <aside className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
+          <div className="space-y-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
+            <button type="button" className={primaryButtonClass} onClick={onAddText}>
+              Добавить текст
+            </button>
+            <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
+              Загрузить изображение
+              <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
+            </label>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+          </div>
+
+          {selectedElement && (
+            <div className="space-y-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Настройки объекта</p>
+              <p className="text-xs text-neutral-600">Выбрано: {selectedElement === 'image' ? 'Изображение' : 'Текст'}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  className={toolButtonClass}
+                  onClick={() => {
+                    if (selectedElement === 'image') setTransform((prev) => ({ ...prev, x: prev.x + 60, y: prev.y + 60 }));
+                    if (selectedElement === 'text') setTextLayer((prev) => (prev ? { ...prev, x: prev.x + 40, y: prev.y + 40 } : prev));
                   }}
-                  onTransformEnd={() => {
-                    if (selectedElement === 'text') {
-                      const node = textNodeRef.current;
-                      if (!node) return;
-
-                      setTextLayer((prev) => (
-                        prev
-                          ? {
-                              ...prev,
-                              x: node.x(),
-                              y: node.y(),
-                              rotation: node.rotation(),
-                              scaleX: clampScale(node.scaleX()),
-                              scaleY: clampScale(node.scaleY()),
-                              width: Math.max(40, node.width()),
-                              height: Math.max(20, node.height()),
-                            }
-                          : prev
-                      ));
-                      return;
-                    }
-
-                    const node = userImageRef.current;
-                    if (!node || !userImage) return;
-
-                    const nextScaleX = clampScale(node.scaleX());
-                    const nextScaleY = clampScale(node.scaleY());
-                    const width = userImage.width * Math.abs(nextScaleX);
-                    const height = userImage.height * Math.abs(nextScaleY);
-                    const next = clampPosition(node.x(), node.y(), width, height);
-
-                    node.x(next.x);
-                    node.y(next.y);
-
-                    setTransform((prev) => ({
-                      ...prev,
-                      x: next.x,
-                      y: next.y,
-                      scaleX: nextScaleX,
-                      scaleY: nextScaleY,
-                      rotation: node.rotation(),
-                    }));
+                >
+                  Дублировать
+                </button>
+                <button
+                  type="button"
+                  className={toolButtonClass}
+                  onClick={() => {
+                    if (selectedElement === 'image') onFileChange(null);
+                    if (selectedElement === 'text') setTextLayer(null);
+                    setSelectedElement(null);
                   }}
+                >
+                  Удалить
+                </button>
+                <button
+                  type="button"
+                  className={`${toolButtonClass} col-span-2`}
+                  onClick={() => {
+                    if (selectedElement === 'image') setTransform((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }));
+                    if (selectedElement === 'text') setTextLayer((prev) => (prev ? { ...prev, rotation: (prev.rotation + 90) % 360 } : prev));
+                  }}
+                >
+                  Повернуть на 90°
+                </button>
+              </div>
+            </div>
+          )}
+
+          {selectedElement === 'text' && textLayer && (
+            <div className="space-y-2">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Текст</p>
+              <label className="space-y-1 text-sm text-neutral-700">
+                <span>Содержимое текста</span>
+                <input
+                  type="text"
+                  value={textLayer.text}
+                  onChange={(event) => setTextLayer((prev) => (prev ? { ...prev, text: event.target.value } : prev))}
+                  className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                 />
-              )}
-            </Layer>
-          </Stage>
-        </div>
-      </section>
+              </label>
+            </div>
+          )}
 
-      <aside className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
-          <button type="button" className={`w-full ${primaryButtonClass}`} onClick={onAddText}>
-            Добавить текст
-          </button>
-          <label className={`block w-full cursor-pointer text-center ${primaryButtonClass}`}>
-            Загрузить изображение
-            <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
-          </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </div>
-
-        {selectedElement === 'image' && userImage && (
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Редактирование</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button type="button" className={toolButtonClass} onClick={() => onFileChange(null)}>
-                Удалить
-              </button>
-              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, x: prev.x + 60, y: prev.y + 60 }))}>
-                Дублировать
-              </button>
-              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }))}>
-                Повернуть 90°
-              </button>
-              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, scaleX: prev.scaleX * -1 }))}>
-                Отразить по X
-              </button>
-              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, scaleY: prev.scaleY * -1 }))}>
-                Отразить по Y
-              </button>
-              <button type="button" className={toolButtonClass} onClick={onFitToPrint}>
+          {selectedElement === 'image' && userImage && (
+            <div className="space-y-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Настройки изображения</p>
+              <label className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-neutral-600">Непрозрачность</span>
+                  <span className="text-xs text-neutral-500">{imageOpacity}%</span>
+                </div>
+                <input type="range" min={0} max={100} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))} className="w-full accent-red-600" />
+              </label>
+              <label className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-neutral-600">Удалить белый фон (предпросмотр)</span>
+                  <span className="text-xs text-neutral-500">{removeWhiteBgLevel}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={removeWhiteBgLevel}
+                  onChange={(event) => setRemoveWhiteBgLevel(Number(event.target.value))}
+                  className="w-full accent-red-600"
+                />
+              </label>
+              <button type="button" className={secondaryButtonClass} onClick={onFitToPrint}>
                 Вписать в зону печати
               </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {selectedElement === 'text' && textLayer && (
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Текст</p>
-            <label className="space-y-1 text-sm text-neutral-700">
-              <span>Содержимое текста</span>
-              <input
-                type="text"
-                value={textLayer.text}
-                onChange={(event) => setTextLayer((prev) => (prev ? { ...prev, text: event.target.value } : prev))}
-                className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-              />
-            </label>
-          </div>
-        )}
-
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Настройки изображения</p>
-          <label className="space-y-1 text-sm text-neutral-700">
-            <span>Непрозрачность: {imageOpacity}%</span>
-            <input type="range" min={0} max={100} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))} className="w-full accent-red-600" />
-          </label>
-          <label className="space-y-1 text-sm text-neutral-700">
-            <span>Удалить белый фон (предпросмотр): {removeWhiteBgLevel}%</span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={removeWhiteBgLevel}
-              onChange={(event) => setRemoveWhiteBgLevel(Number(event.target.value))}
-              className="w-full accent-red-600"
-            />
-          </label>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Параметры</p>
-          <div className="space-y-1">
+          <div className="space-y-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Параметры</p>
             <p className="text-sm text-neutral-700">Количество</p>
-            <div className="flex items-center justify-between rounded-md border border-neutral-200 bg-white px-2 py-1">
-              <button type="button" className={secondaryButtonClass} onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>
+            <div className="flex items-center gap-2">
+              <button type="button" className="h-10 w-10 rounded-md border border-neutral-200 bg-white hover:bg-neutral-50" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>
                 -
               </button>
-              <span className="text-sm font-medium">{quantity}</span>
-              <button type="button" className={secondaryButtonClass} onClick={() => setQuantity((prev) => prev + 1)}>
+              <div className="flex h-10 flex-1 items-center justify-center rounded-md border border-neutral-200 bg-white text-sm">{quantity}</div>
+              <button type="button" className="h-10 w-10 rounded-md border border-neutral-200 bg-white hover:bg-neutral-50" onClick={() => setQuantity((prev) => prev + 1)}>
                 +
               </button>
             </div>
           </div>
-        </div>
 
-        <div className="space-y-3 border-t border-neutral-200 pt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Стоимость</p>
-          <p className="text-3xl font-semibold">490 ₽</p>
-          <button
-            type="button"
-            className={`w-full ${primaryButtonClass}`}
-            onClick={() => {
-              document.getElementById('mug-order-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }}
-          >
-            Добавить в заказ
-          </button>
-        </div>
-
-        <button type="button" onClick={onReset} disabled={!userImage} className={`w-full ${secondaryButtonClass}`}>
-          Сбросить макет
-        </button>
-      </aside>
+          <div className="space-y-3 border-t border-neutral-200 pt-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Стоимость</p>
+            <p className="text-4xl font-semibold tracking-tight">490 ₽</p>
+            <button
+              type="button"
+              className="w-full rounded-md bg-red-600 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+              onClick={() => {
+                document.getElementById('mug-order-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
+              Добавить в заказ
+            </button>
+            <button type="button" onClick={onReset} disabled={!userImage} className="w-full rounded-md border border-neutral-200 bg-white py-3 text-sm font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50">
+              Сбросить макет
+            </button>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 });
