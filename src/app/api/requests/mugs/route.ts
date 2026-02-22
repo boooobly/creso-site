@@ -5,7 +5,7 @@ import { env } from '@/lib/env';
 import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
 import { logger } from '@/lib/logger';
 import { EmailAttachment, sendEmailLead } from '@/lib/notifications/email';
-import { sendTelegramLead, sendTelegramPhotoBuffer } from '@/lib/notifications/telegram';
+import { sendTelegramLead, sendTelegramPhotoAlbumBuffer, sendTelegramPhotoBuffer } from '@/lib/notifications/telegram';
 import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram/sendDocumentWithCaption';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
@@ -28,6 +28,8 @@ const mugsRequestSchema = z.object({
   covering: z.string().trim().min(1),
   comment: z.string().trim().optional(),
   website: z.string().trim().optional(),
+  rawImageDataUrl: z.string().optional().nullable(),
+  mockPngDataUrl: z.string().optional().nullable(),
 });
 
 function toText(value: FormDataEntryValue | null): string {
@@ -38,6 +40,21 @@ function toText(value: FormDataEntryValue | null): string {
 function toBoolean(value: FormDataEntryValue | null): boolean {
   if (typeof value !== 'string') return false;
   return value.trim().toLowerCase() === 'true';
+}
+
+
+function dataUrlToBuffer(dataUrl: string): { buffer: Buffer; mime: string } | null {
+  try {
+    const match = dataUrl.match(/^data:(.+);base64,(.*)$/);
+    if (!match) return null;
+    const mime = match[1];
+    const base64 = match[2];
+    const buffer = Buffer.from(base64, 'base64');
+    if (!buffer.length) return null;
+    return { buffer, mime };
+  } catch {
+    return null;
+  }
 }
 
 function isAllowedFile(file: File): boolean {
@@ -97,6 +114,7 @@ async function sendMugsTelegramNotification(params: {
   mockPreview: File | null;
   printPreview: File | null;
   layout: File | null;
+  rawImageDataUrl: string | null;
   mockPngDataUrl: string | null;
   name: string;
   phone: string;
@@ -126,19 +144,66 @@ async function sendMugsTelegramNotification(params: {
   try {
     await sendTelegramLead(params.text);
 
-    if (params.mockPngDataUrl) {
-      const prefix = 'data:image/png;base64,';
-      if (params.mockPngDataUrl.startsWith(prefix)) {
-        const bytes = Buffer.from(params.mockPngDataUrl.slice(prefix.length), 'base64');
+    const mockImageFromDataUrl = params.mockPngDataUrl ? dataUrlToBuffer(params.mockPngDataUrl) : null;
+    const rawImageFromDataUrl = params.rawImageDataUrl ? dataUrlToBuffer(params.rawImageDataUrl) : null;
+
+    const imageStatusCaption = `${caption}
+Исходник клиента: ${rawImageFromDataUrl ? 'прикреплен' : 'не прикреплен'}
+Макет на кружке: ${mockImageFromDataUrl ? 'прикреплен' : 'не прикреплен'}`;
+
+    const mockItem = mockImageFromDataUrl
+      ? { bytes: mockImageFromDataUrl.buffer, mime: mockImageFromDataUrl.mime, filename: 'mug-mock-preview.png' }
+      : null;
+    const rawItem = rawImageFromDataUrl
+      ? { bytes: rawImageFromDataUrl.buffer, mime: rawImageFromDataUrl.mime, filename: 'mug-raw-upload.png' }
+      : null;
+
+    if (mockItem && rawItem) {
+      try {
+        await sendTelegramPhotoAlbumBuffer({
+          chatId,
+          token,
+          items: [mockItem, rawItem],
+          caption: imageStatusCaption,
+        });
+      } catch {
         await sendTelegramPhotoBuffer({
           chatId,
           token,
-          bytes,
-          caption: `${caption}\nФинальный мокап: прикреплён`,
-          filename: 'mug-mock-preview.png',
+          bytes: mockItem.bytes,
+          mime: mockItem.mime,
+          caption: imageStatusCaption,
+          filename: mockItem.filename,
+        });
+        await sendTelegramPhotoBuffer({
+          chatId,
+          token,
+          bytes: rawItem.bytes,
+          mime: rawItem.mime,
+          caption: 'Исходник клиента',
+          filename: rawItem.filename,
         });
       }
+    } else if (mockItem) {
+      await sendTelegramPhotoBuffer({
+        chatId,
+        token,
+        bytes: mockItem.bytes,
+        mime: mockItem.mime,
+        caption: imageStatusCaption,
+        filename: mockItem.filename,
+      });
+    } else if (rawItem) {
+      await sendTelegramPhotoBuffer({
+        chatId,
+        token,
+        bytes: rawItem.bytes,
+        mime: rawItem.mime,
+        caption: imageStatusCaption,
+        filename: rawItem.filename,
+      });
     }
+
 
     const docs: Array<{ file: File | null; name: string; contentType: string; tag: string }> = [
       { file: params.file, name: 'original-upload', contentType: params.file?.type || 'application/octet-stream', tag: 'Original file' },
@@ -176,6 +241,7 @@ export async function POST(request: NextRequest) {
     const mockPreviewValue = formData.get('mockPreview');
     const printPreviewValue = formData.get('printPreview') ?? formData.get('preview');
     const layoutValue = formData.get('layout');
+    const rawImageDataUrl = toText(formData.get('rawImageDataUrl')) || null;
     const mockPngDataUrl = toText(formData.get('mockPngDataUrl')) || null;
 
     const needsDesign = toBoolean(formData.get('needsDesign'));
@@ -187,6 +253,8 @@ export async function POST(request: NextRequest) {
       covering: toText(formData.get('covering')),
       comment: toText(formData.get('comment')),
       website: toText(formData.get('website')),
+      rawImageDataUrl,
+      mockPngDataUrl,
     });
 
     if (!parsed.success) return NextResponse.json({ ok: false, error: 'Проверьте заполнение обязательных полей.' }, { status: 400 });
@@ -218,10 +286,6 @@ export async function POST(request: NextRequest) {
 
     const coveringLabel = getCoveringLabel(parsed.data.covering);
 
-    if (mockPngDataUrl && !mockPngDataUrl.startsWith('data:image/png;base64,')) {
-      return NextResponse.json({ ok: false, error: 'Некорректный формат mockPngDataUrl.' }, { status: 400 });
-    }
-
     const text = buildMugsText({
       name: parsed.data.name,
       phone: normalizedPhone,
@@ -244,7 +308,7 @@ export async function POST(request: NextRequest) {
     if (layout) attachments.push({ filename: layout.name || 'mug-layout.json', content: Buffer.from(await layout.arrayBuffer()), contentType: 'application/json' });
 
     const [telegramSent, emailSent] = await Promise.all([
-      sendMugsTelegramNotification({ text, file, mockPreview, printPreview, layout, mockPngDataUrl, name: parsed.data.name, phone: normalizedPhone, quantity: parsed.data.quantity, coveringLabel, comment: parsed.data.comment, needsDesign }),
+      sendMugsTelegramNotification({ text, file, mockPreview, printPreview, layout, rawImageDataUrl, mockPngDataUrl, name: parsed.data.name, phone: normalizedPhone, quantity: parsed.data.quantity, coveringLabel, comment: parsed.data.comment, needsDesign }),
       sendEmailLead({ subject: 'Новая заявка — Печать на кружках', html: buildEmailHtmlFromText(text), attachments })
         .then(() => true)
         .catch((error) => {
