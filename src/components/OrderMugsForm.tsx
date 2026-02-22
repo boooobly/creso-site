@@ -119,6 +119,7 @@ export default function OrderMugsForm() {
         formData.set('mockPreview', mockPreview, mockPreview.name);
         formData.set('printPreview', printPreview, printPreview.name);
         formData.set('layout', layout, layout.name);
+        formData.set('mockPngDataUrl', exported.mockPngDataUrl);
       }
 
       const response = await fetch('/api/requests/mugs', {

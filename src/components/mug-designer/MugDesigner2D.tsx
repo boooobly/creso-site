@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { Group, Image as KonvaImage, Layer, Rect, Stage, Transformer } from 'react-konva';
+import { Group, Image as KonvaImage, Layer, Rect, Stage, Text as KonvaText, Transformer } from 'react-konva';
 import type Konva from 'konva';
 import { MOCKUP_HEIGHT, MOCKUP_SRC, MOCKUP_WIDTH, PRINT_AREA } from '@/components/mug-designer/mugMockupConfig';
 import { MAX_IMAGE_SCALE, MIN_IMAGE_SIDE } from '@/lib/mugDesigner/constants';
@@ -21,7 +21,19 @@ type TransformState = {
   rotation: number;
 };
 
-type SelectedElement = 'image' | null;
+type SelectedElement = 'image' | 'text' | null;
+
+type TextLayerState = {
+  text: string;
+  x: number;
+  y: number;
+  rotation: number;
+  width: number;
+  height: number;
+  scaleX: number;
+  scaleY: number;
+  fontSize: number;
+};
 
 export type MugDesigner2DHandle = {
   exportDesign: () => Promise<{ mockPngDataUrl: string; printPngDataUrl: string; layoutJson: string } | null>;
@@ -75,6 +87,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const stageRef = useRef<Konva.Stage | null>(null);
   const printLayerRef = useRef<Konva.Layer | null>(null);
   const userImageRef = useRef<Konva.Image | null>(null);
+  const textNodeRef = useRef<Konva.Text | null>(null);
   const transformerRef = useRef<Konva.Transformer | null>(null);
 
   const [error, setError] = useState('');
@@ -88,12 +101,13 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const [imageOpacity, setImageOpacity] = useState(100);
   const [removeWhiteBgLevel, setRemoveWhiteBgLevel] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [textLayer, setTextLayer] = useState<TextLayerState | null>(null);
 
   useImperativeHandle(
     ref,
     () => ({
       exportDesign: async () => {
-        if (!stageRef.current || !printLayerRef.current || !userImage || !file) return null;
+        if (!stageRef.current || !printLayerRef.current || (!userImage && !textLayer)) return null;
 
         const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 1, mimeType: 'image/png' });
         const printPngDataUrl = printLayerRef.current.toDataURL({
@@ -107,17 +121,32 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
         const layoutJson = JSON.stringify(
           {
-            fileName: file.name,
+            fileName: file?.name ?? null,
             printRect: PRINT_RECT,
-            image: {
-              x: transform.x,
-              y: transform.y,
-              scaleX: transform.scaleX,
-              scaleY: transform.scaleY,
-              rotation: transform.rotation,
-              width: userImage.width,
-              height: userImage.height,
-            },
+            image: userImage
+              ? {
+                  x: transform.x,
+                  y: transform.y,
+                  scaleX: transform.scaleX,
+                  scaleY: transform.scaleY,
+                  rotation: transform.rotation,
+                  width: userImage.width,
+                  height: userImage.height,
+                }
+              : null,
+            text: textLayer
+              ? {
+                  text: textLayer.text,
+                  x: textLayer.x,
+                  y: textLayer.y,
+                  rotation: textLayer.rotation,
+                  width: textLayer.width,
+                  height: textLayer.height,
+                  scaleX: textLayer.scaleX,
+                  scaleY: textLayer.scaleY,
+                  fontSize: textLayer.fontSize,
+                }
+              : null,
           },
           null,
           2,
@@ -126,7 +155,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         return { mockPngDataUrl, printPngDataUrl, layoutJson };
       },
     }),
-    [file, transform, userImage],
+    [file, textLayer, transform, userImage],
   );
 
   useEffect(() => {
@@ -158,6 +187,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       setUserImage(null);
       setSelectedElement(null);
       setTransform(defaultTransform);
+      setTextLayer(null);
       return;
     }
 
@@ -181,10 +211,23 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   }, [file]);
 
   useEffect(() => {
-    if (!transformerRef.current || !userImageRef.current || !userImage || selectedElement !== 'image') return;
-    transformerRef.current.nodes([userImageRef.current]);
-    transformerRef.current.getLayer()?.batchDraw();
-  }, [selectedElement, userImage]);
+    if (!transformerRef.current || !selectedElement) {
+      transformerRef.current?.nodes([]);
+      transformerRef.current?.getLayer()?.batchDraw();
+      return;
+    }
+
+    if (selectedElement === 'image' && userImageRef.current && userImage) {
+      transformerRef.current.nodes([userImageRef.current]);
+      transformerRef.current.getLayer()?.batchDraw();
+      return;
+    }
+
+    if (selectedElement === 'text' && textNodeRef.current && textLayer) {
+      transformerRef.current.nodes([textNodeRef.current]);
+      transformerRef.current.getLayer()?.batchDraw();
+    }
+  }, [selectedElement, textLayer, userImage]);
 
   const isAllowed = useMemo(
     () => (candidate: File) => {
@@ -239,6 +282,24 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       scaleY: nextScale,
       rotation: 0,
     });
+    setTextLayer(null);
+    setSelectedElement('image');
+  };
+
+  const onAddText = () => {
+    const defaultWidth = Math.min(PRINT_RECT.width - 20, 220);
+    setTextLayer({
+      text: 'Ваш текст',
+      x: PRINT_RECT.x + PRINT_RECT.width / 2,
+      y: PRINT_RECT.y + PRINT_RECT.height / 2,
+      rotation: 0,
+      width: defaultWidth,
+      height: 40,
+      scaleX: 1,
+      scaleY: 1,
+      fontSize: 32,
+    });
+    setSelectedElement('text');
   };
 
   const primaryButtonClass = 'rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700';
@@ -257,7 +318,20 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
       <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div ref={wrapperRef} className="mx-auto flex w-full max-w-[1100px] justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4">
-          <Stage width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} scaleX={stageScale} scaleY={stageScale} ref={stageRef} style={{ width: viewportWidth, height: viewportHeight }}>
+          <Stage
+            width={MOCKUP_WIDTH}
+            height={MOCKUP_HEIGHT}
+            scaleX={stageScale}
+            scaleY={stageScale}
+            ref={stageRef}
+            style={{ width: viewportWidth, height: viewportHeight }}
+            onMouseDown={(event) => {
+              if (event.target === event.target.getStage()) setSelectedElement(null);
+            }}
+            onTouchStart={(event) => {
+              if (event.target === event.target.getStage()) setSelectedElement(null);
+            }}
+          >
             <Layer>
               <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
             </Layer>
@@ -315,6 +389,33 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                     }}
                   />
                 )}
+
+                {textLayer && (
+                  <KonvaText
+                    ref={textNodeRef}
+                    text={textLayer.text}
+                    x={textLayer.x}
+                    y={textLayer.y}
+                    offsetX={textLayer.width / 2}
+                    offsetY={textLayer.height / 2}
+                    width={textLayer.width}
+                    height={textLayer.height}
+                    fontSize={textLayer.fontSize}
+                    align="center"
+                    verticalAlign="middle"
+                    fill="#dc2626"
+                    rotation={textLayer.rotation}
+                    scaleX={textLayer.scaleX}
+                    scaleY={textLayer.scaleY}
+                    draggable
+                    onClick={() => setSelectedElement('text')}
+                    onTap={() => setSelectedElement('text')}
+                    onDragStart={() => setSelectedElement('text')}
+                    onDragEnd={(event) => {
+                      setTextLayer((prev) => (prev ? { ...prev, x: event.target.x(), y: event.target.y() } : prev));
+                    }}
+                  />
+                )}
               </Group>
 
               <Rect
@@ -336,10 +437,10 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                 </>
               )}
 
-              {userImage && selectedElement === 'image' && (
+              {selectedElement && (
                 <Transformer
                   ref={transformerRef}
-                  keepRatio
+                  keepRatio={selectedElement === 'image'}
                   rotateEnabled
                   enabledAnchors={['top-left', 'top-center', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right']}
                   anchorStroke="#dc2626"
@@ -350,11 +451,33 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                     if (!Number.isFinite(newBox.width) || !Number.isFinite(newBox.height) || newBox.width <= 0 || newBox.height <= 0) {
                       return oldBox;
                     }
+                    if (selectedElement === 'text') return newBox;
                     if (newBox.width < MIN_IMAGE_SIDE || newBox.height < MIN_IMAGE_SIDE) return oldBox;
                     if (newBox.width > PRINT_RECT.width * MAX_IMAGE_SCALE || newBox.height > PRINT_RECT.height * MAX_IMAGE_SCALE) return oldBox;
                     return newBox;
                   }}
                   onTransformEnd={() => {
+                    if (selectedElement === 'text') {
+                      const node = textNodeRef.current;
+                      if (!node) return;
+
+                      setTextLayer((prev) => (
+                        prev
+                          ? {
+                              ...prev,
+                              x: node.x(),
+                              y: node.y(),
+                              rotation: node.rotation(),
+                              scaleX: clampScale(node.scaleX()),
+                              scaleY: clampScale(node.scaleY()),
+                              width: Math.max(40, node.width()),
+                              height: Math.max(20, node.height()),
+                            }
+                          : prev
+                      ));
+                      return;
+                    }
+
                     const node = userImageRef.current;
                     if (!node || !userImage) return;
 
@@ -386,7 +509,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       <aside className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
-          <button type="button" className={`w-full ${primaryButtonClass}`} disabled>
+          <button type="button" className={`w-full ${primaryButtonClass}`} onClick={onAddText}>
             Добавить текст
           </button>
           <label className={`block w-full cursor-pointer text-center ${primaryButtonClass}`}>
@@ -419,6 +542,21 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                 Вписать в зону печати
               </button>
             </div>
+          </div>
+        )}
+
+        {selectedElement === 'text' && textLayer && (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Текст</p>
+            <label className="space-y-1 text-sm text-neutral-700">
+              <span>Содержимое текста</span>
+              <input
+                type="text"
+                value={textLayer.text}
+                onChange={(event) => setTextLayer((prev) => (prev ? { ...prev, text: event.target.value } : prev))}
+                className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              />
+            </label>
           </div>
         )}
 
