@@ -37,12 +37,13 @@ export async function sendTelegramPhotoBuffer(params: {
   bytes: Buffer;
   caption?: string;
   filename?: string;
+  mime?: string;
 }): Promise<void> {
   const formData = new FormData();
   formData.set('chat_id', params.chatId);
   if (params.caption) formData.set('caption', params.caption.slice(0, 1024));
 
-  const photoBlob = new Blob([new Uint8Array(params.bytes)], { type: 'image/png' });
+  const photoBlob = new Blob([new Uint8Array(params.bytes)], { type: params.mime || 'image/png' });
   formData.set('photo', photoBlob, params.filename || 'mug-mock-preview.png');
 
   const response = await fetch(`${TELEGRAM_API_BASE}/bot${params.token}/sendPhoto`, {

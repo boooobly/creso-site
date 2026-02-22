@@ -144,51 +144,63 @@ async function sendMugsTelegramNotification(params: {
   try {
     await sendTelegramLead(params.text);
 
-    const rawImageFromDataUrl = params.rawImageDataUrl ? dataUrlToBuffer(params.rawImageDataUrl) : null;
     const mockImageFromDataUrl = params.mockPngDataUrl ? dataUrlToBuffer(params.mockPngDataUrl) : null;
-
-    const imageItems: Array<{ bytes: Buffer; mime?: string; filename: string }> = [];
-    if (rawImageFromDataUrl) {
-      imageItems.push({ bytes: rawImageFromDataUrl.buffer, mime: rawImageFromDataUrl.mime, filename: 'mug-raw-upload.png' });
-    }
-    if (mockImageFromDataUrl) {
-      imageItems.push({ bytes: mockImageFromDataUrl.buffer, mime: mockImageFromDataUrl.mime, filename: 'mug-mock-preview.png' });
-    }
+    const rawImageFromDataUrl = params.rawImageDataUrl ? dataUrlToBuffer(params.rawImageDataUrl) : null;
 
     const imageStatusCaption = `${caption}
 Исходник клиента: ${rawImageFromDataUrl ? 'прикреплен' : 'не прикреплен'}
 Макет на кружке: ${mockImageFromDataUrl ? 'прикреплен' : 'не прикреплен'}`;
 
-    if (imageItems.length >= 2) {
+    const mockItem = mockImageFromDataUrl
+      ? { bytes: mockImageFromDataUrl.buffer, mime: mockImageFromDataUrl.mime, filename: 'mug-mock-preview.png' }
+      : null;
+    const rawItem = rawImageFromDataUrl
+      ? { bytes: rawImageFromDataUrl.buffer, mime: rawImageFromDataUrl.mime, filename: 'mug-raw-upload.png' }
+      : null;
+
+    if (mockItem && rawItem) {
       try {
         await sendTelegramPhotoAlbumBuffer({
           chatId,
           token,
-          items: imageItems,
+          items: [mockItem, rawItem],
           caption: imageStatusCaption,
         });
       } catch {
         await sendTelegramPhotoBuffer({
           chatId,
           token,
-          bytes: imageItems[0].bytes,
+          bytes: mockItem.bytes,
+          mime: mockItem.mime,
           caption: imageStatusCaption,
-          filename: imageItems[0].filename,
+          filename: mockItem.filename,
         });
         await sendTelegramPhotoBuffer({
           chatId,
           token,
-          bytes: imageItems[1].bytes,
-          filename: imageItems[1].filename,
+          bytes: rawItem.bytes,
+          mime: rawItem.mime,
+          caption: 'Исходник клиента',
+          filename: rawItem.filename,
         });
       }
-    } else if (imageItems.length === 1) {
+    } else if (mockItem) {
       await sendTelegramPhotoBuffer({
         chatId,
         token,
-        bytes: imageItems[0].bytes,
+        bytes: mockItem.bytes,
+        mime: mockItem.mime,
         caption: imageStatusCaption,
-        filename: imageItems[0].filename,
+        filename: mockItem.filename,
+      });
+    } else if (rawItem) {
+      await sendTelegramPhotoBuffer({
+        chatId,
+        token,
+        bytes: rawItem.bytes,
+        mime: rawItem.mime,
+        caption: imageStatusCaption,
+        filename: rawItem.filename,
       });
     }
 
@@ -273,14 +285,6 @@ export async function POST(request: NextRequest) {
     if (!isKnownCovering(parsed.data.covering)) return NextResponse.json({ ok: false, error: 'Выберите корректное покрытие.' }, { status: 400 });
 
     const coveringLabel = getCoveringLabel(parsed.data.covering);
-
-    if (rawImageDataUrl && !dataUrlToBuffer(rawImageDataUrl)) {
-      return NextResponse.json({ ok: false, error: 'Некорректный формат rawImageDataUrl.' }, { status: 400 });
-    }
-
-    if (mockPngDataUrl && !dataUrlToBuffer(mockPngDataUrl)) {
-      return NextResponse.json({ ok: false, error: 'Некорректный формат mockPngDataUrl.' }, { status: 400 });
-    }
 
     const text = buildMugsText({
       name: parsed.data.name,
