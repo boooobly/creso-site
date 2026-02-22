@@ -3,7 +3,7 @@
 import { ChangeEvent, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { Group, Image as KonvaImage, Layer, Rect, Stage, Transformer } from 'react-konva';
 import type Konva from 'konva';
-import { MOCKUP_SRC, PRINT_AREA } from '@/components/mug-designer/mugMockupConfig';
+import { MOCKUP_HEIGHT, MOCKUP_SRC, MOCKUP_WIDTH, PRINT_AREA } from '@/components/mug-designer/mugMockupConfig';
 import { MAX_IMAGE_SCALE, MIN_IMAGE_SIDE } from '@/lib/mugDesigner/constants';
 
 export const PRINT_RECT = {
@@ -39,11 +39,19 @@ function fitScale(imgW: number, imgH: number): number {
   return Math.min(PRINT_RECT.width / imgW, PRINT_RECT.height / imgH);
 }
 
+function clampScale(value: number): number {
+  if (!Number.isFinite(value) || value === 0) return 1;
+  return value;
+}
+
 function clampPosition(x: number, y: number, width: number, height: number): { x: number; y: number } {
-  const minX = PRINT_RECT.x - width / 2;
-  const maxX = PRINT_RECT.x + PRINT_RECT.width + width / 2;
-  const minY = PRINT_RECT.y - height / 2;
-  const maxY = PRINT_RECT.y + PRINT_RECT.height + height / 2;
+  const minVisibleX = Math.min(width * 0.25, PRINT_RECT.width * 0.35);
+  const minVisibleY = Math.min(height * 0.25, PRINT_RECT.height * 0.35);
+
+  const minX = PRINT_RECT.x - width / 2 + minVisibleX;
+  const maxX = PRINT_RECT.x + PRINT_RECT.width + width / 2 - minVisibleX;
+  const minY = PRINT_RECT.y - height / 2 + minVisibleY;
+  const maxY = PRINT_RECT.y + PRINT_RECT.height + height / 2 - minVisibleY;
 
   return {
     x: Math.min(Math.max(x, minX), maxX),
@@ -72,7 +80,8 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const [error, setError] = useState('');
   const [mockupImage, setMockupImage] = useState<HTMLImageElement | null>(null);
   const [userImage, setUserImage] = useState<HTMLImageElement | null>(null);
-  const [canvasWidth, setCanvasWidth] = useState(900);
+  const [viewportWidth, setViewportWidth] = useState(900);
+  const [viewportHeight, setViewportHeight] = useState(460);
   const [transform, setTransform] = useState<TransformState>(defaultTransform);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedElement, setSelectedElement] = useState<SelectedElement>(null);
@@ -86,7 +95,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       exportDesign: async () => {
         if (!stageRef.current || !printLayerRef.current || !userImage || !file) return null;
 
-        const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 2, mimeType: 'image/png' });
+        const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 1, mimeType: 'image/png' });
         const printPngDataUrl = printLayerRef.current.toDataURL({
           x: PRINT_RECT.x,
           y: PRINT_RECT.y,
@@ -132,8 +141,14 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width ?? 900;
-      setCanvasWidth(Math.min(width, 900));
+      const maxWidth = Math.min(width, 1100);
+      const maxHeight = 560;
+      const scale = Math.min(maxWidth / MOCKUP_WIDTH, maxHeight / MOCKUP_HEIGHT);
+
+      setViewportWidth(MOCKUP_WIDTH * scale);
+      setViewportHeight(MOCKUP_HEIGHT * scale);
     });
+
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
@@ -205,13 +220,13 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const onFitToPrint = () => {
     if (!userImage) return;
     const nextScale = fitScale(userImage.width, userImage.height);
-    setTransform((prev) => ({
-      ...prev,
+    setTransform({
       x: PRINT_RECT.x + PRINT_RECT.width / 2,
       y: PRINT_RECT.y + PRINT_RECT.height / 2,
       scaleX: nextScale,
       scaleY: nextScale,
-    }));
+      rotation: 0,
+    });
   };
 
   const onReset = () => {
@@ -233,47 +248,33 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     'rounded-md border border-neutral-200 bg-white px-3 py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50';
 
   if (!mockupImage) {
-    return <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm text-sm text-neutral-600">Загрузка конструктора…</div>;
+    return <div className="rounded-2xl border border-neutral-200 bg-white p-6 text-sm text-neutral-600 shadow-sm">Загрузка конструктора…</div>;
   }
 
-  const stageScale = canvasWidth / mockupImage.width;
-  const stageHeight = mockupImage.height * stageScale;
+  const stageScale = viewportWidth / MOCKUP_WIDTH;
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
       <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <div ref={wrapperRef} className="mx-auto flex w-full max-w-[900px] justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4">
-          <Stage ref={stageRef} width={canvasWidth} height={stageHeight}>
+        <div ref={wrapperRef} className="mx-auto flex w-full max-w-[1100px] justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4">
+          <Stage width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} scaleX={stageScale} scaleY={stageScale} ref={stageRef} style={{ width: viewportWidth, height: viewportHeight }}>
             <Layer>
-              <Group scaleX={stageScale} scaleY={stageScale}>
-                <KonvaImage image={mockupImage} x={0} y={0} width={mockupImage.width} height={mockupImage.height} opacity={0.72} />
-              </Group>
-              <Group scaleX={stageScale} scaleY={stageScale} clipX={PRINT_RECT.x} clipY={PRINT_RECT.y} clipWidth={PRINT_RECT.width} clipHeight={PRINT_RECT.height}>
-                <KonvaImage image={mockupImage} x={0} y={0} width={mockupImage.width} height={mockupImage.height} />
-              </Group>
+              <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
             </Layer>
 
             <Layer ref={printLayerRef}>
-              <Group scaleX={stageScale} scaleY={stageScale}>
-                <Rect x={0} y={0} width={mockupImage.width} height={PRINT_RECT.y} fill="rgba(23,23,23,0.08)" />
-                <Rect
-                  x={0}
-                  y={PRINT_RECT.y + PRINT_RECT.height}
-                  width={mockupImage.width}
-                  height={mockupImage.height - (PRINT_RECT.y + PRINT_RECT.height)}
-                  fill="rgba(23,23,23,0.08)"
-                />
-                <Rect x={0} y={PRINT_RECT.y} width={PRINT_RECT.x} height={PRINT_RECT.height} fill="rgba(23,23,23,0.08)" />
-                <Rect
-                  x={PRINT_RECT.x + PRINT_RECT.width}
-                  y={PRINT_RECT.y}
-                  width={mockupImage.width - (PRINT_RECT.x + PRINT_RECT.width)}
-                  height={PRINT_RECT.height}
-                  fill="rgba(23,23,23,0.08)"
-                />
-              </Group>
+              <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0.10)" />
+              <Rect
+                x={PRINT_RECT.x}
+                y={PRINT_RECT.y}
+                width={PRINT_RECT.width}
+                height={PRINT_RECT.height}
+                cornerRadius={8}
+                fill="black"
+                globalCompositeOperation="destination-out"
+              />
 
-              <Group scaleX={stageScale} scaleY={stageScale} clipX={PRINT_RECT.x} clipY={PRINT_RECT.y} clipWidth={PRINT_RECT.width} clipHeight={PRINT_RECT.height}>
+              <Group clipX={PRINT_RECT.x} clipY={PRINT_RECT.y} clipWidth={PRINT_RECT.width} clipHeight={PRINT_RECT.height}>
                 {userImage && (
                   <KonvaImage
                     ref={userImageRef}
@@ -315,15 +316,23 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                 )}
               </Group>
 
-              <Group scaleX={stageScale} scaleY={stageScale}>
-                <Rect x={PRINT_RECT.x} y={PRINT_RECT.y} width={PRINT_RECT.width} height={PRINT_RECT.height} stroke="#dc2626" dash={[6, 6]} strokeWidth={2} />
-                {isDragging && (
-                  <>
-                    <Rect x={PRINT_RECT.x + PRINT_RECT.width / 2} y={PRINT_RECT.y} width={1} height={PRINT_RECT.height} fill="rgba(220,38,38,0.4)" />
-                    <Rect x={PRINT_RECT.x} y={PRINT_RECT.y + PRINT_RECT.height / 2} width={PRINT_RECT.width} height={1} fill="rgba(220,38,38,0.4)" />
-                  </>
-                )}
-              </Group>
+              <Rect
+                x={PRINT_RECT.x}
+                y={PRINT_RECT.y}
+                width={PRINT_RECT.width}
+                height={PRINT_RECT.height}
+                cornerRadius={8}
+                stroke="#dc2626"
+                dash={[10, 8]}
+                strokeWidth={4}
+              />
+
+              {isDragging && (
+                <>
+                  <Rect x={PRINT_RECT.x + PRINT_RECT.width / 2} y={PRINT_RECT.y} width={2} height={PRINT_RECT.height} fill="rgba(220,38,38,0.35)" />
+                  <Rect x={PRINT_RECT.x} y={PRINT_RECT.y + PRINT_RECT.height / 2} width={PRINT_RECT.width} height={2} fill="rgba(220,38,38,0.35)" />
+                </>
+              )}
 
               {userImage && selectedElement === 'image' && (
                 <Transformer
@@ -334,8 +343,11 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                   anchorStroke="#dc2626"
                   anchorFill="#dc2626"
                   borderStroke="#dc2626"
-                  anchorSize={8}
+                  anchorSize={14}
                   boundBoxFunc={(oldBox, newBox) => {
+                    if (!Number.isFinite(newBox.width) || !Number.isFinite(newBox.height) || newBox.width <= 0 || newBox.height <= 0) {
+                      return oldBox;
+                    }
                     if (newBox.width < MIN_IMAGE_SIDE || newBox.height < MIN_IMAGE_SIDE) return oldBox;
                     if (newBox.width > PRINT_RECT.width * MAX_IMAGE_SCALE || newBox.height > PRINT_RECT.height * MAX_IMAGE_SCALE) return oldBox;
                     return newBox;
@@ -344,8 +356,10 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                     const node = userImageRef.current;
                     if (!node || !userImage) return;
 
-                    const width = userImage.width * Math.abs(node.scaleX());
-                    const height = userImage.height * Math.abs(node.scaleY());
+                    const nextScaleX = clampScale(node.scaleX());
+                    const nextScaleY = clampScale(node.scaleY());
+                    const width = userImage.width * Math.abs(nextScaleX);
+                    const height = userImage.height * Math.abs(nextScaleY);
                     const next = clampPosition(node.x(), node.y(), width, height);
 
                     node.x(next.x);
@@ -355,8 +369,8 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                       ...prev,
                       x: next.x,
                       y: next.y,
-                      scaleX: node.scaleX(),
-                      scaleY: node.scaleY(),
+                      scaleX: nextScaleX,
+                      scaleY: nextScaleY,
                       rotation: node.rotation(),
                     }));
                   }}
@@ -367,17 +381,17 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         </div>
       </section>
 
-      <aside className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm space-y-6">
+      <aside className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
-          <button type="button" className={`w-full ${primaryButtonClass}`} onClick={() => undefined}>
+          <button type="button" className={`w-full ${primaryButtonClass}`} disabled>
             Добавить текст
           </button>
           <label className={`block w-full cursor-pointer text-center ${primaryButtonClass}`}>
             Загрузить изображение
             <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
           </label>
-          <button type="button" className={`w-full ${primaryButtonClass}`} onClick={() => undefined}>
+          <button type="button" className={`w-full ${primaryButtonClass}`} disabled>
             Добавить клипарт
           </button>
           {error && <p className="text-sm text-red-600">{error}</p>}
@@ -390,7 +404,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
               <button type="button" className={toolButtonClass} onClick={() => onFileChange(null)}>
                 Удалить
               </button>
-              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, x: prev.x + 12, y: prev.y + 12 }))}>
+              <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, x: prev.x + 60, y: prev.y + 60 }))}>
                 Дублировать
               </button>
               <button type="button" className={toolButtonClass} onClick={() => setTransform((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }))}>
@@ -403,7 +417,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                 Отразить по Y
               </button>
               <button type="button" className={toolButtonClass} onClick={onFitToPrint}>
-                Вписать в зону
+                Вписать в зону печати
               </button>
             </div>
           </div>
