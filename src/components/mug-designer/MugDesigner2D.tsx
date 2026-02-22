@@ -391,9 +391,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
             Загрузить изображение
             <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
           </label>
-          <button type="button" className={`w-full ${primaryButtonClass}`} disabled>
-            Добавить клипарт
-          </button>
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
 
@@ -444,12 +441,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Параметры</p>
-          <label className="space-y-1 text-sm text-neutral-700">
-            <span>Размер</span>
-            <select className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm">
-              <option>330 мл</option>
-            </select>
-          </label>
           <div className="space-y-1">
             <p className="text-sm text-neutral-700">Количество</p>
             <div className="flex items-center justify-between rounded-md border border-neutral-200 bg-white px-2 py-1">
@@ -467,7 +458,13 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         <div className="space-y-3 border-t border-neutral-200 pt-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Стоимость</p>
           <p className="text-3xl font-semibold">490 ₽</p>
-          <button type="button" className={`w-full ${primaryButtonClass}`}>
+          <button
+            type="button"
+            className={`w-full ${primaryButtonClass}`}
+            onClick={() => {
+              document.getElementById('mug-order-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
             Добавить в заказ
           </button>
         </div>
