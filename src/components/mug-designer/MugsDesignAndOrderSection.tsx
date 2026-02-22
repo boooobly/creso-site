@@ -32,7 +32,7 @@ export default function MugsDesignAndOrderSection({ complexityLevels, checklist 
       </Section>
 
       <Section id="mugs-request" className="pt-0 pb-12">
-        <OrderMugsForm needsDesign={needsDesign} />
+        <OrderMugsForm />
       </Section>
     </>
   );
