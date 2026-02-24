@@ -1,16 +1,7 @@
 import Section from '@/components/Section';
-import Link from 'next/link';
 import Image from 'next/image';
 import MugPrintAreaCalibrator from '@/components/mug-designer/MugPrintAreaCalibrator';
 import OrderMugsForm from '@/components/OrderMugsForm';
-
-const anchorLinks = [
-  { href: '#mugs-description', label: 'Описание' },
-  { href: '#mugs-prices', label: 'Цены' },
-  { href: '#mugs-designer', label: 'Конструктор' },
-  { href: '#mugs-request', label: 'Заявка' },
-  { href: '#mugs-faq', label: 'Вопросы' },
-];
 
 const faqItems = [
   {
@@ -50,12 +41,9 @@ export default function MugsServicePage() {
               </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="#mugs-designer" className="rounded-md bg-red-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-red-700">
+                <a href="#mugs-designer" className="rounded-md bg-red-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-red-700">
                   Собрать макет
-                </Link>
-                <Link href="/portfolio" className="rounded-md border border-neutral-200 bg-white px-5 py-3 text-sm font-medium transition hover:bg-neutral-50">
-                  Смотреть примеры
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -65,18 +53,6 @@ export default function MugsServicePage() {
               </div>
             </div>
           </div>
-        </div>
-      </Section>
-
-      <Section className="pt-0 pb-0">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <nav className="flex flex-wrap gap-2">
-            {anchorLinks.map((link) => (
-              <a key={link.href} href={link.href} className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50">
-                {link.label}
-              </a>
-            ))}
-          </nav>
         </div>
       </Section>
 
