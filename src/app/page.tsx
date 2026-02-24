@@ -5,6 +5,15 @@ import faqLocal from '@/data/faq.json';
 import { getServices, getPortfolio, getFaq } from '@/lib/contentful';
 import { messages } from '@/lib/messages';
 
+const trustBadges = ['Более 10 лет на рынке', 'Собственное производство', 'Контроль качества на каждом этапе', 'Сроки от 2 дней'];
+
+const processSteps = [
+  { title: 'Бриф и расчёт', description: 'Уточняем задачу, сроки и бюджет. Предлагаем лучший формат и материалы.' },
+  { title: 'Макет и согласование', description: 'Подготавливаем визуализацию и корректируем детали до финального согласования.' },
+  { title: 'Производство', description: 'Запускаем проект на собственных мощностях, соблюдая стандарты качества.' },
+  { title: 'Монтаж и передача', description: 'Организуем доставку, установку или передачу готового тиража.' },
+];
+
 export default async function Home() {
   const [sCMS, pCMS, fCMS] = await Promise.all([
     getServices().catch(() => null),
