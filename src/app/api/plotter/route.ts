@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
 import { logger } from '@/lib/logger';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 export const runtime = 'nodejs';
 
 type PlotterPayload = {
@@ -42,6 +42,7 @@ function formatExtras(extras: PlotterPayload['calculator']['extras']) {
 }
 
 async function sendTelegramMessage(payload: PlotterPayload) {
+  const env = getServerEnv();
   const botToken = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
   if (!botToken || !chatId) return false;
@@ -78,6 +79,7 @@ async function sendTelegramMessage(payload: PlotterPayload) {
 }
 
 async function sendEmail(payload: PlotterPayload) {
+  const env = getServerEnv();
   const host = env.SMTP_HOST;
   const port = Number(env.SMTP_PORT || 0);
   const user = env.SMTP_USER;
@@ -122,6 +124,7 @@ async function sendEmail(payload: PlotterPayload) {
 
 export async function POST(req: NextRequest) {
   try {
+    getServerEnv();
     const payload = (await req.json()) as PlotterPayload;
 
     if (!payload?.contact?.name || !payload?.contact?.phone || !payload?.contact?.agreed) {
@@ -146,6 +149,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }

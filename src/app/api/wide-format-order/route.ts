@@ -7,7 +7,7 @@ import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentW
 import { getWideFormatMaterialLabel, WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/pricing-config/wideFormat';
 
 import { logger } from '@/lib/logger';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = 50 * 1024 * 1024;
@@ -47,6 +47,7 @@ function isAllowedUploadFile(file: File): boolean {
 }
 
 async function sendTelegramMessage(text: string) {
+  const env = getServerEnv();
   const botToken = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
   if (!botToken || !chatId) return false;
@@ -61,6 +62,7 @@ async function sendTelegramMessage(text: string) {
 }
 
 async function sendEmail(text: string, file?: File) {
+  const env = getServerEnv();
   const host = env.SMTP_HOST;
   const port = Number(env.SMTP_PORT || 0);
   const user = env.SMTP_USER;
@@ -95,6 +97,8 @@ async function sendEmail(text: string, file?: File) {
 
 export async function POST(request: NextRequest) {
   try {
+    const env = getServerEnv();
+
     if (!hasUserAgent(request)) {
       return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
     }
@@ -248,6 +252,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, fileSent: telegramCanSendFile ? true : undefined });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }
