@@ -3,10 +3,11 @@ import { z } from 'zod';
 import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
 import { getServerEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
+import { validateUploadedFile } from '@/lib/file-validation';
 import { sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramLead } from '@/lib/notifications/telegram';
 import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram/sendDocumentWithCaption';
-import { MUGS_ALLOWED_EXTENSIONS, MUGS_ALLOWED_MIME_TYPES, MUGS_MAX_UPLOAD_SIZE_MB } from '@/lib/pricing-config/mugs';
+import { MUGS_ALLOWED_EXTENSIONS, MUGS_ALLOWED_MIME_TYPES } from '@/lib/pricing-config/mugs';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
 
@@ -33,12 +34,6 @@ const tshirtsRequestSchema = z.object({
 
 function toText(value: FormDataEntryValue | null): string {
   return typeof value === 'string' ? value.trim() : '';
-}
-
-function isAllowedFile(file: File): boolean {
-  const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase() ?? ''}` : '';
-  const mime = file.type.toLowerCase();
-  return allowedExtensionsSet.has(extension) || allowedMimeTypesSet.has(mime);
 }
 
 function formatFileSize(size: number): string {
@@ -184,12 +179,16 @@ export async function POST(request: NextRequest) {
 
     const file = fileValue instanceof File ? fileValue : null;
 
-    if (file && !isAllowedFile(file)) {
-      return NextResponse.json({ ok: false, error: 'Разрешены png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg.' }, { status: 400 });
-    }
+    if (file) {
+      const fileValidation = validateUploadedFile({
+        file,
+        allowedMimeTypes: allowedMimeTypesSet,
+        allowedExtensions: allowedExtensionsSet,
+      });
 
-    if (file && (file.size <= 0 || file.size > MUGS_MAX_UPLOAD_SIZE_MB * 1024 * 1024)) {
-      return NextResponse.json({ ok: false, error: `Размер файла должен быть от 1 байта до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.` }, { status: 400 });
+      if (!fileValidation.ok) {
+        return NextResponse.json({ ok: false, error: fileValidation.error }, { status: 400 });
+      }
     }
 
     const normalizedPhone = normalizePhone(parsed.data.phone);
