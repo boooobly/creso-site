@@ -21,6 +21,42 @@ a { @apply underline-offset-4; }
 
 .card { @apply rounded-2xl border border-neutral-300 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900; }
 
+.premium-card {
+  @apply relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_8px_24px_-22px_rgba(15,23,42,0.45)] transition-all duration-300;
+}
+.premium-card::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(212, 28, 28, 0.6), rgba(212, 28, 28, 0.15));
+  transform: scaleX(0.2);
+  opacity: 0;
+  transform-origin: left;
+  transition: transform 260ms ease, opacity 260ms ease;
+}
+.premium-card:hover {
+  @apply -translate-y-1 border-neutral-300 shadow-[0_14px_34px_-24px_rgba(15,23,42,0.45)];
+}
+.premium-card:hover::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.card-dot {
+  @apply inline-block size-1.5 rounded-full;
+  background-color: rgba(212, 28, 28, 0.8);
+}
+
+.chip-elevated {
+  @apply rounded-full border shadow-[0_6px_18px_-16px_rgba(15,23,42,0.55)];
+  border-color: rgba(212, 28, 28, 0.2);
+  background-color: rgba(212, 28, 28, 0.06);
+}
+
 .highlight-on-scroll {
   animation: form-highlight-pulse 1.8s ease-out;
   border-color: rgba(239, 68, 68, 0.45);
@@ -36,4 +72,18 @@ a { @apply underline-offset-4; }
     background-color: transparent;
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
   }
+}
+
+
+.marquee-wrap {
+  position: relative;
+}
+
+.marquee-track {
+  animation: trust-marquee 32s linear infinite;
+}
+
+@keyframes trust-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
