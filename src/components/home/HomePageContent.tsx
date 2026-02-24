@@ -8,9 +8,8 @@ import FAQ from '@/components/FAQ';
 import LeadForm from '@/components/LeadForm';
 import BadgeChip from '@/components/home/BadgeChip';
 import FeatureCard from '@/components/home/FeatureCard';
-import KpiCard from '@/components/home/KpiCard';
 import type { SiteMessages } from '@/lib/messages';
-import { fadeUp, staggerContainer } from '@/lib/motion';
+import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
 
 type HomePageContentProps = {
   services: Array<{ id: string; title: string; description: string; href: string }>;
@@ -19,7 +18,9 @@ type HomePageContentProps = {
   messages: SiteMessages;
 };
 
-const trustBadges = ['Более 10 лет на рынке', 'Собственное производство', 'Контроль качества на каждом этапе', 'Сроки от 2 дней'];
+const trustBadges = ['Собственное производство', 'Монтажная бригада', 'НДС и договор', 'Гарантия 5 лет'];
+
+const trustedByPlaceholders = ['Компания A', 'Компания B', 'Компания C', 'Компания D', 'Компания E', 'Компания F', 'Компания G', 'Компания H'];
 
 const processSteps = [
   { title: 'Бриф и расчёт', description: 'Уточняем задачу, сроки и бюджет. Предлагаем лучший формат и материалы.' },
@@ -33,52 +34,67 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
 
   return (
     <div>
-      <Section className="pb-10 md:pb-16">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-          <motion.div className="space-y-6" variants={fadeUp()} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={{ once: true, amount: 0.2 }}>
+      <Section className="pb-8 md:pb-12">
+        <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
+          <div className="space-y-6">
             <p className="inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">
               Производственная студия Creso
             </p>
-            <h1 className="max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-neutral-900 md:text-6xl">{messages.hero.title}</h1>
-            <p className="max-w-2xl text-base text-neutral-600 md:text-lg">{messages.hero.subtitle}</p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
-                <Link className="btn-primary no-underline text-center shadow-sm hover:shadow-md" href="/#lead-form">
-                  {messages.hero.ctas.primary}
-                </Link>
-              </motion.div>
-              <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
-                <Link className="btn-secondary no-underline text-center shadow-sm hover:shadow-md" href="/portfolio">
-                  {messages.hero.ctas.secondary}
-                </Link>
-              </motion.div>
-            </div>
-          </motion.div>
-          <motion.div
-            className="grid gap-4 sm:grid-cols-2"
-            variants={staggerContainer(0.08)}
+            <h1 className="max-w-5xl text-4xl font-black leading-[1.05] tracking-tight text-neutral-900 md:text-6xl lg:text-7xl">
+              Реклама и производство<br className="hidden md:block" /> под ключ без срывов сроков
+            </h1>
+            <p className="max-w-3xl text-base leading-relaxed text-neutral-600 md:text-lg">{messages.hero.subtitle}</p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
+              <Link className="btn-primary no-underline text-center shadow-sm hover:shadow-md" href="/#lead-form">
+                Рассчитать стоимость
+              </Link>
+            </motion.div>
+            <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
+              <Link className="btn-secondary no-underline text-center shadow-sm hover:shadow-md" href="/portfolio">
+                Смотреть портфолио
+              </Link>
+            </motion.div>
+          </div>
+
+          <motion.ul
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+            variants={staggerContainer(0.07)}
             initial={shouldReduceMotion ? false : 'hidden'}
             whileInView={shouldReduceMotion ? undefined : 'show'}
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={viewportOnce}
           >
-            {[
-              ['5000+', 'Реализованных проектов'],
-              ['2 дня', 'Средний срок запуска'],
-              ['24/7', 'Поддержка менеджера'],
-              ['98%', 'Клиентов возвращаются снова'],
-            ].map(([value, label]) => (
-              <motion.div key={value} variants={fadeUp(14)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }}>
-                <KpiCard value={value} label={label} />
-              </motion.div>
+            {trustBadges.map((badge) => (
+              <BadgeChip key={badge} label={badge} />
             ))}
-          </motion.div>
-        </div>
+          </motion.ul>
+        </motion.div>
       </Section>
 
-      <Section className="py-8 md:py-10" background="muted">
-        <motion.ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={{ once: true, amount: 0.2 }}>
-          {trustBadges.map((badge) => (
-            <BadgeChip key={badge} label={badge} />
+      <Section className="border-y border-neutral-200/70 py-10 md:py-12" background="muted">
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-neutral-500">Нам доверяют</p>
+          <div className="h-px flex-1 bg-neutral-200" />
+        </div>
+        <motion.ul
+          className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8"
+          variants={staggerContainer(0.05)}
+          initial={shouldReduceMotion ? false : 'hidden'}
+          whileInView={shouldReduceMotion ? undefined : 'show'}
+          viewport={viewportOnce}
+        >
+          {trustedByPlaceholders.map((item) => (
+            <motion.li
+              key={item}
+              variants={fadeUp(10)}
+              whileHover={shouldReduceMotion ? undefined : { y: -2 }}
+              transition={{ duration: 0.2 }}
+              className="flex h-14 items-center justify-center rounded-2xl border border-neutral-200/80 bg-white/90 px-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 opacity-70 grayscale"
+            >
+              {item}
+            </motion.li>
           ))}
         </motion.ul>
       </Section>
@@ -88,16 +104,16 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Услуги</p>
           <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Комплексные решения для рекламы и печати</h2>
         </div>
-        <motion.div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={{ once: true, amount: 0.2 }}>
+        <motion.div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {services.map((s) => (
-            <motion.div key={s.id} variants={fadeUp(16)} whileHover={shouldReduceMotion ? undefined : { y: -5 }} transition={{ duration: 0.22 }}>
+            <motion.div key={s.id} variants={fadeUp(16)}>
               <ServiceCard title={s.title} desc={s.description} href={s.href} />
             </motion.div>
           ))}
         </motion.div>
       </Section>
 
-      <Section background="muted">
+      <Section background="muted" className="border-y border-neutral-200/70">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Портфолио</p>
@@ -105,7 +121,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           </div>
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)]">Смотреть всё портфолио</Link>
         </div>
-        <motion.div className="grid gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={{ once: true, amount: 0.2 }}>
+        <motion.div className="grid gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {portfolio.slice(0, 3).map((item) => (
             <motion.div key={item.id} variants={fadeUp(18)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }}>
               <FeatureCard title={item.title} category={item.category} href="/portfolio" />
@@ -119,7 +135,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Процесс</p>
           <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Как мы запускаем ваш проект</h2>
         </div>
-        <motion.ol className="grid gap-5 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={{ once: true, amount: 0.2 }}>
+        <motion.ol className="grid gap-5 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {processSteps.map((step, index) => (
             <motion.li key={step.title} variants={fadeUp(16)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md">
               <p className="text-sm font-bold text-[var(--brand-red)]">0{index + 1}</p>
@@ -130,7 +146,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.ol>
       </Section>
 
-      <Section background="muted">
+      <Section background="muted" className="border-y border-neutral-200/70">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">FAQ</p>
@@ -138,19 +154,20 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           </div>
           <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)]">Задать свой вопрос</Link>
         </div>
-        <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={{ once: true, amount: 0.2 }}>
+        <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <FAQ items={faq.slice(0, 4)} />
         </motion.div>
       </Section>
 
       <Section id="lead-form">
-        <motion.div className="grid gap-10 rounded-3xl border border-neutral-200 bg-white p-6 md:p-10 lg:grid-cols-[1fr_1.1fr]" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={{ once: true, amount: 0.2 }}>
+        <motion.div className="grid gap-10 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm md:p-10 lg:grid-cols-[1fr_1.1fr]" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <div className="space-y-4">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Оставить заявку</p>
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">{messages.lead.title}</h2>
             <p className="text-sm text-neutral-600">Опишите задачу, а мы предложим оптимальный формат производства, сроки и стоимость.</p>
+            <p className="text-sm text-neutral-500">Ответим в течение 30 минут. Без спама.</p>
           </div>
-          <LeadForm t={messages} />
+          <LeadForm t={messages} showMessageField />
         </motion.div>
       </Section>
     </div>
