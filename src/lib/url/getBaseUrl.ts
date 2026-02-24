@@ -6,5 +6,9 @@ export function getBaseUrl(): string {
     return fromEnv.replace(/\/$/, '');
   }
 
-  return env.NODE_ENV === 'production' ? 'http://localhost:3000' : 'http://localhost:3000';
+  if (env.NODE_ENV === 'development') {
+    return 'http://localhost:3000';
+  }
+
+  throw new Error('[env] PUBLIC_BASE_URL is required outside development.');
 }

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
+import { env } from '@/lib/env';
 
 export const runtime = 'nodejs';
 
 const statusSchema = z.enum(['pending', 'approved', 'rejected']);
 
 function isAdminAuthorized(request: NextRequest): boolean {
-  const adminToken = process.env.ADMIN_TOKEN;
+  const adminToken = env.ADMIN_TOKEN;
   const headerToken = request.headers.get('x-admin-token');
 
   if (!adminToken) {
