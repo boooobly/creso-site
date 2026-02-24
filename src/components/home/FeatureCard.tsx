@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'framer-motion';
 
 export default function FeatureCard({
   title,
@@ -9,8 +12,14 @@ export default function FeatureCard({
   category: string;
   href: string;
 }) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
-    <article className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <motion.article
+      whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+      transition={{ duration: 0.22 }}
+      className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+    >
       <div className="h-36 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white" />
       <div className="space-y-3 p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--brand-red)]">{category}</p>
@@ -19,6 +28,6 @@ export default function FeatureCard({
           Смотреть кейс
         </Link>
       </div>
-    </article>
+    </motion.article>
   );
 }
