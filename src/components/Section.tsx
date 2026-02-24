@@ -1,23 +1,28 @@
-'use client';
-import { motion } from 'framer-motion';
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
+import Container from '@/components/Container';
+
+type SectionProps = PropsWithChildren<{
+  className?: string;
+  containerClassName?: string;
+  id?: string;
+  background?: 'default' | 'muted';
+}>;
+
+const backgroundStyles: Record<NonNullable<SectionProps['background']>, string> = {
+  default: 'bg-white',
+  muted: 'bg-neutral-50/70',
+};
 
 export default function Section({
   children,
   className = '',
   containerClassName = '',
   id,
-}: PropsWithChildren<{ className?: string; containerClassName?: string; id?: string }>) {
+  background = 'default',
+}: SectionProps) {
   return (
-    <motion.section
-      id={id}
-      className={`py-16 ${className}`.trim()}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      <div className={`container ${containerClassName}`.trim()}>{children}</div>
-    </motion.section>
+    <section id={id} className={`py-12 md:py-20 ${backgroundStyles[background]} ${className}`.trim()}>
+      <Container className={containerClassName}>{children}</Container>
+    </section>
   );
 }
