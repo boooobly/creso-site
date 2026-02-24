@@ -26,6 +26,7 @@ type FormValues = {
   email: string;
   comment: string;
   website: string;
+  flyersRequested: boolean;
 };
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
@@ -36,6 +37,7 @@ const defaultValues: FormValues = {
   email: '',
   comment: '',
   website: '',
+  flyersRequested: false,
 };
 
 const FIXED_NOTES = [
@@ -67,7 +69,8 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
       printType: 'offset',
     },
     notes: FIXED_NOTES,
-  }), [summary]);
+    flyersRequested: values.flyersRequested,
+  }), [summary, values.flyersRequested]);
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -125,6 +128,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
       formData.set('stock', payloadMeta.fixedSpecs.stock);
       formData.set('printType', payloadMeta.fixedSpecs.printType);
       formData.set('notes', JSON.stringify(payloadMeta.notes));
+      formData.set('flyersRequested', String(payloadMeta.flyersRequested));
 
       if (file) {
         formData.set('fileName', file.name);
@@ -223,6 +227,23 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
             />
             <p className="text-xs text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
           </div>
+        </div>
+
+
+        <div className="space-y-2">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={values.flyersRequested}
+              onChange={(e) => setValues((prev) => ({ ...prev, flyersRequested: e.target.checked }))}
+              className="h-4 w-4"
+            />
+            <span className="text-sm font-medium">Флаеры (расчёт по согласованию)</span>
+          </label>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">Укажите желаемый формат, бумагу и тираж в комментарии.</p>
+          {values.flyersRequested && !values.comment.trim() && (
+            <p className="text-xs text-amber-700 dark:text-amber-300">Подсказка: добавьте в комментарии параметры флаеров для точного расчёта.</p>
+          )}
         </div>
 
         <label className="space-y-2 block">

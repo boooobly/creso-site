@@ -109,6 +109,7 @@ export async function POST(request: NextRequest) {
     const stock = toStringValue(formData.get('stock'));
     const printType = toStringValue(formData.get('printType'));
     const notes = toStringValue(formData.get('notes'));
+    const flyersRequested = toBooleanValue(formData.get('flyersRequested'));
 
     const fileName = toStringValue(formData.get('fileName'));
     const fileType = toStringValue(formData.get('fileType'));
@@ -175,6 +176,7 @@ export async function POST(request: NextRequest) {
       `Материал: ${stock}`,
       `Тип печати: ${printType}`,
       `Notes: ${notes || '—'}`,
+      `Флаеры: ${flyersRequested ? 'нужен расчёт по согласованию с менеджером.' : 'не запрошены'}`,
       '',
       `Имя: ${name}`,
       `Телефон: ${phone}`,
