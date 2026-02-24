@@ -8,10 +8,11 @@ import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
 import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
 import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
+import { createOrderPdfAccessToken } from '@/lib/orders/pdfAccessToken';
 import { normalizePhone } from '@/lib/utils/phone';
 
 import { logger } from '@/lib/logger';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 export const runtime = 'nodejs';
 
 const bagetItemSchema = z.object({
@@ -104,6 +105,7 @@ async function createOrderWithRetry(data: {
 
 export async function POST(request: NextRequest) {
   try {
+    const env = getServerEnv();
     const payload = await request.json().catch(() => null);
     const parsed = orderSchema.safeParse(payload);
 
@@ -163,9 +165,11 @@ export async function POST(request: NextRequest) {
     });
 
 
-    const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS === 'true';
+    const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS;
     const customerEmail = parsed.data.customer.email?.trim();
-    const pdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf`;
+    const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
+    const pdfAccessToken = createOrderPdfAccessToken(orderNumber, tokenSecret);
+    const securePdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf?token=${encodeURIComponent(pdfAccessToken)}`;
 
     if (shouldSendCustomerEmail && customerEmail) {
       await sendCustomerOrderEmail({
@@ -175,7 +179,7 @@ export async function POST(request: NextRequest) {
         total: quote.total,
         prepayRequired,
         prepayAmount,
-        pdfUrl,
+        pdfUrl: securePdfUrl,
       }).catch((error) => {
         console.error('[orders] Customer email send failed', error);
       });
@@ -185,8 +189,13 @@ export async function POST(request: NextRequest) {
       quote,
       prepayRequired,
       prepayAmount,
+      securePdfUrl,
     });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('orders.post.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заказа.' }, { status: 500 });
   }
