@@ -11,6 +11,8 @@ import {
 
 type PrintType = 'single' | 'double';
 
+const LAMINATION_MULTIPLIER = 1.15;
+
 export default function PrintPricingCalculator() {
   const [quantity, setQuantity] = useState<number>(1000);
   const [printType, setPrintType] = useState<PrintType>('single');
