@@ -138,9 +138,9 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
         <motion.div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {services.map((s) => (
-            <motion.div key={s.id} variants={fadeUp(16)}>
-              <ServiceCard title={s.title} desc={s.description} href={s.href} />
+          {services.map((s, index) => (
+            <motion.div key={s.id} variants={fadeUp(16)} className={index === 0 ? 'md:col-span-2 xl:col-span-2' : ''}>
+              <ServiceCard title={s.title} desc={s.description} href={s.href} featured={index === 0} />
             </motion.div>
           ))}
         </motion.div>
