@@ -23,6 +23,17 @@ const sendCustomerEmailsSchema = z.preprocess((value) => {
   return value;
 }, z.boolean({ invalid_type_error: 'SEND_CUSTOMER_EMAILS must be a boolean (true/false).' }));
 
+const enableDatabaseSchema = z.preprocess((value) => {
+  if (value === undefined || value === null || value === '') return false;
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+  return value;
+}, z.boolean({ invalid_type_error: 'ENABLE_DATABASE must be a boolean (true/false).' }));
+
 const publicEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PUBLIC_BASE_URL: optionalUrl,
@@ -30,7 +41,8 @@ const publicEnvSchema = z.object({
 
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  DATABASE_URL: z.string().trim().min(1, 'DATABASE_URL is required.'),
+  ENABLE_DATABASE: enableDatabaseSchema,
+  DATABASE_URL: optionalTrimmedString,
   PUBLIC_BASE_URL: optionalUrl,
   SEND_CUSTOMER_EMAILS: sendCustomerEmailsSchema,
   ADMIN_TOKEN: z.string().trim().min(1, 'ADMIN_TOKEN is required.'),
@@ -54,6 +66,14 @@ const serverEnvSchema = z.object({
       code: z.ZodIssueCode.custom,
       path: ['PUBLIC_BASE_URL'],
       message: 'PUBLIC_BASE_URL is required when NODE_ENV=production.',
+    });
+  }
+
+  if (value.ENABLE_DATABASE && !value.DATABASE_URL) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['DATABASE_URL'],
+      message: 'DATABASE_URL is required when ENABLE_DATABASE=true.',
     });
   }
 
@@ -127,4 +147,16 @@ export function getServerEnv(): ServerEnv {
 
   cachedServerEnv = parsed.data;
   return cachedServerEnv;
+}
+
+export function requireDatabaseEnv(): void {
+  const env = getServerEnv();
+
+  if (!env.ENABLE_DATABASE) {
+    throw new Error('[env] Database is disabled. Set ENABLE_DATABASE=true to use Prisma/database routes.');
+  }
+
+  if (!env.DATABASE_URL) {
+    throw new Error('[env] DATABASE_URL is required when ENABLE_DATABASE=true.');
+  }
 }
