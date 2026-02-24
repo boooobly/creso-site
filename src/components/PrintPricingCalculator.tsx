@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import {
   BUSINESS_CARD_ALLOWED_QUANTITIES,
   calculateTotal,
@@ -40,12 +39,6 @@ export default function PrintPricingCalculator() {
     [],
   );
 
-  const handleFlyersRequest = () => {
-    openLeadFormWithCalculation({
-      service: 'Флаеры',
-      message: 'Запрос на флаеры. Флаеры рассчитываются индивидуально. Пожалуйста, свяжитесь со мной для уточнения размера, бумаги и тиража.',
-    });
-  };
 
   return (
     <div className="space-y-6">
@@ -170,9 +163,7 @@ export default function PrintPricingCalculator() {
       <section className="card p-4 md:p-6 space-y-3">
         <h2 className="text-xl font-semibold">Флаеры</h2>
         <p className="text-neutral-700 dark:text-neutral-300">Флаеры рассчитываются индивидуально. Цена зависит от размера, бумаги и тиража.</p>
-        <button type="button" className="btn-secondary" onClick={handleFlyersRequest}>
-          Получить расчёт у менеджера
-        </button>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">Отметьте чекбокс Флаеры в заявке ниже, и менеджер подготовит расчёт.</p>
       </section>
 
       <OrderBusinessCardsForm
