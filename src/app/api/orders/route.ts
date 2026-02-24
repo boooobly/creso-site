@@ -8,10 +8,11 @@ import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
 import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
 import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
+import { createOrderPdfAccessToken } from '@/lib/orders/pdfAccessToken';
 import { normalizePhone } from '@/lib/utils/phone';
 
 import { logger } from '@/lib/logger';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 export const runtime = 'nodejs';
 
 const bagetItemSchema = z.object({
@@ -63,7 +64,9 @@ async function createOrderWithRetry(data: {
     comment?: string;
   };
 }): Promise<string> {
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  // Public order numbers are intentionally short; collisions are resolved by retries
+  // and enforced DB uniqueness on Order.number.
+  for (let attempt = 0; attempt < 10; attempt += 1) {
     const orderNumber = generateOrderNumber();
 
     try {
@@ -91,7 +94,7 @@ async function createOrderWithRetry(data: {
         && error !== null
         && 'code' in error
         && (error as { code?: string }).code === 'P2002'
-        && attempt < 1
+        && attempt < 9
       ) {
         continue;
       }
@@ -99,11 +102,12 @@ async function createOrderWithRetry(data: {
     }
   }
 
-  throw new Error('Failed to create unique order number');
+  throw new Error('Failed to create unique order number after 10 collision retries.');
 }
 
 export async function POST(request: NextRequest) {
   try {
+    const env = getServerEnv();
     const payload = await request.json().catch(() => null);
     const parsed = orderSchema.safeParse(payload);
 
@@ -163,9 +167,11 @@ export async function POST(request: NextRequest) {
     });
 
 
-    const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS === 'true';
+    const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS;
     const customerEmail = parsed.data.customer.email?.trim();
-    const pdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf`;
+    const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
+    const pdfAccessToken = createOrderPdfAccessToken(orderNumber, tokenSecret);
+    const securePdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf?token=${encodeURIComponent(pdfAccessToken)}`;
 
     if (shouldSendCustomerEmail && customerEmail) {
       await sendCustomerOrderEmail({
@@ -175,7 +181,7 @@ export async function POST(request: NextRequest) {
         total: quote.total,
         prepayRequired,
         prepayAmount,
-        pdfUrl,
+        pdfUrl: securePdfUrl,
       }).catch((error) => {
         console.error('[orders] Customer email send failed', error);
       });
@@ -185,8 +191,13 @@ export async function POST(request: NextRequest) {
       quote,
       prepayRequired,
       prepayAmount,
+      securePdfUrl,
     });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('orders.post.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заказа.' }, { status: 500 });
   }
