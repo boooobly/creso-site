@@ -47,6 +47,7 @@ const serverEnvSchema = z.object({
   TELEGRAM_CHAT_ID: optionalTrimmedString,
   REVIEW_MODERATION_TOKEN: optionalTrimmedString,
   ORDER_TOKEN_SECRET: optionalTrimmedString,
+  PAYMENT_WEBHOOK_SECRET: optionalTrimmedString,
 }).superRefine((value, ctx) => {
   if (value.NODE_ENV === 'production' && !value.PUBLIC_BASE_URL) {
     ctx.addIssue({
