@@ -19,7 +19,6 @@ type HomePageContentProps = {
 };
 
 const trustBadges = ['Собственное производство', 'Монтажная бригада', 'НДС и договор', 'Гарантия 5 лет'];
-
 const trustedByPlaceholders = ['Компания A', 'Компания B', 'Компания C', 'Компания D', 'Компания E', 'Компания F', 'Компания G', 'Компания H'];
 
 const processSteps = [
@@ -60,13 +59,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        <motion.div
-          variants={fadeUp(20)}
-          initial={shouldReduceMotion ? false : 'hidden'}
-          whileInView={shouldReduceMotion ? undefined : 'show'}
-          viewport={viewportOnce}
-          className="relative z-10 space-y-8"
-        >
+        <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="relative z-10 space-y-8">
           <div className="space-y-6">
             <p className="inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">
               ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
@@ -90,13 +83,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
             </motion.div>
           </div>
 
-          <motion.ul
-            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-            variants={staggerContainer(0.07)}
-            initial={shouldReduceMotion ? false : 'hidden'}
-            whileInView={shouldReduceMotion ? undefined : 'show'}
-            viewport={viewportOnce}
-          >
+          <motion.ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
             {trustBadges.map((badge) => (
               <BadgeChip key={badge} label={badge} />
             ))}
@@ -109,31 +96,20 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-neutral-500">Нам доверяют</p>
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
-        <motion.ul
-          className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8"
-          variants={staggerContainer(0.05)}
-          initial={shouldReduceMotion ? false : 'hidden'}
-          whileInView={shouldReduceMotion ? undefined : 'show'}
-          viewport={viewportOnce}
-        >
+        <motion.ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8" variants={staggerContainer(0.05)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {trustedByPlaceholders.map((item) => (
-            <motion.li
-              key={item}
-              variants={fadeUp(10)}
-              whileHover={shouldReduceMotion ? undefined : { y: -2 }}
-              transition={{ duration: 0.2 }}
-              className="flex h-14 items-center justify-center rounded-2xl border border-neutral-200/80 bg-white/90 px-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 opacity-70 grayscale"
-            >
+            <motion.li key={item} variants={fadeUp(10)} whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }} className="flex h-14 items-center justify-center rounded-2xl border border-neutral-200/80 bg-white/90 px-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 opacity-70 grayscale">
               {item}
             </motion.li>
           ))}
         </motion.ul>
       </Section>
 
-      <Section>
-        <div className="mb-8 space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Услуги</p>
+      <Section className="py-10 md:py-16">
+        <div className="mb-6 space-y-2 md:mb-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">УСЛУГИ</p>
           <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Комплексные решения для рекламы и печати</h2>
+          <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
         <motion.div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {services.map((s) => (
@@ -144,11 +120,12 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.div>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/70">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div className="space-y-3">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Портфолио</p>
+      <Section background="muted" className="border-y border-neutral-200/60 py-10 md:py-16">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">ПОРТФОЛИО</p>
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Избранные проекты</h2>
+            <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
           </div>
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>
@@ -161,10 +138,11 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.div>
       </Section>
 
-      <Section>
-        <div className="mb-8 space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Процесс</p>
+      <Section className="py-10 md:py-16">
+        <div className="mb-6 space-y-2 md:mb-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">ПРОЦЕСС</p>
           <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Как мы запускаем ваш проект</h2>
+          <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Прозрачные этапы, понятные сроки и контроль качества на каждом шаге.</p>
         </div>
         <motion.ol className="grid gap-5 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {processSteps.map((step, index) => (
@@ -177,11 +155,12 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.ol>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/70">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div className="space-y-3">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">FAQ</p>
+      <Section background="muted" className="border-y border-neutral-200/60 py-10 md:py-16">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">FAQ</p>
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Частые вопросы</h2>
+            <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.</p>
           </div>
           <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Задать свой вопрос</Link>
         </div>
@@ -190,10 +169,10 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.div>
       </Section>
 
-      <Section id="lead-form">
+      <Section id="lead-form" className="py-10 md:py-14">
         <motion.div className="grid gap-10 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm md:p-10 lg:grid-cols-[1fr_1.1fr]" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          <div className="space-y-4">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Оставить заявку</p>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">ЗАЯВКА</p>
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">{messages.lead.title}</h2>
             <p className="text-sm text-neutral-600">Опишите задачу, а мы предложим оптимальный формат производства, сроки и стоимость.</p>
           </div>
