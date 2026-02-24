@@ -30,6 +30,20 @@ const strengths = [
   'Гарантия 5 лет',
 ];
 
+const heroTrustBadges = [
+  'Собственное производство',
+  'Монтажная бригада и автовышка',
+  'Работаем с НДС и договором',
+  'Гарантия 5 лет',
+] as const;
+
+const trustStripItems = [
+  'Сроки фиксируем в договоре',
+  'Монтаж по городу - замер бесплатно',
+  'Проекты любой сложности',
+  'Работаем по всему Ставропольскому краю',
+] as const;
+
 const steps = ['Заявка', 'Замер (бесплатно по городу)', 'Производство', 'Монтаж'];
 
 const cities = ['Невинномысске', 'Ставрополе', 'Пятигорске', 'Минеральных Водах', 'Кисловодске', 'Ессентуках'];
@@ -50,12 +64,25 @@ export default function OutdoorAdvertisingPage() {
           <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">
             Проектирование, производство и монтаж конструкций любой сложности.
           </p>
+
+          <div className="flex flex-wrap gap-2.5">
+            {heroTrustBadges.map((badge) => (
+              <span
+                key={badge}
+                className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                {badge}
+              </span>
+            ))}
+          </div>
+
           <div className="flex flex-wrap gap-3">
             <Link
               href="#outdoor-lead-form"
               className="btn-primary no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)]"
             >
-              Получить бесплатный расчёт
+              Получить бесплатный расчет
             </Link>
             <Link href="#outdoor-portfolio" className="btn-secondary no-underline">
               Смотреть примеры работ
@@ -82,17 +109,30 @@ export default function OutdoorAdvertisingPage() {
 
       <Section className="pt-0">
         <RevealOnScroll>
-          <h2 className="mb-5 text-2xl font-bold">Почему выбирают нас</h2>
+          <h2 className="mb-2 text-2xl font-bold">Почему выбирают нас</h2>
+          <p className="mb-5 text-sm text-neutral-600 dark:text-neutral-300">Без посредников - отвечаем за результат</p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {strengths.map((item) => (
-              <div key={item} className="card rounded-xl p-5">
-                <p className="text-sm font-medium leading-relaxed">{item}</p>
+              <div key={item} className="card flex min-h-[112px] items-start gap-2.5 rounded-xl p-5">
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                <p className="text-sm font-semibold leading-relaxed">{item}</p>
               </div>
             ))}
           </div>
         </RevealOnScroll>
       </Section>
 
+      <Section className="pt-0">
+        <RevealOnScroll>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {trustStripItems.map((item) => (
+              <article key={item} className="card rounded-xl border border-neutral-200/80 bg-neutral-50/60 px-4 py-3">
+                <p className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{item}</p>
+              </article>
+            ))}
+          </div>
+        </RevealOnScroll>
+      </Section>
 
       <ProductionTrustBlock />
 
@@ -118,7 +158,7 @@ export default function OutdoorAdvertisingPage() {
           <h2 className="mb-5 text-2xl font-bold">Портфолио</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {portfolioImages.map((image) => (
-              <figure key={image.src} className="card overflow-hidden">
+              <figure key={image.src} className="card overflow-hidden rounded-xl border border-neutral-200/70 shadow-sm">
                 <Image src={image.src} alt={image.alt} width={900} height={600} className="h-52 w-full object-cover" />
               </figure>
             ))}
@@ -134,7 +174,7 @@ export default function OutdoorAdvertisingPage() {
             href="#outdoor-lead-form"
             className="btn-primary mt-5 no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)]"
           >
-            Получить расчёт
+            Получить расчет
           </Link>
         </div>
       </Section>
@@ -160,7 +200,7 @@ export default function OutdoorAdvertisingPage() {
       <Section className="pt-0" id="outdoor-form-section">
         <RevealOnScroll>
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Получить бесплатный расчёт наружной рекламы</h2>
+            <h2 className="text-2xl font-bold">Получить бесплатный расчет наружной рекламы</h2>
             <OutdoorLeadForm />
           </div>
         </RevealOnScroll>
