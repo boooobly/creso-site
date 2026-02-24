@@ -1,9 +1,4 @@
-import Hero from '@/components/Hero';
-import Section from '@/components/Section';
-import ServiceCard from '@/components/ServiceCard';
-import PortfolioGrid from '@/components/PortfolioGrid';
-import FAQ from '@/components/FAQ';
-import LeadForm from '@/components/LeadForm';
+import HomePageContent from '@/components/home/HomePageContent';
 import servicesLocal from '@/data/services.json';
 import portfolioLocal from '@/data/portfolio.json';
 import faqLocal from '@/data/faq.json';
@@ -17,9 +12,9 @@ export default async function Home() {
     getFaq().catch(() => null),
   ]);
 
-  const services = sCMS ?? servicesLocal;
-  const portfolio = pCMS ?? portfolioLocal;
-  const faq = fCMS ?? faqLocal;
+  const services = (sCMS ?? servicesLocal) as any[];
+  const portfolio = (pCMS ?? portfolioLocal) as any[];
+  const faq = (fCMS ?? faqLocal) as any[];
 
   const resolveServiceHref = (service: any) => {
     const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
@@ -30,7 +25,8 @@ export default async function Home() {
     if (isWideFormatService) return '/wide-format-printing';
     const isPlotterService = service?.id === 'plotter' || service?.title === 'Плоттерная резка';
     if (isPlotterService) return '/plotter-cutting';
-    const isHeatTransferService = service?.id === 'thermo' || service?.title === 'Печать на футболках' || service?.title === 'Термоперенос на футболки и кружки';
+    const isHeatTransferService =
+      service?.id === 'thermo' || service?.title === 'Печать на футболках' || service?.title === 'Термоперенос на футболки и кружки';
     if (isHeatTransferService) return '/heat-transfer';
     const isMugsService = service?.id === 'mugs' || service?.title === 'Печать на кружках';
     if (isMugsService) return '/services/mugs';
@@ -39,34 +35,18 @@ export default async function Home() {
     return `/${service.slug}`;
   };
 
-  return (
-    <div className="space-y-12">
-      <Hero t={messages} />
+  const servicesWithHref = services.map((service) => ({
+    id: String(service.id),
+    title: String(service.title),
+    description: String(service.description ?? ''),
+    href: resolveServiceHref(service),
+  }));
 
-      <Section>
-        <h2 className="mb-4 text-2xl font-bold">Наши услуги</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          {services.map((s: any) => (
-            <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} />
-          ))}
-        </div>
-      </Section>
+  const portfolioPreview = portfolio.map((item) => ({
+    id: String(item.id),
+    title: String(item.title),
+    category: String(item.category ?? 'Проект'),
+  }));
 
-      <Section>
-        <h2 className="mb-4 text-2xl font-bold">Портфолио</h2>
-        <PortfolioGrid items={portfolio as any[]} />
-      </Section>
-
-      <Section containerClassName="grid items-start gap-6 md:grid-cols-2">
-        <div>
-          <h2 id="lead-form" className="mb-4 text-2xl font-bold">{messages.lead.title}</h2>
-          <LeadForm t={messages} />
-        </div>
-        <div>
-          <h2 className="mb-4 text-2xl font-bold">FAQ</h2>
-          <FAQ items={faq as any[]} />
-        </div>
-      </Section>
-    </div>
-  );
+  return <HomePageContent services={servicesWithHref} portfolio={portfolioPreview} faq={faq} messages={messages} />;
 }
