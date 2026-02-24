@@ -1,10 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import Section from '@/components/Section';
-import OutdoorLeadForm from '@/components/OutdoorLeadForm';
+import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import OutdoorFloatingCtas from '@/components/OutdoorFloatingCtas';
 import ProductionTrustBlock from '@/components/ProductionTrustBlock';
+import { messages } from '@/lib/messages';
 
 const services = [
   'Световые короба',
@@ -201,7 +202,15 @@ export default function OutdoorAdvertisingPage() {
         <RevealOnScroll>
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">Получить бесплатный расчет наружной рекламы</h2>
-            <OutdoorLeadForm />
+            <LeadForm
+              t={messages}
+              source="outdoor"
+              initialService="Наружная реклама"
+              showMessageField
+              phoneRequired
+              submitMessagePrefix="Запрос: Наружная реклама (Ставропольский край)."
+              includePageUrl
+            />
           </div>
         </RevealOnScroll>
       </Section>
