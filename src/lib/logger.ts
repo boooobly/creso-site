@@ -1,5 +1,3 @@
-import { env } from '@/lib/env';
-
 type LogLevel = 'info' | 'warn' | 'error';
 
 type LogMeta = Record<string, unknown>;
@@ -22,7 +20,7 @@ function write(level: LogLevel, message: string, meta?: LogMeta): void {
     return;
   }
 
-  if (env.NODE_ENV !== 'test') {
+  if (process.env.NODE_ENV !== 'test') {
     console.info(JSON.stringify(payload));
   }
 }

@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import { getClientIp, hasUserAgent, isEmptyPayload, isHoneypotTriggered, isRateLimited } from '@/lib/anti-spam';
 
 import { logger } from '@/lib/logger';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 export const runtime = 'nodejs';
 
 type OutdoorPayload = {
@@ -26,6 +26,7 @@ function buildMessage(payload: OutdoorPayload) {
 }
 
 async function sendTelegramMessage(text: string) {
+  const env = getServerEnv();
   const botToken = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
   if (!botToken || !chatId) return false;
@@ -40,6 +41,7 @@ async function sendTelegramMessage(text: string) {
 }
 
 async function sendEmail(text: string) {
+  const env = getServerEnv();
   const host = env.SMTP_HOST;
   const port = Number(env.SMTP_PORT || 0);
   const user = env.SMTP_USER;
@@ -67,6 +69,7 @@ async function sendEmail(text: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    getServerEnv();
     const payload = (await req.json()) as OutdoorPayload;
 
     if (!hasUserAgent(req)) {
@@ -112,6 +115,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }

@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 
 export type EmailAttachment = {
   filename: string;
@@ -23,6 +23,7 @@ export type SmtpConfig = {
 };
 
 export function getSmtpConfig(): SmtpConfig | null {
+  const env = getServerEnv();
   const host = env.SMTP_HOST;
   const port = Number(env.SMTP_PORT || 0);
   const user = env.SMTP_USER;

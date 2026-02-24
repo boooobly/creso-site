@@ -1,4 +1,3 @@
-import { env } from '@/lib/env';
 export type AnalyticsPayload = Record<string, unknown>;
 
 type IdleWindow = Window & {
@@ -21,12 +20,10 @@ export function trackEvent(eventName: string, payload?: AnalyticsPayload): void 
   if (typeof window === 'undefined') return;
 
   runOnIdle(() => {
-    if (env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production') {
       console.debug('[analytics]', eventName, payload ?? {});
     }
 
-    // Placeholder for future analytics integrations (GA, Yandex, custom API, etc.)
-    // Keep this async/non-blocking so UI interactions remain fast.
     void eventName;
     void payload;
   });
