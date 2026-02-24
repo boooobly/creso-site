@@ -1,16 +1,7 @@
 import Section from '@/components/Section';
-import Link from 'next/link';
 import Image from 'next/image';
 import MugPrintAreaCalibrator from '@/components/mug-designer/MugPrintAreaCalibrator';
 import OrderMugsForm from '@/components/OrderMugsForm';
-
-const anchorLinks = [
-  { href: '#mugs-description', label: 'Описание' },
-  { href: '#mugs-prices', label: 'Цены' },
-  { href: '#mugs-designer', label: 'Конструктор' },
-  { href: '#mugs-request', label: 'Заявка' },
-  { href: '#mugs-faq', label: 'Вопросы' },
-];
 
 const faqItems = [
   {
@@ -34,49 +25,55 @@ export default function MugsServicePage() {
     <div className="space-y-10 sm:space-y-12 lg:space-y-14">
       <Section className="pb-0">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-red-600">Студийный уровень печати</p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Печать на кружках</h1>
-              <p className="mt-4 text-base text-neutral-600 sm:text-lg">Белые керамические кружки 330 мл. Класс AAA. Печать по кругу.</p>
+          <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 px-8 py-10 shadow-sm lg:px-12 lg:py-12">
+            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-red-600">СТУДИЙНЫЙ УРОВЕНЬ ПЕЧАТИ</p>
+                <h1 className="mt-3 text-4xl font-semibold tracking-tight lg:text-5xl">Печать на кружках</h1>
+                <p className="mt-4 max-w-[42ch] leading-relaxed text-neutral-600">Белые керамические кружки 330 мл. Класс AAA. Печать по кругу.</p>
 
-              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-neutral-700">
-                {heroBenefits.map((item) => (
-                  <span key={item} className="inline-flex items-center gap-2">
-                    <span className="text-red-600">✓</span>
-                    {item}
-                  </span>
-                ))}
+                <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-700">
+                  {heroBenefits.map((item) => (
+                    <span key={item} className="inline-flex items-center gap-2">
+                      <span className="text-red-600">✓</span>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <a href="#mugs-designer" className="inline-flex h-12 items-center rounded-xl bg-red-600 px-6 text-sm font-medium text-white shadow-sm transition hover:bg-red-700">
+                    Собрать макет
+                  </a>
+                </div>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="#mugs-designer" className="rounded-md bg-red-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-red-700">
-                  Собрать макет
-                </Link>
-                <Link href="/portfolio" className="rounded-md border border-neutral-200 bg-white px-5 py-3 text-sm font-medium transition hover:bg-neutral-50">
-                  Смотреть примеры
-                </Link>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-8">
-              <div className="mx-auto flex justify-center">
-                <Image src="/images/mug/mug-base.png" alt="Белая кружка с зоной печати" width={320} height={320} className="h-auto w-full max-w-[320px] shadow-md" priority />
+              <div className="relative">
+                <div className="absolute -inset-6 -z-10 rounded-[32px] bg-red-500/10 blur-3xl" />
+                <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-xl">
+                  <div className="relative aspect-[4/3]">
+                    <Image
+                      src="/images/mug/mug-base.png"
+                      alt="Печать на кружках — пример готовой работы"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10" />
+                  </div>
+                  <div className="flex items-center justify-between gap-4 px-5 py-4">
+                    <div>
+                      <p className="text-sm font-medium text-neutral-900">Пример готовой кружки</p>
+                      <p className="text-xs text-neutral-500">Печать по кругу, белая керамика 330 мл</p>
+                    </div>
+                    <div className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-600">
+                      450 ₽ / шт
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </Section>
-
-      <Section className="pt-0 pb-0">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <nav className="flex flex-wrap gap-2">
-            {anchorLinks.map((link) => (
-              <a key={link.href} href={link.href} className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50">
-                {link.label}
-              </a>
-            ))}
-          </nav>
         </div>
       </Section>
 
