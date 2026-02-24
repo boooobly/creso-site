@@ -2,16 +2,14 @@
 
 import { useMemo, useState } from 'react';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
-import { trackEvent } from '@/lib/analytics';
 import {
   BUSINESS_CARD_ALLOWED_QUANTITIES,
   calculateTotal,
   getUnitPrice,
 } from '@/lib/pricing-config/business-cards';
+import OrderBusinessCardsForm from '@/components/OrderBusinessCardsForm';
 
 type PrintType = 'single' | 'double';
-
-const LAMINATION_MULTIPLIER = 1.15;
 
 export default function PrintPricingCalculator() {
   const [quantity, setQuantity] = useState<number>(1000);
@@ -42,29 +40,10 @@ export default function PrintPricingCalculator() {
     [],
   );
 
-  const handleSendRequest = (service: 'Визитки' | 'Флаеры') => {
-    const message = service === 'Визитки'
-      ? [
-        'Запрос на офсетные визитки:',
-        'Размер: 90x50 мм',
-        'Материал: мелованный картон 300 gsm',
-        `Печать: ${printType === 'single' ? 'Односторонняя' : 'Двусторонняя (цена не меняется)'}`,
-        `Ламинация: ${lamination ? 'Да (+15%, только с одной стороны)' : 'Нет'}`,
-        `Нужен дизайн: ${needDesign ? 'Да, обсудить с менеджером' : 'Нет'}`,
-        `Тираж: ${quantity} шт.`,
-        `Итоговая стоимость: ${pricing.total.toLocaleString('ru-RU')} ₽`,
-      ].join('\n')
-      : [
-        'Запрос на флаеры.',
-        'Флаеры рассчитываются индивидуально.',
-        'Пожалуйста, свяжитесь со мной для уточнения размера, бумаги и тиража.',
-      ].join('\n');
-
-    trackEvent('send_calculation_clicked', { calculator: 'print', product: service.toLowerCase() });
-
+  const handleFlyersRequest = () => {
     openLeadFormWithCalculation({
-      service,
-      message,
+      service: 'Флаеры',
+      message: 'Запрос на флаеры. Флаеры рассчитываются индивидуально. Пожалуйста, свяжитесь со мной для уточнения размера, бумаги и тиража.',
     });
   };
 
@@ -185,19 +164,27 @@ export default function PrintPricingCalculator() {
             <p>• Стоимость дизайна согласовывается с менеджером.</p>
           </div>
 
-          <button type="button" onClick={() => handleSendRequest('Визитки')} className="btn-primary w-full justify-center">
-            Отправить заявку
-          </button>
         </aside>
       </div>
 
       <section className="card p-4 md:p-6 space-y-3">
         <h2 className="text-xl font-semibold">Флаеры</h2>
         <p className="text-neutral-700 dark:text-neutral-300">Флаеры рассчитываются индивидуально. Цена зависит от размера, бумаги и тиража.</p>
-        <button type="button" className="btn-secondary" onClick={() => handleSendRequest('Флаеры')}>
+        <button type="button" className="btn-secondary" onClick={handleFlyersRequest}>
           Получить расчёт у менеджера
         </button>
       </section>
+
+      <OrderBusinessCardsForm
+        summary={{
+          quantity,
+          printSide: printType,
+          lamination,
+          needDesign,
+          unitPrice: Math.round((pricing.total / quantity) * 100) / 100,
+          totalPrice: pricing.total,
+        }}
+      />
     </div>
   );
 }
