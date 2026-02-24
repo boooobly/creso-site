@@ -3,22 +3,13 @@
 import { useMemo, useState } from 'react';
 import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
+import {
+  BUSINESS_CARD_ALLOWED_QUANTITIES,
+  calculateTotal,
+  getUnitPrice,
+} from '@/lib/pricing-config/business-cards';
 
 type PrintType = 'single' | 'double';
-
-const QUANTITY_OPTIONS = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000] as const;
-
-const BASE_PRICES: Record<number, number> = {
-  1000: 5000,
-  2000: 10000,
-  3000: 15000,
-  4000: 20000,
-  5000: 25000,
-  6000: 30000,
-  7000: 35000,
-  8000: 40000,
-  9000: 45000,
-};
 
 const LAMINATION_MULTIPLIER = 1.15;
 
@@ -29,22 +20,25 @@ export default function PrintPricingCalculator() {
   const [needDesign, setNeedDesign] = useState(false);
 
   const pricing = useMemo(() => {
-    const baseTotal = BASE_PRICES[quantity];
-    const total = lamination ? Math.round(baseTotal * LAMINATION_MULTIPLIER) : baseTotal;
+    const total = calculateTotal({ qty: quantity, lamination });
 
     return {
-      baseTotal,
       total,
-      perPiece: Math.round((total / quantity) * 100) / 100,
+      perPiece: total / quantity,
     };
   }, [lamination, quantity]);
 
   const pricingRows = useMemo(
-    () => QUANTITY_OPTIONS.map((tierQuantity) => ({
-      quantity: tierQuantity,
-      price: BASE_PRICES[tierQuantity],
-      withLamination: Math.round(BASE_PRICES[tierQuantity] * LAMINATION_MULTIPLIER),
-    })),
+    () => BUSINESS_CARD_ALLOWED_QUANTITIES.map((tierQuantity) => {
+      const unitPrice = getUnitPrice(tierQuantity);
+      const total = calculateTotal({ qty: tierQuantity, lamination: false });
+
+      return {
+        quantity: tierQuantity,
+        unitPrice,
+        total,
+      };
+    }),
     [],
   );
 
@@ -86,16 +80,16 @@ export default function PrintPricingCalculator() {
                 <thead>
                   <tr className="border-b border-neutral-200 dark:border-neutral-700">
                     <th className="px-3 py-2 text-left font-semibold">Тираж</th>
-                    <th className="px-3 py-2 text-left font-semibold">Цена</th>
-                    <th className="px-3 py-2 text-left font-semibold">С ламинацией (+15%)</th>
+                    <th className="px-3 py-2 text-left font-semibold">Цена за шт.</th>
+                    <th className="px-3 py-2 text-left font-semibold">Итого</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pricingRows.map((row) => (
                     <tr key={row.quantity} className="border-b border-neutral-100 dark:border-neutral-800 last:border-b-0">
                       <td className="px-3 py-2">{row.quantity.toLocaleString('ru-RU')} шт.</td>
-                      <td className="px-3 py-2">{row.price.toLocaleString('ru-RU')} ₽</td>
-                      <td className="px-3 py-2">{row.withLamination.toLocaleString('ru-RU')} ₽</td>
+                      <td className="px-3 py-2">{row.unitPrice.toLocaleString('ru-RU')} ₽</td>
+                      <td className="px-3 py-2">{row.total.toLocaleString('ru-RU')} ₽</td>
                     </tr>
                   ))}
                 </tbody>
@@ -109,7 +103,7 @@ export default function PrintPricingCalculator() {
             <div className="space-y-3">
               <p className="font-medium">Тираж</p>
               <div className="flex flex-wrap gap-2">
-                {QUANTITY_OPTIONS.map((value) => (
+                {BUSINESS_CARD_ALLOWED_QUANTITIES.map((value) => (
                   <button
                     key={value}
                     type="button"
@@ -182,7 +176,7 @@ export default function PrintPricingCalculator() {
           <div className="rounded-xl bg-neutral-100 p-4 dark:bg-neutral-800">
             <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
             <p className="text-3xl font-extrabold">{pricing.total.toLocaleString('ru-RU')} ₽</p>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">{pricing.perPiece.toLocaleString('ru-RU')} ₽ / шт.</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">{pricing.perPiece.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₽ / шт.</p>
           </div>
 
           <div className="rounded-xl border border-neutral-200 p-3 text-xs text-neutral-600 dark:border-neutral-700 dark:text-neutral-300 space-y-1">
