@@ -34,61 +34,74 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
   return (
     <div>
       <Section className="relative overflow-hidden pb-10 pt-16 md:pb-14 md:pt-24">
-        <div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden="true"
-          style={{
-            backgroundImage:
-              'linear-gradient(to right, rgba(15,23,42,0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.03) 1px, transparent 1px)',
-            backgroundSize: '42px 42px',
-            opacity: 0.45,
-          }}
-        />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_22%,rgba(212,28,28,0.14),transparent_55%)]" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(212,28,28,0.1),transparent_60%)]" aria-hidden="true" />
 
         <motion.div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-24 top-10 h-64 w-64 rounded-[44%_56%_53%_47%/49%_45%_55%_51%] bg-[var(--brand-red)]/8 blur-2xl"
-          animate={shouldReduceMotion ? undefined : { x: [0, 12, 0], y: [0, -8, 0], rotate: [0, 4, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute -left-20 bottom-2 h-52 w-52 rounded-[57%_43%_46%_54%/41%_53%_47%_59%] bg-[var(--brand-red)]/6 blur-2xl"
-          animate={shouldReduceMotion ? undefined : { x: [0, -10, 0], y: [0, 8, 0], rotate: [0, -4, 0] }}
-          transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute right-[-9rem] top-8 hidden h-[23rem] w-[23rem] rounded-[56%_44%_60%_40%/42%_58%_42%_58%] bg-[var(--brand-red)]/8 blur-3xl lg:block"
+          animate={shouldReduceMotion ? undefined : { x: [0, 8, 0], y: [0, -6, 0], rotate: [0, 2, 0] }}
+          transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="relative z-10 space-y-8">
-          <div className="space-y-6">
-            <p className="inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">
-              ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
-            </p>
-            <h1 className="max-w-5xl text-3xl font-black leading-[1.05] tracking-tight text-neutral-900 sm:text-4xl md:text-6xl lg:text-7xl">
-              Реклама и производство<br className="hidden md:block" /> под ключ без срывов сроков
-            </h1>
-            <p className="max-w-[45rem] text-base leading-relaxed text-neutral-600 md:text-lg">{messages.hero.subtitle}</p>
-          </div>
+        <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
+            <div className="space-y-6">
+              <p className="inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">
+                ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
+              </p>
+              <h1 className="max-w-5xl text-3xl font-black leading-[1.05] tracking-tight text-neutral-900 sm:text-4xl md:text-6xl lg:text-7xl">
+                Реклама и производство<br className="hidden md:block" /> под ключ без срывов сроков
+              </h1>
+              <p className="max-w-[45rem] text-base leading-relaxed text-neutral-600 md:text-lg">{messages.hero.subtitle}</p>
+            </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
-              <Link className="btn-primary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
-                Рассчитать стоимость
-              </Link>
-            </motion.div>
-            <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
-              <Link className="btn-secondary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/portfolio" aria-label="Перейти в портфолио">
-                Смотреть портфолио
-              </Link>
-            </motion.div>
-          </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
+                <Link className="btn-primary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
+                  Рассчитать стоимость
+                </Link>
+              </motion.div>
+              <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
+                <Link className="btn-secondary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/portfolio" aria-label="Перейти в портфолио">
+                  Смотреть портфолио
+                </Link>
+              </motion.div>
+            </div>
 
-          <motion.ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-            {trustBadges.map((badge) => (
-              <BadgeChip key={badge} label={badge} />
-            ))}
-          </motion.ul>
-        </motion.div>
+            <motion.ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+              {trustBadges.map((badge) => (
+                <BadgeChip key={badge} label={badge} />
+              ))}
+            </motion.ul>
+          </motion.div>
+
+          <motion.div
+            aria-hidden="true"
+            className="relative hidden lg:flex lg:justify-end"
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={viewportOnce}
+          >
+            <motion.div
+              className="relative h-72 w-[22rem] rounded-[28px] border border-neutral-200/80 bg-white/90 p-5 shadow-[0_28px_45px_-30px_rgba(15,23,42,0.45)] backdrop-blur-sm"
+              style={{ rotate: '1.8deg' }}
+              animate={shouldReduceMotion ? undefined : { y: [0, -6, 0] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <div className="absolute inset-x-5 top-5 h-24 rounded-2xl border border-neutral-200/80 bg-gradient-to-br from-white to-neutral-100" />
+              <div className="absolute inset-x-5 top-34 h-px bg-neutral-200" />
+              <div className="absolute left-5 right-5 top-40 space-y-3">
+                <div className="h-2.5 w-3/4 rounded-full bg-neutral-200" />
+                <div className="h-2.5 w-full rounded-full bg-neutral-100" />
+                <div className="h-2.5 w-5/6 rounded-full bg-neutral-100" />
+              </div>
+              <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/8 px-3 py-1 text-[11px] font-medium text-[var(--brand-red)]">
+                <span className="size-1.5 rounded-full bg-[var(--brand-red)]" />
+                Макет согласован
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
       </Section>
 
       <Section className="border-y border-neutral-200/70 py-10 md:py-12" background="muted">
