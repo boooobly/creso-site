@@ -8,6 +8,7 @@ import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
 import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
 import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
+import { createOrderPdfAccessToken } from '@/lib/orders/pdfAccessToken';
 import { normalizePhone } from '@/lib/utils/phone';
 
 import { logger } from '@/lib/logger';
@@ -166,7 +167,9 @@ export async function POST(request: NextRequest) {
 
     const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS;
     const customerEmail = parsed.data.customer.email?.trim();
-    const pdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf`;
+    const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
+    const pdfAccessToken = createOrderPdfAccessToken(orderNumber, tokenSecret);
+    const securePdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf?token=${encodeURIComponent(pdfAccessToken)}`;
 
     if (shouldSendCustomerEmail && customerEmail) {
       await sendCustomerOrderEmail({
@@ -176,7 +179,7 @@ export async function POST(request: NextRequest) {
         total: quote.total,
         prepayRequired,
         prepayAmount,
-        pdfUrl,
+        pdfUrl: securePdfUrl,
       }).catch((error) => {
         console.error('[orders] Customer email send failed', error);
       });
@@ -186,6 +189,7 @@ export async function POST(request: NextRequest) {
       quote,
       prepayRequired,
       prepayAmount,
+      securePdfUrl,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown server error.';
