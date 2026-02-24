@@ -51,12 +51,13 @@ export default function MugsServicePage() {
               <div className="relative">
                 <div className="absolute -inset-6 -z-10 rounded-[32px] bg-red-500/10 blur-3xl" />
                 <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-xl">
-                  <div className="relative aspect-[4/3]">
+                  <div className="relative aspect-[4/3] w-full">
                     <Image
-                      src="/images/mug/mug-base.png"
+                      src="/images/mug/mug-hero.jpg"
                       alt="Печать на кружках — пример готовой работы"
                       fill
-                      className="object-cover"
+                      sizes="(min-width: 1024px) 520px, 90vw"
+                      className="object-cover object-[55%_50%]"
                       priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10" />
