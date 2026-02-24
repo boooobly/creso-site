@@ -40,20 +40,20 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
             <p className="inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">
               Производственная студия Creso
             </p>
-            <h1 className="max-w-5xl text-4xl font-black leading-[1.05] tracking-tight text-neutral-900 md:text-6xl lg:text-7xl">
+            <h1 className="max-w-5xl text-3xl font-black leading-[1.05] tracking-tight text-neutral-900 sm:text-4xl md:text-6xl lg:text-7xl">
               Реклама и производство<br className="hidden md:block" /> под ключ без срывов сроков
             </h1>
-            <p className="max-w-3xl text-base leading-relaxed text-neutral-600 md:text-lg">{messages.hero.subtitle}</p>
+            <p className="max-w-[45rem] text-base leading-relaxed text-neutral-600 md:text-lg">{messages.hero.subtitle}</p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
-              <Link className="btn-primary no-underline text-center shadow-sm hover:shadow-md" href="/#lead-form">
+              <Link className="btn-primary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
                 Рассчитать стоимость
               </Link>
             </motion.div>
             <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
-              <Link className="btn-secondary no-underline text-center shadow-sm hover:shadow-md" href="/portfolio">
+              <Link className="btn-secondary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/portfolio" aria-label="Перейти в портфолио">
                 Смотреть портфолио
               </Link>
             </motion.div>
@@ -119,7 +119,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Портфолио</p>
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Избранные проекты</h2>
           </div>
-          <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)]">Смотреть всё портфолио</Link>
+          <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>
         <motion.div className="grid gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {portfolio.slice(0, 3).map((item) => (
@@ -152,7 +152,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">FAQ</p>
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Частые вопросы</h2>
           </div>
-          <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)]">Задать свой вопрос</Link>
+          <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Задать свой вопрос</Link>
         </div>
         <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <FAQ items={faq.slice(0, 4)} />
@@ -165,7 +165,6 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">Оставить заявку</p>
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">{messages.lead.title}</h2>
             <p className="text-sm text-neutral-600">Опишите задачу, а мы предложим оптимальный формат производства, сроки и стоимость.</p>
-            <p className="text-sm text-neutral-500">Ответим в течение 30 минут. Без спама.</p>
           </div>
           <LeadForm t={messages} showMessageField />
         </motion.div>
