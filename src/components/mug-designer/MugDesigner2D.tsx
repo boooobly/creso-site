@@ -460,22 +460,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     setSelectedElement('image');
   };
 
-  const onAddText = () => {
-    const defaultWidth = Math.min(PRINT_RECT.width - 20, 220);
-    setTextLayer({
-      text: 'Ваш текст',
-      x: PRINT_RECT.x + PRINT_RECT.width / 2,
-      y: PRINT_RECT.y + PRINT_RECT.height / 2,
-      rotation: 0,
-      width: defaultWidth,
-      height: 40,
-      scaleX: 1,
-      scaleY: 1,
-      fontSize: 32,
-    });
-    setSelectedElement('text');
-  };
-
   const primaryButtonClass = 'w-full rounded-md bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700';
   const secondaryButtonClass = 'w-full rounded-md border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-50';
   const toolButtonClass = 'rounded-md border border-neutral-200 bg-white px-3 py-2 text-xs font-medium hover:bg-neutral-50 transition';
@@ -718,9 +702,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         <aside className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-5 sm:p-6">
           <div className="space-y-3">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
-            <button type="button" className={primaryButtonClass} onClick={onAddText}>
-              Добавить текст
-            </button>
             <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
               Загрузить изображение
               <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
