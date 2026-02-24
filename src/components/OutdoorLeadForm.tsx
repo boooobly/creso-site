@@ -192,10 +192,11 @@ export default function OutdoorLeadForm() {
       </label>
       {touched.agreed && errors.agreed ? <p className="-mt-2 text-xs text-red-500">{errors.agreed}</p> : null}
 
+      <p className="text-sm text-neutral-700 dark:text-neutral-200">Ответим и уточним детали в ближайшее время.</p>
       <button type="submit" className="btn-primary w-full ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)]" disabled={isSubmitDisabled}>
-        {status === 'loading' ? 'Отправка...' : 'Отправить заявку'}
+        {status === 'loading' ? 'Отправка...' : 'Получить расчет'}
       </button>
-      <p className="text-sm text-neutral-600 dark:text-neutral-300">Менеджер свяжется с вами для уточнения деталей.</p>
+      <p className="text-xs text-neutral-500 dark:text-neutral-400">Без спама. Только по заявке.</p>
       {status === 'success' ? (
         <p className="text-sm text-green-600">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>
       ) : null}

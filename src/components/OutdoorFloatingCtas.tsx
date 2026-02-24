@@ -58,7 +58,7 @@ export default function OutdoorFloatingCtas() {
             showDesktopCta ? 'pointer-events-auto opacity-100 translate-y-0' : 'pointer-events-none opacity-0 translate-y-4',
           ].join(' ')}
         >
-          Получить расчёт
+          Получить расчет
         </Link>
       </div>
 

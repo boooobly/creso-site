@@ -28,35 +28,50 @@ const optionalPhoneSchema = z.preprocess(
   z.string().refine((value) => getPhoneDigits(value).length === 11, 'Введите корректный телефон').optional(),
 );
 
-const schema = z
-  .object({
-    name: z.string().trim().min(2, 'Введите имя'),
-    email: optionalEmailSchema,
-    phone: optionalPhoneSchema,
-    service: z.string().min(2),
-    message: z.string().optional(),
-    consent: z.boolean().refine((value) => value, {
-      message: 'Необходимо согласие с политикой обработки персональных данных',
-    }),
-    website: z.string().optional(),
-  })
-  .superRefine((values, ctx) => {
-    if (!values.email && !values.phone) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['phone'],
-        message: 'Укажите телефон или e-mail',
-      });
-    }
-  });
+function createSchema(phoneRequired: boolean) {
+  return z
+    .object({
+      name: z.string().trim().min(2, 'Введите имя'),
+      email: optionalEmailSchema,
+      phone: optionalPhoneSchema,
+      service: z.string().min(2),
+      message: z.string().optional(),
+      consent: z.boolean().refine((value) => value, {
+        message: 'Необходимо согласие с политикой обработки персональных данных',
+      }),
+      website: z.string().optional(),
+    })
+    .superRefine((values, ctx) => {
+      if (phoneRequired && !values.phone) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['phone'],
+          message: 'Укажите телефон',
+        });
+        return;
+      }
 
-type FormData = z.infer<typeof schema>;
+      if (!phoneRequired && !values.email && !values.phone) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['phone'],
+          message: 'Укажите телефон или e-mail',
+        });
+      }
+    });
+}
+
+type FormData = z.infer<ReturnType<typeof createSchema>>;
 
 type LeadFormProps = {
   t: SiteMessages;
   initialService?: string;
   initialMessage?: string;
   source?: string;
+  showMessageField?: boolean;
+  phoneRequired?: boolean;
+  submitMessagePrefix?: string;
+  includePageUrl?: boolean;
 };
 
 const DEFAULT_SERVICE = 'Общая заявка';
@@ -70,7 +85,16 @@ const DEFAULT_VALUES: Omit<FormData, 'consent'> = {
   website: '',
 };
 
-export default function LeadForm({ t, initialService, initialMessage, source = 'main' }: LeadFormProps) {
+export default function LeadForm({
+  t,
+  initialService,
+  initialMessage,
+  source = 'main',
+  showMessageField = false,
+  phoneRequired = false,
+  submitMessagePrefix,
+  includePageUrl = false,
+}: LeadFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const resolvedService = useMemo(() => (initialService?.trim() ? initialService.trim() : DEFAULT_SERVICE), [initialService]);
@@ -83,7 +107,7 @@ export default function LeadForm({ t, initialService, initialMessage, source = '
     reset,
     getValues,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(createSchema(phoneRequired)),
     defaultValues: { ...DEFAULT_VALUES, consent: false },
     mode: 'onChange',
   });
@@ -102,12 +126,19 @@ export default function LeadForm({ t, initialService, initialMessage, source = '
 
     try {
       const phoneDigits = getPhoneDigits(data.phone ?? '');
+      const pageUrl = includePageUrl && typeof window !== 'undefined' ? window.location.href : undefined;
+      const commentLines = [
+        submitMessagePrefix?.trim(),
+        data.message?.trim(),
+        pageUrl ? `Страница: ${pageUrl}` : undefined,
+      ].filter(Boolean);
+
       const res = await postJSON<{ ok: true }>(`/api/leads`, {
         source,
         name: data.name,
         phone: phoneDigits,
         email: data.email,
-        comment: data.message,
+        comment: commentLines.length > 0 ? commentLines.join('\n') : undefined,
         extras: {
           service: data.service,
           consent: data.consent,
@@ -132,7 +163,7 @@ export default function LeadForm({ t, initialService, initialMessage, source = '
       {submitError && <p className="text-sm text-red-600">{submitError}</p>}
 
       <input type="hidden" {...register('service')} />
-      <input type="hidden" {...register('message')} />
+      {!showMessageField && <input type="hidden" {...register('message')} />}
       <input
         type="text"
         tabIndex={-1}
@@ -178,7 +209,17 @@ export default function LeadForm({ t, initialService, initialMessage, source = '
         </div>
       </div>
 
-      <p className="text-xs text-neutral-600 dark:text-neutral-300">Укажите телефон или e-mail — как вам удобнее.</p>
+      {showMessageField ? (
+        <div>
+          <textarea
+            className="min-h-[120px] w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+            placeholder="Комментарий"
+            {...register('message')}
+          />
+        </div>
+      ) : (
+        <p className="text-xs text-neutral-600 dark:text-neutral-300">Укажите телефон или e-mail — как вам удобнее.</p>
+      )}
       <p className="text-xs text-neutral-600 dark:text-neutral-300">Ответим в течение 30 минут. Без спама.</p>
 
       <label className="flex items-start gap-2 text-sm">
