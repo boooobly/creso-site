@@ -5,16 +5,11 @@ import { sendTelegramLead } from '@/lib/notifications/telegram';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
 import { getClientIp } from '@/lib/utils/request';
+import { isRateLimited } from '@/lib/anti-spam';
 import { sourceTitle } from '@/lib/utils/sourceTitle';
 
 import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
-
-type RateRecord = { count: number; resetAt: number };
-
-const RATE_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT = 10;
-const ipRequests = new Map<string, RateRecord>();
 
 const leadSchema = z.object({
   source: z.string().trim().min(1),
@@ -27,20 +22,6 @@ const leadSchema = z.object({
   extras: z.record(z.unknown()).optional(),
   company: z.string().optional(),
 });
-
-function isRateLimited(ip: string, now = Date.now()) {
-  const current = ipRequests.get(ip);
-  if (!current || current.resetAt <= now) {
-    ipRequests.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return false;
-  }
-
-  if (current.count >= RATE_LIMIT) return true;
-
-  current.count += 1;
-  ipRequests.set(ip, current);
-  return false;
-}
 
 function formatValue(value?: string | number | null): string {
   if (value === null || value === undefined) return '—';
