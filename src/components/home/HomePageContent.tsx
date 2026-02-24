@@ -168,7 +168,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </div>
         <motion.ol className="grid gap-5 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {processSteps.map((step, index) => (
-            <motion.li key={step.title} variants={fadeUp(16)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md">
+            <motion.li key={step.title} variants={fadeUp(16)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="premium-card p-6">
               <p className="text-sm font-bold text-[var(--brand-red)]">0{index + 1}</p>
               <h3 className="mt-3 text-lg font-semibold text-neutral-900">{step.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">{step.description}</p>
