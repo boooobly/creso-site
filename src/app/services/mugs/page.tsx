@@ -1,16 +1,7 @@
 import Section from '@/components/Section';
-import Link from 'next/link';
 import Image from 'next/image';
 import MugPrintAreaCalibrator from '@/components/mug-designer/MugPrintAreaCalibrator';
 import OrderMugsForm from '@/components/OrderMugsForm';
-
-const anchorLinks = [
-  { href: '#mugs-description', label: 'Описание' },
-  { href: '#mugs-prices', label: 'Цены' },
-  { href: '#mugs-designer', label: 'Конструктор' },
-  { href: '#mugs-request', label: 'Заявка' },
-  { href: '#mugs-faq', label: 'Вопросы' },
-];
 
 const faqItems = [
   {
@@ -32,9 +23,9 @@ export default function MugsServicePage() {
 
   return (
     <div className="space-y-10 sm:space-y-12 lg:space-y-14">
-      <Section className="pb-0">
+      <Section className="bg-gradient-to-br from-white via-neutral-50 to-neutral-100 pb-0">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-12 items-center lg:grid-cols-2">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-red-600">Студийный уровень печати</p>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Печать на кружках</h1>
@@ -50,33 +41,24 @@ export default function MugsServicePage() {
               </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="#mugs-designer" className="rounded-md bg-red-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-red-700">
+                <a href="#mugs-designer" className="rounded-md bg-red-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-red-700">
                   Собрать макет
-                </Link>
-                <Link href="/portfolio" className="rounded-md border border-neutral-200 bg-white px-5 py-3 text-sm font-medium transition hover:bg-neutral-50">
-                  Смотреть примеры
-                </Link>
+                </a>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-8">
-              <div className="mx-auto flex justify-center">
-                <Image src="/images/mug/mug-base.png" alt="Белая кружка с зоной печати" width={320} height={320} className="h-auto w-full max-w-[320px] shadow-md" priority />
-              </div>
+            <div className="relative flex justify-center lg:justify-end">
+              <div className="absolute -z-10 right-10 top-10 h-64 w-64 rounded-full bg-red-500/10 blur-3xl" />
+              <Image
+                src="/images/mug/mug-base.png"
+                alt="Печать на кружках — пример готовой работы"
+                width={800}
+                height={800}
+                className="w-full max-w-[620px] rounded-2xl object-cover shadow-2xl"
+                priority
+              />
             </div>
           </div>
-        </div>
-      </Section>
-
-      <Section className="pt-0 pb-0">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <nav className="flex flex-wrap gap-2">
-            {anchorLinks.map((link) => (
-              <a key={link.href} href={link.href} className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50">
-                {link.label}
-              </a>
-            ))}
-          </nav>
         </div>
       </Section>
 
