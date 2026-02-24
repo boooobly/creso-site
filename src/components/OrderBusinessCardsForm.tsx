@@ -169,21 +169,21 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
   }`;
 
   return (
-    <div id="business-cards-form" className="card p-6 shadow-sm transition-all duration-300 md:p-8">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold">Отправить заявку</h2>
-        <p className="mt-2 text-sm text-neutral-600">Оставьте контакты и приложите макет — менеджер подтвердит детали и сроки.</p>
+    <div id="business-cards-form" className="card rounded-2xl p-6 shadow-sm transition-all duration-300 md:p-8">
+      <div className="mb-5">
+        <h2 className="text-2xl font-bold">Отправить заявку</h2>
+        <p className="mt-1.5 text-sm text-neutral-600">Оставьте контакты и приложите макет — менеджер подтвердит детали и сроки.</p>
       </div>
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2">
+          <label className="space-y-1.5">
             <span className="text-sm font-medium">Имя *</span>
             <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
             {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
           </label>
 
-          <label className="space-y-2">
+          <label className="space-y-1.5">
             <span className="text-sm font-medium">Телефон *</span>
             <PhoneInput
               value={values.phone}
@@ -195,8 +195,8 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           </label>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <label className="space-y-2">
+        <div className="grid gap-5 md:grid-cols-2">
+          <label className="space-y-1.5">
             <span className="text-sm font-medium">Email</span>
             <input className={inputClass('email')} type="email" value={values.email} onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))} />
             {errors.email && <span className="text-xs text-red-600">{errors.email}</span>}
@@ -229,8 +229,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           </div>
         </div>
 
-
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
@@ -246,12 +245,12 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           )}
         </div>
 
-        <label className="space-y-2 block">
+        <label className="space-y-1.5 block">
           <span className="text-sm font-medium">Комментарий</span>
-          <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
+          <textarea className={`${inputClass('comment')} min-h-[110px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
         </label>
 
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-700 dark:bg-neutral-900/60 space-y-1">
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900/60 space-y-0.5">
           <p><b>Тираж:</b> {summary.quantity.toLocaleString('ru-RU')} шт.</p>
           <p><b>Печать:</b> {summary.printSide === 'single' ? 'Односторонняя' : 'Двусторонняя'}</p>
           <p><b>Ламинация:</b> {summary.lamination ? 'Да' : 'Нет'}</p>
@@ -268,11 +267,11 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           aria-hidden="true"
         />
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="pt-1 flex flex-col gap-3 md:flex-row md:items-center">
           <button
             type="submit"
             disabled={isSending}
-            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
+            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-red-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[200px]"
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
