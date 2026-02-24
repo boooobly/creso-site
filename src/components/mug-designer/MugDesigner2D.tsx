@@ -484,7 +484,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     return <div className="rounded-2xl border border-neutral-200 bg-white p-6 text-sm text-neutral-600 shadow-sm">Загрузка конструктора…</div>;
   }
 
-  const stageScale = viewportWidth / MOCKUP_WIDTH;
+  const displayedWidth = viewportWidth;
+  const displayedHeight = viewportHeight;
+  const stageScale = displayedWidth / MOCKUP_WIDTH;
 
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
@@ -495,21 +497,21 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_360px]">
-        <section className="self-start h-fit rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
+        <section className="self-start rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
           <div className="mb-3 flex items-center justify-between text-xs text-neutral-500">
             <span>Область печати</span>
             <span>Перетащите объект внутрь рамки</span>
           </div>
-          <div className="h-fit rounded-xl border border-neutral-200 bg-white p-3 sm:p-4">
-            <div ref={wrapperRef} className="mx-auto h-fit w-full max-w-[1100px] overflow-hidden rounded-xl border border-neutral-200 bg-white p-2">
-              <div className="relative mx-auto" style={{ width: viewportWidth, height: viewportHeight }}>
+          <div className="rounded-xl border border-neutral-200 bg-white p-3 sm:p-4">
+            <div ref={wrapperRef} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-xl border border-neutral-200 bg-white p-2">
+              <div className="relative mx-auto" style={{ width: displayedWidth, height: displayedHeight }}>
                 <Stage
                   width={MOCKUP_WIDTH}
                   height={MOCKUP_HEIGHT}
                   scaleX={stageScale}
                   scaleY={stageScale}
                   ref={stageRef}
-                  style={{ width: viewportWidth, height: viewportHeight }}
+                  style={{ width: displayedWidth, height: displayedHeight }}
                   onMouseDown={(event) => {
                     if (event.target === event.target.getStage()) setSelectedElement(null);
                   }}
