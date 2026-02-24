@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
+import { validateUploadedFile } from '@/lib/file-validation';
 import { sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramLead } from '@/lib/notifications/telegram';
 import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram/sendDocumentWithCaption';
@@ -10,7 +11,6 @@ import {
   MILLING_ALLOWED_EXTENSIONS,
   MILLING_ALLOWED_MIME_TYPES,
   MILLING_MATERIAL_OPTIONS,
-  MILLING_MAX_UPLOAD_SIZE_MB,
   MILLING_THICKNESS_BY_MATERIAL,
 } from '@/lib/pricing-config/milling';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
@@ -37,12 +37,6 @@ function toText(value: FormDataEntryValue | null): string {
 
 function toBoolean(value: FormDataEntryValue | null): boolean {
   return toText(value).toLowerCase() === 'true';
-}
-
-function isAllowedFile(file: File): boolean {
-  const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase() ?? ''}` : '';
-  const mime = file.type.toLowerCase();
-  return allowedExtensionsSet.has(extension) || allowedMimeTypesSet.has(mime);
 }
 
 function formatFileSize(size: number): string {
@@ -103,6 +97,7 @@ async function sendMillingTelegramNotification(params: {
   helpWithPrep: boolean;
   comment?: string;
 }): Promise<boolean> {
+  const env = getServerEnv();
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
 
@@ -162,6 +157,7 @@ async function sendMillingTelegramNotification(params: {
 
 export async function POST(request: NextRequest) {
   try {
+    getServerEnv();
     if (!hasUserAgent(request)) {
       return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
     }
@@ -193,12 +189,16 @@ export async function POST(request: NextRequest) {
 
     const file = fileValue instanceof File ? fileValue : null;
 
-    if (file && !isAllowedFile(file)) {
-      return NextResponse.json({ ok: false, error: 'Разрешены только PDF, CDR, AI, EPS, DXF, SVG.' }, { status: 400 });
-    }
+    if (file) {
+      const fileValidation = validateUploadedFile({
+        file,
+        allowedMimeTypes: allowedMimeTypesSet,
+        allowedExtensions: allowedExtensionsSet,
+      });
 
-    if (file && (file.size <= 0 || file.size > MILLING_MAX_UPLOAD_SIZE_MB * 1024 * 1024)) {
-      return NextResponse.json({ ok: false, error: `Размер файла должен быть от 1 байта до ${MILLING_MAX_UPLOAD_SIZE_MB} МБ.` }, { status: 400 });
+      if (!fileValidation.ok) {
+        return NextResponse.json({ ok: false, error: fileValidation.error }, { status: 400 });
+      }
     }
 
     const normalizedPhone = normalizePhone(parsed.data.phone);
@@ -254,6 +254,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }

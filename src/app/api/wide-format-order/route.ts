@@ -7,10 +7,11 @@ import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentW
 import { getWideFormatMaterialLabel, WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/pricing-config/wideFormat';
 
 import { logger } from '@/lib/logger';
-import { env } from '@/lib/env';
+import { FIVE_MB_IN_BYTES, validateUploadedFile } from '@/lib/file-validation';
+import { getServerEnv } from '@/lib/env';
 export const runtime = 'nodejs';
 
-const MAX_TELEGRAM_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
 const ALLOWED_UPLOAD_MIME_TYPES = new Set([
   'image/jpeg',
   'image/png',
@@ -40,13 +41,8 @@ function isWideFormatMaterialType(value: string): value is WideFormatMaterialTyp
 }
 
 
-function isAllowedUploadFile(file: File): boolean {
-  const mime = (file.type || '').toLowerCase();
-  const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase() ?? ''}` : '';
-  return ALLOWED_UPLOAD_MIME_TYPES.has(mime) || ALLOWED_UPLOAD_EXTENSIONS.has(extension);
-}
-
 async function sendTelegramMessage(text: string) {
+  const env = getServerEnv();
   const botToken = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
   if (!botToken || !chatId) return false;
@@ -61,6 +57,7 @@ async function sendTelegramMessage(text: string) {
 }
 
 async function sendEmail(text: string, file?: File) {
+  const env = getServerEnv();
   const host = env.SMTP_HOST;
   const port = Number(env.SMTP_PORT || 0);
   const user = env.SMTP_USER;
@@ -95,6 +92,8 @@ async function sendEmail(text: string, file?: File) {
 
 export async function POST(request: NextRequest) {
   try {
+    const env = getServerEnv();
+
     if (!hasUserAgent(request)) {
       return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
     }
@@ -178,12 +177,17 @@ export async function POST(request: NextRequest) {
 
     const file = fileRaw instanceof File ? fileRaw : undefined;
 
-    if (file && !isAllowedUploadFile(file)) {
-      return NextResponse.json({ ok: false, error: 'Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD.' }, { status: 400 });
-    }
+    if (file) {
+      const fileValidation = validateUploadedFile({
+        file,
+        allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
+        allowedExtensions: ALLOWED_UPLOAD_EXTENSIONS,
+        maxBytes: MAX_TELEGRAM_FILE_SIZE_BYTES,
+      });
 
-    if (file && file.size > MAX_TELEGRAM_FILE_SIZE_BYTES) {
-      return NextResponse.json({ ok: false, error: 'Размер файла не должен превышать 50 МБ.' }, { status: 400 });
+      if (!fileValidation.ok) {
+        return NextResponse.json({ ok: false, error: fileValidation.error }, { status: 400 });
+      }
     }
 
     const message = [
@@ -217,7 +221,7 @@ export async function POST(request: NextRequest) {
     const isFileTooLarge = Boolean(file && file.size > MAX_TELEGRAM_FILE_SIZE_BYTES);
 
     const telegramText = isFileTooLarge
-      ? `${message}\n\n⚠️ File too large for bot upload (>50MB).`
+      ? `${message}\n\n⚠️ File too large for bot upload (>5MB).`
       : message;
 
     const [emailSent, telegramSent] = await Promise.all([
@@ -248,6 +252,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, fileSent: telegramCanSendFile ? true : undefined });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }

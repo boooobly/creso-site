@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
-import { env } from '@/lib/env';
-import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
+import { getServerEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
+import { FIVE_MB_IN_BYTES, validateDataUrlFile, validateUploadedFile } from '@/lib/file-validation';
 import { EmailAttachment, sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramLead, sendTelegramPhotoAlbumBuffer, sendTelegramPhotoBuffer } from '@/lib/notifications/telegram';
 import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram/sendDocumentWithCaption';
@@ -13,7 +13,6 @@ import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
   MUGS_COVERING_OPTIONS,
-  MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
 
 export const runtime = 'nodejs';
@@ -44,23 +43,21 @@ function toBoolean(value: FormDataEntryValue | null): boolean {
 
 
 function dataUrlToBuffer(dataUrl: string): { buffer: Buffer; mime: string } | null {
+  const validation = validateDataUrlFile({
+    dataUrl,
+    allowedMimeTypes: allowedMimeTypesSet,
+    maxBytes: FIVE_MB_IN_BYTES,
+  });
+
+  if (!validation.ok) return null;
+
   try {
-    const match = dataUrl.match(/^data:(.+);base64,(.*)$/);
-    if (!match) return null;
-    const mime = match[1];
-    const base64 = match[2];
-    const buffer = Buffer.from(base64, 'base64');
+    const buffer = Buffer.from(validation.base64, 'base64');
     if (!buffer.length) return null;
-    return { buffer, mime };
+    return { buffer, mime: validation.mime };
   } catch {
     return null;
   }
-}
-
-function isAllowedFile(file: File): boolean {
-  const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase() ?? ''}` : '';
-  const mime = file.type.toLowerCase();
-  return allowedExtensionsSet.has(extension) || allowedMimeTypesSet.has(mime);
 }
 
 function isKnownCovering(value: string): boolean {
@@ -116,6 +113,7 @@ async function sendMugsTelegramNotification(params: {
   comment?: string;
   needsDesign: boolean;
 }): Promise<boolean> {
+  const env = getServerEnv();
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
 
@@ -180,6 +178,7 @@ async function sendMugsTelegramNotification(params: {
 
 export async function POST(request: NextRequest) {
   try {
+    getServerEnv();
     if (!hasUserAgent(request)) return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
     if (isRateLimited(getClientIp(request))) return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
 
@@ -212,19 +211,47 @@ export async function POST(request: NextRequest) {
     const printPreview = printPreviewValue instanceof File ? printPreviewValue : null;
     const layout = layoutValue instanceof File ? layoutValue : null;
 
-    if (file && !isAllowedFile(file)) return NextResponse.json({ ok: false, error: 'Разрешены png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg.' }, { status: 400 });
-    if (file && (file.size <= 0 || file.size > MUGS_MAX_UPLOAD_SIZE_MB * 1024 * 1024)) return NextResponse.json({ ok: false, error: `Размер файла должен быть от 1 байта до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.` }, { status: 400 });
+    if (file) {
+      const fileValidation = validateUploadedFile({
+        file,
+        allowedMimeTypes: allowedMimeTypesSet,
+        allowedExtensions: allowedExtensionsSet,
+        maxBytes: FIVE_MB_IN_BYTES,
+      });
+
+      if (!fileValidation.ok) return NextResponse.json({ ok: false, error: fileValidation.error }, { status: 400 });
+    }
+
+    if (rawImageDataUrl) {
+      const rawDataUrlValidation = validateDataUrlFile({
+        dataUrl: rawImageDataUrl,
+        allowedMimeTypes: allowedMimeTypesSet,
+        maxBytes: FIVE_MB_IN_BYTES,
+      });
+
+      if (!rawDataUrlValidation.ok) return NextResponse.json({ ok: false, error: rawDataUrlValidation.error }, { status: 400 });
+    }
+
+    if (mockPngDataUrl) {
+      const mockDataUrlValidation = validateDataUrlFile({
+        dataUrl: mockPngDataUrl,
+        allowedMimeTypes: new Set(['image/png']),
+        maxBytes: FIVE_MB_IN_BYTES,
+      });
+
+      if (!mockDataUrlValidation.ok) return NextResponse.json({ ok: false, error: mockDataUrlValidation.error }, { status: 400 });
+    }
 
     const previews = [mockPreview, printPreview];
     for (const preview of previews) {
       if (!preview) continue;
       if (preview.type !== 'image/png') return NextResponse.json({ ok: false, error: 'Файлы превью должны быть PNG.' }, { status: 400 });
-      if (preview.size <= 0 || preview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) return NextResponse.json({ ok: false, error: `Размер превью должен быть от 1 байта до ${PREVIEW_MAX_SIZE_MB} МБ.` }, { status: 400 });
+      if (preview.size <= 0 || preview.size > FIVE_MB_IN_BYTES) return NextResponse.json({ ok: false, error: 'File too large' }, { status: 400 });
     }
 
     if (layout) {
       if (layout.type !== 'application/json') return NextResponse.json({ ok: false, error: 'Layout должен быть в формате JSON.' }, { status: 400 });
-      if (layout.size <= 0 || layout.size > LAYOUT_MAX_SIZE_KB * 1024) return NextResponse.json({ ok: false, error: `Размер layout JSON должен быть от 1 байта до ${LAYOUT_MAX_SIZE_KB} КБ.` }, { status: 400 });
+      if (layout.size <= 0 || layout.size > FIVE_MB_IN_BYTES) return NextResponse.json({ ok: false, error: 'File too large' }, { status: 400 });
     }
 
     const normalizedPhone = normalizePhone(parsed.data.phone);
@@ -263,6 +290,10 @@ export async function POST(request: NextRequest) {
     if (!telegramSent && !emailSent) return NextResponse.json({ ok: false, error: 'Не удалось отправить уведомления в Telegram и Email.' }, { status: 502 });
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('mugs.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }
