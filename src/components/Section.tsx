@@ -1,23 +1,41 @@
 'use client';
-import { motion } from 'framer-motion';
-import { PropsWithChildren } from 'react';
+
+import type { PropsWithChildren } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import Container from '@/components/Container';
+import { fadeUp, viewportOnce } from '@/lib/motion';
+
+type SectionProps = PropsWithChildren<{
+  className?: string;
+  containerClassName?: string;
+  id?: string;
+  background?: 'default' | 'muted';
+}>;
+
+const backgroundStyles: Record<NonNullable<SectionProps['background']>, string> = {
+  default: 'bg-white',
+  muted: 'bg-neutral-50/70',
+};
 
 export default function Section({
   children,
   className = '',
   containerClassName = '',
   id,
-}: PropsWithChildren<{ className?: string; containerClassName?: string; id?: string }>) {
+  background = 'default',
+}: SectionProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <motion.section
       id={id}
-      className={`py-16 ${className}`.trim()}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className={`py-12 md:py-20 ${backgroundStyles[background]} ${className}`.trim()}
+      initial={shouldReduceMotion ? false : 'hidden'}
+      whileInView={shouldReduceMotion ? undefined : 'show'}
+      viewport={viewportOnce}
+      variants={fadeUp(20)}
     >
-      <div className={`container ${containerClassName}`.trim()}>{children}</div>
+      <Container className={containerClassName}>{children}</Container>
     </motion.section>
   );
 }
