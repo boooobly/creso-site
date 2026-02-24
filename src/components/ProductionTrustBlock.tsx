@@ -9,45 +9,61 @@ const guaranteeItems = [
   'Гарантийная поддержка и оперативный выезд при необходимости.',
 ];
 
+const productionPlaceholders = [
+  { title: 'Производство' },
+  { title: 'Монтаж' },
+] as const;
+
 export default function ProductionTrustBlock() {
   return (
-    <section className="bg-gradient-to-b from-neutral-900 to-neutral-950 py-16 text-neutral-100 md:py-24">
+    <section className="py-16 md:py-24">
       <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
-        <RevealOnScroll className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold leading-tight md:text-4xl">Производим сами. От проекта до монтажа.</h2>
-          <p className="mt-4 text-base text-neutral-300 md:text-lg">Собственная производственная база и монтажная команда.</p>
-        </RevealOnScroll>
+        <RevealOnScroll className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm md:p-8">
+          <div className="grid gap-7 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-3xl font-bold leading-tight text-neutral-900 md:text-4xl">Производим сами. От проекта до монтажа.</h2>
+                <p className="mt-3 text-base text-neutral-600 md:text-lg">Собственная производственная база и монтажная команда.</p>
+              </div>
 
-        <RevealOnScroll className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {productionFeatures.map((feature) => (
-            <article
-              key={feature}
-              className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/40 hover:shadow-[0_0_20px_rgba(239,68,68,0.18)]"
-            >
-              <p className="text-sm font-semibold tracking-wide text-neutral-100 md:text-base">{feature}</p>
-            </article>
-          ))}
-        </RevealOnScroll>
+              <div className="flex flex-wrap gap-2.5">
+                {productionFeatures.map((feature) => (
+                  <span
+                    key={feature}
+                    className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-700"
+                  >
+                    {feature}
+                  </span>
+                ))}
+              </div>
 
-        <RevealOnScroll className="mt-8 grid gap-4 md:grid-cols-2">
-          <div className="flex min-h-[220px] items-center justify-center rounded-2xl border border-neutral-800 bg-neutral-900/70 p-8 text-center text-sm text-neutral-400 md:min-h-[280px]">
-            Фото производства (placeholder)
+              <div className="grid gap-3 sm:grid-cols-2">
+                {guaranteeItems.map((item) => (
+                  <article key={item} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5">
+                    <p className="flex items-start gap-2.5 text-sm text-neutral-700 md:text-[15px]">
+                      <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                      <span>{item}</span>
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              {productionPlaceholders.map((item) => (
+                <article key={item.title} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5">
+                  <h3 className="text-sm font-semibold text-neutral-900">{item.title}</h3>
+                  <div className="mt-3 flex min-h-[160px] items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-center text-sm text-neutral-500 md:min-h-[190px]">
+                    Фото будет добавлено
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
-          <div className="flex min-h-[220px] items-center justify-center rounded-2xl border border-neutral-800 bg-neutral-900/70 p-8 text-center text-sm text-neutral-400 md:min-h-[280px]">
-            Фото монтажа (placeholder)
-          </div>
-        </RevealOnScroll>
 
-        <RevealOnScroll className="mt-8 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 md:p-8">
-          <h3 className="text-xl font-semibold">Гарантии и контроль качества</h3>
-          <ul className="mt-4 space-y-3 text-sm text-neutral-300 md:text-base">
-            {guaranteeItems.map((item) => (
-              <li key={item} className="flex items-start gap-3">
-                <span className="mt-1 h-2 w-2 rounded-full bg-red-500" aria-hidden="true" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="mt-6 border-t border-neutral-200 pt-4 text-sm font-medium text-neutral-700">
+            Работаем по договору. С НДС. Гарантия 5 лет.
+          </p>
         </RevealOnScroll>
       </div>
     </section>
