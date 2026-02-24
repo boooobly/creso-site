@@ -829,7 +829,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
           <div className="space-y-3 border-t border-neutral-200 pt-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Стоимость</p>
-            <p className="text-4xl font-semibold tracking-tight">490 ₽</p>
+            <p className="text-4xl font-semibold tracking-tight">450 ₽</p>
             <button
               type="button"
               className="w-full rounded-md bg-red-600 py-3 text-sm font-semibold text-white transition hover:bg-red-700"

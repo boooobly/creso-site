@@ -1,6 +1,6 @@
 export const MUGS_COVERING_OPTIONS = [
-  { value: 'glossy', label: 'Глянец' },
-  { value: 'matte', label: 'Мат' },
+  { value: 'glossy', label: 'Глянец - глянцевое' },
+  { value: 'matte', label: 'Мат - Матовое' },
 ] as const;
 
 export const MUGS_ALLOWED_RASTER_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp'] as const;
