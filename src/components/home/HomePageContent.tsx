@@ -34,11 +34,42 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
 
   return (
     <div>
-      <Section className="pb-8 md:pb-12">
-        <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
+      <Section className="relative overflow-hidden pb-10 pt-16 md:pb-14 md:pt-24">
+        <div
+          className="pointer-events-none absolute inset-0"
+          aria-hidden="true"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, rgba(15,23,42,0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.03) 1px, transparent 1px)',
+            backgroundSize: '42px 42px',
+            opacity: 0.45,
+          }}
+        />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_22%,rgba(212,28,28,0.14),transparent_55%)]" aria-hidden="true" />
+
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 top-10 h-64 w-64 rounded-[44%_56%_53%_47%/49%_45%_55%_51%] bg-[var(--brand-red)]/8 blur-2xl"
+          animate={shouldReduceMotion ? undefined : { x: [0, 12, 0], y: [0, -8, 0], rotate: [0, 4, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-20 bottom-2 h-52 w-52 rounded-[57%_43%_46%_54%/41%_53%_47%_59%] bg-[var(--brand-red)]/6 blur-2xl"
+          animate={shouldReduceMotion ? undefined : { x: [0, -10, 0], y: [0, 8, 0], rotate: [0, -4, 0] }}
+          transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        <motion.div
+          variants={fadeUp(20)}
+          initial={shouldReduceMotion ? false : 'hidden'}
+          whileInView={shouldReduceMotion ? undefined : 'show'}
+          viewport={viewportOnce}
+          className="relative z-10 space-y-8"
+        >
           <div className="space-y-6">
-            <p className="inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">
-              Производственная студия Creso
+            <p className="inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">
+              ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
             </p>
             <h1 className="max-w-5xl text-3xl font-black leading-[1.05] tracking-tight text-neutral-900 sm:text-4xl md:text-6xl lg:text-7xl">
               Реклама и производство<br className="hidden md:block" /> под ключ без срывов сроков
