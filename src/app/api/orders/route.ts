@@ -64,7 +64,9 @@ async function createOrderWithRetry(data: {
     comment?: string;
   };
 }): Promise<string> {
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  // Public order numbers are intentionally short; collisions are resolved by retries
+  // and enforced DB uniqueness on Order.number.
+  for (let attempt = 0; attempt < 10; attempt += 1) {
     const orderNumber = generateOrderNumber();
 
     try {
@@ -92,7 +94,7 @@ async function createOrderWithRetry(data: {
         && error !== null
         && 'code' in error
         && (error as { code?: string }).code === 'P2002'
-        && attempt < 1
+        && attempt < 9
       ) {
         continue;
       }
@@ -100,7 +102,7 @@ async function createOrderWithRetry(data: {
     }
   }
 
-  throw new Error('Failed to create unique order number');
+  throw new Error('Failed to create unique order number after 10 collision retries.');
 }
 
 export async function POST(request: NextRequest) {
