@@ -23,7 +23,12 @@ const sendCustomerEmailsSchema = z.preprocess((value) => {
   return value;
 }, z.boolean({ invalid_type_error: 'SEND_CUSTOMER_EMAILS must be a boolean (true/false).' }));
 
-const envSchema = z.object({
+const publicEnvSchema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  PUBLIC_BASE_URL: optionalUrl,
+});
+
+const serverEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   DATABASE_URL: z.string().trim().min(1, 'DATABASE_URL is required.'),
   PUBLIC_BASE_URL: optionalUrl,
@@ -83,14 +88,41 @@ const envSchema = z.object({
   }
 });
 
-const parsedEnv = envSchema.safeParse(process.env);
+export type PublicEnv = z.infer<typeof publicEnvSchema>;
+export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
-if (!parsedEnv.success) {
-  const details = parsedEnv.error.issues
+let cachedServerEnv: ServerEnv | null = null;
+
+function buildEnvError(error: z.ZodError): Error {
+  const details = error.issues
     .map((issue) => `${issue.path.join('.') || 'env'}: ${issue.message}`)
     .join('; ');
 
-  throw new Error(`[env] Invalid environment configuration. ${details}`);
+  return new Error(`[env] Invalid environment configuration: ${details}`);
 }
 
-export const env = parsedEnv.data;
+export function getPublicEnv(): PublicEnv {
+  const parsed = publicEnvSchema.safeParse(process.env);
+  if (!parsed.success) {
+    return {
+      NODE_ENV: process.env.NODE_ENV === 'production' ? 'production' : process.env.NODE_ENV === 'test' ? 'test' : 'development',
+      PUBLIC_BASE_URL: undefined,
+    };
+  }
+
+  return parsed.data;
+}
+
+export function getServerEnv(): ServerEnv {
+  if (cachedServerEnv) {
+    return cachedServerEnv;
+  }
+
+  const parsed = serverEnvSchema.safeParse(process.env);
+  if (!parsed.success) {
+    throw buildEnvError(parsed.error);
+  }
+
+  cachedServerEnv = parsed.data;
+  return cachedServerEnv;
+}

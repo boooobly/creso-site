@@ -1,8 +1,7 @@
 import { createClient } from 'contentful';
 
-import { env } from '@/lib/env';
-const space = env.CONTENTFUL_SPACE_ID;
-const accessToken = env.CONTENTFUL_ACCESS_TOKEN;
+const space = process.env.CONTENTFUL_SPACE_ID?.trim();
+const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN?.trim();
 
 export const client: any = space && accessToken
   ? createClient({
@@ -11,7 +10,6 @@ export const client: any = space && accessToken
     })
   : null;
 
-// Готовые функции-загрузчики
 export async function getServices() {
   const res = await client.getEntries({ content_type: 'service', order: ['fields.title'], limit: 1000 });
   return res.items.map((item: any) => ({

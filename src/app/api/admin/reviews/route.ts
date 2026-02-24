@@ -1,27 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 
 export const runtime = 'nodejs';
 
 const statusSchema = z.enum(['pending', 'approved', 'rejected']);
 
-function isAdminAuthorized(request: NextRequest): boolean {
-  const adminToken = env.ADMIN_TOKEN;
+function isAdminAuthorized(request: NextRequest, adminToken: string): boolean {
   const headerToken = request.headers.get('x-admin-token');
-
-  if (!adminToken) {
-    return false;
-  }
-
   return headerToken === adminToken;
 }
 
 export async function GET(request: NextRequest) {
-  if (!isAdminAuthorized(request)) {
-    return NextResponse.json({ ok: false }, { status: 404 });
-  }
+  try {
+    const env = getServerEnv();
+    if (!isAdminAuthorized(request, env.ADMIN_TOKEN)) {
+      return NextResponse.json({ ok: false }, { status: 404 });
+    }
 
   const parsed = statusSchema.safeParse(request.nextUrl.searchParams.get('status') || 'pending');
 
@@ -44,5 +40,12 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  return NextResponse.json({ items });
+    return NextResponse.json({ items });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
+    throw error;
+  }
 }
