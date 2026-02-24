@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
 import { logger } from '@/lib/logger';
 import { EmailAttachment, sendEmailLead } from '@/lib/notifications/email';
@@ -116,6 +116,7 @@ async function sendMugsTelegramNotification(params: {
   comment?: string;
   needsDesign: boolean;
 }): Promise<boolean> {
+  const env = getServerEnv();
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
 
@@ -180,6 +181,7 @@ async function sendMugsTelegramNotification(params: {
 
 export async function POST(request: NextRequest) {
   try {
+    getServerEnv();
     if (!hasUserAgent(request)) return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
     if (isRateLimited(getClientIp(request))) return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
 
@@ -263,6 +265,10 @@ export async function POST(request: NextRequest) {
     if (!telegramSent && !emailSent) return NextResponse.json({ ok: false, error: 'Не удалось отправить уведомления в Telegram и Email.' }, { status: 502 });
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('mugs.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }
