@@ -73,3 +73,17 @@ a { @apply underline-offset-4; }
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
   }
 }
+
+
+.marquee-wrap {
+  position: relative;
+}
+
+.marquee-track {
+  animation: trust-marquee 32s linear infinite;
+}
+
+@keyframes trust-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}

@@ -109,13 +109,26 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-neutral-500">Нам доверяют</p>
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
-        <motion.ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8" variants={staggerContainer(0.05)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {trustedByPlaceholders.map((item) => (
-            <motion.li key={item} variants={fadeUp(10)} whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }} className="flex h-14 items-center justify-center rounded-2xl border border-neutral-200/80 bg-white/90 px-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 opacity-70 grayscale">
-              {item}
-            </motion.li>
-          ))}
-        </motion.ul>
+
+        {shouldReduceMotion ? (
+          <ul className="flex flex-wrap gap-3">
+            {trustedByPlaceholders.map((item) => (
+              <li key={item} className="flex h-14 min-w-[140px] items-center justify-center rounded-2xl border border-neutral-200/80 bg-white/90 px-5 text-xs font-semibold uppercase tracking-wide text-neutral-500 opacity-70 grayscale">
+                {item}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="marquee-wrap group overflow-hidden">
+            <div className="marquee-track flex w-max gap-3 group-hover:[animation-play-state:paused]">
+              {[...trustedByPlaceholders, ...trustedByPlaceholders].map((item, index) => (
+                <div key={`${item}-${index}`} className="flex h-14 min-w-[160px] items-center justify-center rounded-2xl border border-neutral-200/80 bg-white/90 px-5 text-xs font-semibold uppercase tracking-wide text-neutral-500 opacity-70 grayscale">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Section>
 
       <Section className="py-10 md:py-16">
