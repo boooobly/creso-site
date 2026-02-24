@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
     });
 
 
-    const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS === 'true';
+    const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS;
     const customerEmail = parsed.data.customer.email?.trim();
     const pdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf`;
 
