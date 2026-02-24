@@ -50,10 +50,10 @@ export default function MugsServicePage() {
             <div className="relative flex justify-center lg:justify-end">
               <div className="absolute -z-10 right-10 top-10 h-64 w-64 rounded-full bg-red-500/10 blur-3xl" />
               <Image
-                src="/images/mug/mug-base.png"
+                src="/images/mug/mug-hero.jpg"
                 alt="Печать на кружках — пример готовой работы"
-                width={800}
-                height={800}
+                width={900}
+                height={900}
                 className="w-full max-w-[620px] rounded-2xl object-cover shadow-2xl"
                 priority
               />
