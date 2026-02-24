@@ -1,22 +1,62 @@
 import { z } from 'zod';
 
-const envSchema = z.object({
+const optionalTrimmedString = z.preprocess((value) => {
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+}, z.string().optional());
+
+const optionalUrl = z.preprocess((value) => {
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+}, z.string().url('PUBLIC_BASE_URL must be a valid URL.').optional());
+
+const sendCustomerEmailsSchema = z.preprocess((value) => {
+  if (value === undefined || value === null || value === '') return false;
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+  return value;
+}, z.boolean({ invalid_type_error: 'SEND_CUSTOMER_EMAILS must be a boolean (true/false).' }));
+
+const publicEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PUBLIC_BASE_URL: z.string().trim().url().optional(),
-  SEND_CUSTOMER_EMAILS: z.enum(['true', 'false']).optional(),
-  CONTENTFUL_SPACE_ID: z.string().trim().optional(),
-  CONTENTFUL_ACCESS_TOKEN: z.string().trim().optional(),
-  SMTP_HOST: z.string().trim().optional(),
-  SMTP_PORT: z.coerce.number().int().positive().optional(),
-  SMTP_USER: z.string().trim().optional(),
-  SMTP_PASS: z.string().trim().optional(),
-  MAIL_TO: z.string().trim().optional(),
-  LEADS_TO_EMAIL: z.string().trim().optional(),
-  LEADS_FROM_EMAIL: z.string().trim().optional(),
-  TELEGRAM_BOT_TOKEN: z.string().trim().optional(),
-  TELEGRAM_CHAT_ID: z.string().trim().optional(),
-  REVIEW_MODERATION_TOKEN: z.string().trim().optional(),
+  PUBLIC_BASE_URL: optionalUrl,
+});
+
+const serverEnvSchema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  DATABASE_URL: z.string().trim().min(1, 'DATABASE_URL is required.'),
+  PUBLIC_BASE_URL: optionalUrl,
+  SEND_CUSTOMER_EMAILS: sendCustomerEmailsSchema,
+  ADMIN_TOKEN: z.string().trim().min(1, 'ADMIN_TOKEN is required.'),
+  MAIL_TO: z.string().trim().min(1, 'MAIL_TO is required.'),
+  CONTENTFUL_SPACE_ID: optionalTrimmedString,
+  CONTENTFUL_ACCESS_TOKEN: optionalTrimmedString,
+  SMTP_HOST: optionalTrimmedString,
+  SMTP_PORT: z.preprocess((value) => (value === '' ? undefined : value), z.coerce.number().int().positive().optional()),
+  SMTP_USER: optionalTrimmedString,
+  SMTP_PASS: optionalTrimmedString,
+  LEADS_TO_EMAIL: optionalTrimmedString,
+  LEADS_FROM_EMAIL: optionalTrimmedString,
+  TELEGRAM_BOT_TOKEN: optionalTrimmedString,
+  TELEGRAM_CHAT_ID: optionalTrimmedString,
+  REVIEW_MODERATION_TOKEN: optionalTrimmedString,
+  ORDER_TOKEN_SECRET: optionalTrimmedString,
+  PAYMENT_WEBHOOK_SECRET: optionalTrimmedString,
 }).superRefine((value, ctx) => {
+  if (value.NODE_ENV === 'production' && !value.PUBLIC_BASE_URL) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['PUBLIC_BASE_URL'],
+      message: 'PUBLIC_BASE_URL is required when NODE_ENV=production.',
+    });
+  }
+
   const hasAnySmtp = Boolean(value.SMTP_HOST || value.SMTP_PORT || value.SMTP_USER || value.SMTP_PASS);
   if (hasAnySmtp) {
     if (!value.SMTP_HOST) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['SMTP_HOST'], message: 'SMTP_HOST is required when SMTP is configured.' });
@@ -31,7 +71,7 @@ const envSchema = z.object({
     if (!value.TELEGRAM_CHAT_ID) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['TELEGRAM_CHAT_ID'], message: 'TELEGRAM_CHAT_ID is required when Telegram is configured.' });
   }
 
-  if (value.SEND_CUSTOMER_EMAILS === 'true') {
+  if (value.SEND_CUSTOMER_EMAILS) {
     if (!value.PUBLIC_BASE_URL) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -50,14 +90,41 @@ const envSchema = z.object({
   }
 });
 
-const parsedEnv = envSchema.safeParse(process.env);
+export type PublicEnv = z.infer<typeof publicEnvSchema>;
+export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
-if (!parsedEnv.success) {
-  const details = parsedEnv.error.issues
+let cachedServerEnv: ServerEnv | null = null;
+
+function buildEnvError(error: z.ZodError): Error {
+  const details = error.issues
     .map((issue) => `${issue.path.join('.') || 'env'}: ${issue.message}`)
     .join('; ');
 
-  throw new Error(`[env] Invalid environment configuration. ${details}`);
+  return new Error(`[env] Invalid environment configuration: ${details}`);
 }
 
-export const env = parsedEnv.data;
+export function getPublicEnv(): PublicEnv {
+  const parsed = publicEnvSchema.safeParse(process.env);
+  if (!parsed.success) {
+    return {
+      NODE_ENV: process.env.NODE_ENV === 'production' ? 'production' : process.env.NODE_ENV === 'test' ? 'test' : 'development',
+      PUBLIC_BASE_URL: undefined,
+    };
+  }
+
+  return parsed.data;
+}
+
+export function getServerEnv(): ServerEnv {
+  if (cachedServerEnv) {
+    return cachedServerEnv;
+  }
+
+  const parsed = serverEnvSchema.safeParse(process.env);
+  if (!parsed.success) {
+    throw buildEnvError(parsed.error);
+  }
+
+  cachedServerEnv = parsed.data;
+  return cachedServerEnv;
+}

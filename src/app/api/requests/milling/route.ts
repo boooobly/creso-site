@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
-import { env } from '@/lib/env';
+import { getServerEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramLead } from '@/lib/notifications/telegram';
@@ -103,6 +103,7 @@ async function sendMillingTelegramNotification(params: {
   helpWithPrep: boolean;
   comment?: string;
 }): Promise<boolean> {
+  const env = getServerEnv();
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
 
@@ -162,6 +163,7 @@ async function sendMillingTelegramNotification(params: {
 
 export async function POST(request: NextRequest) {
   try {
+    getServerEnv();
     if (!hasUserAgent(request)) {
       return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
     }
@@ -254,6 +256,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown server error.';
+    if (message.startsWith('[env]')) {
+      return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    }
     logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }
