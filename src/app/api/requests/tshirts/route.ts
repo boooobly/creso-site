@@ -41,7 +41,7 @@ function formatFileSize(size: number): string {
 }
 
 function tshirtSourceLabel(value: (typeof tshirtSourceValues)[number]): string {
-  return value === 'client' ? 'Клиента' : 'Наша';
+  return value === 'client' ? 'Ваша' : 'Наша';
 }
 
 function transferTypeLabel(value: (typeof transferTypeValues)[number]): string {
