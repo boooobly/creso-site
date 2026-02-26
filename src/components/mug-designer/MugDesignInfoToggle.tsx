@@ -48,7 +48,8 @@ export default function MugDesignInfoToggle({ complexityLevels, checklist, needs
           : 'mt-0 overflow-hidden transition-all duration-300 ease-out opacity-0 max-h-0 pointer-events-none'}
       >
         <h2 className="text-2xl font-semibold">Дизайн</h2>
-        <p className="text-sm text-neutral-700 dark:text-neutral-300">3 макета входит в стоимость.</p>
+        <p className="text-sm text-neutral-700 dark:text-neutral-300">2 макета входит в стоимость.</p>
+        <p className="text-sm text-neutral-700 dark:text-neutral-300">К двум макетам включены 2 правки 1-й категории.</p>
 
         <div>
           <h3 className="text-lg font-medium">Категории сложности I/II/III</h3>
