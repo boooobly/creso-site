@@ -154,7 +154,7 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0">
+      <Section className="pt-4 md:pt-6">
         <RevealOnScroll>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {trustStripItems.map((item) => (
