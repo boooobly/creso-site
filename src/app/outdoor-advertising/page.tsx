@@ -30,11 +30,22 @@ const strengths = [
   'Гарантия 5 лет',
 ];
 
+const fullCycleItems = [
+  'Дизайн и визуализация',
+  'Технический расчет',
+  'Проектирование',
+  'Изготовление',
+  'Монтаж',
+  'Ремонт и реставрация',
+  'Диагностика неисправностей',
+  'Постгарантийное обслуживание',
+] as const;
+
 const heroTrustBadges = [
+  'Работаем по ЮФО',
+  'Гарантия до 5 лет',
+  'Пожизненное сервисное обслуживание',
   'Собственное производство',
-  'Монтажная бригада и автовышка',
-  'Работаем по договору',
-  'Гарантия 5 лет',
 ] as const;
 
 const trustStripItems = [
@@ -62,7 +73,7 @@ export default function OutdoorAdvertisingPage() {
         <div className="card space-y-5 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-10">
           <h1 className="text-4xl font-bold leading-tight md:text-5xl">Наружная реклама под ключ в Ставропольском крае</h1>
           <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">
-            Проектирование, производство и монтаж конструкций любой сложности.
+            Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.
           </p>
 
           <div className="flex flex-wrap gap-2.5">
@@ -113,6 +124,20 @@ export default function OutdoorAdvertisingPage() {
           <p className="mb-5 text-sm text-neutral-600 dark:text-neutral-300">Без посредников - отвечаем за результат</p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {strengths.map((item) => (
+              <div key={item} className="card flex min-h-[112px] items-start gap-2.5 rounded-xl p-5">
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                <p className="text-sm font-semibold leading-relaxed">{item}</p>
+              </div>
+            ))}
+          </div>
+        </RevealOnScroll>
+      </Section>
+
+      <Section className="pt-0">
+        <RevealOnScroll>
+          <h2 className="mb-5 text-2xl font-bold">Полный цикл работ</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {fullCycleItems.map((item) => (
               <div key={item} className="card flex min-h-[112px] items-start gap-2.5 rounded-xl p-5">
                 <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                 <p className="text-sm font-semibold leading-relaxed">{item}</p>
