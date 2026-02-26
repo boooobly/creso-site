@@ -19,7 +19,7 @@ const faqItems = [
 ];
 
 export default function MugsServicePage() {
-  const heroBenefits = ['3–5 рабочих дней', '3 макета включены', 'Скидка от 10 шт', 'Проверка перед печатью'];
+  const heroBenefits = ['3–5 рабочих дней', '2 макета включены', 'Скидка до 20%', 'Проверка перед печатью'];
 
   return (
     <div className="space-y-10 sm:space-y-12 lg:space-y-14">
@@ -107,8 +107,8 @@ export default function MugsServicePage() {
               <h3 className="text-lg font-semibold">Сроки и скидки</h3>
               <ul className="mt-4 space-y-2 text-sm text-neutral-700">
                 <li>• Изготовление: 3–5 рабочих дней</li>
-                <li>• От 10 шт — скидка 10%</li>
-                <li>• 3 макета входят в стоимость</li>
+                <li>• Скидка по шагам: каждые 12 шт = 2,5% (до 20%)</li>
+                <li>• 2 макета входят в стоимость</li>
                 <li>• Срочная печать по согласованию</li>
               </ul>
             </div>
