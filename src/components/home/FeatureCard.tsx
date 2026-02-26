@@ -25,7 +25,7 @@ export default function FeatureCard({
       <div className="space-y-3 p-5">
         <p className="inline-flex items-center gap-2 t-eyebrow"><span className="card-dot" />{category}</p>
         <h3 className="t-h3">{title}</h3>
-        <Link href={href} className="group/link inline-flex items-center gap-2 text-sm font-medium text-neutral-700 no-underline hover:text-[var(--brand-red)]">
+        <Link href={href} className="t-link group/link">
           Смотреть кейс <ArrowRight className="size-4 transition-transform duration-200 group-hover/link:translate-x-1" />
         </Link>
       </div>

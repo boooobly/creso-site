@@ -33,7 +33,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
 
   return (
     <div>
-      <Section className="relative overflow-hidden pb-10 pt-16 md:pb-14 md:pt-24">
+      <Section className="relative overflow-hidden pb-10 pt-14 md:pb-12 md:pt-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(212,28,28,0.1),transparent_60%)]" aria-hidden="true" />
 
         <motion.div
@@ -44,31 +44,31 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         />
 
         <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
-            <div className="space-y-6">
+          <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
+            <div className="space-y-7">
               <p className="t-eyebrow rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5">
                 ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
               </p>
               <h1 className="t-h1 max-w-5xl">
                 Реклама и производство<br className="hidden md:block" /> под ключ без срывов сроков
               </h1>
-              <p className="t-body max-w-[45rem] md:text-lg">{messages.hero.subtitle}</p>
+              <p className="t-body max-w-[34rem]">{messages.hero.subtitle}</p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
-                <Link className="btn-primary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
+                <Link className="btn-primary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
                   Рассчитать стоимость
                 </Link>
               </motion.div>
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
-                <Link className="btn-secondary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/portfolio" aria-label="Перейти в портфолио">
+                <Link className="btn-secondary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/portfolio" aria-label="Перейти в портфолио">
                   Смотреть портфолио
                 </Link>
               </motion.div>
             </div>
 
-            <motion.ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+            <motion.ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
               {trustBadges.map((badge) => (
                 <BadgeChip key={badge} label={badge} />
               ))}
@@ -131,8 +131,8 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         )}
       </Section>
 
-      <Section className="py-10 md:py-16">
-        <div className="mb-6 space-y-2 md:mb-8">
+      <Section className="py-9 md:py-14">
+        <div className="mb-5 space-y-1.5 md:mb-7">
           <p className="t-eyebrow">УСЛУГИ</p>
           <h2 className="t-h2">Комплексные решения для рекламы и печати</h2>
           <p className="t-body max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
@@ -146,9 +146,9 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.div>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/60 py-10 md:py-16">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8">
-          <div className="space-y-2">
+      <Section background="muted" className="border-y border-neutral-200/60 py-9 md:py-14">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-7">
+          <div className="space-y-1.5">
             <p className="t-eyebrow">ПОРТФОЛИО</p>
             <h2 className="t-h2">Избранные проекты</h2>
             <p className="t-body max-w-2xl">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
@@ -164,8 +164,8 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.div>
       </Section>
 
-      <Section className="py-10 md:py-16">
-        <div className="mb-6 space-y-2 md:mb-8">
+      <Section className="py-9 md:py-14">
+        <div className="mb-5 space-y-1.5 md:mb-7">
           <p className="t-eyebrow">ПРОЦЕСС</p>
           <h2 className="t-h2">Как мы запускаем ваш проект</h2>
           <p className="t-body max-w-2xl">Прозрачные этапы, понятные сроки и контроль качества на каждом шаге.</p>
@@ -181,9 +181,9 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.ol>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/60 py-10 md:py-16">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8">
-          <div className="space-y-2">
+      <Section background="muted" className="border-y border-neutral-200/60 py-9 md:py-14">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-7">
+          <div className="space-y-1.5">
             <p className="t-eyebrow">FAQ</p>
             <h2 className="t-h2">Частые вопросы</h2>
             <p className="t-body max-w-2xl">Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.</p>
@@ -195,12 +195,12 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.div>
       </Section>
 
-      <Section id="lead-form" className="py-10 md:py-14">
+      <Section id="lead-form" className="py-9 md:py-12">
         <motion.div className="grid gap-10 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm md:p-10 lg:grid-cols-[1fr_1.1fr]" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <p className="t-eyebrow">ЗАЯВКА</p>
-            <h2 className="t-h2">{messages.lead.title}</h2>
-            <p className="t-body">Опишите задачу, а мы предложим оптимальный формат производства, сроки и стоимость.</p>
+            <h2 className="t-h2 font-extrabold">{messages.lead.title}</h2>
+            <p className="t-body max-w-md">Опишите задачу — предложим формат, сроки и стоимость.</p>
           </div>
           <LeadForm t={messages} showMessageField />
         </motion.div>

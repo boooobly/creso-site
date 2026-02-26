@@ -30,8 +30,8 @@ export default function ServiceCard({
           {title}
         </h3>
       </div>
-      <p className="t-body mt-3">{desc}</p>
-      <div className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[var(--brand-red)]">
+      <p className="t-body mt-3 text-neutral-500">{desc}</p>
+      <div className="t-link mt-5">
         Подробнее <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
       </div>
     </Link>
