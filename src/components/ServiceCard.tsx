@@ -15,7 +15,7 @@ export default function ServiceCard({
   return (
     <Link
       href={href}
-      className={`premium-card group flex h-full flex-col justify-between p-5 md:min-h-[18rem] md:p-6 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 ${
+      className={`premium-card group flex h-full flex-col justify-between p-5 md:p-6 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 ${
         featured ? 'bg-[rgba(212,28,28,0.04)]' : ''
       }`}
     >
@@ -30,8 +30,8 @@ export default function ServiceCard({
           {title}
         </h3>
       </div>
-      <p className="t-body text-muted-foreground mt-3">{desc}</p>
-      <div className="t-link mt-auto pt-5">
+      <p className="t-body text-muted-foreground mt-3 line-clamp-3">{desc}</p>
+      <div className="t-link mt-auto pt-4">
         Подробнее <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
       </div>
     </Link>
