@@ -117,7 +117,7 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
 
   const grommetsCost = grommetsCount * WIDE_FORMAT_PRICING_CONFIG.grommetPrice * quantity;
 
-  const positioningMarksCutCost = input.cutByPositioningMarks && basePrintCost > 0
+  const positioningMarksCutCost = input.cutByPositioningMarks && !isBannerMaterial(input.material) && basePrintCost > 0
     ? basePrintCost * WIDE_FORMAT_PRICING_CONFIG.positioningMarksCutPercent
     : 0;
 
