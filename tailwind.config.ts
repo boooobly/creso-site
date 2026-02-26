@@ -5,6 +5,9 @@ const config: Config = {
   content: ["./src/**/*.{ts,tsx}", "./src/app/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-onest)", "ui-sans-serif", "system-ui"]
+      },
       colors: {
         brand: {
           red: "#d41c1c",
