@@ -33,7 +33,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
 
   return (
     <div>
-      <Section className="relative overflow-hidden pb-10 pt-16 md:pb-14 md:pt-24">
+      <Section className="relative overflow-hidden pb-10 pt-14 md:pb-12 md:pt-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(212,28,28,0.1),transparent_60%)]" aria-hidden="true" />
 
         <motion.div
@@ -45,30 +45,30 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
 
         <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
-            <div className="space-y-6">
-              <p className="inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">
+            <div className="space-y-7">
+              <p className="t-eyebrow rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5">
                 ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
               </p>
-              <h1 className="max-w-5xl text-3xl font-black leading-[1.05] tracking-tight text-neutral-900 sm:text-4xl md:text-6xl lg:text-7xl">
+              <h1 className="t-h1 max-w-5xl">
                 Реклама и производство<br className="hidden md:block" /> под ключ без срывов сроков
               </h1>
-              <p className="max-w-[45rem] text-base leading-relaxed text-neutral-600 md:text-lg">{messages.hero.subtitle}</p>
+              <p className="t-body text-muted-foreground mt-1 max-w-[40rem]">{messages.hero.subtitle}</p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end">
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
-                <Link className="btn-primary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
+                <Link className="btn-primary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
                   Рассчитать стоимость
                 </Link>
               </motion.div>
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
-                <Link className="btn-secondary no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2" href="/portfolio" aria-label="Перейти в портфолио">
+                <Link className="btn-secondary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/portfolio" aria-label="Перейти в портфолио">
                   Смотреть портфолио
                 </Link>
               </motion.div>
             </div>
 
-            <motion.ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+            <motion.ul className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
               {trustBadges.map((badge) => (
                 <BadgeChip key={badge} label={badge} />
               ))}
@@ -106,7 +106,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
 
       <Section className="border-y border-neutral-200/70 py-10 md:py-12" background="muted">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-neutral-500">Нам доверяют</p>
+          <p className="t-small text-muted-foreground font-semibold uppercase tracking-[0.12em]">Нам доверяют</p>
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
 
@@ -131,62 +131,62 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         )}
       </Section>
 
-      <Section className="py-10 md:py-16">
-        <div className="mb-6 space-y-2 md:mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">УСЛУГИ</p>
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Комплексные решения для рекламы и печати</h2>
-          <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
+      <Section className="py-9 md:py-14">
+        <div className="mb-4 space-y-1.5 md:mb-6">
+          <p className="t-eyebrow">УСЛУГИ</p>
+          <h2 className="t-h2">Комплексные решения для рекламы и печати</h2>
+          <p className="t-body text-muted-foreground max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
-        <motion.div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {services.map((s, index) => (
-            <motion.div key={s.id} variants={fadeUp(16)} className={index === 0 ? 'md:col-span-2 xl:col-span-2' : ''}>
+            <motion.div key={s.id} variants={fadeUp(16)} className={index === 0 ? 'h-full md:col-span-2 xl:col-span-2' : 'h-full'}>
               <ServiceCard title={s.title} desc={s.description} href={s.href} featured={index === 0} />
             </motion.div>
           ))}
         </motion.div>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/60 py-10 md:py-16">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">ПОРТФОЛИО</p>
-            <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Избранные проекты</h2>
-            <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
+      <Section background="muted" className="border-y border-neutral-200/60 py-9 md:py-14">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-4 md:mb-6">
+          <div className="space-y-1.5">
+            <p className="t-eyebrow">ПОРТФОЛИО</p>
+            <h2 className="t-h2">Избранные проекты</h2>
+            <p className="t-body text-muted-foreground max-w-2xl">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
           </div>
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>
-        <motion.div className="grid gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {portfolio.slice(0, 3).map((item) => (
-            <motion.div key={item.id} variants={fadeUp(18)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }}>
+            <motion.div key={item.id} variants={fadeUp(18)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="h-full">
               <FeatureCard title={item.title} category={item.category} href="/portfolio" />
             </motion.div>
           ))}
         </motion.div>
       </Section>
 
-      <Section className="py-10 md:py-16">
-        <div className="mb-6 space-y-2 md:mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">ПРОЦЕСС</p>
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Как мы запускаем ваш проект</h2>
-          <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Прозрачные этапы, понятные сроки и контроль качества на каждом шаге.</p>
+      <Section className="py-9 md:py-14">
+        <div className="mb-4 space-y-1.5 md:mb-6">
+          <p className="t-eyebrow">ПРОЦЕСС</p>
+          <h2 className="t-h2">Как мы запускаем ваш проект</h2>
+          <p className="t-body text-muted-foreground max-w-2xl">Прозрачные этапы, понятные сроки и контроль качества на каждом шаге.</p>
         </div>
         <motion.ol className="grid gap-5 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {processSteps.map((step, index) => (
-            <motion.li key={step.title} variants={fadeUp(16)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="premium-card p-6">
+            <motion.li key={step.title} variants={fadeUp(16)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="premium-card p-5 md:p-6">
               <p className="text-sm font-bold text-[var(--brand-red)]">0{index + 1}</p>
-              <h3 className="mt-3 text-lg font-semibold text-neutral-900">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{step.description}</p>
+              <h3 className="t-h3 mt-3">{step.title}</h3>
+              <p className="t-body mt-2">{step.description}</p>
             </motion.li>
           ))}
         </motion.ol>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/60 py-10 md:py-16">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">FAQ</p>
-            <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Частые вопросы</h2>
-            <p className="max-w-2xl text-sm text-neutral-600 md:text-base">Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.</p>
+      <Section background="muted" className="border-y border-neutral-200/60 py-9 md:py-14">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-4 md:mb-6">
+          <div className="space-y-1.5">
+            <p className="t-eyebrow">FAQ</p>
+            <h2 className="t-h2">Частые вопросы</h2>
+            <p className="t-body text-muted-foreground max-w-2xl">Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.</p>
           </div>
           <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Задать свой вопрос</Link>
         </div>
@@ -195,12 +195,12 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.div>
       </Section>
 
-      <Section id="lead-form" className="py-10 md:py-14">
+      <Section id="lead-form" className="py-9 md:py-12">
         <motion.div className="grid gap-10 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm md:p-10 lg:grid-cols-[1fr_1.1fr]" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">ЗАЯВКА</p>
-            <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">{messages.lead.title}</h2>
-            <p className="text-sm text-neutral-600">Опишите задачу, а мы предложим оптимальный формат производства, сроки и стоимость.</p>
+          <div className="space-y-1.5">
+            <p className="t-eyebrow">ЗАЯВКА</p>
+            <h2 className="t-h2 font-extrabold">{messages.lead.title}</h2>
+            <p className="t-body text-muted-foreground max-w-md">Опишите задачу — предложим формат, сроки и стоимость.</p>
           </div>
           <LeadForm t={messages} showMessageField />
         </motion.div>
