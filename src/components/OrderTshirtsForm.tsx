@@ -27,16 +27,6 @@ const colorOptions = [
   { value: 'colored', label: 'Цветная' },
 ] as const;
 
-const fabricOptions = [
-  { value: 'synthetic', label: 'Синтетика' },
-  { value: 'cotton', label: 'ХБ' },
-] as const;
-
-const colorOptions = [
-  { value: 'white', label: 'Белая' },
-  { value: 'colored', label: 'Цветная' },
-] as const;
-
 const transferTypeOptions = [
   { value: 'a4', label: 'Полноцвет A4 (250 ₽/сторона)' },
   { value: 'film', label: 'Термоплёнка (расчёт менеджером)' },
