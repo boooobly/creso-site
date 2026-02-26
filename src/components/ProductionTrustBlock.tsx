@@ -62,7 +62,7 @@ export default function ProductionTrustBlock() {
           </div>
 
           <p className="mt-6 border-t border-neutral-200 pt-4 text-sm font-medium text-neutral-700">
-            Работаем по договору. С НДС. Гарантия 5 лет.
+            Работаем по договору. Гарантия 5 лет.
           </p>
         </RevealOnScroll>
       </div>
