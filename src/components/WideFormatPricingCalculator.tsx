@@ -218,6 +218,10 @@ export default function WideFormatPricingCalculator() {
   }, [isFilm, plotterCutByRegistrationMarks]);
 
   useEffect(() => {
+    if (isBanner && cutByPositioningMarks) setCutByPositioningMarks(false);
+  }, [cutByPositioningMarks, isBanner]);
+
+  useEffect(() => {
     if (!isExtrasAllowed) {
       setEdgeGluing(false);
       setImageWelding(false);
@@ -437,7 +441,13 @@ export default function WideFormatPricingCalculator() {
             {isBanner && <CheckboxRow label={`Люверсы (${WIDE_FORMAT_PRICING_CONFIG.grommetPrice} ₽/шт${quote.grommetsCount > 0 ? `, ~${quote.grommetsCount} шт` : ""})`} checked={grommets} onChange={setGrommets} />}
             {canShowWelding && <CheckboxRow label="Сварка изображения (+150 ₽ за пог. метр)" checked={imageWelding} onChange={setImageWelding} />}
             {isFilm && <CheckboxRow label="Резка по меткам (от 250 ₽, точно после утверждения макета)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
-            <CheckboxRow label="Резка по меткам позиционирования (+30% от материала)" checked={cutByPositioningMarks} onChange={setCutByPositioningMarks} />
+            {!isBanner && (
+              <CheckboxRow
+                label="Резка по меткам позиционирования (+30% от материала)"
+                checked={cutByPositioningMarks}
+                onChange={setCutByPositioningMarks}
+              />
+            )}
           </div>
         )}
 
