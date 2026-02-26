@@ -39,7 +39,6 @@ const checklist = [
   'Несколько изображений в одном макете',
   'Сложная типографика или много текста',
   'Нестандартная композиция по кругу кружки',
-  'Подготовка варианта для глянца и мата',
   'Замена фона/ретушь',
   'Подбор фирменных цветов по брендбуку',
   'Срочная подготовка макета',
@@ -266,7 +265,8 @@ export default function OrderMugsForm() {
             >
               <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4">
                 <h3 className="text-xl font-semibold">Дизайн</h3>
-                <p className="text-sm text-neutral-700">3 макета входит в стоимость.</p>
+                <p className="text-sm text-neutral-700">2 макета входит в стоимость.</p>
+                <p className="text-sm text-neutral-700">К двум макетам включены 2 правки 1-й категории.</p>
 
                 <div>
                   <h4 className="text-lg font-medium">Категории сложности I/II/III</h4>
