@@ -31,10 +31,10 @@ const strengths = [
 ];
 
 const heroTrustBadges = [
+  'Работаем по ЮФО',
+  'Гарантия до 5 лет',
+  'Пожизненное сервисное обслуживание',
   'Собственное производство',
-  'Монтажная бригада и автовышка',
-  'Работаем по договору',
-  'Гарантия 5 лет',
 ] as const;
 
 const trustStripItems = [
@@ -62,7 +62,7 @@ export default function OutdoorAdvertisingPage() {
         <div className="card space-y-5 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-10">
           <h1 className="text-4xl font-bold leading-tight md:text-5xl">Наружная реклама под ключ в Ставропольском крае</h1>
           <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">
-            Проектирование, производство и монтаж конструкций любой сложности.
+            Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.
           </p>
 
           <div className="flex flex-wrap gap-2.5">
