@@ -15,23 +15,23 @@ export default function ServiceCard({
   return (
     <Link
       href={href}
-      className={`premium-card group block p-6 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 ${
+      className={`premium-card group flex h-full flex-col justify-between p-5 md:min-h-[18rem] md:p-6 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 ${
         featured ? 'bg-[rgba(212,28,28,0.04)]' : ''
       }`}
     >
       {featured && (
-        <span className="mb-3 inline-flex rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--brand-red)]">
+        <span className="mb-3 inline-flex rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 t-eyebrow text-[var(--brand-red)]">
           Основное направление
         </span>
       )}
-      <div className="flex items-center gap-2">
+      <div className="flex items-start gap-2">
         <span className="card-dot" />
-        <h3 className={`font-semibold leading-tight text-neutral-900 transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'text-2xl' : 'text-xl'}`}>
+        <h3 className={`t-h3 leading-snug transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'md:text-[1.625rem]' : ''}`}>
           {title}
         </h3>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-neutral-600">{desc}</p>
-      <div className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[var(--brand-red)]">
+      <p className="t-body text-muted-foreground mt-3">{desc}</p>
+      <div className="t-link mt-auto pt-5">
         Подробнее <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
       </div>
     </Link>
