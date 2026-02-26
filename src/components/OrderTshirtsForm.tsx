@@ -14,7 +14,17 @@ const sizes = Array.from({ length: 29 }, (_, index) => String(index + 32));
 
 const tshirtSourceOptions = [
   { value: 'ours', label: 'Наша' },
-  { value: 'client', label: 'Клиента' },
+  { value: 'client', label: 'Ваша' },
+] as const;
+
+const fabricOptions = [
+  { value: 'synthetic', label: 'Синтетика' },
+  { value: 'cotton', label: 'ХБ' },
+] as const;
+
+const colorOptions = [
+  { value: 'white', label: 'Белая' },
+  { value: 'colored', label: 'Цветная' },
 ] as const;
 
 const fabricOptions = [
