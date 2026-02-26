@@ -30,18 +30,26 @@ const strengths = [
   'Гарантия 5 лет',
 ];
 
+const fullCycleItems = [
+  'Дизайн и визуализация',
+  'Технический расчет',
+  'Проектирование',
+  'Изготовление',
+  'Монтаж',
+] as const;
+
 const heroTrustBadges = [
+  'Работаем по ЮФО',
+  'Гарантия до 5 лет',
+  'Пожизненное сервисное обслуживание',
   'Собственное производство',
-  'Монтажная бригада и автовышка',
-  'Работаем по договору',
-  'Гарантия 5 лет',
 ] as const;
 
 const trustStripItems = [
   'Сроки фиксируем в договоре',
   'Монтаж по городу - замер бесплатно',
   'Проекты любой сложности',
-  'Работаем по всему Ставропольскому краю',
+  'Работаем по всему ЮФО',
 ] as const;
 
 const steps = ['Заявка', 'Замер (бесплатно по городу)', 'Производство', 'Монтаж'];
@@ -62,7 +70,7 @@ export default function OutdoorAdvertisingPage() {
         <div className="card space-y-5 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-10">
           <h1 className="text-4xl font-bold leading-tight md:text-5xl">Наружная реклама под ключ в Ставропольском крае</h1>
           <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">
-            Проектирование, производство и монтаж конструкций любой сложности.
+            Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.
           </p>
 
           <div className="flex flex-wrap gap-2.5">
@@ -123,6 +131,30 @@ export default function OutdoorAdvertisingPage() {
       </Section>
 
       <Section className="pt-0">
+        <RevealOnScroll>
+          <h2 className="mb-5 text-2xl font-bold">Полный цикл работ</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {fullCycleItems.map((item) => (
+              <div key={item} className="card flex min-h-[112px] items-start gap-2.5 rounded-xl p-5">
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                <p className="text-sm font-semibold leading-relaxed">{item}</p>
+              </div>
+            ))}
+          </div>
+
+          <article className="card mt-4 rounded-xl border border-neutral-200/80 bg-neutral-50/60 p-5 dark:border-neutral-700 dark:bg-neutral-900/60">
+            <h3 className="text-base font-semibold">Сервис и сопровождение</h3>
+            <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-200">
+              Диагностика и обслуживание, реставрация и обновление, постгарантийная поддержка.
+            </p>
+            <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
+              Сопровождаем вывески на всем сроке эксплуатации.
+            </p>
+          </article>
+        </RevealOnScroll>
+      </Section>
+
+      <Section className="pt-4 md:pt-6">
         <RevealOnScroll>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {trustStripItems.map((item) => (
