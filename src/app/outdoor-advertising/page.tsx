@@ -36,9 +36,6 @@ const fullCycleItems = [
   'Проектирование',
   'Изготовление',
   'Монтаж',
-  'Ремонт и реставрация',
-  'Диагностика неисправностей',
-  'Постгарантийное обслуживание',
 ] as const;
 
 const heroTrustBadges = [
@@ -144,6 +141,16 @@ export default function OutdoorAdvertisingPage() {
               </div>
             ))}
           </div>
+
+          <article className="card mt-4 rounded-xl border border-neutral-200/80 bg-neutral-50/60 p-5 dark:border-neutral-700 dark:bg-neutral-900/60">
+            <h3 className="text-base font-semibold">Сервис и сопровождение</h3>
+            <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-200">
+              Диагностика и обслуживание, реставрация и обновление, постгарантийная поддержка.
+            </p>
+            <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
+              Сопровождаем вывески на всем сроке эксплуатации.
+            </p>
+          </article>
         </RevealOnScroll>
       </Section>
 
