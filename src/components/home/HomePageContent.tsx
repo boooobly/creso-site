@@ -135,7 +135,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         <div className="mb-5 space-y-1.5 md:mb-7">
           <p className="t-eyebrow">УСЛУГИ</p>
           <h2 className="t-h2">Комплексные решения для рекламы и печати</h2>
-          <p className="t-body max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
+          <p className="t-body text-muted-foreground max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
         <motion.div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {services.map((s, index) => (
@@ -151,7 +151,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <div className="space-y-1.5">
             <p className="t-eyebrow">ПОРТФОЛИО</p>
             <h2 className="t-h2">Избранные проекты</h2>
-            <p className="t-body max-w-2xl">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
+            <p className="t-body text-muted-foreground max-w-2xl">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
           </div>
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>
@@ -168,11 +168,11 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         <div className="mb-5 space-y-1.5 md:mb-7">
           <p className="t-eyebrow">ПРОЦЕСС</p>
           <h2 className="t-h2">Как мы запускаем ваш проект</h2>
-          <p className="t-body max-w-2xl">Прозрачные этапы, понятные сроки и контроль качества на каждом шаге.</p>
+          <p className="t-body text-muted-foreground max-w-2xl">Прозрачные этапы, понятные сроки и контроль качества на каждом шаге.</p>
         </div>
         <motion.ol className="grid gap-5 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {processSteps.map((step, index) => (
-            <motion.li key={step.title} variants={fadeUp(16)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="premium-card p-6">
+            <motion.li key={step.title} variants={fadeUp(16)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="premium-card p-5 md:p-6">
               <p className="text-sm font-bold text-[var(--brand-red)]">0{index + 1}</p>
               <h3 className="t-h3 mt-3">{step.title}</h3>
               <p className="t-body mt-2">{step.description}</p>
@@ -186,7 +186,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <div className="space-y-1.5">
             <p className="t-eyebrow">FAQ</p>
             <h2 className="t-h2">Частые вопросы</h2>
-            <p className="t-body max-w-2xl">Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.</p>
+            <p className="t-body text-muted-foreground max-w-2xl">Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.</p>
           </div>
           <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Задать свой вопрос</Link>
         </div>
@@ -200,7 +200,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <div className="space-y-1.5">
             <p className="t-eyebrow">ЗАЯВКА</p>
             <h2 className="t-h2 font-extrabold">{messages.lead.title}</h2>
-            <p className="t-body max-w-md">Опишите задачу — предложим формат, сроки и стоимость.</p>
+            <p className="t-body text-muted-foreground max-w-md">Опишите задачу — предложим формат, сроки и стоимость.</p>
           </div>
           <LeadForm t={messages} showMessageField />
         </motion.div>

@@ -24,7 +24,17 @@ body { @apply bg-white text-neutral-900 font-normal transition-colors dark:bg-ne
   }
 
   button {
-    @apply font-semibold;
+    @apply font-semibold tracking-normal;
+  }
+
+  label {
+    @apply font-medium;
+  }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
+  select,
+  textarea {
+    @apply min-h-11;
   }
 }
 
@@ -51,6 +61,10 @@ a { @apply underline-offset-4; }
     @apply text-[13px] font-medium leading-[1.5] text-neutral-500 md:text-sm;
   }
 
+  .text-muted-foreground {
+    @apply text-neutral-600 dark:text-neutral-300;
+  }
+
   .t-eyebrow {
     @apply inline-flex text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)];
   }
@@ -61,7 +75,7 @@ a { @apply underline-offset-4; }
 }
 
 
-.btn-primary { @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--brand-red)] px-5 py-3 text-white font-semibold transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--brand-red)] dark:focus:ring-offset-neutral-950; }
+.btn-primary { @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--brand-red)] px-5 py-3 text-white font-semibold tracking-normal transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--brand-red)] dark:focus:ring-offset-neutral-950; }
 .btn-secondary { @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-neutral-900 font-semibold hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800; }
 
 .card { @apply rounded-2xl border border-neutral-300 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900; }

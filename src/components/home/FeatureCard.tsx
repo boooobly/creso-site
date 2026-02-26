@@ -22,7 +22,7 @@ export default function FeatureCard({
       className="premium-card"
     >
       <div className="h-36 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white" />
-      <div className="space-y-3 p-5">
+      <div className="space-y-3 p-4 sm:p-5">
         <p className="inline-flex items-center gap-2 t-eyebrow"><span className="card-dot" />{category}</p>
         <h3 className="t-h3">{title}</h3>
         <Link href={href} className="t-link group/link">
