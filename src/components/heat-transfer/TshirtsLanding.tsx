@@ -37,6 +37,27 @@ const pricingCards = [
   },
 ] as const;
 
+const printTechnologyCards = [
+  {
+    title: 'Сублимация',
+    lines: [
+      'Полноцветная печать методом сублимации',
+      'Только белая синтетическая ткань',
+      'Идеально для фотографий и градиентов',
+      'Максимальная яркость и стойкость цвета',
+    ],
+  },
+  {
+    title: 'Термотрансферная пленка',
+    lines: [
+      'Подходит для хлопковой ткани (ХБ)',
+      'Монохромные или цветные пленки',
+      'Четкие логотипы и надписи',
+      'Надежная фиксация изображения',
+    ],
+  },
+] as const;
+
 const galleryCards = [
   { title: 'Логотип на груди', tag: 'A4', printClass: 'h-[26%] w-[38%] bg-sky-500', printPosition: 'left-6 top-6' },
   { title: 'Спина A4', tag: 'СПИНА', printClass: 'h-[52%] w-[56%] bg-indigo-500', printPosition: 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' },
@@ -200,6 +221,28 @@ export default function TshirtsLanding() {
           </div>
         </div>
       </section>
+
+      <SectionBlock title="Технологии печати" subtitle="Подбираем технологию под материал и задачу, чтобы принт выглядел ярко и держался долго.">
+        {(reveal) => (
+          <div className="grid gap-4 md:grid-cols-2">
+            {printTechnologyCards.map((card, index) => (
+              <AnimatedCard
+                key={card.title}
+                index={index}
+                reveal={reveal}
+                className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm hover:-translate-y-1 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
+              >
+                <h3 className="text-lg font-semibold">{card.title}</h3>
+                <ul className="mt-4 space-y-2 text-sm text-neutral-600 dark:text-neutral-300">
+                  {card.lines.map((line) => (
+                    <li key={line}>• {line}</li>
+                  ))}
+                </ul>
+              </AnimatedCard>
+            ))}
+          </div>
+        )}
+      </SectionBlock>
 
       <SectionBlock title="Тарифы" subtitle="Прозрачные условия без скрытых доплат. Для нестандартных задач менеджер подтвердит расчёт перед печатью.">
         {(reveal) => (
