@@ -290,6 +290,11 @@ export default function OrderTshirtsForm() {
 
           {formError && <p className="text-sm text-red-600">{formError}</p>}
           {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
+
+          <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 px-4 py-3 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/70 dark:text-neutral-300">
+            <p>Технология печати подбирается в зависимости от типа ткани.</p>
+            <p className="mt-1">Это позволяет сохранить яркость цвета и долговечность изображения.</p>
+          </div>
         </form>
       </div>
     </div>
