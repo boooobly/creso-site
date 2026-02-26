@@ -180,7 +180,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           <label className="space-y-1.5">
             <span className="text-sm font-medium">Имя *</span>
             <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-            {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+            {errors.name && <span className="t-small text-red-500">{errors.name}</span>}
           </label>
 
           <label className="space-y-1.5">
@@ -191,15 +191,15 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
               placeholder="+7 (___) ___-__-__"
               className={inputClass('phone')}
             />
-            {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
+            {errors.phone && <span className="t-small text-red-500">{errors.phone}</span>}
           </label>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-1.5">
             <span className="text-sm font-medium">Email</span>
             <input className={inputClass('email')} type="email" value={values.email} onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))} />
-            {errors.email && <span className="text-xs text-red-600">{errors.email}</span>}
+            {errors.email && <span className="t-small text-red-500">{errors.email}</span>}
           </label>
 
           <div className="flex flex-col gap-2">
@@ -222,10 +222,10 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
               allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
               invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
               className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
-              helperTextClassName="mt-1 text-xs text-muted-foreground"
+              helperTextClassName="mt-1 t-small text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
-            <p className="text-xs text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
+            <p className="t-small text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
           </div>
         </div>
 
@@ -239,9 +239,9 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
             />
             <span className="text-sm font-medium">Флаеры (расчёт по согласованию)</span>
           </label>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">Укажите желаемый формат, бумагу и тираж в комментарии.</p>
+          <p className="t-small text-muted-foreground">Укажите желаемый формат, бумагу и тираж в комментарии.</p>
           {values.flyersRequested && !values.comment.trim() && (
-            <p className="text-xs text-amber-700 dark:text-amber-300">Подсказка: добавьте в комментарии параметры флаеров для точного расчёта.</p>
+            <p className="t-small text-amber-700 dark:text-amber-300">Подсказка: добавьте в комментарии параметры флаеров для точного расчёта.</p>
           )}
         </div>
 
@@ -277,7 +277,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           </button>
         </div>
 
-        {formError && <p className="text-sm text-red-600">{formError}</p>}
+        {formError && <p className="t-small text-red-500">{formError}</p>}
         {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
       </form>
     </div>
