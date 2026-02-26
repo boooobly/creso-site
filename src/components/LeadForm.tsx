@@ -160,7 +160,7 @@ export default function LeadForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+      {submitError && <p className="text-sm text-red-500">{submitError}</p>}
 
       <input type="hidden" {...register('service')} />
       {!showMessageField && <input type="hidden" {...register('message')} />}
@@ -179,7 +179,7 @@ export default function LeadForm({
           placeholder="Имя"
           {...register('name')}
         />
-        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
+        {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -197,7 +197,7 @@ export default function LeadForm({
               />
             )}
           />
-          {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
+          {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>}
         </div>
         <div>
           <input
@@ -205,7 +205,7 @@ export default function LeadForm({
             placeholder="E-mail"
             {...register('email')}
           />
-          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
+          {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
         </div>
       </div>
 
@@ -218,17 +218,17 @@ export default function LeadForm({
           />
         </div>
       ) : (
-        <p className="text-xs text-neutral-600 dark:text-neutral-300">Укажите телефон или e-mail — как вам удобнее.</p>
+        <p className="t-muted text-muted-foreground">Укажите телефон или e-mail — как вам удобнее.</p>
       )}
-      <p className="text-xs text-neutral-600 dark:text-neutral-300">Ответим в течение 30 минут. Без спама.</p>
+      <p className="t-muted text-muted-foreground">Ответим в течение 30 минут. Без спама.</p>
 
-      <label className="flex items-start gap-2 text-sm">
+      <label className="flex items-start gap-2 text-sm font-medium">
         <input type="checkbox" className="mt-1" {...register('consent')} />
         <span>
           Я согласен с <Link href="/privacy" className="underline hover:no-underline">политикой обработки персональных данных</Link>
         </span>
       </label>
-      {errors.consent && <p className="text-sm text-red-600">{errors.consent.message}</p>}
+      {errors.consent && <p className="text-sm text-red-500">{errors.consent.message}</p>}
 
       <button
         disabled={isSubmitting}
