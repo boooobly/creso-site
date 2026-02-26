@@ -17,6 +17,16 @@ const tshirtSourceOptions = [
   { value: 'client', label: 'Клиента' },
 ] as const;
 
+const fabricOptions = [
+  { value: 'synthetic', label: 'Синтетика' },
+  { value: 'cotton', label: 'ХБ' },
+] as const;
+
+const colorOptions = [
+  { value: 'white', label: 'Белая' },
+  { value: 'colored', label: 'Цветная' },
+] as const;
+
 const transferTypeOptions = [
   { value: 'a4', label: 'Полноцвет A4 (250 ₽/сторона)' },
   { value: 'film', label: 'Термоплёнка (расчёт менеджером)' },
@@ -33,6 +43,8 @@ type FormValues = {
   phone: string;
   size: string;
   tshirtSource: string;
+  fabric: string;
+  color: string;
   transferType: string;
   side: string;
   comment: string;
@@ -46,6 +58,8 @@ const defaultValues: FormValues = {
   phone: '',
   size: '',
   tshirtSource: tshirtSourceOptions[0].value,
+  fabric: '',
+  color: '',
   transferType: transferTypeOptions[0].value,
   side: '',
   comment: '',
@@ -69,6 +83,18 @@ export default function OrderTshirtsForm() {
     () => `Растровые: PNG, JPG, JPEG, WEBP. Векторные: PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`,
     [],
   );
+
+  const technologyRecommendation = useMemo(() => {
+    if (values.fabric === 'synthetic' && values.color === 'white') {
+      return 'Для белой синтетической ткани доступна полноцветная печать методом сублимации.';
+    }
+
+    if (values.fabric === 'cotton') {
+      return 'Для хлопковой ткани рекомендуем термотрансферные пленки (монохром или цветная печать).';
+    }
+
+    return '';
+  }, [values.color, values.fabric]);
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -176,6 +202,33 @@ export default function OrderTshirtsForm() {
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
+            </label>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Ткань</span>
+              <select className={inputClass('fabric')} value={values.fabric} onChange={(e) => setValues((prev) => ({ ...prev, fabric: e.target.value }))}>
+                <option value="">Не выбрано</option>
+                {fabricOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Цвет ткани</span>
+              <select className={inputClass('color')} value={values.color} onChange={(e) => setValues((prev) => ({ ...prev, color: e.target.value }))}>
+                <option value="">Не выбрано</option>
+                {colorOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              {technologyRecommendation && (
+                <p className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-800 dark:border-sky-900/70 dark:bg-sky-950/40 dark:text-sky-200">
+                  {technologyRecommendation}
+                </p>
+              )}
             </label>
           </div>
 
