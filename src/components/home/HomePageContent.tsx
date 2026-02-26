@@ -155,9 +155,9 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           </div>
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>
-        <motion.div className="grid gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {portfolio.slice(0, 3).map((item) => (
-            <motion.div key={item.id} variants={fadeUp(18)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }}>
+            <motion.div key={item.id} variants={fadeUp(18)} whileHover={shouldReduceMotion ? undefined : { y: -4 }} transition={{ duration: 0.2 }} className="h-full">
               <FeatureCard title={item.title} category={item.category} href="/portfolio" />
             </motion.div>
           ))}
