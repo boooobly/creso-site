@@ -121,9 +121,11 @@ export default function OutdoorAdvertisingPage() {
           <p className="mb-5 text-sm text-neutral-600 dark:text-neutral-300">Без посредников - отвечаем за результат</p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {strengths.map((item) => (
-              <div key={item} className="card flex min-h-[112px] items-start gap-2.5 rounded-xl p-5">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
-                <p className="text-sm font-semibold leading-relaxed">{item}</p>
+              <div key={item} className="card min-h-[112px] rounded-xl p-5">
+                <div className="flex h-full items-center gap-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                  <p className="text-sm font-semibold leading-relaxed">{item}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -135,9 +137,11 @@ export default function OutdoorAdvertisingPage() {
           <h2 className="mb-5 text-2xl font-bold">Полный цикл работ</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {fullCycleItems.map((item) => (
-              <div key={item} className="card flex min-h-[112px] items-start gap-2.5 rounded-xl p-5">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
-                <p className="text-sm font-semibold leading-relaxed">{item}</p>
+              <div key={item} className="card min-h-[112px] rounded-xl p-5">
+                <div className="flex h-full items-center gap-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                  <p className="text-sm font-semibold leading-relaxed">{item}</p>
+                </div>
               </div>
             ))}
           </div>
