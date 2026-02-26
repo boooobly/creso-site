@@ -107,8 +107,9 @@ export default function MugsServicePage() {
               <h3 className="text-lg font-semibold">Сроки и скидки</h3>
               <ul className="mt-4 space-y-2 text-sm text-neutral-700">
                 <li>• Изготовление: 3–5 рабочих дней</li>
-                <li>• Скидка по шагам: каждые 12 шт = 2,5% (до 20%)</li>
+                <li>• Скидка: каждые 12 шт — 2,5%, максимум 20%</li>
                 <li>• 2 макета входят в стоимость</li>
+                <li>• 2 правки 1-й категории включены</li>
                 <li>• Срочная печать по согласованию</li>
               </ul>
             </div>
