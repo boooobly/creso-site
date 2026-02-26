@@ -23,9 +23,9 @@ export default function FeatureCard({
     >
       <div className="h-36 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white" />
       <div className="space-y-3 p-5">
-        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[var(--brand-red)]"><span className="card-dot" />{category}</p>
-        <h3 className="text-lg font-semibold leading-tight text-neutral-900">{title}</h3>
-        <Link href={href} className="group/link inline-flex items-center gap-2 text-sm font-medium text-neutral-700 no-underline hover:text-[var(--brand-red)]">
+        <p className="inline-flex items-center gap-2 t-eyebrow"><span className="card-dot" />{category}</p>
+        <h3 className="t-h3">{title}</h3>
+        <Link href={href} className="t-link group/link">
           Смотреть кейс <ArrowRight className="size-4 transition-transform duration-200 group-hover/link:translate-x-1" />
         </Link>
       </div>
