@@ -91,6 +91,10 @@ const defaultTransform: TransformState = {
 const DRAFT_KEY = 'mugsDesignerDraft:v1';
 const TARGET_MOCK_EXPORT_WIDTH = 1800;
 const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const MUG_UNIT_PRICE = 450;
+const MUG_DISCOUNT_STEP_QUANTITY = 12;
+const MUG_DISCOUNT_STEP_RATE = 0.025;
+const MUG_MAX_DISCOUNT_RATE = 0.2;
 
 type DesignerDraft = {
   version: 1;
@@ -140,6 +144,19 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const [removeWhiteBgLevel, setRemoveWhiteBgLevel] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [textLayer, setTextLayer] = useState<TextLayerState | null>(null);
+
+  const pricing = useMemo(() => {
+    const baseTotal = quantity * MUG_UNIT_PRICE;
+    const steps = Math.floor(quantity / MUG_DISCOUNT_STEP_QUANTITY);
+    const discountRate = Math.min(steps * MUG_DISCOUNT_STEP_RATE, MUG_MAX_DISCOUNT_RATE);
+    const finalTotal = baseTotal * (1 - discountRate);
+
+    return {
+      baseTotal: Math.round(baseTotal * 100) / 100,
+      discountRate,
+      finalTotal: Math.round(finalTotal * 100) / 100,
+    };
+  }, [quantity]);
 
 
   const buildLayoutJson = () => JSON.stringify(
@@ -810,7 +827,11 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
           <div className="space-y-3 border-t border-neutral-200 pt-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Стоимость</p>
-            <p className="text-4xl font-semibold tracking-tight">450 ₽</p>
+            <div className="space-y-1">
+              <p className="text-sm text-neutral-600">Базовая стоимость: {pricing.baseTotal.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₽</p>
+              <p className="text-sm text-neutral-600">Скидка: {(pricing.discountRate * 100).toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%</p>
+            </div>
+            <p className="text-4xl font-semibold tracking-tight">{pricing.finalTotal.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₽</p>
             <button
               type="button"
               className="w-full rounded-md bg-red-600 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
