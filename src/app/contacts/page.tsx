@@ -20,7 +20,12 @@ const trustItems = [
   'Безналичная оплата',
 ];
 
-const processSteps = ['Оставляете заявку', 'Рассчитываем стоимость', 'Согласуем макет', 'Изготавливаем и передаем'];
+const processSteps = [
+  { title: 'Оставляете заявку' },
+  { title: 'Рассчитываем стоимость' },
+  { title: 'Согласуем макет' },
+  { title: 'Изготавливаем и передаем', caption: 'Есть доставка' },
+];
 
 export default function ContactsPage() {
   return (
@@ -57,9 +62,10 @@ export default function ContactsPage() {
         <h2 className="text-xl font-semibold">Как мы работаем</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {processSteps.map((step, index) => (
-            <div key={step} className="card rounded-xl p-4">
+            <div key={step.title} className="card rounded-xl p-4">
               <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand-red)]/10 font-semibold text-[var(--brand-red)]">{index + 1}</div>
-              <p className="text-sm font-medium">{step}</p>
+              <p className="text-sm font-medium">{step.title}</p>
+              {step.caption ? <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{step.caption}</p> : null}
             </div>
           ))}
         </div>
