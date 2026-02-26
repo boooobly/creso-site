@@ -20,17 +20,17 @@ export default function ServiceCard({
       }`}
     >
       {featured && (
-        <span className="mb-3 inline-flex rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--brand-red)]">
+        <span className="mb-3 inline-flex rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 t-eyebrow text-[var(--brand-red)]">
           Основное направление
         </span>
       )}
       <div className="flex items-center gap-2">
         <span className="card-dot" />
-        <h3 className={`font-semibold leading-tight text-neutral-900 transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'text-2xl' : 'text-xl'}`}>
+        <h3 className={`t-h3 transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'md:text-[1.625rem]' : ''}`}>
           {title}
         </h3>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-neutral-600">{desc}</p>
+      <p className="t-body mt-3">{desc}</p>
       <div className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[var(--brand-red)]">
         Подробнее <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
       </div>
