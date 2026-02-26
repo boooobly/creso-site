@@ -218,9 +218,9 @@ export default function LeadForm({
           />
         </div>
       ) : (
-        <p className="t-muted text-muted-foreground">Укажите телефон или e-mail — как вам удобнее.</p>
+        <p className="t-small text-muted-foreground">Укажите телефон или e-mail — как вам удобнее.</p>
       )}
-      <p className="t-muted text-muted-foreground">Ответим в течение 30 минут. Без спама.</p>
+      <p className="t-small text-muted-foreground">Ответим в течение 30 минут. Без спама.</p>
 
       <label className="flex items-start gap-2 text-sm font-medium">
         <input type="checkbox" className="mt-1" {...register('consent')} />

@@ -40,7 +40,7 @@ body { @apply bg-white text-neutral-900 font-normal transition-colors dark:bg-ne
 
 a { @apply underline-offset-4; }
 
-@layer components {
+@layer utilities {
   .t-h1 {
     @apply text-[clamp(2.625rem,5vw,4rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-neutral-900;
   }
@@ -58,7 +58,11 @@ a { @apply underline-offset-4; }
   }
 
   .t-muted {
-    @apply text-[13px] font-medium leading-[1.5] text-neutral-500 md:text-sm;
+    @apply text-[15px] font-normal leading-[1.58] text-neutral-600 md:text-base;
+  }
+
+  .t-small {
+    @apply text-[13px] leading-[1.5] md:text-sm;
   }
 
   .text-muted-foreground {

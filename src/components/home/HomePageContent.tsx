@@ -106,7 +106,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
 
       <Section className="border-y border-neutral-200/70 py-10 md:py-12" background="muted">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <p className="t-eyebrow text-neutral-500">Нам доверяют</p>
+          <p className="t-small text-muted-foreground font-semibold uppercase tracking-[0.12em]">Нам доверяют</p>
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
 
