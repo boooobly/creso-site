@@ -121,6 +121,9 @@ export default function BagetPreview({
     };
   }, [containerPx.height, containerPx.width, passepartoutEnabled, safeHeightMm, safePasseBottomMm, safePasseMm, safeWidthMm, selectedBaget, stretchedCanvas]);
 
+  const frameBackgroundImage = selectedBaget?.image ? `url(${selectedBaget.image})` : undefined;
+  const frameBackgroundFallback = 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)';
+
   return (
     <div className={['card rounded-2xl p-5 shadow-md', className].join(' ')}>
       <h2 className="mb-3 text-base font-semibold">Превью</h2>
@@ -140,9 +143,11 @@ export default function BagetPreview({
               height: `${previewGeometry.outerHpx}px`,
               padding: `${previewGeometry.framePx}px`,
               boxSizing: 'border-box',
-              background: stretchedCanvas
-                ? 'transparent'
-                : 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)',
+              background: stretchedCanvas ? 'transparent' : frameBackgroundFallback,
+              backgroundImage: stretchedCanvas ? undefined : frameBackgroundImage,
+              backgroundSize: stretchedCanvas ? undefined : 'cover',
+              backgroundPosition: stretchedCanvas ? undefined : 'center',
+              backgroundRepeat: stretchedCanvas ? undefined : 'no-repeat',
               boxShadow: stretchedCanvas
                 ? '0 10px 20px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.1), inset 0 -2px 4px rgba(15, 23, 42, 0.1)'
                 : '0 12px 26px rgba(15, 23, 42, 0.16), inset 0 2px 4px rgba(255,255,255,0.42), inset 2px 0 4px rgba(255,255,255,0.24), inset 0 -4px 8px rgba(15,23,42,0.28), inset -3px 0 6px rgba(15,23,42,0.24)',
