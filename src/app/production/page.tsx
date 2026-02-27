@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
-import Section from '@/components/Section';
+import Section from '@/components/layout/Section';
 
 const capabilities = [
   'ЧПУ 2×4 м',
@@ -16,7 +16,7 @@ const guarantees = ['Работаем по договору', 'Фиксируе�
 export default function ProductionPage() {
   return (
     <div>
-      <Section className="pb-8">
+      <Section>
         <div className="card space-y-5 p-6 md:p-8">
           <h1 className="max-w-3xl text-3xl font-bold leading-tight md:text-4xl">Собственное производство рекламных конструкций</h1>
           <p className="max-w-2xl text-base leading-relaxed text-neutral-700 md:text-lg">
@@ -28,7 +28,7 @@ export default function ProductionPage() {
         </div>
       </Section>
 
-      <Section className="py-8">
+      <Section className="pt-0">
         <div className="space-y-5 rounded-2xl border border-red-100 bg-red-50/40 p-6 md:p-8">
           <h2 className="text-2xl font-semibold md:text-3xl">Наши производственные возможности</h2>
           <div className="grid gap-4 md:grid-cols-2">
@@ -87,7 +87,7 @@ export default function ProductionPage() {
         </div>
       </Section>
 
-      <Section className="pt-0">
+      <Section className="pt-0 pb-0">
         <div className="card flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between md:p-8">
           <div>
             <h2 className="text-2xl font-semibold">Готовы обсудить задачу?</h2>
