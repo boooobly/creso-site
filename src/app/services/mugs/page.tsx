@@ -22,8 +22,8 @@ export default function MugsServicePage() {
   const heroBenefits = ['3–5 рабочих дней', '2 макета включены', 'Скидка до 20%', 'Проверка перед печатью'];
 
   return (
-    <div className="space-y-10 sm:space-y-12 lg:space-y-14">
-      <Section className="bg-gradient-to-br from-white via-neutral-50 to-neutral-100 pb-0">
+    <div>
+      <Section className="bg-gradient-to-br from-white via-neutral-50 to-neutral-100 pb-6 pt-8 sm:pb-8 sm:pt-10 lg:pb-10 lg:pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 px-8 py-10 shadow-sm lg:px-12 lg:py-12">
             <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
@@ -78,7 +78,7 @@ export default function MugsServicePage() {
         </div>
       </Section>
 
-      <Section id="mugs-description" className="pt-0 pb-0">
+      <Section id="mugs-description" className="py-0">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
             <p className="text-sm leading-relaxed text-neutral-700 sm:text-base">Печатаем на белых керамических кружках 330 мл. Макет проверяем перед запуском, чтобы не было сюрпризов по цвету и обрезке.</p>
@@ -86,7 +86,7 @@ export default function MugsServicePage() {
         </div>
       </Section>
 
-      <Section id="mugs-prices" className="pt-0 pb-0">
+      <Section id="mugs-prices" className="pb-8 pt-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Цены и условия</h2>
           <p className="mt-2 text-sm text-neutral-600 sm:text-base">Прозрачно и без скрытых пунктов.</p>
@@ -117,7 +117,7 @@ export default function MugsServicePage() {
         </div>
       </Section>
 
-      <Section id="mugs-designer" className="pt-0 pb-0">
+      <Section id="mugs-designer" className="pb-8 pt-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Конструктор</h2>
           <p className="mt-2 text-sm text-neutral-600 sm:text-base">Соберите макет прямо на сайте - или прикрепите файл, если уже готов.</p>
@@ -129,15 +129,7 @@ export default function MugsServicePage() {
         </div>
       </Section>
 
-      <Section id="mugs-request" className="pt-0 pb-0">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Заявка</h2>
-          <p className="mt-2 text-sm text-neutral-600 sm:text-base">Оставьте контакты - ответим в течение 30 минут в рабочее время.</p>
-          <p className="mt-2 text-xs text-neutral-500">Форма заявки расположена в блоке конструктора выше на этой странице.</p>
-        </div>
-      </Section>
-
-      <Section id="mugs-faq" className="pt-0 pb-0">
+      <Section id="mugs-faq" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Вопросы</h2>
           <p className="mt-2 text-sm text-neutral-600 sm:text-base">Коротко о сроках, печати и подготовке макета.</p>
