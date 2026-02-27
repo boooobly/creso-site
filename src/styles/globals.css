@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Leaflet CSS globally (Next.js requires global CSS at root) */
-@import "leaflet/dist/leaflet.css";
-
 :root {
   --brand-red: #d41c1c;
   --brand-gray: #828282;

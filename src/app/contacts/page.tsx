@@ -1,15 +1,37 @@
 import Link from 'next/link';
-import { MessageCircle, Mail, Phone, Send } from 'lucide-react';
+import type { ComponentType } from 'react';
+import { MessageCircle, Mail, Phone, Send, Clock3 } from 'lucide-react';
 import ContactsLeadCapture from '@/components/ContactsLeadCapture';
 import MapSection from '@/components/MapSection';
 import { BRAND } from '@/lib/constants';
 import { messages } from '@/lib/messages';
 
-const quickContacts = [
+
+type LinkedQuickContact = {
+  title: string;
+  value: string;
+  href: string;
+  icon: ComponentType<{ className?: string }>;
+};
+
+type HoursQuickContact = {
+  title: string;
+  lines: string[];
+  helper: string;
+  icon: ComponentType<{ className?: string }>;
+};
+
+const quickContacts: Array<LinkedQuickContact | HoursQuickContact> = [
   { title: 'Позвонить', value: '+7 988 731 74 04', href: 'tel:+79887317404', icon: Phone },
   { title: 'Telegram', value: '@Credomir', href: 'https://t.me/Credomir', icon: Send },
   { title: 'Max Messenger', value: '+7 988 731 74 04', href: 'https://wa.me/79887317404', icon: MessageCircle },
   { title: 'Email', value: 'credomir26@mail.ru', href: 'mailto:credomir26@mail.ru', icon: Mail },
+  {
+    title: 'График работы',
+    lines: ['Пн–Пт: 9:00–17:30', 'Сб–Вс: выходной'],
+    helper: 'Отвечаем в рабочее время.',
+    icon: Clock3,
+  },
 ];
 
 const trustItems = [
@@ -33,17 +55,40 @@ export default function ContactsPage() {
       <section className="space-y-4">
         <h1 className="text-2xl font-bold">Контакты</h1>
         <p className="text-neutral-700 dark:text-neutral-300">Адрес: {BRAND.address}</p>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {quickContacts.map((item) => {
             const Icon = item.icon;
-            return (
-              <a key={item.title} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined} className="card flex h-full flex-col gap-3 rounded-xl p-5 no-underline transition hover:-translate-y-0.5 hover:shadow-md">
+
+            const cardContent = (
+              <>
                 <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon className="size-5" />
                 </div>
                 <p className="text-sm text-neutral-500 dark:text-neutral-300">{item.title}</p>
-                <p className="font-semibold text-neutral-900 dark:text-neutral-100">{item.value}</p>
-              </a>
+                {'value' in item ? <p className="font-semibold text-neutral-900 dark:text-neutral-100">{item.value}</p> : null}
+                {'lines' in item ? (
+                  <div className="space-y-1 font-semibold text-neutral-900 dark:text-neutral-100">
+                    {item.lines.map((line) => (
+                      <p key={line}>{line}</p>
+                    ))}
+                  </div>
+                ) : null}
+                {'helper' in item && item.helper ? <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.helper}</p> : null}
+              </>
+            );
+
+            if ('href' in item) {
+              return (
+                <a key={item.title} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined} className="card flex h-full flex-col gap-3 rounded-xl p-5 no-underline transition hover:-translate-y-0.5 hover:shadow-md">
+                  {cardContent}
+                </a>
+              );
+            }
+
+            return (
+              <div key={item.title} className="card flex h-full flex-col gap-3 rounded-xl p-5">
+                {cardContent}
+              </div>
             );
           })}
         </div>
