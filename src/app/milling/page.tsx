@@ -86,7 +86,7 @@ export default function MillingPage() {
 
   return (
     <div>
-      <Section className="pb-8">
+      <Section className="pb-6 md:pb-8">
         <div className={`card space-y-6 p-6 md:p-10 ${revealClass(heroVisible)}`}>
           <div className="space-y-3">
             <h1 className="text-3xl font-bold md:text-5xl">Фрезеровка листовых материалов</h1>
@@ -117,7 +117,7 @@ export default function MillingPage() {
         </div>
       </Section>
 
-      <Section className="pt-0">
+      <Section className="pt-2 md:pt-4">
         <div id="milling-prices" className="card p-6 md:p-8 scroll-mt-24">
           <div className="mb-4 flex flex-wrap gap-2">
             {quickInfo.map((item) => (
