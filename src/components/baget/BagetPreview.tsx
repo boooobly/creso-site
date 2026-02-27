@@ -167,11 +167,49 @@ export default function BagetPreview({
       }
     : undefined;
 
-  const cornerTextureBase: CSSProperties = frameTextureImage
+  const topCornerTextureStyle: CSSProperties = frameTextureImage
     ? {
         backgroundImage: frameTextureImage,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '240% 240%',
+        backgroundRepeat: 'repeat-x',
+        backgroundSize: 'auto 100%',
+        backgroundPosition: 'center top',
+      }
+    : {
+        background: frameFallbackGradient,
+      };
+
+  const bottomCornerTextureStyle: CSSProperties = frameTextureImage
+    ? {
+        backgroundImage: frameTextureImage,
+        backgroundRepeat: 'repeat-x',
+        backgroundSize: 'auto 100%',
+        backgroundPosition: 'center bottom',
+      }
+    : {
+        background: frameFallbackGradient,
+      };
+
+  const leftCornerTextureStyle: CSSProperties = frameTextureImage
+    ? {
+        backgroundImage: frameTextureImage,
+        backgroundRepeat: 'repeat-x',
+        backgroundSize: 'auto 100%',
+        backgroundPosition: 'center',
+        transform: 'rotate(-90deg) scaleY(-1)',
+        transformOrigin: 'center',
+      }
+    : {
+        background: frameFallbackGradient,
+      };
+
+  const rightCornerTextureStyle: CSSProperties = frameTextureImage
+    ? {
+        backgroundImage: frameTextureImage,
+        backgroundRepeat: 'repeat-x',
+        backgroundSize: 'auto 100%',
+        backgroundPosition: 'center',
+        transform: 'rotate(90deg) scaleY(-1)',
+        transformOrigin: 'center',
       }
     : {
         background: frameFallbackGradient,
@@ -239,50 +277,22 @@ export default function BagetPreview({
                   {rightVerticalFrameTextureStyle ? <div style={rightVerticalFrameTextureStyle} /> : null}
                 </div>
 
-                <div
-                  className="pointer-events-none absolute left-0 top-0 z-10"
-                  style={{
-                    width: `${previewGeometry.framePx}px`,
-                    height: `${previewGeometry.framePx}px`,
-                    clipPath: 'polygon(0 100%, 100% 0, 0 0)',
-                    ...cornerTextureBase,
-                    backgroundPosition: 'left top',
-                    boxShadow: 'inset -1px -1px 2px rgba(15,23,42,0.22)',
-                  }}
-                />
-                <div
-                  className="pointer-events-none absolute right-0 top-0 z-10"
-                  style={{
-                    width: `${previewGeometry.framePx}px`,
-                    height: `${previewGeometry.framePx}px`,
-                    clipPath: 'polygon(100% 100%, 100% 0, 0 0)',
-                    ...cornerTextureBase,
-                    backgroundPosition: 'right top',
-                    boxShadow: 'inset 1px -1px 2px rgba(15,23,42,0.22)',
-                  }}
-                />
-                <div
-                  className="pointer-events-none absolute bottom-0 left-0 z-10"
-                  style={{
-                    width: `${previewGeometry.framePx}px`,
-                    height: `${previewGeometry.framePx}px`,
-                    clipPath: 'polygon(0 100%, 100% 100%, 0 0)',
-                    ...cornerTextureBase,
-                    backgroundPosition: 'left bottom',
-                    boxShadow: 'inset -1px 1px 2px rgba(15,23,42,0.24)',
-                  }}
-                />
-                <div
-                  className="pointer-events-none absolute bottom-0 right-0 z-10"
-                  style={{
-                    width: `${previewGeometry.framePx}px`,
-                    height: `${previewGeometry.framePx}px`,
-                    clipPath: 'polygon(100% 100%, 100% 0, 0 100%)',
-                    ...cornerTextureBase,
-                    backgroundPosition: 'right bottom',
-                    boxShadow: 'inset 1px 1px 2px rgba(15,23,42,0.24)',
-                  }}
-                />
+                <div className="pointer-events-none absolute left-0 top-0 z-10 overflow-hidden" style={{ width: `${previewGeometry.framePx}px`, height: `${previewGeometry.framePx}px` }}>
+                  <div className="absolute inset-0" style={{ ...topCornerTextureStyle, clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
+                  <div className="absolute inset-0" style={{ ...leftCornerTextureStyle, clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }} />
+                </div>
+                <div className="pointer-events-none absolute right-0 top-0 z-10 overflow-hidden" style={{ width: `${previewGeometry.framePx}px`, height: `${previewGeometry.framePx}px` }}>
+                  <div className="absolute inset-0" style={{ ...topCornerTextureStyle, clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }} />
+                  <div className="absolute inset-0" style={{ ...rightCornerTextureStyle, clipPath: 'polygon(0 0, 100% 100%, 0 100%)' }} />
+                </div>
+                <div className="pointer-events-none absolute bottom-0 left-0 z-10 overflow-hidden" style={{ width: `${previewGeometry.framePx}px`, height: `${previewGeometry.framePx}px` }}>
+                  <div className="absolute inset-0" style={{ ...bottomCornerTextureStyle, clipPath: 'polygon(0 0, 100% 100%, 0 100%)' }} />
+                  <div className="absolute inset-0" style={{ ...leftCornerTextureStyle, clipPath: 'polygon(100% 0, 100% 100%, 0 0)' }} />
+                </div>
+                <div className="pointer-events-none absolute bottom-0 right-0 z-10 overflow-hidden" style={{ width: `${previewGeometry.framePx}px`, height: `${previewGeometry.framePx}px` }}>
+                  <div className="absolute inset-0" style={{ ...bottomCornerTextureStyle, clipPath: 'polygon(0 100%, 100% 0, 100% 100%)' }} />
+                  <div className="absolute inset-0" style={{ ...rightCornerTextureStyle, clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
+                </div>
               </>
             ) : null}
 
