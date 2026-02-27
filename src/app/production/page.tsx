@@ -50,7 +50,7 @@ export default function ProductionPage() {
             {[1, 2, 3, 4].map((item) => (
               <div
                 key={item}
-                className="h-52 rounded-3xl bg-gradient-to-br from-neutral-200 to-neutral-300 shadow-inner ring-1 ring-neutral-200 md:h-64"
+                className="aspect-[4/3] w-full rounded-3xl bg-gradient-to-br from-neutral-200 to-neutral-300 shadow-inner ring-1 ring-neutral-200"
                 aria-label={`Плейсхолдер фото производства ${item}`}
               />
             ))}
