@@ -12,7 +12,7 @@ import {
   Wrench,
   Zap,
 } from 'lucide-react';
-import Section from '@/components/Section';
+import Section from '@/components/layout/Section';
 import OrderMillingForm from '@/components/OrderMillingForm';
 import MillingMaterialsAccordion from '@/components/MillingMaterialsAccordion';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
@@ -65,6 +65,7 @@ const revealBase =
 export default function MillingPage() {
   const [heroVisible, setHeroVisible] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [showFloatingCta, setShowFloatingCta] = useState(false);
 
   const howReveal = useRevealOnScroll<HTMLDivElement>();
   const servicesReveal = useRevealOnScroll<HTMLDivElement>();
@@ -81,12 +82,42 @@ export default function MillingPage() {
     return () => window.cancelAnimationFrame(rafId);
   }, []);
 
+  useEffect(() => {
+    const updateFloatingCtaVisibility = () => {
+      const orderSection = document.getElementById('milling-order');
+      if (!orderSection) {
+        setShowFloatingCta(false);
+        return;
+      }
+
+      const scrolledPastHero = window.scrollY > 200;
+      const rect = orderSection.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const orderSectionVisible = rect.top <= viewportHeight * 0.85 && rect.bottom >= 120;
+
+      setShowFloatingCta(scrolledPastHero && !orderSectionVisible);
+    };
+
+    updateFloatingCtaVisibility();
+    window.addEventListener('scroll', updateFloatingCtaVisibility, { passive: true });
+    window.addEventListener('resize', updateFloatingCtaVisibility);
+
+    return () => {
+      window.removeEventListener('scroll', updateFloatingCtaVisibility);
+      window.removeEventListener('resize', updateFloatingCtaVisibility);
+    };
+  }, []);
+
   const revealClass = (isVisible: boolean) =>
     `${revealBase} ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'} motion-reduce:translate-y-0 motion-reduce:opacity-100`;
 
+  const scrollToOrderSection = () => {
+    document.getElementById('milling-order')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div>
-      <Section className="pb-8">
+      <Section className="pt-8 pb-6 md:pt-10 md:pb-8">
         <div className={`card space-y-6 p-6 md:p-10 ${revealClass(heroVisible)}`}>
           <div className="space-y-3">
             <h1 className="text-3xl font-bold md:text-5xl">Фрезеровка листовых материалов</h1>
@@ -109,7 +140,7 @@ export default function MillingPage() {
 
           <button
             type="button"
-            onClick={() => document.getElementById('milling-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            onClick={scrollToOrderSection}
             className="inline-flex w-fit items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
           >
             Рассчитать заказ
@@ -248,7 +279,18 @@ export default function MillingPage() {
         </div>
       </Section>
 
-      <Section className="pt-0 pb-12">
+
+      {showFloatingCta && (
+        <button
+          type="button"
+          onClick={scrollToOrderSection}
+          className="fixed bottom-5 right-4 z-40 inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(220,38,38,0.3)] transition-all hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 md:bottom-6 md:right-6 md:px-5 md:py-3"
+        >
+          Рассчитать заказ
+        </button>
+      )}
+
+      <Section id="milling-order" className="pt-0">
         <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200">
           <p className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-red-500" aria-hidden="true" /><span>Подтверждаем стоимость перед запуском. Макет проверяется инженером.</span></p>
         </div>

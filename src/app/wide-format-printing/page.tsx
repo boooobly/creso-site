@@ -33,8 +33,8 @@ export default function WideFormatPrintingPage() {
 
   return (
     <div>
-      <Section className="pb-8">
-        <div className="card p-8 md:p-10">
+      <Section className="pt-6 pb-4 md:pt-10 md:pb-6">
+        <div className="card p-6 md:p-8">
           <h1 className="text-3xl font-bold md:text-4xl">Широкоформатная печать до 3.2 м</h1>
           <p className="mt-3 text-neutral-600">Материалы, интерьерная/уличная печать, варианты постобработки.</p>
 
@@ -49,7 +49,7 @@ export default function WideFormatPrintingPage() {
         </div>
       </Section>
 
-      <Section className="pt-0 pb-12">
+      <Section className="pt-4 pb-12 md:pt-6">
         <div className="space-y-10">
           <WideFormatPricingCalculator />
 
