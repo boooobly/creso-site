@@ -151,6 +151,16 @@ export default function BagetPreview({
       }
     : undefined;
 
+  const cornerTextureBase: CSSProperties = frameTextureImage
+    ? {
+        backgroundImage: frameTextureImage,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '240% 240%',
+      }
+    : {
+        background: frameFallbackGradient,
+      };
+
   return (
     <div className={['card rounded-2xl p-5 shadow-md', className].join(' ')}>
       <h2 className="mb-3 text-base font-semibold">Превью</h2>
@@ -171,7 +181,7 @@ export default function BagetPreview({
               boxSizing: 'border-box',
               boxShadow: stretchedCanvas
                 ? '0 10px 20px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.1), inset 0 -2px 4px rgba(15, 23, 42, 0.1)'
-                : '0 12px 26px rgba(15, 23, 42, 0.16), inset 0 2px 4px rgba(255,255,255,0.42), inset 2px 0 4px rgba(255,255,255,0.24), inset 0 -4px 8px rgba(15,23,42,0.28), inset -3px 0 6px rgba(15,23,42,0.24)',
+                : '0 8px 18px rgba(15,23,42,0.16), 0 2px 6px rgba(15,23,42,0.08), inset 0 1px 2px rgba(255,255,255,0.22), inset 0 -2px 5px rgba(15,23,42,0.24)',
             }}
           >
             {!stretchedCanvas ? (
@@ -212,6 +222,51 @@ export default function BagetPreview({
                 >
                   {verticalFrameTextureStyle ? <div style={verticalFrameTextureStyle} /> : null}
                 </div>
+
+                <div
+                  className="pointer-events-none absolute left-0 top-0 z-10"
+                  style={{
+                    width: `${previewGeometry.framePx}px`,
+                    height: `${previewGeometry.framePx}px`,
+                    clipPath: 'polygon(0 100%, 100% 0, 0 0)',
+                    ...cornerTextureBase,
+                    backgroundPosition: 'left top',
+                    boxShadow: 'inset -1px -1px 2px rgba(15,23,42,0.22)',
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute right-0 top-0 z-10"
+                  style={{
+                    width: `${previewGeometry.framePx}px`,
+                    height: `${previewGeometry.framePx}px`,
+                    clipPath: 'polygon(100% 100%, 100% 0, 0 0)',
+                    ...cornerTextureBase,
+                    backgroundPosition: 'right top',
+                    boxShadow: 'inset 1px -1px 2px rgba(15,23,42,0.22)',
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute bottom-0 left-0 z-10"
+                  style={{
+                    width: `${previewGeometry.framePx}px`,
+                    height: `${previewGeometry.framePx}px`,
+                    clipPath: 'polygon(0 100%, 100% 100%, 0 0)',
+                    ...cornerTextureBase,
+                    backgroundPosition: 'left bottom',
+                    boxShadow: 'inset -1px 1px 2px rgba(15,23,42,0.24)',
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute bottom-0 right-0 z-10"
+                  style={{
+                    width: `${previewGeometry.framePx}px`,
+                    height: `${previewGeometry.framePx}px`,
+                    clipPath: 'polygon(100% 100%, 100% 0, 0 100%)',
+                    ...cornerTextureBase,
+                    backgroundPosition: 'right bottom',
+                    boxShadow: 'inset 1px 1px 2px rgba(15,23,42,0.24)',
+                  }}
+                />
               </>
             ) : null}
 
@@ -223,6 +278,7 @@ export default function BagetPreview({
                 width: `${previewGeometry.effectiveWpx}px`,
                 height: `${previewGeometry.effectiveHpx}px`,
                 backgroundColor: PASSEPARTOUT_COLORS[passepartoutColor],
+                boxShadow: stretchedCanvas ? 'inset 0 1px 2px rgba(15,23,42,0.08)' : 'inset 0 0 0 1px rgba(255,255,255,0.18), inset 0 0 12px rgba(15,23,42,0.12)',
               }}
             >
               <div
