@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Brush, CheckCheck, ChevronDown, Palette, Shirt, Sparkles, Timer, UploadCloud } from 'lucide-react';
 import { CSSProperties, ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
+import FloatingTshirtsCTA from '@/components/heat-transfer/FloatingTshirtsCTA';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 
 type FaqItem = { question: string; answer: string };
@@ -182,7 +183,7 @@ export default function TshirtsLanding() {
 
   return (
     <div className="bg-neutral-100 pb-10 dark:bg-neutral-950">
-      <section className="relative overflow-hidden py-16 md:py-24">
+      <section id="tshirts-hero" className="relative overflow-hidden py-16 md:py-24">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(220,38,38,0.14),transparent_55%)]" aria-hidden="true" />
         <div className="container relative">
           <div
@@ -210,7 +211,7 @@ export default function TshirtsLanding() {
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link href="#tshirt-request" className="inline-flex items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none">
+              <Link href="#tshirts-order" className="inline-flex items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none">
                 Оставить заявку
               </Link>
               <Link href="#examples" className="text-sm font-semibold text-neutral-700 underline-offset-4 transition hover:text-red-600 hover:underline dark:text-neutral-200 dark:hover:text-red-300">
@@ -342,7 +343,9 @@ export default function TshirtsLanding() {
         {() => <FaqAccordion />}
       </SectionBlock>
 
-      <section id="tshirt-request" className="py-12 md:py-16">
+      <FloatingTshirtsCTA />
+
+      <section id="tshirts-order" className="py-12 md:py-16">
         <div className="container">
           <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Менеджер уточнит детали и подтвердит стоимость перед печатью.</p>
           <OrderTshirtsForm />
