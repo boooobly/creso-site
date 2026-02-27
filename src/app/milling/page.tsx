@@ -148,7 +148,7 @@ export default function MillingPage() {
         </div>
       </Section>
 
-      <Section className="pt-0">
+      <Section className="pt-2 md:pt-4">
         <div id="milling-prices" className="card p-6 md:p-8 scroll-mt-24">
           <div className="mb-4 flex flex-wrap gap-2">
             {quickInfo.map((item) => (
