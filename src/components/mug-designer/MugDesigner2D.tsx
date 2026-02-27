@@ -136,7 +136,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   const [mockupImage, setMockupImage] = useState<HTMLImageElement | null>(null);
   const [userImage, setUserImage] = useState<HTMLImageElement | null>(null);
   const [viewportWidth, setViewportWidth] = useState(900);
-  const [viewportHeight, setViewportHeight] = useState(460);
   const [transform, setTransform] = useState<TransformState>(defaultTransform);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedElement, setSelectedElement] = useState<SelectedElement>(null);
@@ -308,12 +307,12 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width ?? 900;
-      const maxWidth = Math.min(width, 1100);
+      const maxWidthByAspect = Math.floor((560 * MOCKUP_WIDTH) / MOCKUP_HEIGHT);
+      const maxWidth = Math.min(width, 1100, maxWidthByAspect);
       const maxHeight = 560;
       const scale = Math.min(maxWidth / MOCKUP_WIDTH, maxHeight / MOCKUP_HEIGHT);
 
       setViewportWidth(MOCKUP_WIDTH * scale);
-      setViewportHeight(MOCKUP_HEIGHT * scale);
     });
 
     observer.observe(node);
@@ -486,7 +485,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
   }
 
   const displayedWidth = viewportWidth;
-  const displayedHeight = viewportHeight;
+  const displayedHeight = Math.round((displayedWidth * MOCKUP_HEIGHT) / MOCKUP_WIDTH);
   const stageScale = displayedWidth / MOCKUP_WIDTH;
 
   return (
@@ -526,7 +525,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                 </Layer>
 
                 <Layer ref={printLayerRef}>
-                  <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0.08)" listening={false} />
+                  <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0)" listening={false} />
                   <Rect
                     x={PRINT_RECT.x}
                     y={PRINT_RECT.y}

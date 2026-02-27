@@ -116,7 +116,7 @@ export default function MugMockPreview({ wrapDataUrl, onExportReady }: Props) {
   return (
     <div className="space-y-3 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm md:p-6">
       <h4 className="text-lg font-semibold">Предпросмотр на кружке</h4>
-      <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3">
+      <div className="rounded-xl border border-neutral-200 bg-white p-3">
         <canvas ref={canvasRef} className="h-auto w-full rounded-lg" />
       </div>
     </div>
