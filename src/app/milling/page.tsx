@@ -12,7 +12,7 @@ import {
   Wrench,
   Zap,
 } from 'lucide-react';
-import Section from '@/components/Section';
+import Section from '@/components/layout/Section';
 import OrderMillingForm from '@/components/OrderMillingForm';
 import MillingMaterialsAccordion from '@/components/MillingMaterialsAccordion';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
@@ -117,7 +117,7 @@ export default function MillingPage() {
 
   return (
     <div>
-      <Section className="pb-6 md:pb-8">
+      <Section className="pt-8 pb-6 md:pt-10 md:pb-8">
         <div className={`card space-y-6 p-6 md:p-10 ${revealClass(heroVisible)}`}>
           <div className="space-y-3">
             <h1 className="text-3xl font-bold md:text-5xl">Фрезеровка листовых материалов</h1>
@@ -290,7 +290,7 @@ export default function MillingPage() {
         </button>
       )}
 
-      <Section id="milling-order" className="pt-0 pb-12">
+      <Section id="milling-order" className="pt-0">
         <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200">
           <p className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-red-500" aria-hidden="true" /><span>Подтверждаем стоимость перед запуском. Макет проверяется инженером.</span></p>
         </div>
