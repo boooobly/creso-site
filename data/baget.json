@@ -1,5 +1,15 @@
 [
   {
+    "id": "baget-real",
+    "article": "TEST-001",
+    "name": "Багет (тест)",
+    "color": "brown",
+    "style": "classic",
+    "width_mm": 35,
+    "price_per_meter": 1000,
+    "image": "/images/baget/baget-test.png"
+  },
+  {
     "id": "b001",
     "article": "A-101",
     "name": "Золотой классик",
