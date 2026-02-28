@@ -167,6 +167,12 @@ export default function BagetPreview({
     ...buildTextureStyle('translate(-50%, -50%) rotate(270deg) scaleY(-1)'),
   };
 
+  const fp = previewGeometry.framePx;
+  const miter = Math.max(0, Math.round(fp));
+  const topMiterClipPath = `polygon(${miter}px 0, calc(100% - ${miter}px) 0, 100% ${miter}px, 100% 100%, 0 100%, 0 ${miter}px)`;
+  const bottomMiterClipPath = `polygon(0 0, 100% 0, 100% calc(100% - ${miter}px), calc(100% - ${miter}px) 100%, ${miter}px 100%, 0 calc(100% - ${miter}px))`;
+  const leftMiterClipPath = `polygon(0 0, 100% ${miter}px, 100% calc(100% - ${miter}px), 0 100%, 0 0)`;
+  const rightMiterClipPath = `polygon(0 ${miter}px, 100% 0, 100% 100%, 0 calc(100% - ${miter}px), 0 ${miter}px)`;
 
   return (
     <div className={['card rounded-2xl p-5 shadow-md', className].join(' ')}>
@@ -186,6 +192,7 @@ export default function BagetPreview({
               width: `${previewGeometry.outerWpx}px`,
               height: `${previewGeometry.outerHpx}px`,
               boxSizing: 'border-box',
+              outline: stretchedCanvas ? undefined : '1px solid rgba(0,0,0,0.03)',
               boxShadow: stretchedCanvas
                 ? '0 10px 20px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.1), inset 0 -2px 4px rgba(15, 23, 42, 0.1)'
                 : '0 6px 14px rgba(15,23,42,0.14), 0 1px 3px rgba(15,23,42,0.08), inset 0 1px 2px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(15,23,42,0.2)',
@@ -200,6 +207,7 @@ export default function BagetPreview({
                     height: `${previewGeometry.framePx}px`,
                     ...buildTextureStyle(),
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.24)',
+                    clipPath: topMiterClipPath,
                   }}
                 />
                 <div
@@ -209,6 +217,7 @@ export default function BagetPreview({
                     height: `${previewGeometry.framePx}px`,
                     ...buildTextureStyle('rotate(180deg)'),
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
+                    clipPath: bottomMiterClipPath,
                   }}
                 />
                 <div
@@ -217,6 +226,7 @@ export default function BagetPreview({
                     zIndex: 1,
                     width: `${previewGeometry.framePx}px`,
                     background: texUrl ? undefined : fallback,
+                    clipPath: leftMiterClipPath,
                   }}
                 >
                   {texUrl ? <div style={leftVerticalTextureStyle} /> : null}
@@ -227,51 +237,13 @@ export default function BagetPreview({
                     zIndex: 1,
                     width: `${previewGeometry.framePx}px`,
                     background: texUrl ? undefined : fallback,
+                    clipPath: rightMiterClipPath,
                   }}
                 >
                   {texUrl ? <div style={rightVerticalTextureStyle} /> : null}
                 </div>
 
-                <div
-                  className="pointer-events-none absolute left-0 top-0"
-                  style={{
-                    zIndex: 2,
-                    width: `${previewGeometry.framePx}px`,
-                    height: `${previewGeometry.framePx}px`,
-                    ...buildTextureStyle(),
-                    clipPath: 'polygon(0 0, 100% 0, 0 100%)',
-                  }}
-                />
-                <div
-                  className="pointer-events-none absolute right-0 top-0"
-                  style={{
-                    zIndex: 2,
-                    width: `${previewGeometry.framePx}px`,
-                    height: `${previewGeometry.framePx}px`,
-                    ...buildTextureStyle('scaleX(-1)'),
-                    clipPath: 'polygon(0 0, 100% 0, 100% 100%)',
-                  }}
-                />
-                <div
-                  className="pointer-events-none absolute bottom-0 left-0"
-                  style={{
-                    zIndex: 2,
-                    width: `${previewGeometry.framePx}px`,
-                    height: `${previewGeometry.framePx}px`,
-                    ...buildTextureStyle('rotate(180deg) scaleY(-1)'),
-                    clipPath: 'polygon(0 0, 0 100%, 100% 100%)',
-                  }}
-                />
-                <div
-                  className="pointer-events-none absolute bottom-0 right-0"
-                  style={{
-                    zIndex: 2,
-                    width: `${previewGeometry.framePx}px`,
-                    height: `${previewGeometry.framePx}px`,
-                    ...buildTextureStyle('scaleX(-1) scaleY(-1)'),
-                    clipPath: 'polygon(100% 0, 0 100%, 100% 100%)',
-                  }}
-                />
+
               </>
             ) : null}
 
