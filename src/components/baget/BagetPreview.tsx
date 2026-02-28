@@ -169,7 +169,7 @@ export default function BagetPreview({
 
   const fp = previewGeometry.framePx;
   const miter = Math.max(0, Math.round(fp));
-  const topMiterClipPath = `polygon(${miter}px 0, calc(100% - ${miter}px) 0, 100% ${miter}px, 100% 100%, 0 100%, 0 ${miter}px)`;
+  const topMiterClipPath = `polygon(0 0, 100% 0, calc(100% - ${miter}px) 100%, ${miter}px 100%, 0 0)`;
   const bottomMiterClipPath = `polygon(0 0, 100% 0, 100% calc(100% - ${miter}px), calc(100% - ${miter}px) 100%, ${miter}px 100%, 0 calc(100% - ${miter}px))`;
   const leftMiterClipPath = `polygon(0 0, 100% ${miter}px, 100% calc(100% - ${miter}px), 0 100%, 0 0)`;
   const rightMiterClipPath = `polygon(0 ${miter}px, 100% 0, 100% 100%, 0 calc(100% - ${miter}px), 0 ${miter}px)`;
