@@ -207,7 +207,7 @@ export default function BagetPreview({
                   style={{
                     zIndex: 1,
                     height: `${previewGeometry.framePx}px`,
-                    ...buildTextureStyle('rotate(180deg) scaleY(-1)'),
+                    ...buildTextureStyle('rotate(180deg)'),
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
                   }}
                 />
