@@ -156,6 +156,7 @@ export default function BagetPreview({
     width: `${previewGeometry.outerHpx}px`,
     height: `${previewGeometry.framePx}px`,
     ...buildTextureStyle('translate(-50%, -50%) rotate(90deg) scaleY(-1)'),
+    borderRadius: 0,
   };
 
   const rightVerticalTextureStyle: CSSProperties = {
@@ -165,6 +166,7 @@ export default function BagetPreview({
     width: `${previewGeometry.outerHpx}px`,
     height: `${previewGeometry.framePx}px`,
     ...buildTextureStyle('translate(-50%, -50%) rotate(270deg) scaleY(-1)'),
+    borderRadius: 0,
   };
 
   const fp = previewGeometry.framePx;
@@ -175,23 +177,24 @@ export default function BagetPreview({
   const rightMiterClipPath = `polygon(0 ${miter}px, 100% 0, 100% 100%, 0 calc(100% - ${miter}px), 0 ${miter}px)`;
 
   return (
-    <div className={['card rounded-2xl p-5 shadow-md', className].join(' ')}>
+    <div className={['card p-5 shadow-md', className].join(' ')}>
       <h2 className="mb-3 text-base font-semibold">Превью</h2>
 
       <div className="mx-auto w-full max-w-[520px]">
         <div
           ref={containerRef}
-          className="relative grid aspect-square min-h-[280px] w-full place-items-center overflow-hidden rounded-xl p-2"
+          className="relative grid aspect-square min-h-[280px] w-full place-items-center overflow-hidden p-2"
         >
           <div
             className={[
-              'relative max-h-full max-w-full overflow-hidden rounded-md transition-all duration-200',
+              'relative max-h-full max-w-full overflow-hidden transition-all duration-200',
               highlighted ? 'animate-pulse shadow-[0_0_0_4px_rgba(220,38,38,0.18)]' : '',
             ].join(' ')}
             style={{
               width: `${previewGeometry.outerWpx}px`,
               height: `${previewGeometry.outerHpx}px`,
               boxSizing: 'border-box',
+              borderRadius: 0,
               outline: stretchedCanvas ? undefined : '1px solid rgba(0,0,0,0.03)',
               boxShadow: stretchedCanvas
                 ? '0 10px 20px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.1), inset 0 -2px 4px rgba(15, 23, 42, 0.1)'
@@ -208,6 +211,7 @@ export default function BagetPreview({
                     ...buildTextureStyle(),
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.24)',
                     clipPath: topMiterClipPath,
+                    borderRadius: 0,
                   }}
                 />
                 <div
@@ -218,6 +222,7 @@ export default function BagetPreview({
                     ...buildTextureStyle('rotate(180deg)'),
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
                     clipPath: bottomMiterClipPath,
+                    borderRadius: 0,
                   }}
                 />
                 <div
@@ -227,6 +232,7 @@ export default function BagetPreview({
                     width: `${previewGeometry.framePx}px`,
                     background: texUrl ? undefined : fallback,
                     clipPath: leftMiterClipPath,
+                    borderRadius: 0,
                   }}
                 >
                   {texUrl ? <div style={leftVerticalTextureStyle} /> : null}
@@ -238,6 +244,7 @@ export default function BagetPreview({
                     width: `${previewGeometry.framePx}px`,
                     background: texUrl ? undefined : fallback,
                     clipPath: rightMiterClipPath,
+                    borderRadius: 0,
                   }}
                 >
                   {texUrl ? <div style={rightVerticalTextureStyle} /> : null}
@@ -248,13 +255,14 @@ export default function BagetPreview({
             ) : null}
 
             <div
-              className="absolute overflow-hidden rounded-[2px] transition-all duration-200"
+              className="absolute overflow-hidden transition-all duration-200"
               style={{
                 top: `${previewGeometry.framePx}px`,
                 left: `${previewGeometry.framePx}px`,
                 width: `${previewGeometry.effectiveWpx}px`,
                 height: `${previewGeometry.effectiveHpx}px`,
                 backgroundColor: PASSEPARTOUT_COLORS[passepartoutColor],
+                borderRadius: 0,
                 boxShadow: stretchedCanvas ? 'inset 0 1px 2px rgba(15,23,42,0.08)' : 'inset 0 0 0 1px rgba(255,255,255,0.18), inset 0 0 10px rgba(15,23,42,0.1), inset 0 1px 1px rgba(255,255,255,0.2)',
               }}
             >
@@ -282,7 +290,7 @@ export default function BagetPreview({
               </div>
               {passepartoutEnabled ? (
                 <div
-                  className="pointer-events-none absolute inset-0 rounded-[2px]"
+                  className="pointer-events-none absolute inset-0"
                   style={{
                     boxShadow: `inset ${previewGeometry.passePx}px ${previewGeometry.passePx}px 0 0 transparent, inset ${previewGeometry.passePx}px ${previewGeometry.passeBottomPx}px 0 0 transparent`,
                   }}
