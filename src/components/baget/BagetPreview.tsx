@@ -155,7 +155,7 @@ export default function BagetPreview({
     top: '50%',
     width: `${previewGeometry.outerHpx}px`,
     height: `${previewGeometry.framePx}px`,
-    ...buildTextureStyle('translate(-50%, -50%) rotate(-90deg) scaleY(-1)'),
+    ...buildTextureStyle('translate(-50%, -50%) rotate(90deg) scaleY(-1)'),
   };
 
   const rightVerticalTextureStyle: CSSProperties = {
@@ -164,7 +164,7 @@ export default function BagetPreview({
     top: '50%',
     width: `${previewGeometry.outerHpx}px`,
     height: `${previewGeometry.framePx}px`,
-    ...buildTextureStyle('translate(-50%, -50%) rotate(90deg) scaleY(-1)'),
+    ...buildTextureStyle('translate(-50%, -50%) rotate(270deg) scaleY(-1)'),
   };
 
 
@@ -207,7 +207,7 @@ export default function BagetPreview({
                   style={{
                     zIndex: 1,
                     height: `${previewGeometry.framePx}px`,
-                    ...buildTextureStyle('scaleY(-1)'),
+                    ...buildTextureStyle('rotate(180deg) scaleY(-1)'),
                     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
                   }}
                 />
@@ -258,7 +258,7 @@ export default function BagetPreview({
                     zIndex: 2,
                     width: `${previewGeometry.framePx}px`,
                     height: `${previewGeometry.framePx}px`,
-                    ...buildTextureStyle('scaleY(-1)'),
+                    ...buildTextureStyle('rotate(180deg) scaleY(-1)'),
                     clipPath: 'polygon(0 0, 0 100%, 100% 100%)',
                   }}
                 />
