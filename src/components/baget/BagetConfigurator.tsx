@@ -16,7 +16,7 @@ import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
 import BagetPreview from './BagetPreview';
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 15;
 
 
 const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
@@ -387,7 +387,7 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
   ]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[20%_45%_35%] lg:items-start">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[18%_52%_30%] lg:items-start">
       <aside className="space-y-4 lg:sticky lg:top-24">
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-3 text-base font-semibold">Размер изделия (мм)</h2>
@@ -428,8 +428,8 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
         />
       </aside>
 
-      <main className="space-y-3 lg:pr-2">
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <main className="space-y-3 lg:pr-1">
+        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {pagedItems.map((item) => (
             <BagetCard
               key={item.id}
