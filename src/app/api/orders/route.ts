@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
-import bagetData from '../../../../data/baget.json';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import { prisma } from '@/lib/db/prisma';
 import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
@@ -13,6 +12,7 @@ import { normalizePhone } from '@/lib/utils/phone';
 
 import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
+import { getBagetCatalogFromSheet, mapSheetItemsToBagetItems } from '@/lib/baget/sheetsCatalog';
 export const runtime = 'nodejs';
 
 const bagetItemSchema = z.object({
@@ -124,7 +124,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
     }
 
-    const allBagets = z.array(bagetItemSchema).parse(bagetData);
+    const sheetItems = await getBagetCatalogFromSheet();
+    const allBagets = z.array(bagetItemSchema).parse(mapSheetItemsToBagetItems(sheetItems));
     const selectedBaget = allBagets.find((item) => item.id === parsed.data.baget.selectedBagetId);
 
     if (!selectedBaget) {
