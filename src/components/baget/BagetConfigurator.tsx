@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import bagetData from '../../../data/baget.json';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
@@ -75,12 +74,12 @@ const initialMaterials: MaterialsState = {
 };
 
 type BagetConfiguratorProps = {
+  items: BagetItem[];
   initialWidth?: string;
   initialHeight?: string;
 };
 
-export default function BagetConfigurator({ initialWidth, initialHeight }: BagetConfiguratorProps) {
-  const items = bagetData as BagetItem[];
+export default function BagetConfigurator({ items, initialWidth, initialHeight }: BagetConfiguratorProps) {
   const [widthInput, setWidthInput] = useState(initialWidth?.trim() || '500');
   const [heightInput, setHeightInput] = useState(initialHeight?.trim() || '700');
   const [filters, setFilters] = useState<FilterState>(initialFilters);
