@@ -1,6 +1,7 @@
 import { parse } from 'csv-parse/sync';
 import localCatalogData from '../../../data/baget.json';
 
+const DEFAULT_SHEET_ID = '1lH3zq_PrUQVbVa37P4WPn24Y60iAmmznnHP-soS7dYA';
 const DEFAULT_TAB = 'baget_catalog';
 const DEFAULT_CACHE_SECONDS = 300;
 const DEFAULT_RESERVE_MM = 10;
@@ -40,6 +41,25 @@ export type BagetSheetItem = {
 };
 
 type CsvRow = Record<string, string>;
+
+type BagetCatalogItem = {
+  id: string;
+  article: string;
+  name: string;
+  color: string;
+  style: string;
+  width_mm: number;
+  price_per_meter: number;
+  image: string;
+};
+
+export type BagetCatalogLoadResult = {
+  source: 'sheet' | 'fallback';
+  sheetId: string;
+  tab: string;
+  items: BagetSheetItem[];
+  error: string | null;
+};
 
 function toNumber(input: string, fallback?: number): number {
   const normalized = input.trim().replace(',', '.');
@@ -84,17 +104,6 @@ function mapRowToItem(row: CsvRow): BagetSheetItem | null {
   };
 }
 
-type BagetCatalogItem = {
-  id: string;
-  article: string;
-  name: string;
-  color: string;
-  style: string;
-  width_mm: number;
-  price_per_meter: number;
-  image: string;
-};
-
 function getFallbackCatalog(): BagetSheetItem[] {
   const fallbackItems = localCatalogData as BagetCatalogItem[];
   return fallbackItems.map((item) => ({
@@ -128,42 +137,57 @@ export function mapSheetItemsToBagetItems(items: BagetSheetItem[]): BagetCatalog
   }));
 }
 
-export async function getBagetCatalogFromSheet(): Promise<BagetSheetItem[]> {
-  const sheetId = process.env.BAGET_SHEET_ID?.trim();
+export async function loadBagetCatalog(): Promise<BagetCatalogLoadResult> {
+  const sheetId = process.env.BAGET_SHEET_ID?.trim() || DEFAULT_SHEET_ID;
   const tab = process.env.BAGET_SHEET_TAB?.trim() || DEFAULT_TAB;
   const cacheSecondsRaw = process.env.BAGET_SHEET_CACHE_SECONDS?.trim();
   const cacheSeconds = toNumber(cacheSecondsRaw ?? '', DEFAULT_CACHE_SECONDS);
-
-  if (!sheetId) {
-    return getFallbackCatalog();
-  }
-
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
 
   try {
     const response = await fetch(url, { next: { revalidate: cacheSeconds } });
     if (!response.ok) {
-      throw new Error(`Sheet fetch failed: ${response.status}`);
+      const error = `Sheet response not ok: ${response.status} ${response.statusText}`;
+      console.error('[baget/sheetsCatalog] fallback: invalid response', { error, sheetId, tab, url });
+      return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error };
     }
 
     const csvText = await response.text();
-    const records = parse(csvText, {
-      columns: true,
-      skip_empty_lines: true,
-      bom: true,
-      trim: true,
-    }) as CsvRow[];
+
+    let records: CsvRow[];
+    try {
+      records = parse(csvText, {
+        columns: true,
+        skip_empty_lines: true,
+        bom: true,
+        trim: true,
+      }) as CsvRow[];
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown CSV parse error';
+      console.error('[baget/sheetsCatalog] fallback: CSV parse failure', { error: message, sheetId, tab, url });
+      return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error: message };
+    }
 
     const items = records
       .map(mapRowToItem)
       .filter((item): item is BagetSheetItem => item !== null);
 
     if (items.length === 0) {
-      throw new Error('Parsed sheet has no valid items.');
+      const error = 'Zero valid parsed items from sheet.';
+      console.error('[baget/sheetsCatalog] fallback: zero valid parsed items', { error, sheetId, tab, url, rows: records.length });
+      return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error };
     }
 
-    return items;
-  } catch {
-    return getFallbackCatalog();
+    console.log('[baget/sheetsCatalog] loaded from Google Sheets', { sheetId, tab, count: items.length });
+    return { source: 'sheet', sheetId, tab, items, error: null };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown fetch error';
+    console.error('[baget/sheetsCatalog] fallback: fetch failure', { error: message, sheetId, tab, url });
+    return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error: message };
   }
+}
+
+export async function getBagetCatalogFromSheet(): Promise<BagetSheetItem[]> {
+  const result = await loadBagetCatalog();
+  return result.items;
 }
