@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
+import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
 import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
@@ -104,7 +105,13 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
         style: item.style,
         width_mm: item.width_mm,
         price_per_meter: item.price_per_meter,
-        image: item.image_url || item.corner_image_url || BAGET_PLACEHOLDER_IMAGE,
+        image:
+          normalizeBagetImageUrl(item.image_url) ||
+          normalizeBagetImageUrl(item.corner_image_url) ||
+          BAGET_PLACEHOLDER_IMAGE,
+        fallbackImage: item.image_url
+          ? (normalizeBagetImageUrl(item.corner_image_url) || BAGET_PLACEHOLDER_IMAGE)
+          : BAGET_PLACEHOLDER_IMAGE,
         residues_text: item.residues_text,
         reserve_mm: Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10,
         show_on_site: item.show_on_site,
