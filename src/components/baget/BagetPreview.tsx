@@ -121,10 +121,34 @@ export default function BagetPreview({
     };
   }, [containerPx.height, containerPx.width, passepartoutEnabled, safeHeightMm, safePasseBottomMm, safePasseMm, safeWidthMm, selectedBaget, stretchedCanvas]);
 
-  const texUrl = selectedBaget?.image;
+  const texUrl = selectedBaget?.frameTextureImage ?? '';
+  const [textureFailed, setTextureFailed] = useState(false);
   const fallback = 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)';
 
-  const textureBaseStyle: CSSProperties | undefined = texUrl
+  useEffect(() => {
+    if (!texUrl) {
+      setTextureFailed(false);
+      return;
+    }
+
+    let cancelled = false;
+    const textureProbe = new window.Image();
+    textureProbe.onload = () => {
+      if (!cancelled) setTextureFailed(false);
+    };
+    textureProbe.onerror = () => {
+      if (!cancelled) setTextureFailed(true);
+    };
+    textureProbe.src = texUrl;
+
+    return () => {
+      cancelled = true;
+    };
+  }, [texUrl]);
+
+  const hasTexture = Boolean(texUrl) && !textureFailed;
+
+  const textureBaseStyle: CSSProperties | undefined = hasTexture
     ? {
         backgroundImage: `url(${texUrl})`,
         backgroundRepeat: 'repeat-x',
@@ -230,24 +254,24 @@ export default function BagetPreview({
                   style={{
                     zIndex: 1,
                     width: `${previewGeometry.framePx}px`,
-                    background: texUrl ? undefined : fallback,
+                    background: hasTexture ? undefined : fallback,
                     clipPath: leftMiterClipPath,
                     borderRadius: 0,
                   }}
                 >
-                  {texUrl ? <div style={leftVerticalTextureStyle} /> : null}
+                  {hasTexture ? <div style={leftVerticalTextureStyle} /> : null}
                 </div>
                 <div
                   className="absolute bottom-0 right-0 top-0 overflow-hidden"
                   style={{
                     zIndex: 1,
                     width: `${previewGeometry.framePx}px`,
-                    background: texUrl ? undefined : fallback,
+                    background: hasTexture ? undefined : fallback,
                     clipPath: rightMiterClipPath,
                     borderRadius: 0,
                   }}
                 >
-                  {texUrl ? <div style={rightVerticalTextureStyle} /> : null}
+                  {hasTexture ? <div style={rightVerticalTextureStyle} /> : null}
                 </div>
 
 
