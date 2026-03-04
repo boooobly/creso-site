@@ -1,5 +1,5 @@
 import BagetConfigurator from '@/components/baget/BagetConfigurator';
-import { getBagetCatalogFromSheet, mapSheetItemsToBagetItems } from '@/lib/baget/sheetsCatalog';
+import { getBagetCatalogFromSheet } from '@/lib/baget/sheetsCatalog';
 
 type BagetPageProps = {
   searchParams?: {
@@ -9,8 +9,7 @@ type BagetPageProps = {
 };
 
 export default async function BagetPage({ searchParams }: BagetPageProps) {
-  const sheetItems = await getBagetCatalogFromSheet();
-  const items = mapSheetItemsToBagetItems(sheetItems);
+  const items = await getBagetCatalogFromSheet();
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 space-y-6">

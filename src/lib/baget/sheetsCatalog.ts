@@ -104,7 +104,7 @@ function getFallbackCatalog(): BagetSheetItem[] {
     name: item.name,
     width_mm: item.width_mm,
     price_per_meter: item.price_per_meter,
-    residues_text: 'fallback',
+    residues_text: '100*20',
     reserve_mm: DEFAULT_RESERVE_MM,
     show_on_site: true,
     image_url: item.image,

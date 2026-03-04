@@ -9,6 +9,8 @@ import {
   useState,
 } from 'react';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
+import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
+import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
@@ -73,8 +75,16 @@ const initialMaterials: MaterialsState = {
   stretcherType: 'narrow',
 };
 
+type CatalogBagetItem = BagetItem & {
+  residues_text: string;
+  reserve_mm: number;
+  show_on_site: boolean;
+};
+
+const BAGET_PLACEHOLDER_IMAGE = '/images/outdoor-portfolio/placeholder-1.svg';
+
 type BagetConfiguratorProps = {
-  items: BagetItem[];
+  items: BagetSheetItem[];
   initialWidth?: string;
   initialHeight?: string;
 };
@@ -84,7 +94,24 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
   const [heightInput, setHeightInput] = useState(initialHeight?.trim() || '700');
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [materials, setMaterials] = useState<MaterialsState>(initialMaterials);
-  const [selectedBaget, setSelectedBaget] = useState<BagetItem | null>(items[0] ?? null);
+  const catalogItems = useMemo<CatalogBagetItem[]>(
+    () =>
+      items.map((item) => ({
+        id: item.id,
+        article: item.article,
+        name: item.name,
+        color: item.color,
+        style: item.style,
+        width_mm: item.width_mm,
+        price_per_meter: item.price_per_meter,
+        image: item.image_url || item.corner_image_url || BAGET_PLACEHOLDER_IMAGE,
+        residues_text: item.residues_text,
+        reserve_mm: Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10,
+        show_on_site: item.show_on_site,
+      })),
+    [items],
+  );
+  const [selectedBaget, setSelectedBaget] = useState<CatalogBagetItem | null>(catalogItems[0] ?? null);
   const [page, setPage] = useState(1);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
@@ -176,19 +203,26 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
     }));
   }, [materials.workType]);
 
-  const colors = useMemo(() => Array.from(new Set(items.map((item) => item.color))), [items]);
-  const styles = useMemo(() => Array.from(new Set(items.map((item) => item.style))), [items]);
+  const colors = useMemo(() => Array.from(new Set(catalogItems.map((item) => item.color))), [catalogItems]);
+  const styles = useMemo(() => Array.from(new Set(catalogItems.map((item) => item.style))), [catalogItems]);
 
   const filteredItems = useMemo(
     () =>
-      items.filter((item) => {
+      catalogItems.filter((item) => {
         const colorMatch = filters.color === 'all' || item.color === filters.color;
         const styleMatch = filters.style === 'all' || item.style === filters.style;
         const widthMatch = item.width_mm >= filters.widthMin && item.width_mm <= filters.widthMax;
         const priceMatch = item.price_per_meter >= filters.priceMin && item.price_per_meter <= filters.priceMax;
-        return colorMatch && styleMatch && widthMatch && priceMatch;
+        const visibleOnSite = item.show_on_site;
+
+        const canFulfillFromStock = !validSize || canFulfillFrameFromPieces(
+          parseResiduesToPieces(item.residues_text),
+          computeRequiredSidesMeters(widthMm, heightMm, Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10),
+        );
+
+        return colorMatch && styleMatch && widthMatch && priceMatch && visibleOnSite && canFulfillFromStock;
       }),
-    [filters, items],
+    [catalogItems, filters, heightMm, validSize, widthMm],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
@@ -203,6 +237,12 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
   }, [page, totalPages]);
 
 
+  useEffect(() => {
+    if (!selectedBaget || !filteredItems.some((item) => item.id === selectedBaget.id)) {
+      setSelectedBaget(filteredItems[0] ?? null);
+    }
+  }, [filteredItems, selectedBaget]);
+
   const onImageUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -216,10 +256,11 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
   }, []);
 
   const handleSelectBaget = useCallback((item: BagetItem) => {
-    setSelectedBaget(item);
+    const found = filteredItems.find((candidate) => candidate.id === item.id) ?? null;
+    setSelectedBaget(found);
     previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setPreviewHighlighted(true);
-  }, []);
+  }, [filteredItems]);
 
   useEffect(() => {
     if (!previewHighlighted) return;
