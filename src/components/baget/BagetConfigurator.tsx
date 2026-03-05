@@ -129,6 +129,9 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
   const [previewHighlighted, setPreviewHighlighted] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isPreviewZoomed, setIsPreviewZoomed] = useState(false);
+  const [previewZoomOrigin, setPreviewZoomOrigin] = useState({ xPct: 50, yPct: 50 });
+  const [hoverZoomEnabled, setHoverZoomEnabled] = useState(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const previewTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -148,6 +151,22 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
       localStorage.removeItem(BAGET_TRANSFER_IMAGE_KEY);
     }
   }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia('(hover: hover)');
+    const update = () => setHoverZoomEnabled(media.matches);
+
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!isPreviewOpen) {
+      setIsPreviewZoomed(false);
+      setPreviewZoomOrigin({ xPct: 50, yPct: 50 });
+    }
+  }, [isPreviewOpen]);
 
   useEffect(() => {
     if (!isPreviewOpen) return;
@@ -639,18 +658,55 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
               >
                 ✕
               </button>
-              <BagetPreview
-                className="max-h-[calc(80vh-2rem)]"
-                widthMm={widthMm}
-                heightMm={heightMm}
-                selectedBaget={selectedBaget}
-                imageUrl={imageUrl}
-                stretchedCanvas={materials.workType === 'stretchedCanvas'}
-                passepartoutEnabled={materials.passepartout}
-                passepartoutMm={passepartoutMm}
-                passepartoutBottomMm={passepartoutBottomMm}
-                passepartoutColor={materials.passepartoutColor}
-              />
+              <div
+                className={[
+                  'overflow-hidden rounded-xl',
+                  hoverZoomEnabled ? (isPreviewZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in') : '',
+                ].join(' ')}
+                onMouseEnter={() => {
+                  if (!hoverZoomEnabled) return;
+                  setIsPreviewZoomed(true);
+                }}
+                onMouseMove={(event) => {
+                  if (!hoverZoomEnabled) return;
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  if (!rect.width || !rect.height) return;
+
+                  const xPct = Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100));
+                  const yPct = Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100));
+                  setPreviewZoomOrigin({ xPct, yPct });
+                }}
+                onMouseLeave={() => {
+                  if (!hoverZoomEnabled) return;
+                  setIsPreviewZoomed(false);
+                  setPreviewZoomOrigin({ xPct: 50, yPct: 50 });
+                }}
+              >
+                {hoverZoomEnabled ? (
+                  <p className="mb-2 text-right text-xs text-neutral-500 dark:text-neutral-400">Наведите курсор для увеличения</p>
+                ) : null}
+                <div
+                  style={{
+                    transform: `scale(${isPreviewZoomed ? 1.8 : 1})`,
+                    transformOrigin: `${previewZoomOrigin.xPct}% ${previewZoomOrigin.yPct}%`,
+                    transition: 'transform 140ms ease-out',
+                    willChange: 'transform',
+                  }}
+                >
+                  <BagetPreview
+                    className="max-h-[calc(80vh-2rem)]"
+                    widthMm={widthMm}
+                    heightMm={heightMm}
+                    selectedBaget={selectedBaget}
+                    imageUrl={imageUrl}
+                    stretchedCanvas={materials.workType === 'stretchedCanvas'}
+                    passepartoutEnabled={materials.passepartout}
+                    passepartoutMm={passepartoutMm}
+                    passepartoutBottomMm={passepartoutBottomMm}
+                    passepartoutColor={materials.passepartoutColor}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         ) : null}
