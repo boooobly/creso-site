@@ -97,25 +97,26 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
   const [materials, setMaterials] = useState<MaterialsState>(initialMaterials);
   const catalogItems = useMemo<CatalogBagetItem[]>(
     () =>
-      items.map((item) => ({
-        id: item.id,
-        article: item.article,
-        name: item.name,
-        color: item.color,
-        style: item.style,
-        width_mm: item.width_mm,
-        price_per_meter: item.price_per_meter,
-        image:
-          normalizeBagetImageUrl(item.image_url) ||
-          normalizeBagetImageUrl(item.corner_image_url) ||
-          BAGET_PLACEHOLDER_IMAGE,
-        fallbackImage: item.image_url
-          ? (normalizeBagetImageUrl(item.corner_image_url) || BAGET_PLACEHOLDER_IMAGE)
-          : BAGET_PLACEHOLDER_IMAGE,
-        residues_text: item.residues_text,
-        reserve_mm: Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10,
-        show_on_site: item.show_on_site,
-      })),
+      items.map((item) => {
+        const plankImage = normalizeBagetImageUrl(item.image_url);
+        const cornerImage = normalizeBagetImageUrl(item.corner_image_url);
+
+        return {
+          id: item.id,
+          article: item.article,
+          name: item.name,
+          color: item.color,
+          style: item.style,
+          width_mm: item.width_mm,
+          price_per_meter: item.price_per_meter,
+          cardImage: cornerImage || plankImage || BAGET_PLACEHOLDER_IMAGE,
+          frameTextureImage: plankImage || cornerImage || '',
+          fallbackImage: plankImage || BAGET_PLACEHOLDER_IMAGE,
+          residues_text: item.residues_text,
+          reserve_mm: Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10,
+          show_on_site: item.show_on_site,
+        };
+      }),
     [items],
   );
   const [selectedBaget, setSelectedBaget] = useState<CatalogBagetItem | null>(catalogItems[0] ?? null);

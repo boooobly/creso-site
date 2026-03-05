@@ -11,7 +11,8 @@ export type BagetItem = {
   style: string;
   width_mm: number;
   price_per_meter: number;
-  image: string;
+  cardImage?: string;
+  frameTextureImage?: string;
   fallbackImage?: string;
 };
 
@@ -25,8 +26,8 @@ const BAGET_PLACEHOLDER_IMAGE = '/images/outdoor-portfolio/placeholder-1.svg';
 
 function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   const imageCandidates = useMemo(
-    () => [item.image, item.fallbackImage, BAGET_PLACEHOLDER_IMAGE].filter(Boolean) as string[],
-    [item.fallbackImage, item.image],
+    () => [item.cardImage, item.fallbackImage, BAGET_PLACEHOLDER_IMAGE].filter(Boolean) as string[],
+    [item.cardImage, item.fallbackImage],
   );
   const [imageIndex, setImageIndex] = useState(0);
 
