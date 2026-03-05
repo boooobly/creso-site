@@ -128,7 +128,9 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
   const [fileName, setFileName] = useState<string>('');
   const [previewHighlighted, setPreviewHighlighted] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
+  const previewTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const storedPayload = localStorage.getItem(BAGET_TRANSFER_IMAGE_KEY);
@@ -146,6 +148,26 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
       localStorage.removeItem(BAGET_TRANSFER_IMAGE_KEY);
     }
   }, []);
+
+  useEffect(() => {
+    if (!isPreviewOpen) return;
+
+    const onEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsPreviewOpen(false);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onEsc);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', onEsc);
+      previewTriggerRef.current?.focus();
+    };
+  }, [isPreviewOpen]);
 
   const widthMm = Number(widthInput);
   const heightMm = Number(heightInput);
@@ -498,20 +520,28 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
           )}
         </div>
 
-        <div ref={previewRef}>
-          <BagetPreview
-            widthMm={widthMm}
-            heightMm={heightMm}
-            selectedBaget={selectedBaget}
-            imageUrl={imageUrl}
-            highlighted={previewHighlighted}
-            stretchedCanvas={materials.workType === 'stretchedCanvas'}
-            passepartoutEnabled={materials.passepartout}
-            passepartoutMm={passepartoutMm}
-            passepartoutBottomMm={passepartoutBottomMm}
-            passepartoutColor={materials.passepartoutColor}
-          />
-        </div>
+        <button
+          ref={previewTriggerRef}
+          type="button"
+          aria-label="Open preview"
+          onClick={() => setIsPreviewOpen(true)}
+          className="block w-full cursor-zoom-in text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2"
+        >
+          <div ref={previewRef}>
+            <BagetPreview
+              widthMm={widthMm}
+              heightMm={heightMm}
+              selectedBaget={selectedBaget}
+              imageUrl={imageUrl}
+              highlighted={previewHighlighted}
+              stretchedCanvas={materials.workType === 'stretchedCanvas'}
+              passepartoutEnabled={materials.passepartout}
+              passepartoutMm={passepartoutMm}
+              passepartoutBottomMm={passepartoutBottomMm}
+              passepartoutColor={materials.passepartoutColor}
+            />
+          </div>
+        </button>
 
         <div className="card rounded-2xl bg-white/90 p-4 shadow-md ring-1 ring-neutral-200/70 backdrop-blur-sm dark:bg-neutral-900/80 dark:ring-neutral-700/70">
           <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
@@ -587,6 +617,43 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
             Оформить заказ
           </button>
         </div>
+
+        {isPreviewOpen ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) {
+                setIsPreviewOpen(false);
+              }
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Увеличенное превью багета"
+          >
+            <div className="relative w-[min(1000px,90vw)] max-h-[80vh] overflow-auto rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900">
+              <button
+                type="button"
+                onClick={() => setIsPreviewOpen(false)}
+                aria-label="Закрыть увеличенное превью"
+                className="absolute right-3 top-3 z-10 rounded-lg p-2 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+              >
+                ✕
+              </button>
+              <BagetPreview
+                className="max-h-[calc(80vh-2rem)]"
+                widthMm={widthMm}
+                heightMm={heightMm}
+                selectedBaget={selectedBaget}
+                imageUrl={imageUrl}
+                stretchedCanvas={materials.workType === 'stretchedCanvas'}
+                passepartoutEnabled={materials.passepartout}
+                passepartoutMm={passepartoutMm}
+                passepartoutBottomMm={passepartoutBottomMm}
+                passepartoutColor={materials.passepartoutColor}
+              />
+            </div>
+          </div>
+        ) : null}
 
         <BagetOrderModal
           open={isOrderModalOpen}
