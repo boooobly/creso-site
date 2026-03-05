@@ -18,7 +18,7 @@ import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
 import BagetPreview from './BagetPreview';
 
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 16;
 
 
 const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
