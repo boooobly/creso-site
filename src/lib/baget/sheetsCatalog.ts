@@ -1,5 +1,6 @@
 import { parse } from 'csv-parse/sync';
 import localCatalogData from '../../../data/baget.json';
+import { normalizeBagetImageUrl } from './normalizeBagetImageUrl';
 
 const DEFAULT_SHEET_ID = '1lH3zq_PrUQVbVa37P4WPn24Y60iAmmznnHP-soS7dYA';
 const DEFAULT_TAB = 'baget_catalog';
@@ -96,8 +97,8 @@ function mapRowToItem(row: CsvRow): BagetSheetItem | null {
     residues_text: residuesText,
     reserve_mm: toNumber(row[HEADERS.reserveMm] ?? '', DEFAULT_RESERVE_MM),
     show_on_site: showOnSite,
-    image_url: (row[HEADERS.imageUrl] ?? '').trim(),
-    corner_image_url: (row[HEADERS.cornerImageUrl] ?? '').trim(),
+    image_url: normalizeBagetImageUrl(row[HEADERS.imageUrl] ?? ''),
+    corner_image_url: normalizeBagetImageUrl(row[HEADERS.cornerImageUrl] ?? ''),
     style: (row[HEADERS.style] ?? '').trim(),
     color: (row[HEADERS.color] ?? '').trim(),
     note: (row[HEADERS.note] ?? '').trim(),
@@ -116,7 +117,7 @@ function getFallbackCatalog(): BagetSheetItem[] {
     residues_text: '100*20',
     reserve_mm: DEFAULT_RESERVE_MM,
     show_on_site: true,
-    image_url: item.image,
+    image_url: normalizeBagetImageUrl(item.image),
     corner_image_url: '',
     style: item.style,
     color: item.color,
@@ -133,7 +134,10 @@ export function mapSheetItemsToBagetItems(items: BagetSheetItem[]): BagetCatalog
     style: item.style,
     width_mm: item.width_mm,
     price_per_meter: item.price_per_meter,
-    image: item.image_url || item.corner_image_url || '/images/outdoor-portfolio/placeholder-1.svg',
+    image:
+      normalizeBagetImageUrl(item.image_url) ||
+      normalizeBagetImageUrl(item.corner_image_url) ||
+      '/images/outdoor-portfolio/placeholder-1.svg',
   }));
 }
 
