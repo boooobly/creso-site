@@ -124,29 +124,36 @@ export default function BagetPreview({
   const textureUrl = selectedBaget?.frameTextureImage || '';
   const texUrl = textureUrl || selectedBaget?.fallbackImage || '/images/outdoor-portfolio/placeholder-1.svg';
   const fallback = 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)';
+  const [textureFailed, setTextureFailed] = useState(false);
 
   useEffect(() => {
-    if (!textureUrl) return;
+    setTextureFailed(false);
+    if (!texUrl) return;
 
     const probe = new window.Image();
+    probe.onload = () => setTextureFailed(false);
     probe.onerror = () => {
-      console.warn('[BagetPreview] texture url:', texUrl);
+      setTextureFailed(true);
+      if (textureUrl) {
+        console.warn('[BagetPreview] texture url:', texUrl);
+      }
     };
-    probe.src = textureUrl;
+    probe.src = texUrl;
 
     return () => {
+      probe.onload = null;
       probe.onerror = null;
     };
   }, [texUrl, textureUrl]);
 
-  const hasTexture = Boolean(texUrl);
+  const hasTexture = Boolean(texUrl) && !textureFailed;
 
   const textureBaseStyle: CSSProperties | undefined = hasTexture
     ? {
-        backgroundImage: `url(${texUrl}), ${fallback}`,
-        backgroundRepeat: 'repeat-x, no-repeat',
-        backgroundSize: 'auto 100%, 100% 100%',
-        backgroundPosition: 'center, center',
+        backgroundImage: `url("${texUrl}")`,
+        backgroundRepeat: 'repeat-x',
+        backgroundSize: 'auto 100%',
+        backgroundPosition: 'center',
       }
     : undefined;
 
