@@ -101,8 +101,8 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
       items.map((item) => {
         const plankImage = normalizeBagetImageUrl(item.image_url);
         const cornerImage = normalizeBagetImageUrl(item.corner_image_url);
-        const plankTexture = normalizeBagetTextureUrl(item.image_url);
-        const cornerTextureFallback = normalizeBagetTextureUrl(item.corner_image_url);
+        const plankTexture = (item.image_url || '').trim();
+        const cornerTextureFallback = (item.corner_image_url || '').trim();
 
         return {
           id: item.id,
