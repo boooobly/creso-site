@@ -40,9 +40,9 @@ const steps = [
 ];
 
 const galleryItems = [
-  { title: 'Акрил 8 мм', bg: 'from-cyan-500/35 via-sky-500/20 to-transparent' },
-  { title: 'АКП 4 мм', bg: 'from-emerald-500/35 via-green-500/20 to-transparent' },
-  { title: 'ПВХ 10 мм', bg: 'from-violet-500/35 via-fuchsia-500/20 to-transparent' },
+  { title: 'Акрил 8 мм', image: '/images/milling/milling_acryl.png' },
+  { title: 'АКП 4 мм', image: '/images/milling/milling_acp.png' },
+  { title: 'ПВХ 10 мм', image: '/images/milling/milling_pvc.png' },
 ];
 
 const workConditions = [
@@ -268,7 +268,12 @@ export default function MillingPage() {
             {galleryItems.map((item) => (
               <article key={item.title} className="group overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
                 <div className="relative h-44 overflow-hidden bg-neutral-100 dark:bg-neutral-900">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${item.bg} transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none`} />
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
+                  />
                 </div>
                 <div className="px-4 py-3">
                   <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">{item.title}</p>
