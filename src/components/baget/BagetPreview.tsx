@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import { buildDriveDirectImageCandidates, extractDriveFileId } from '@/lib/baget/driveDirectImageUrl';
 import { BagetItem } from './BagetCard';
 import { PassepartoutColor } from './BagetFilters';
 
@@ -121,22 +122,69 @@ export default function BagetPreview({
     };
   }, [containerPx.height, containerPx.width, passepartoutEnabled, safeHeightMm, safePasseBottomMm, safePasseMm, safeWidthMm, selectedBaget, stretchedCanvas]);
 
-  const texUrl =
-    selectedBaget?.frameTextureImage ||
-    selectedBaget?.fallbackImage ||
-    '/images/outdoor-portfolio/placeholder-1.svg';
+  const textureUrl = selectedBaget?.frameTextureImage || '';
   const fallback = 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)';
+  const [resolvedTexUrl, setResolvedTexUrl] = useState('');
 
-  const hasTexture = Boolean(texUrl);
+  useEffect(() => {
+    let cancelled = false;
+
+    const preload = (src: string) =>
+      new Promise<boolean>((resolve) => {
+        const probe = new window.Image();
+        probe.onload = () => resolve(true);
+        probe.onerror = () => resolve(false);
+        probe.src = src;
+      });
+
+    const resolveTexture = async () => {
+      const source = textureUrl.trim();
+      if (!source) {
+        setResolvedTexUrl('');
+        return;
+      }
+
+      const fileId = extractDriveFileId(source);
+      const candidates = fileId ? buildDriveDirectImageCandidates(fileId) : [source];
+
+      for (const candidate of candidates) {
+        const ok = await preload(candidate);
+        if (cancelled) return;
+        if (ok) {
+          setResolvedTexUrl(candidate);
+          return;
+        }
+      }
+
+      if (!cancelled) {
+        setResolvedTexUrl('');
+        if (fileId) {
+          console.warn('[BagetPreview] texture candidates failed:', { fileId, candidates });
+        } else {
+          console.warn('[BagetPreview] texture url:', source);
+        }
+      }
+    };
+
+    resolveTexture();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [textureUrl]);
+
+  const hasTexture = Boolean(resolvedTexUrl);
 
   const textureBaseStyle: CSSProperties | undefined = hasTexture
     ? {
-        backgroundImage: `url(${texUrl}), ${fallback}`,
+        backgroundImage: `url("${resolvedTexUrl}"), ${fallback}`,
         backgroundRepeat: 'repeat-x, no-repeat',
         backgroundSize: 'auto 100%, 100% 100%',
         backgroundPosition: 'center, center',
       }
-    : undefined;
+    : {
+        backgroundImage: fallback,
+      };
 
   const buildTextureStyle = (transform?: string): CSSProperties => {
     if (!textureBaseStyle) {
@@ -235,7 +283,7 @@ export default function BagetPreview({
                   style={{
                     zIndex: 1,
                     width: `${previewGeometry.framePx}px`,
-                    background: hasTexture ? undefined : fallback,
+                    backgroundImage: hasTexture ? undefined : fallback,
                     clipPath: leftMiterClipPath,
                     borderRadius: 0,
                   }}
@@ -247,7 +295,7 @@ export default function BagetPreview({
                   style={{
                     zIndex: 1,
                     width: `${previewGeometry.framePx}px`,
-                    background: hasTexture ? undefined : fallback,
+                    backgroundImage: hasTexture ? undefined : fallback,
                     clipPath: rightMiterClipPath,
                     borderRadius: 0,
                   }}
