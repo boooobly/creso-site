@@ -11,6 +11,7 @@ import {
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
+import { normalizeBagetTextureUrl } from '@/lib/baget/normalizeBagetTextureUrl';
 import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
