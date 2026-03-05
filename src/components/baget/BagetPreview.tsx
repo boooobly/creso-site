@@ -121,20 +121,39 @@ export default function BagetPreview({
     };
   }, [containerPx.height, containerPx.width, passepartoutEnabled, safeHeightMm, safePasseBottomMm, safePasseMm, safeWidthMm, selectedBaget, stretchedCanvas]);
 
-  const texUrl =
-    selectedBaget?.frameTextureImage ||
-    selectedBaget?.fallbackImage ||
-    '/images/outdoor-portfolio/placeholder-1.svg';
+  const textureUrl = selectedBaget?.frameTextureImage || '';
+  const texUrl = textureUrl || selectedBaget?.fallbackImage || '/images/outdoor-portfolio/placeholder-1.svg';
   const fallback = 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)';
+  const [textureFailed, setTextureFailed] = useState(false);
 
-  const hasTexture = Boolean(texUrl);
+  useEffect(() => {
+    setTextureFailed(false);
+    if (!texUrl) return;
+
+    const probe = new window.Image();
+    probe.onload = () => setTextureFailed(false);
+    probe.onerror = () => {
+      setTextureFailed(true);
+      if (textureUrl) {
+        console.warn('[BagetPreview] texture url:', texUrl);
+      }
+    };
+    probe.src = texUrl;
+
+    return () => {
+      probe.onload = null;
+      probe.onerror = null;
+    };
+  }, [texUrl, textureUrl]);
+
+  const hasTexture = Boolean(texUrl) && !textureFailed;
 
   const textureBaseStyle: CSSProperties | undefined = hasTexture
     ? {
-        backgroundImage: `url(${texUrl}), ${fallback}`,
-        backgroundRepeat: 'repeat-x, no-repeat',
-        backgroundSize: 'auto 100%, 100% 100%',
-        backgroundPosition: 'center, center',
+        backgroundImage: `url("${texUrl}")`,
+        backgroundRepeat: 'repeat-x',
+        backgroundSize: 'auto 100%',
+        backgroundPosition: 'center',
       }
     : undefined;
 
