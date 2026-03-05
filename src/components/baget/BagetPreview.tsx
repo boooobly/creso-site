@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import { normalizeDriveTextureUrl } from '@/lib/baget/normalizeDriveTextureUrl';
 import { BagetItem } from './BagetCard';
 import { PassepartoutColor } from './BagetFilters';
 
@@ -125,13 +126,43 @@ export default function BagetPreview({
     selectedBaget?.frameTextureImage ||
     selectedBaget?.fallbackImage ||
     '/images/outdoor-portfolio/placeholder-1.svg';
+  const normalizedTexUrl = useMemo(() => normalizeDriveTextureUrl(texUrl ?? ''), [texUrl]);
+  const [textureOk, setTextureOk] = useState(false);
+
+  useEffect(() => {
+    if (!normalizedTexUrl) {
+      setTextureOk(false);
+      return;
+    }
+
+    let active = true;
+    const probe = new window.Image();
+
+    probe.onload = () => {
+      if (active) setTextureOk(true);
+    };
+
+    probe.onerror = () => {
+      if (active) {
+        setTextureOk(false);
+        console.warn('[BagetPreview] Failed to load frame texture:', normalizedTexUrl);
+      }
+    };
+
+    probe.src = normalizedTexUrl;
+
+    return () => {
+      active = false;
+    };
+  }, [normalizedTexUrl]);
+
   const fallback = 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)';
 
-  const hasTexture = Boolean(texUrl);
+  const hasTexture = Boolean(normalizedTexUrl) && textureOk;
 
   const textureBaseStyle: CSSProperties | undefined = hasTexture
     ? {
-        backgroundImage: `url(${texUrl}), ${fallback}`,
+        backgroundImage: `url(${normalizedTexUrl}), ${fallback}`,
         backgroundRepeat: 'repeat-x, no-repeat',
         backgroundSize: 'auto 100%, 100% 100%',
         backgroundPosition: 'center, center',
