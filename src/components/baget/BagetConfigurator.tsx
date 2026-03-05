@@ -11,6 +11,7 @@ import {
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
+import { normalizeBagetTextureUrl } from '@/lib/baget/normalizeBagetTextureUrl';
 import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
@@ -100,6 +101,8 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
       items.map((item) => {
         const plankImage = normalizeBagetImageUrl(item.image_url);
         const cornerImage = normalizeBagetImageUrl(item.corner_image_url);
+        const plankTexture = normalizeBagetTextureUrl(item.image_url);
+        const cornerTextureFallback = normalizeBagetTextureUrl(item.corner_image_url);
 
         return {
           id: item.id,
@@ -110,7 +113,7 @@ export default function BagetConfigurator({ items, initialWidth, initialHeight }
           width_mm: item.width_mm,
           price_per_meter: item.price_per_meter,
           cardImage: cornerImage || plankImage || BAGET_PLACEHOLDER_IMAGE,
-          frameTextureImage: plankImage || cornerImage || '',
+          frameTextureImage: plankTexture || cornerTextureFallback || '',
           fallbackImage: plankImage || BAGET_PLACEHOLDER_IMAGE,
           residues_text: item.residues_text,
           reserve_mm: Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10,
