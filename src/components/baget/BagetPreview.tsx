@@ -122,38 +122,16 @@ export default function BagetPreview({
   }, [containerPx.height, containerPx.width, passepartoutEnabled, safeHeightMm, safePasseBottomMm, safePasseMm, safeWidthMm, selectedBaget, stretchedCanvas]);
 
   const texUrl = selectedBaget?.frameTextureImage ?? '';
-  const [textureFailed, setTextureFailed] = useState(false);
   const fallback = 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)';
 
-  useEffect(() => {
-    if (!texUrl) {
-      setTextureFailed(false);
-      return;
-    }
-
-    let cancelled = false;
-    const textureProbe = new window.Image();
-    textureProbe.onload = () => {
-      if (!cancelled) setTextureFailed(false);
-    };
-    textureProbe.onerror = () => {
-      if (!cancelled) setTextureFailed(true);
-    };
-    textureProbe.src = texUrl;
-
-    return () => {
-      cancelled = true;
-    };
-  }, [texUrl]);
-
-  const hasTexture = Boolean(texUrl) && !textureFailed;
+  const hasTexture = Boolean(texUrl);
 
   const textureBaseStyle: CSSProperties | undefined = hasTexture
     ? {
-        backgroundImage: `url(${texUrl})`,
-        backgroundRepeat: 'repeat-x',
-        backgroundSize: 'auto 100%',
-        backgroundPosition: 'center',
+        backgroundImage: `url(${texUrl}), ${fallback}`,
+        backgroundRepeat: 'repeat-x, no-repeat',
+        backgroundSize: 'auto 100%, 100% 100%',
+        backgroundPosition: 'center, center',
       }
     : undefined;
 
