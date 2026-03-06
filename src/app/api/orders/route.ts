@@ -37,7 +37,7 @@ const orderSchema = z.object({
     width: z.number().positive(),
     height: z.number().positive(),
     quantity: z.number().int().positive().default(1),
-    selectedBagetId: z.string().min(1),
+    selectedBagetId: z.string().min(1).optional().nullable(),
     workType: z.enum(['canvas', 'stretchedCanvas', 'rhinestone', 'embroidery', 'beads', 'photo', 'other']),
     glazing: z.enum(['none', 'glass', 'antiReflectiveGlass', 'museumGlass', 'plexiglass', 'pet1mm']),
     hasPassepartout: z.boolean(),
@@ -47,6 +47,7 @@ const orderSchema = z.object({
     hangerType: z.enum(['crocodile', 'wire']).nullable().optional(),
     stand: z.boolean(),
     stretcherType: z.enum(['narrow', 'wide']).nullable().optional(),
+    frameMode: z.enum(['framed', 'noFrame']).nullable().optional(),
   }),
   fulfillmentType: z.enum(['pickup', 'selfPickup', 'delivery']).default('pickup'),
   company: z.string().optional(),
@@ -126,9 +127,12 @@ export async function POST(request: NextRequest) {
 
     const sheetItems = await getBagetCatalogFromSheet();
     const allBagets = z.array(bagetItemSchema).parse(mapSheetItemsToBagetItems(sheetItems));
-    const selectedBaget = allBagets.find((item) => item.id === parsed.data.baget.selectedBagetId);
+    const requiresBaget = !(parsed.data.baget.workType === 'stretchedCanvas' && parsed.data.baget.frameMode === 'noFrame');
+    const selectedBaget = parsed.data.baget.selectedBagetId
+      ? allBagets.find((item) => item.id === parsed.data.baget.selectedBagetId) ?? null
+      : null;
 
-    if (!selectedBaget) {
+    if (requiresBaget && !selectedBaget) {
       return NextResponse.json({ ok: false, error: 'Выбранный багет не найден.' }, { status: 400 });
     }
 

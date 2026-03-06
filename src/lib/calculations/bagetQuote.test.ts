@@ -101,4 +101,28 @@ describe('bagetQuote', () => {
     expect(forcedWide.meta?.stretcherType).toBe('wide');
     expect(forcedWide.total).toBeGreaterThan(narrow.total);
   });
+
+  it('allows stretched canvas without baget in no-frame mode and keeps stretcher cost', () => {
+    const result = bagetQuote({
+      width: 1200,
+      height: 800,
+      quantity: 1,
+      selectedBaget: null,
+      workType: 'stretchedCanvas',
+      frameMode: 'noFrame',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'wire',
+      stand: false,
+      stretcherType: 'wide',
+    });
+
+    expect(result.warnings).toEqual([]);
+    expect(result.meta?.requiresBaget).toBe(false);
+    expect(result.meta?.bagetCost).toBe(0);
+    expect(result.items.some((item) => item.key === 'baget')).toBe(false);
+    expect(result.items.some((item) => item.key === 'stretcher')).toBe(true);
+    expect(result.total).toBeGreaterThan(0);
+  });
 });

@@ -46,7 +46,7 @@ export type BagetOrderRequestBagetInput = {
   width: number;
   height: number;
   quantity: number;
-  selectedBagetId: string;
+  selectedBagetId?: string | null;
   workType: 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
   glazing: 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlass' | 'plexiglass' | 'pet1mm';
   hasPassepartout: boolean;
@@ -56,6 +56,7 @@ export type BagetOrderRequestBagetInput = {
   hangerType?: 'crocodile' | 'wire' | null;
   stand: boolean;
   stretcherType?: 'narrow' | 'wide' | null;
+  frameMode?: 'framed' | 'noFrame' | null;
 };
 
 type BagetOrderModalProps = {
@@ -353,7 +354,9 @@ export default function BagetOrderModal({
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.selectedBaget
                         ? `${orderSummary.selectedBaget.title || 'Выбран'} (${orderSummary.selectedBaget.article || 'без артикула'})`
-                        : 'Не выбран'}
+                        : orderSummary.workType.toLowerCase().includes('без рамки')
+                          ? 'Без рамки'
+                          : 'Не выбран'}
                       {orderSummary.selectedBaget?.widthMm ? `, ${orderSummary.selectedBaget.widthMm} мм` : ''}
                       {orderSummary.selectedBaget?.pricePerM ? `, ${orderSummary.selectedBaget.pricePerM.toLocaleString('ru-RU')} ₽/м` : ''}
                     </dd>
