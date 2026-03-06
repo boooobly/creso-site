@@ -267,7 +267,7 @@ export default function MillingPage() {
           <div className="grid gap-4 md:grid-cols-3">
             {galleryItems.map((item) => (
               <article key={item.title} className="group overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
-                <div className="relative h-44 overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+                <div className="relative h-44 overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.title}

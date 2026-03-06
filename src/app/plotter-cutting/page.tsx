@@ -28,8 +28,8 @@ const priceFactors = [
 const exampleCards = [
   { title: 'Стикерпак для бренда', tag: 'наклейки', gradient: 'from-sky-500/25 via-cyan-400/10 to-transparent' },
   { title: 'Оформление витрины', tag: 'витрина', gradient: 'from-red-500/20 via-orange-500/10 to-transparent' },
-  { title: 'Контурная серия с печатью', tag: 'по меткам', gradient: 'from-violet-500/20 via-fuchsia-500/10 to-transparent' },
-  { title: 'Маркировка оборудования', tag: 'оракал', gradient: 'from-emerald-500/20 via-teal-500/10 to-transparent' },
+  { title: 'Резка по меткам', tag: 'по меткам', gradient: 'from-violet-500/20 via-fuchsia-500/10 to-transparent' },
+  { title: 'Оклейка машины', tag: 'оракал', gradient: 'from-emerald-500/20 via-teal-500/10 to-transparent' },
 ];
 
 const allowedExtensions = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf', 'png', 'jpg', 'jpeg'];
