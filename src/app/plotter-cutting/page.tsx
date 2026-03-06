@@ -26,10 +26,10 @@ const priceFactors = [
 ];
 
 const exampleCards = [
-  { title: 'Стикерпак для бренда', tag: 'наклейки', gradient: 'from-sky-500/25 via-cyan-400/10 to-transparent' },
-  { title: 'Оформление витрины', tag: 'витрина', gradient: 'from-red-500/20 via-orange-500/10 to-transparent' },
-  { title: 'Резка по меткам', tag: 'по меткам', gradient: 'from-violet-500/20 via-fuchsia-500/10 to-transparent' },
-  { title: 'Оклейка машины', tag: 'оракал', gradient: 'from-emerald-500/20 via-teal-500/10 to-transparent' },
+  { title: 'Стикерпак для бренда', tag: 'наклейки', image: '/images/plotter/plotter_labels.png' },
+  { title: 'Оформление витрины', tag: 'витрина', image: '/images/plotter/plotter_window.png' },
+  { title: 'Резка по меткам', tag: 'по меткам', image: '/images/plotter/plotter_stickers.png' },
+  { title: 'Оклейка машины', tag: 'оракал', image: '/images/plotter/plotter_car.png' },
 ];
 
 const allowedExtensions = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf', 'png', 'jpg', 'jpeg'];
@@ -247,8 +247,15 @@ export default function PlotterCuttingPage() {
                     className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none`} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/15 via-transparent to-transparent" />
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        loading="lazy"
+                        className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
+                        onError={(event) => {
+                          event.currentTarget.style.display = "none";
+                        }}
+                      />
                     </div>
                     <div className="flex items-center justify-between px-4 py-3">
                       <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{item.title}</p>
