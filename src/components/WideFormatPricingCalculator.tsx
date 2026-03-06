@@ -21,6 +21,10 @@ import {
   isFilmMaterial,
   WIDE_FORMAT_PRICING_CONFIG,
 } from '@/lib/pricing-config/wideFormat';
+import {
+  BAGET_TRANSFER_SOURCE_QUERY_KEY,
+  BAGET_TRANSFER_SOURCE_WIDE_FORMAT_CANVAS,
+} from '@/lib/baget/transfer';
 import ImageDropzone from '@/components/ImageDropzone';
 import {
   Select,
@@ -309,9 +313,15 @@ export default function WideFormatPricingCalculator() {
       localStorage.removeItem(BAGET_TRANSFER_IMAGE_KEY);
     }
 
+    const parsedWidth = Number(width.trim());
+    const parsedHeight = Number(height.trim());
+    const widthMm = Number.isFinite(parsedWidth) ? Math.round(parsedWidth * 1000) : null;
+    const heightMm = Number.isFinite(parsedHeight) ? Math.round(parsedHeight * 1000) : null;
+
     const params = new URLSearchParams();
-    if (width.trim()) params.set('width', width.trim());
-    if (height.trim()) params.set('height', height.trim());
+    if (widthMm !== null) params.set('width', String(widthMm));
+    if (heightMm !== null) params.set('height', String(heightMm));
+    params.set(BAGET_TRANSFER_SOURCE_QUERY_KEY, BAGET_TRANSFER_SOURCE_WIDE_FORMAT_CANVAS);
     const query = params.toString();
 
     router.push(query ? `/baget?${query}` : '/baget');
