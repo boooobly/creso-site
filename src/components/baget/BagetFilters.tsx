@@ -13,6 +13,7 @@ export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlas
 export type HangingType = 'crocodile' | 'wire';
 export type WorkType = 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
 export type StretcherType = 'narrow' | 'wide';
+export type FrameMode = 'framed' | 'noFrame';
 export type PassepartoutColor = 'white' | 'ivory' | 'beige' | 'gray' | 'black';
 
 export type MaterialsState = {
@@ -26,6 +27,7 @@ export type MaterialsState = {
   stand: boolean;
   workType: WorkType;
   stretcherType: StretcherType;
+  frameMode: FrameMode;
 };
 
 const COLOR_LABELS: Record<string, string> = {
@@ -171,6 +173,30 @@ export default function BagetFilters({
       <div className="card rounded-2xl p-4 shadow-md">
         <h2 className="mb-3 text-base font-semibold">Материалы (за м²)</h2>
         <div className="space-y-3 text-sm">
+          {materials.workType === 'stretchedCanvas' ? (
+            <div className="space-y-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
+              <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Оформление холста</p>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="frameMode"
+                  checked={materials.frameMode === 'framed'}
+                  onChange={() => setMaterials({ ...materials, frameMode: 'framed' })}
+                />
+                В багете
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="frameMode"
+                  checked={materials.frameMode === 'noFrame'}
+                  onChange={() => setMaterials({ ...materials, frameMode: 'noFrame' })}
+                />
+                Без рамки
+              </label>
+            </div>
+          ) : null}
+
           {materials.workType === 'stretchedCanvas' ? (
             <div className="space-y-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
               <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Подрамник</p>
