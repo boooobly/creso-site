@@ -89,13 +89,22 @@ type BagetConfiguratorProps = {
   items: BagetSheetItem[];
   initialWidth?: string;
   initialHeight?: string;
+  initialWorkType?: MaterialsState['workType'];
 };
 
-export default function BagetConfigurator({ items, initialWidth, initialHeight }: BagetConfiguratorProps) {
+export default function BagetConfigurator({
+  items,
+  initialWidth,
+  initialHeight,
+  initialWorkType,
+}: BagetConfiguratorProps) {
   const [widthInput, setWidthInput] = useState(initialWidth?.trim() || '500');
   const [heightInput, setHeightInput] = useState(initialHeight?.trim() || '700');
   const [filters, setFilters] = useState<FilterState>(initialFilters);
-  const [materials, setMaterials] = useState<MaterialsState>(initialMaterials);
+  const [materials, setMaterials] = useState<MaterialsState>({
+    ...initialMaterials,
+    ...(initialWorkType ? { workType: initialWorkType } : {}),
+  });
   const catalogItems = useMemo<CatalogBagetItem[]>(
     () =>
       items.map((item) => {
