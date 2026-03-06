@@ -2,6 +2,7 @@ import type { BagetItem } from '@/components/baget/BagetCard';
 import type {
   GlazingType,
   HangingType,
+  FrameMode,
   StretcherType,
   WorkType,
 } from '@/components/baget/BagetFilters';
@@ -53,6 +54,7 @@ export interface BagetQuoteInput {
   hangerType?: HangingType | null;
   stand: boolean;
   stretcherType?: StretcherType | null;
+  frameMode?: FrameMode | null;
 }
 
 export interface QuoteLineItem {
@@ -139,6 +141,10 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
   const stretcherNarrowAllowed = width <= 500 && height <= 500;
 
   const autoAdditions = resolveAutoAdditions(input.workType);
+  const effectiveFrameMode: FrameMode = input.workType === 'stretchedCanvas'
+    ? (input.frameMode ?? 'framed')
+    : 'framed';
+  const requiresBaget = !(input.workType === 'stretchedCanvas' && effectiveFrameMode === 'noFrame');
   const hangerType: HangingType = input.workType === 'stretchedCanvas' ? 'wire' : input.hangerType ?? 'crocodile';
   const effectiveBackPanel = input.workType === 'stretchedCanvas'
     ? false
@@ -154,11 +160,11 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
     warnings.push('Введите корректные значения не менее 50 мм.');
   }
 
-  if (!input.selectedBaget) {
+  if (requiresBaget && !input.selectedBaget) {
     warnings.push('Выберите багет для расчёта.');
   }
 
-  if (!validSize || !input.selectedBaget) {
+  if (!validSize || (requiresBaget && !input.selectedBaget)) {
     return {
       total: 0,
       items: [],
@@ -169,8 +175,8 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
       warnings,
       meta: {
         areaM2: 0,
-        framedWidthMm: 0,
-        framedHeightMm: 0,
+        framedWidthMm: Number.isFinite(effectiveWidth) ? effectiveWidth : 0,
+        framedHeightMm: Number.isFinite(effectiveHeight) ? effectiveHeight : 0,
         bagetMeters: 0,
         hangingLabel: hangerType === 'crocodile' ? 'Крокодильчик × 1' : 'Тросик × 1',
         autoAdditions,
@@ -181,14 +187,20 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
         hangingQuantity: 1,
         workType: input.workType,
         stretcherType: effectiveStretcherType,
+        frameMode: effectiveFrameMode,
+        requiresBaget,
       },
     };
   }
 
-  const B = input.selectedBaget.width_mm;
+  const bagetWidthMm = requiresBaget ? (input.selectedBaget?.width_mm ?? 0) : 0;
   const areaM2 = (effectiveWidth * effectiveHeight) / 1_000_000;
-  const bagetMeters = ((2 * (effectiveWidth + effectiveHeight) + 8 * B) / 1000) * 1.05;
-  const bagetCost = bagetMeters * input.selectedBaget.price_per_meter;
+  const bagetMeters = requiresBaget
+    ? ((2 * (effectiveWidth + effectiveHeight) + 8 * bagetWidthMm) / 1000) * 1.05
+    : 0;
+  const bagetCost = requiresBaget && input.selectedBaget
+    ? bagetMeters * input.selectedBaget.price_per_meter
+    : 0;
 
   let materialsCost = 0;
   if (input.glazing !== 'none') {
@@ -282,8 +294,8 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
     warnings,
     meta: {
       areaM2,
-      framedWidthMm: effectiveWidth + 2 * B,
-      framedHeightMm: effectiveHeight + 2 * B,
+      framedWidthMm: effectiveWidth + 2 * bagetWidthMm,
+      framedHeightMm: effectiveHeight + 2 * bagetWidthMm,
       bagetMeters,
       bagetCost,
       materialsCost,
@@ -302,6 +314,8 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
       hangingQuantity,
       workType: input.workType,
       stretcherType: effectiveStretcherType,
+      frameMode: effectiveFrameMode,
+      requiresBaget,
     },
   };
 }
