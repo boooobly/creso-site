@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { BagetQuoteResult } from '@/lib/calculations/bagetQuote';
+import type { FrameMode } from './BagetFilters';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 type SizeMm = {
@@ -38,6 +39,7 @@ export type BagetOrderSummary = {
   glazing: string;
   materials: string[];
   workType: string;
+  frameMode: FrameMode;
   hanging: HangingSelection;
   stand: boolean;
 };
@@ -354,7 +356,7 @@ export default function BagetOrderModal({
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.selectedBaget
                         ? `${orderSummary.selectedBaget.title || 'Выбран'} (${orderSummary.selectedBaget.article || 'без артикула'})`
-                        : orderSummary.workType.toLowerCase().includes('без рамки')
+                        : orderSummary.frameMode === 'noFrame'
                           ? 'Без рамки'
                           : 'Не выбран'}
                       {orderSummary.selectedBaget?.widthMm ? `, ${orderSummary.selectedBaget.widthMm} мм` : ''}

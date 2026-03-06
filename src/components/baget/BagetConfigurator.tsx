@@ -93,14 +93,22 @@ type BagetConfiguratorProps = {
   initialWorkType?: MaterialsState['workType'];
 };
 
+function normalizeInitialDimension(value: string | undefined, fallback: string): string {
+  if (!value) return fallback;
+  const trimmed = value.trim();
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed) || parsed < 50) return fallback;
+  return String(Math.round(parsed));
+}
+
 export default function BagetConfigurator({
   items,
   initialWidth,
   initialHeight,
   initialWorkType,
 }: BagetConfiguratorProps) {
-  const [widthInput, setWidthInput] = useState(initialWidth?.trim() || '500');
-  const [heightInput, setHeightInput] = useState(initialHeight?.trim() || '700');
+  const [widthInput, setWidthInput] = useState(() => normalizeInitialDimension(initialWidth, '500'));
+  const [heightInput, setHeightInput] = useState(() => normalizeInitialDimension(initialHeight, '700'));
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [materials, setMaterials] = useState<MaterialsState>({
     ...initialMaterials,
@@ -213,7 +221,7 @@ export default function BagetConfigurator({
         quantity: 1,
         selectedBaget: selectedBagetForQuote,
         workType: materials.workType,
-        frameMode: materials.frameMode,
+        frameMode: materials.workType === 'stretchedCanvas' ? materials.frameMode : 'framed',
         glazing: materials.glazing,
         hasPassepartout: materials.passepartout,
         passepartoutSize: passepartoutMm,
@@ -260,14 +268,19 @@ export default function BagetConfigurator({
   }, [materials.stretcherType, materials.workType, stretcherNarrowAllowed]);
 
   useEffect(() => {
-    if (materials.workType !== 'stretchedCanvas') return;
+    if (materials.workType !== 'stretchedCanvas') {
+      if (materials.frameMode !== 'framed') {
+        setMaterials((prev) => ({ ...prev, frameMode: 'framed' }));
+      }
+      return;
+    }
 
     setMaterials((prev) => ({
       ...prev,
       hanging: 'wire',
       backPanel: false,
     }));
-  }, [materials.workType]);
+  }, [materials.frameMode, materials.workType]);
 
   const colors = useMemo(() => Array.from(new Set(catalogItems.map((item) => item.color))), [catalogItems]);
   const styles = useMemo(() => Array.from(new Set(catalogItems.map((item) => item.style))), [catalogItems]);
@@ -304,10 +317,17 @@ export default function BagetConfigurator({
 
 
   useEffect(() => {
+    if (isNoFrameStretchedCanvas) {
+      if (selectedBaget !== null) {
+        setSelectedBaget(null);
+      }
+      return;
+    }
+
     if (!selectedBaget || !filteredItems.some((item) => item.id === selectedBaget.id)) {
       setSelectedBaget(filteredItems[0] ?? null);
     }
-  }, [filteredItems, selectedBaget]);
+  }, [filteredItems, isNoFrameStretchedCanvas, selectedBaget]);
 
   const onImageUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -394,6 +414,7 @@ export default function BagetConfigurator({
       workType: materials.workType === 'stretchedCanvas' && materials.frameMode === 'noFrame'
         ? `${WORK_TYPE_LABELS[materials.workType]} (без рамки)`
         : WORK_TYPE_LABELS[materials.workType],
+      frameMode: materials.workType === 'stretchedCanvas' ? materials.frameMode : 'framed',
       hanging: {
         type: effectiveHangingType,
         label: effectiveHangingType === 'crocodile' ? 'Крокодильчик' : 'Тросик',
@@ -423,7 +444,7 @@ export default function BagetConfigurator({
 
   const orderInput = useMemo<{ baget: BagetOrderRequestBagetInput; fulfillmentType: 'pickup' } | null>(() => {
     const requiresBaget = !isNoFrameStretchedCanvas;
-    if (requiresBaget && !selectedBaget) return null;
+    if (requiresBaget && !selectedBagetForQuote) return null;
 
     return {
       baget: {
@@ -440,7 +461,7 @@ export default function BagetConfigurator({
         hangerType: materials.hanging,
         stand: materials.stand,
         stretcherType: materials.stretcherType,
-        frameMode: materials.frameMode,
+        frameMode: materials.workType === 'stretchedCanvas' ? materials.frameMode : 'framed',
       },
       fulfillmentType: 'pickup',
     };
@@ -587,15 +608,15 @@ export default function BagetConfigurator({
 
         <div className="card rounded-2xl bg-white/90 p-4 shadow-md ring-1 ring-neutral-200/70 backdrop-blur-sm dark:bg-neutral-900/80 dark:ring-neutral-700/70">
           <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
-          {selectedBaget || isNoFrameStretchedCanvas ? (
+          {selectedBagetForQuote || isNoFrameStretchedCanvas ? (
             <ul className="space-y-2 text-sm transition-all duration-300">
               {!isNoFrameStretchedCanvas ? (
                 <>
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500">Артикул:</span> {selectedBaget?.article}
+                    <span className="text-neutral-500">Артикул:</span> {selectedBagetForQuote?.article}
                   </li>
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500">Ширина профиля:</span> {selectedBaget?.width_mm} мм
+                    <span className="text-neutral-500">Ширина профиля:</span> {selectedBagetForQuote?.width_mm} мм
                   </li>
                 </>
               ) : (
@@ -622,7 +643,7 @@ export default function BagetConfigurator({
               {!isNoFrameStretchedCanvas ? (
                 <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
                   <span className="text-neutral-500">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
-                  {selectedBaget?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
+                  {selectedBagetForQuote?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
                 </li>
               ) : null}
               <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
@@ -665,7 +686,7 @@ export default function BagetConfigurator({
           <button
             type="button"
             onClick={() => setIsOrderModalOpen(true)}
-            disabled={(!selectedBaget && !isNoFrameStretchedCanvas) || !validSize}
+            disabled={(!selectedBagetForQuote && !isNoFrameStretchedCanvas) || !validSize}
             className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
           >
             Оформить заказ
