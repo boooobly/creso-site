@@ -68,48 +68,60 @@ const steps = ['Заявка', 'Замер (бесплатно по городу
 
 const cities = ['Невинномысске', 'Ставрополе', 'Пятигорске', 'Минеральных Водах', 'Кисловодске', 'Ессентуках'];
 
-const portfolioImages = [
+const portfolioProjects = [
   {
-    src: '/images/outdoor-portfolio/placeholder-1.svg',
-    alt: 'Световая вывеска на фасаде торгового объекта',
-    title: 'Фасадная световая вывеска',
-    category: 'Вывески',
-    location: 'Ставрополь',
+    id: 'baton',
+    label: 'Baton',
+    images: [
+      {
+        src: '/images/outdoor_advertising/outdoor_portfolio/baton.png',
+        alt: 'Проект Baton: общий вид рекламной конструкции',
+        title: 'Общий вид',
+        category: 'Фасадная вывеска',
+        fallbackSrc: '/images/outdoor-portfolio/placeholder-1.svg',
+      },
+      {
+        src: '/images/outdoor_advertising/outdoor_portfolio/baton_zoom.png',
+        alt: 'Проект Baton: крупный план деталей вывески',
+        title: 'Детали',
+        category: 'Крупный план',
+        fallbackSrc: '/images/outdoor-portfolio/placeholder-2.svg',
+      },
+      {
+        src: '/images/outdoor_advertising/outdoor_portfolio/baton_night.png',
+        alt: 'Проект Baton: ночной вид с подсветкой',
+        title: 'Ночной вид',
+        category: 'Подсветка',
+        fallbackSrc: '/images/outdoor-portfolio/placeholder-3.svg',
+      },
+    ],
   },
   {
-    src: '/images/outdoor-portfolio/placeholder-2.svg',
-    alt: 'Объёмные буквы для корпоративного офиса',
-    title: 'Объёмные буквы с контражуром',
-    category: 'Объёмные буквы',
-    location: 'Пятигорск',
-  },
-  {
-    src: '/images/outdoor-portfolio/placeholder-3.svg',
-    alt: 'Брендированная входная группа с подсветкой',
-    title: 'Брендирование входной группы',
-    category: 'Комплексное оформление',
-    location: 'Невинномысск',
-  },
-  {
-    src: '/images/outdoor-portfolio/placeholder-4.svg',
-    alt: 'Крышная рекламная установка',
-    title: 'Крышная установка',
-    category: 'Крышные конструкции',
-    location: 'Минеральные Воды',
-  },
-  {
-    src: '/images/outdoor-portfolio/placeholder-5.svg',
-    alt: 'Навигационная стела у коммерческого объекта',
-    title: 'Навигационная стела',
-    category: 'Стелы и навигация',
-    location: 'Кисловодск',
-  },
-  {
-    src: '/images/outdoor-portfolio/placeholder-6.svg',
-    alt: 'Световой короб для сети магазинов',
-    title: 'Световой короб для ритейла',
-    category: 'Лайтбоксы',
-    location: 'Ессентуки',
+    id: 'cheese',
+    label: 'Cheese',
+    images: [
+      {
+        src: '/images/outdoor_advertising/outdoor_portfolio/cheese.png',
+        alt: 'Проект Cheese: общий вид рекламной конструкции',
+        title: 'Общий вид',
+        category: 'Фасадная вывеска',
+        fallbackSrc: '/images/outdoor-portfolio/placeholder-4.svg',
+      },
+      {
+        src: '/images/outdoor_advertising/outdoor_portfolio/cheese_zoom.png',
+        alt: 'Проект Cheese: крупный план деталей вывески',
+        title: 'Детали',
+        category: 'Крупный план',
+        fallbackSrc: '/images/outdoor-portfolio/placeholder-5.svg',
+      },
+      {
+        src: '/images/outdoor_advertising/outdoor_portfolio/cheese_night.png',
+        alt: 'Проект Cheese: ночной вид с подсветкой',
+        title: 'Ночной вид',
+        category: 'Подсветка',
+        fallbackSrc: '/images/outdoor-portfolio/placeholder-6.svg',
+      },
+    ],
   },
 ] as const;
 
@@ -175,7 +187,7 @@ export default function OutdoorAdvertisingPage() {
             <h2 className="text-2xl font-bold">Портфолио</h2>
             <p className="hidden text-sm text-neutral-600 md:block dark:text-neutral-300">Реализованные проекты по региону</p>
           </div>
-          <OutdoorPortfolioGallery images={[...portfolioImages]} />
+          <OutdoorPortfolioGallery projects={[...portfolioProjects]} />
         </RevealOnScroll>
       </Section>
 
