@@ -16,7 +16,7 @@ export default function SiteFooter() {
     <footer className="mt-20 border-t border-neutral-200 bg-neutral-100 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-300">
       <div className="container py-14 md:py-16">
         <div className="grid gap-10 md:grid-cols-[1.1fr_1fr_1fr] md:gap-8 lg:gap-12">
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2.5 text-sm">
             <Link href="/" className="inline-flex no-underline">
               <Image src="/images/logo-light.png" alt="CredoMir logo" width={180} height={64} className="block h-12 w-auto dark:hidden" />
               <Image src="/images/logo-dark.png" alt="CredoMir logo" width={180} height={64} className="hidden h-12 w-auto dark:block" />
@@ -26,7 +26,7 @@ export default function SiteFooter() {
             <p>MAX phone: +7 988 731 74 04</p>
           </div>
 
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2.5 text-sm">
             <h3 className="text-base font-semibold">Реквизиты</h3>
             <p>ИП Кошелева Валентина Валерьевна</p>
             <p>ИНН 263106597812</p>
@@ -35,9 +35,9 @@ export default function SiteFooter() {
             <p>Телефон: +7 988 731 74 04</p>
           </div>
 
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2.5 text-sm">
             <h3 className="text-base font-semibold">Навигация</h3>
-            <nav className="mt-2 flex flex-col gap-2">
+            <nav className="mt-2 flex flex-col gap-2.5">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href} className="no-underline hover:text-[var(--brand-red)]">
                   {item.label}
