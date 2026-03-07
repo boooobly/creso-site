@@ -25,7 +25,7 @@ const productionPlaceholders = [
 
 export default function ProductionTrustBlock() {
   return (
-    <section className="py-16 md:py-24">
+    <section className="bg-neutral-50/70 py-16 md:py-24">
       <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
         <RevealOnScroll className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm md:p-8">
           <div className="grid gap-7 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
@@ -62,7 +62,7 @@ export default function ProductionTrustBlock() {
               {productionPlaceholders.map((item) => (
                 <article
                   key={item.title}
-                  className="group rounded-xl border border-neutral-200 bg-neutral-50 p-3.5 transition-transform duration-300 hover:-translate-y-1"
+                  className="group rounded-xl border border-neutral-200 bg-neutral-50 p-3.5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-black/10"
                 >
                   <h3 className="text-sm font-semibold text-neutral-900">{item.title}</h3>
                   <div className="relative mt-3 min-h-[160px] overflow-hidden rounded-lg md:min-h-[190px]">
@@ -70,7 +70,7 @@ export default function ProductionTrustBlock() {
                       src={item.imageSrc}
                       alt={item.imageAlt}
                       fill
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-[400ms] group-hover:scale-105"
                       sizes="(max-width: 1024px) 100vw, 320px"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

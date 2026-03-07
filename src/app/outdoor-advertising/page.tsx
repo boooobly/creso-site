@@ -5,6 +5,7 @@ import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import OutdoorFloatingCtas from '@/components/OutdoorFloatingCtas';
 import ProductionTrustBlock from '@/components/ProductionTrustBlock';
+import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import { messages } from '@/lib/messages';
 
 const services = [
@@ -66,47 +67,70 @@ export default function OutdoorAdvertisingPage() {
     <div className="pb-24 md:pb-0">
       <OutdoorFloatingCtas />
 
-      <Section className="pb-8" id="outdoor-hero">
-        <div className="card space-y-5 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-10">
-          <h1 className="text-4xl font-bold leading-tight md:text-5xl">Наружная реклама под ключ в Ставропольском крае</h1>
-          <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">
-            Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.
-          </p>
+      <Section className="pb-8" id="outdoor-hero" background="default">
+        <div className="card grid gap-8 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="space-y-5">
+            <h1 className="text-4xl font-bold leading-tight md:text-5xl">Наружная реклама под ключ в Ставропольском крае</h1>
+            <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">
+              Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.
+            </p>
 
-          <div className="flex flex-wrap gap-2.5">
-            {heroTrustBadges.map((badge) => (
-              <span
-                key={badge}
-                className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200"
+            <div className="flex flex-wrap gap-2.5">
+              {heroTrustBadges.map((badge) => (
+                <span
+                  key={badge}
+                  className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                  {badge}
+                </span>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="#outdoor-form-section"
+                className="btn-primary no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
-                {badge}
-              </span>
-            ))}
+                Получить бесплатный расчет
+              </Link>
+              <Link
+                href="#outdoor-portfolio"
+                className="btn-secondary no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                Смотреть примеры работ
+              </Link>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="#outdoor-lead-form"
-              className="btn-primary no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)]"
-            >
-              Получить бесплатный расчет
-            </Link>
-            <Link href="#outdoor-portfolio" className="btn-secondary no-underline">
-              Смотреть примеры работ
-            </Link>
+          <div className="relative overflow-hidden rounded-2xl border border-neutral-200/80 bg-neutral-100 shadow-md dark:border-neutral-700 dark:bg-neutral-900">
+            <Image
+              src="/images/outdoor_advertising/manufacturing.png"
+              alt="Производство наружной рекламы"
+              width={1200}
+              height={800}
+              className="h-full max-h-[380px] w-full object-cover"
+              priority
+            />
           </div>
         </div>
       </Section>
 
-      <Section className="pt-0">
+      <Section className="pt-0" id="outdoor-portfolio" background="muted">
+        <RevealOnScroll>
+          <h2 className="mb-5 text-2xl font-bold">Портфолио</h2>
+          <OutdoorPortfolioGallery images={portfolioImages} />
+        </RevealOnScroll>
+      </Section>
+
+      <Section className="pt-0" background="default">
         <RevealOnScroll>
           <h2 className="mb-5 text-2xl font-bold">Что изготавливаем</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {services.map((service) => (
               <article
                 key={service}
-                className="card rounded-xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-red-500/10"
+                className="card rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-red-500/10"
               >
                 <p className="font-medium">{service}</p>
               </article>
@@ -115,13 +139,13 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0">
+      <Section className="pt-0" background="muted">
         <RevealOnScroll>
           <h2 className="mb-2 text-2xl font-bold">Почему выбирают нас</h2>
           <p className="mb-5 text-sm text-neutral-600 dark:text-neutral-300">Без посредников - отвечаем за результат</p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {strengths.map((item) => (
-              <div key={item} className="card min-h-[112px] rounded-xl p-5">
+              <div key={item} className="card min-h-[112px] rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10">
                 <div className="flex h-full items-center gap-2.5">
                   <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                   <p className="text-sm font-semibold leading-relaxed">{item}</p>
@@ -132,12 +156,12 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0">
+      <Section className="pt-0" background="default">
         <RevealOnScroll>
           <h2 className="mb-5 text-2xl font-bold">Полный цикл работ</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {fullCycleItems.map((item) => (
-              <div key={item} className="card min-h-[112px] rounded-xl p-5">
+              <div key={item} className="card min-h-[112px] rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10">
                 <div className="flex h-full items-center gap-2.5">
                   <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                   <p className="text-sm font-semibold leading-relaxed">{item}</p>
@@ -158,11 +182,11 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-4 md:pt-6">
+      <Section className="pt-4 md:pt-6" background="muted">
         <RevealOnScroll>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {trustStripItems.map((item) => (
-              <article key={item} className="card rounded-xl border border-neutral-200/80 bg-neutral-50/60 px-4 py-3">
+              <article key={item} className="card rounded-xl border border-neutral-200/80 bg-neutral-50/60 px-4 py-3 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10">
                 <p className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{item}</p>
               </article>
             ))}
@@ -172,12 +196,12 @@ export default function OutdoorAdvertisingPage() {
 
       <ProductionTrustBlock />
 
-      <Section className="pt-0">
+      <Section className="pt-0" background="default">
         <RevealOnScroll>
           <h2 className="mb-5 text-2xl font-bold">Как мы работаем</h2>
           <div className="grid gap-4 md:grid-cols-4">
             {steps.map((step, index) => (
-              <div key={step} className="card rounded-xl p-5">
+              <div key={step} className="card rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10">
                 <p className="mb-2 text-sm text-[var(--brand-red)]">Шаг {index + 1}</p>
                 <p className="font-semibold">{step}</p>
               </div>
@@ -189,33 +213,20 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0" id="outdoor-portfolio">
-        <RevealOnScroll>
-          <h2 className="mb-5 text-2xl font-bold">Портфолио</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {portfolioImages.map((image) => (
-              <figure key={image.src} className="card overflow-hidden rounded-xl border border-neutral-200/70 shadow-sm">
-                <Image src={image.src} alt={image.alt} width={900} height={600} className="h-52 w-full object-cover" />
-              </figure>
-            ))}
-          </div>
-        </RevealOnScroll>
-      </Section>
-
-      <Section className="pt-0">
+      <Section className="pt-0" background="muted">
         <div className="rounded-2xl bg-neutral-900 px-6 py-8 text-white dark:bg-neutral-800 md:px-8">
           <h2 className="text-3xl font-bold">Нужна срочная установка?</h2>
           <p className="mt-3 text-neutral-200">Изготавливаем и монтируем конструкции в сжатые сроки.</p>
           <Link
-            href="#outdoor-lead-form"
-            className="btn-primary mt-5 no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)]"
+            href="#outdoor-form-section"
+            className="btn-primary mt-5 no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
           >
             Получить расчет
           </Link>
         </div>
       </Section>
 
-      <Section className="pt-0">
+      <Section className="pt-0" background="default">
         <div className="card space-y-4 p-6 md:p-8">
           <h2 className="text-2xl font-bold">Работаем по всему Ставропольскому краю</h2>
           <p className="text-neutral-700 dark:text-neutral-300">Изготавливаем и монтируем наружную рекламу в:</p>
@@ -233,7 +244,7 @@ export default function OutdoorAdvertisingPage() {
         </div>
       </Section>
 
-      <Section className="pt-0" id="outdoor-form-section">
+      <Section className="pt-0" id="outdoor-form-section" background="muted">
         <RevealOnScroll>
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">Получить бесплатный расчет наружной рекламы</h2>
