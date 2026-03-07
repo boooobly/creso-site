@@ -13,9 +13,9 @@ const navItems = [
 
 export default function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-neutral-200 bg-neutral-100 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-300">
-      <div className="container py-14">
-        <div className="grid gap-10 md:grid-cols-3">
+    <footer className="mt-20 border-t border-neutral-200 bg-neutral-100 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-300">
+      <div className="container py-14 md:py-16">
+        <div className="grid gap-10 md:grid-cols-[1.1fr_1fr_1fr] md:gap-8 lg:gap-12">
           <div className="space-y-2 text-sm">
             <Link href="/" className="inline-flex no-underline">
               <Image src="/images/logo-light.png" alt="CredoMir logo" width={180} height={64} className="block h-12 w-auto dark:hidden" />

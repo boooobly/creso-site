@@ -48,13 +48,6 @@ const heroTrustBadges = [
   'Собственное производство',
 ] as const;
 
-const trustStripItems = [
-  'Сроки фиксируем в договоре',
-  'Монтаж по городу - замер бесплатно',
-  'Проекты любой сложности',
-  'Работаем по всему ЮФО',
-] as const;
-
 const steps = ['Заявка', 'Замер (бесплатно по городу)', 'Производство', 'Монтаж'];
 
 const cities = ['Невинномысске', 'Ставрополе', 'Пятигорске', 'Минеральных Водах', 'Кисловодске', 'Ессентуках'];
@@ -65,15 +58,13 @@ const portfolioImages = [1, 2, 3, 4, 5, 6].map((index) => ({
 }));
 
 export default function OutdoorAdvertisingPage() {
-  const majorSectionSpacing = 'pt-0 mt-16 md:mt-[120px]';
-
   return (
     <div className="pb-24 md:pb-0">
       <OutdoorFloatingCtas />
 
-      <Section className="pb-8" id="outdoor-hero" background="default">
-        <div className="card grid gap-8 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="space-y-5">
+      <Section className="pb-6 md:pb-10" id="outdoor-hero" background="default">
+        <div className="card grid gap-8 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+          <div className="flex h-full flex-col gap-5 md:gap-6">
             <h1 className="text-4xl font-bold leading-tight md:text-5xl">Наружная реклама под ключ в Ставропольском крае</h1>
             <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">
               Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.
@@ -91,7 +82,7 @@ export default function OutdoorAdvertisingPage() {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="mt-1 flex flex-wrap gap-3">
               <Link
                 href="#outdoor-form-section"
                 className="btn-primary no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
@@ -107,111 +98,99 @@ export default function OutdoorAdvertisingPage() {
             </div>
           </div>
 
-          <div className="relative min-h-[320px] overflow-hidden rounded-xl border border-neutral-200/80 bg-neutral-100 shadow-md dark:border-neutral-700 dark:bg-neutral-900 md:min-h-[420px]">
+          <div className="relative min-h-[340px] overflow-hidden rounded-xl border border-neutral-200/80 bg-neutral-100 shadow-md dark:border-neutral-700 dark:bg-neutral-900 md:min-h-[430px]">
             <Image
               src="/images/outdoor_advertising/manufacturing.png"
               alt="Производство наружной рекламы"
-              width={1200}
-              height={800}
-              className="h-full w-full object-cover"
+              fill
+              className="object-cover"
               priority
+              sizes="(max-width: 1024px) 100vw, 44vw"
             />
           </div>
         </div>
       </Section>
 
-      <Section className={majorSectionSpacing} id="outdoor-portfolio" background="muted">
+      <Section className="pt-0" id="outdoor-portfolio" background="muted">
         <RevealOnScroll>
-          <h2 className="mb-5 text-2xl font-bold">Портфолио</h2>
+          <h2 className="mb-6 text-2xl font-bold">Портфолио</h2>
           <OutdoorPortfolioGallery images={portfolioImages} />
         </RevealOnScroll>
       </Section>
 
-      <Section className={majorSectionSpacing} background="default">
+      <Section className="pt-0" background="default">
         <RevealOnScroll>
-          <h2 className="mb-5 text-2xl font-bold">Что изготавливаем</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <h2 className="mb-6 text-2xl font-bold">Что изготавливаем</h2>
+          <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {services.map((service) => (
               <article
                 key={service}
-                className="card rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-red-500/10"
+                className="card flex min-h-[126px] items-start rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-black/10"
               >
-                <p className="font-medium">{service}</p>
+                <p className="text-[15px] font-semibold leading-relaxed">{service}</p>
               </article>
             ))}
           </div>
         </RevealOnScroll>
       </Section>
 
-      <Section className={majorSectionSpacing} background="muted">
+      <Section className="pt-0" background="muted">
         <RevealOnScroll>
           <h2 className="mb-2 text-2xl font-bold">Почему выбирают нас</h2>
-          <p className="mb-5 text-sm text-neutral-600 dark:text-neutral-300">Без посредников - отвечаем за результат</p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <p className="mb-6 text-sm text-neutral-600 dark:text-neutral-300">Без посредников - отвечаем за результат</p>
+          <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {strengths.map((item) => (
-              <div
+              <article
                 key={item.label}
-                className="card min-h-[112px] rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10"
+                className="card flex min-h-[116px] rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10"
               >
-                <div className="flex h-full items-center gap-3">
-                  <item.icon className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden="true" />
+                <div className="flex items-start gap-3">
+                  <item.icon className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" aria-hidden="true" />
                   <p className="text-sm font-semibold leading-relaxed">{item.label}</p>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         </RevealOnScroll>
       </Section>
 
-      <Section className={majorSectionSpacing} background="default">
+      <Section className="pt-0" background="default">
         <RevealOnScroll>
-          <h2 className="mb-5 text-2xl font-bold">Полный цикл работ</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {fullCycleItems.map((item) => (
-              <div key={item} className="card min-h-[112px] rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10">
-                <div className="flex h-full items-center gap-2.5">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
-                  <p className="text-sm font-semibold leading-relaxed">{item}</p>
-                </div>
-              </div>
+          <h2 className="mb-6 text-2xl font-bold">Полный цикл работ</h2>
+
+          <div className="grid gap-3 md:grid-cols-5">
+            {fullCycleItems.map((item, index) => (
+              <article
+                key={item}
+                className="card rounded-xl border border-neutral-200/90 p-4 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10"
+              >
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Этап {index + 1}</p>
+                <p className="text-sm font-semibold leading-relaxed">{item}</p>
+              </article>
             ))}
           </div>
 
-          <article className="card mt-4 rounded-xl border border-neutral-200/80 bg-neutral-50/60 p-5 dark:border-neutral-700 dark:bg-neutral-900/60">
+          <article className="card mt-4 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-5 md:p-6 dark:border-neutral-700 dark:bg-neutral-900/60">
             <h3 className="text-base font-semibold">Сервис и сопровождение</h3>
             <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-200">
               Диагностика и обслуживание, реставрация и обновление, постгарантийная поддержка.
             </p>
-            <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-              Сопровождаем вывески на всем сроке эксплуатации.
-            </p>
+            <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Сопровождаем вывески на всем сроке эксплуатации.</p>
           </article>
-        </RevealOnScroll>
-      </Section>
-
-      <Section className="mt-16 pt-4 md:mt-[120px] md:pt-6" background="muted">
-        <RevealOnScroll>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {trustStripItems.map((item) => (
-              <article key={item} className="card rounded-xl border border-neutral-200/80 bg-neutral-50/60 px-4 py-3 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10">
-                <p className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{item}</p>
-              </article>
-            ))}
-          </div>
         </RevealOnScroll>
       </Section>
 
       <ProductionTrustBlock />
 
-      <Section className={majorSectionSpacing} background="default">
+      <Section className="pt-0" background="muted">
         <RevealOnScroll>
           <h2 className="mb-5 text-2xl font-bold">Как мы работаем</h2>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-4">
             {steps.map((step, index) => (
-              <div key={step} className="card rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10">
-                <p className="mb-2 text-sm text-[var(--brand-red)]">Шаг {index + 1}</p>
-                <p className="font-semibold">{step}</p>
-              </div>
+              <article key={step} className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Шаг {index + 1}</p>
+                <p className="text-sm font-semibold">{step}</p>
+              </article>
             ))}
           </div>
           <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-300">
@@ -220,50 +199,57 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className={majorSectionSpacing} background="muted">
-        <div className="rounded-2xl bg-neutral-900 px-6 py-8 text-white dark:bg-neutral-800 md:px-8">
-          <h2 className="text-3xl font-bold">Нужна срочная установка?</h2>
-          <p className="mt-3 text-neutral-200">Изготавливаем и монтируем конструкции в сжатые сроки.</p>
+      <Section className="pt-0" background="default">
+        <div className="grid items-center gap-5 rounded-2xl bg-neutral-900 px-6 py-7 text-white dark:bg-neutral-800 md:grid-cols-[1fr_auto] md:px-8">
+          <div>
+            <h2 className="text-3xl font-bold">Нужна срочная установка?</h2>
+            <p className="mt-2.5 text-neutral-200">Изготавливаем и монтируем конструкции в сжатые сроки.</p>
+          </div>
           <Link
             href="#outdoor-form-section"
-            className="btn-primary mt-5 no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+            className="btn-primary w-full no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl md:w-auto"
           >
             Получить расчет
           </Link>
         </div>
       </Section>
 
-      <Section className={majorSectionSpacing} background="default">
-        <div className="card space-y-4 p-6 md:p-8">
+      <Section className="pt-0" background="muted">
+        <div className="card rounded-2xl p-6 md:p-8">
           <h2 className="text-2xl font-bold">Работаем по всему Ставропольскому краю</h2>
-          <p className="text-neutral-700 dark:text-neutral-300">Изготавливаем и монтируем наружную рекламу в:</p>
-          <ul className="grid gap-2 text-sm md:grid-cols-2">
-            {cities.map((city) => (
-              <li key={city} className="text-neutral-700 dark:text-neutral-300">
-                • {city}
-              </li>
-            ))}
-            <li className="text-neutral-700 dark:text-neutral-300">• и других городах региона</li>
-          </ul>
-          <p className="text-sm text-neutral-600 dark:text-neutral-300">
-            Собственная бригада, выезд на замер и доставка конструкций позволяют запускать проекты быстро и в удобные сроки.
-          </p>
+          <p className="mt-2 text-neutral-700 dark:text-neutral-300">Изготавливаем и монтируем наружную рекламу в:</p>
+          <div className="mt-5 grid gap-6 md:grid-cols-[1.1fr_1fr]">
+            <ul className="grid gap-2 text-sm md:grid-cols-2">
+              {cities.map((city) => (
+                <li key={city} className="text-neutral-700 dark:text-neutral-300">
+                  • {city}
+                </li>
+              ))}
+              <li className="text-neutral-700 dark:text-neutral-300">• и других городах региона</li>
+            </ul>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              Собственная бригада, выезд на замер и доставка конструкций позволяют запускать проекты быстро и в удобные сроки.
+            </p>
+          </div>
         </div>
       </Section>
 
-      <Section className={majorSectionSpacing} id="outdoor-form-section" background="muted">
+      <Section className="pt-0" id="outdoor-form-section" background="default">
         <RevealOnScroll>
-          <div className="space-y-4">
+          <div className="card rounded-2xl border border-neutral-200/80 bg-neutral-50/60 p-6 md:p-8 dark:border-neutral-700 dark:bg-neutral-900/50">
             <h2 className="text-2xl font-bold">Получить бесплатный расчет наружной рекламы</h2>
-            <LeadForm
-              t={messages}
-              source="outdoor"
-              initialService="Наружная реклама"
-              showMessageField
-              phoneRequired
-              submitMessagePrefix="Запрос: Наружная реклама (Ставропольский край)."
-              includePageUrl
-            />
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Ответим по стоимости, срокам и предложим оптимальный формат изготовления.</p>
+            <div className="mt-5">
+              <LeadForm
+                t={messages}
+                source="outdoor"
+                initialService="Наружная реклама"
+                showMessageField
+                phoneRequired
+                submitMessagePrefix="Запрос: Наружная реклама (Ставропольский край)."
+                includePageUrl
+              />
+            </div>
           </div>
         </RevealOnScroll>
       </Section>
