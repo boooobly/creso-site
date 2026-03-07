@@ -1,5 +1,7 @@
 'use client';
 
+import AccessoryHelpTooltip from './AccessoryHelpTooltip';
+
 export type FilterState = {
   color: string;
   style: string;
@@ -305,7 +307,14 @@ export default function BagetFilters({
                 checked={materials.hanging === 'crocodile'}
                 onChange={() => setMaterials({ ...materials, hanging: 'crocodile' })}
               />
-              Крокодильчик
+              <span className="inline-flex items-center gap-1.5">
+                Крокодильчик
+                <AccessoryHelpTooltip
+                  imageSrc="/images/accessories/crocodile.png"
+                  label="Крокодильчик"
+                  ariaLabel="Показать изображение крокодильчика"
+                />
+              </span>
             </label>
             <label className="flex items-center gap-2">
               <input
@@ -314,7 +323,14 @@ export default function BagetFilters({
                 checked={materials.hanging === 'wire'}
                 onChange={() => setMaterials({ ...materials, hanging: 'wire' })}
               />
-              Тросик
+              <span className="inline-flex items-center gap-1.5">
+                Тросик
+                <AccessoryHelpTooltip
+                  imageSrc="/images/accessories/cable.png"
+                  label="Тросик"
+                  ariaLabel="Показать изображение тросика"
+                />
+              </span>
             </label>
           </div>
 
@@ -325,7 +341,14 @@ export default function BagetFilters({
               disabled={!standAllowed}
               onChange={(e) => setMaterials({ ...materials, stand: e.target.checked })}
             />
-            Ножка-подставка
+            <span className="inline-flex items-center gap-1.5">
+              Ножка-подставка
+              <AccessoryHelpTooltip
+                imageSrc="/images/accessories/cardboard_leg.png"
+                label="Ножка-подставка"
+                ariaLabel="Показать изображение ножки-подставки"
+              />
+            </span>
           </label>
           {!standAllowed && <p className="text-xs text-amber-700">Ножка доступна только для работ до 30x30 см</p>}
         </div>

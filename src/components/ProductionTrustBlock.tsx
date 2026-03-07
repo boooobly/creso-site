@@ -1,4 +1,5 @@
 import RevealOnScroll from '@/components/RevealOnScroll';
+import Image from 'next/image';
 
 const productionFeatures = ['ЧПУ 2×4 м', 'Печать 3.2 м', 'Сварка и покраска', 'Монтажная бригада'];
 
@@ -10,8 +11,16 @@ const guaranteeItems = [
 ];
 
 const productionPlaceholders = [
-  { title: 'Производство' },
-  { title: 'Монтаж' },
+  {
+    title: 'Производство',
+    imageSrc: '/images/outdoor_advertising/manufacturing.png',
+    imageAlt: 'Производство наружной рекламы',
+  },
+  {
+    title: 'Монтаж',
+    imageSrc: '/images/outdoor_advertising/installation.png',
+    imageAlt: 'Монтаж наружной рекламы',
+  },
 ] as const;
 
 export default function ProductionTrustBlock() {
@@ -51,10 +60,20 @@ export default function ProductionTrustBlock() {
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
               {productionPlaceholders.map((item) => (
-                <article key={item.title} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5">
+                <article
+                  key={item.title}
+                  className="group rounded-xl border border-neutral-200 bg-neutral-50 p-3.5 transition-transform duration-300 hover:-translate-y-1"
+                >
                   <h3 className="text-sm font-semibold text-neutral-900">{item.title}</h3>
-                  <div className="mt-3 flex min-h-[160px] items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-center text-sm text-neutral-500 md:min-h-[190px]">
-                    Фото будет добавлено
+                  <div className="relative mt-3 min-h-[160px] overflow-hidden rounded-lg md:min-h-[190px]">
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.imageAlt}
+                      fill
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 1024px) 100vw, 320px"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </div>
                 </article>
               ))}
