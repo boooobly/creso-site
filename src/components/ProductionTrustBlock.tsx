@@ -1,4 +1,5 @@
 import RevealOnScroll from '@/components/RevealOnScroll';
+import Image from 'next/image';
 
 const productionFeatures = ['ЧПУ 2×4 м', 'Печать 3.2 м', 'Сварка и покраска', 'Монтажная бригада'];
 
@@ -10,8 +11,16 @@ const guaranteeItems = [
 ];
 
 const productionPlaceholders = [
-  { title: 'Производство' },
-  { title: 'Монтаж' },
+  {
+    title: 'Производство',
+    imageSrc: '/images/outdoor_advertising/manufacturing.png',
+    imageAlt: 'Производство наружной рекламы',
+  },
+  {
+    title: 'Монтаж',
+    imageSrc: '/images/outdoor_advertising/installation.png',
+    imageAlt: 'Монтаж наружной рекламы',
+  },
 ] as const;
 
 export default function ProductionTrustBlock() {
@@ -53,8 +62,8 @@ export default function ProductionTrustBlock() {
               {productionPlaceholders.map((item) => (
                 <article key={item.title} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5">
                   <h3 className="text-sm font-semibold text-neutral-900">{item.title}</h3>
-                  <div className="mt-3 flex min-h-[160px] items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-center text-sm text-neutral-500 md:min-h-[190px]">
-                    Фото будет добавлено
+                  <div className="relative mt-3 min-h-[160px] overflow-hidden rounded-lg md:min-h-[190px]">
+                    <Image src={item.imageSrc} alt={item.imageAlt} fill className="h-full w-full object-cover" sizes="(max-width: 1024px) 100vw, 320px" />
                   </div>
                 </article>
               ))}
