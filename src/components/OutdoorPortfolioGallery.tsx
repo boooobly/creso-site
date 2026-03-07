@@ -40,7 +40,7 @@ export default function OutdoorPortfolioGallery({ images }: OutdoorPortfolioGall
           <button
             key={image.src}
             type="button"
-            className="group card overflow-hidden rounded-xl border border-neutral-200/70 text-left shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-black/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2"
+            className="group card overflow-hidden rounded-xl bg-white text-left shadow-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-black/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
             onClick={() => setActiveImage(image)}
             aria-label={`Открыть ${image.alt}`}
           >

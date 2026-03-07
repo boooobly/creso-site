@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import type { LucideIcon } from 'lucide-react';
+import { Building2, FileCheck2, HardHat, ShieldCheck, Truck, Users, Wrench } from 'lucide-react';
 import Section from '@/components/Section';
 import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
@@ -21,14 +23,14 @@ const services = [
   'Кастомные конструкции любой сложности',
 ];
 
-const strengths = [
-  'Собственная производственная база',
-  'Монтажная бригада',
-  'Автовышка',
-  'Работа на высоте',
-  'Доставка по краю',
-  'Заключаем договор',
-  'Гарантия 5 лет',
+const strengths: { label: string; icon: LucideIcon }[] = [
+  { label: 'Собственная производственная база', icon: Building2 },
+  { label: 'Монтажная бригада', icon: Users },
+  { label: 'Автовышка', icon: HardHat },
+  { label: 'Работа на высоте', icon: Wrench },
+  { label: 'Доставка по краю', icon: Truck },
+  { label: 'Заключаем договор', icon: FileCheck2 },
+  { label: 'Гарантия 5 лет', icon: ShieldCheck },
 ];
 
 const fullCycleItems = [
@@ -63,6 +65,8 @@ const portfolioImages = [1, 2, 3, 4, 5, 6].map((index) => ({
 }));
 
 export default function OutdoorAdvertisingPage() {
+  const majorSectionSpacing = 'pt-0 mt-16 md:mt-[120px]';
+
   return (
     <div className="pb-24 md:pb-0">
       <OutdoorFloatingCtas />
@@ -103,27 +107,27 @@ export default function OutdoorAdvertisingPage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl border border-neutral-200/80 bg-neutral-100 shadow-md dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="relative min-h-[320px] overflow-hidden rounded-xl border border-neutral-200/80 bg-neutral-100 shadow-md dark:border-neutral-700 dark:bg-neutral-900 md:min-h-[420px]">
             <Image
               src="/images/outdoor_advertising/manufacturing.png"
               alt="Производство наружной рекламы"
               width={1200}
               height={800}
-              className="h-full max-h-[380px] w-full object-cover"
+              className="h-full w-full object-cover"
               priority
             />
           </div>
         </div>
       </Section>
 
-      <Section className="pt-0" id="outdoor-portfolio" background="muted">
+      <Section className={majorSectionSpacing} id="outdoor-portfolio" background="muted">
         <RevealOnScroll>
           <h2 className="mb-5 text-2xl font-bold">Портфолио</h2>
           <OutdoorPortfolioGallery images={portfolioImages} />
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0" background="default">
+      <Section className={majorSectionSpacing} background="default">
         <RevealOnScroll>
           <h2 className="mb-5 text-2xl font-bold">Что изготавливаем</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -139,16 +143,19 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0" background="muted">
+      <Section className={majorSectionSpacing} background="muted">
         <RevealOnScroll>
           <h2 className="mb-2 text-2xl font-bold">Почему выбирают нас</h2>
           <p className="mb-5 text-sm text-neutral-600 dark:text-neutral-300">Без посредников - отвечаем за результат</p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {strengths.map((item) => (
-              <div key={item} className="card min-h-[112px] rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10">
-                <div className="flex h-full items-center gap-2.5">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
-                  <p className="text-sm font-semibold leading-relaxed">{item}</p>
+              <div
+                key={item.label}
+                className="card min-h-[112px] rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10"
+              >
+                <div className="flex h-full items-center gap-3">
+                  <item.icon className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden="true" />
+                  <p className="text-sm font-semibold leading-relaxed">{item.label}</p>
                 </div>
               </div>
             ))}
@@ -156,7 +163,7 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0" background="default">
+      <Section className={majorSectionSpacing} background="default">
         <RevealOnScroll>
           <h2 className="mb-5 text-2xl font-bold">Полный цикл работ</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -182,7 +189,7 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-4 md:pt-6" background="muted">
+      <Section className="mt-16 pt-4 md:mt-[120px] md:pt-6" background="muted">
         <RevealOnScroll>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {trustStripItems.map((item) => (
@@ -196,7 +203,7 @@ export default function OutdoorAdvertisingPage() {
 
       <ProductionTrustBlock />
 
-      <Section className="pt-0" background="default">
+      <Section className={majorSectionSpacing} background="default">
         <RevealOnScroll>
           <h2 className="mb-5 text-2xl font-bold">Как мы работаем</h2>
           <div className="grid gap-4 md:grid-cols-4">
@@ -213,7 +220,7 @@ export default function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0" background="muted">
+      <Section className={majorSectionSpacing} background="muted">
         <div className="rounded-2xl bg-neutral-900 px-6 py-8 text-white dark:bg-neutral-800 md:px-8">
           <h2 className="text-3xl font-bold">Нужна срочная установка?</h2>
           <p className="mt-3 text-neutral-200">Изготавливаем и монтируем конструкции в сжатые сроки.</p>
@@ -226,7 +233,7 @@ export default function OutdoorAdvertisingPage() {
         </div>
       </Section>
 
-      <Section className="pt-0" background="default">
+      <Section className={majorSectionSpacing} background="default">
         <div className="card space-y-4 p-6 md:p-8">
           <h2 className="text-2xl font-bold">Работаем по всему Ставропольскому краю</h2>
           <p className="text-neutral-700 dark:text-neutral-300">Изготавливаем и монтируем наружную рекламу в:</p>
@@ -244,7 +251,7 @@ export default function OutdoorAdvertisingPage() {
         </div>
       </Section>
 
-      <Section className="pt-0" id="outdoor-form-section" background="muted">
+      <Section className={majorSectionSpacing} id="outdoor-form-section" background="muted">
         <RevealOnScroll>
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">Получить бесплатный расчет наружной рекламы</h2>
