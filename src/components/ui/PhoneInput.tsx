@@ -67,13 +67,13 @@ export default function PhoneInput({
   };
 
   const baseClassName = [
-    'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-red-500 dark:focus:ring-red-500/30',
+    'w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
     isValid ? 'ring-2 ring-green-500/20 border-green-500/40' : '',
     className || '',
   ].join(' ');
 
   return (
-    <div className="space-y-1">
+    <div className="w-full space-y-1">
       <input
         type="tel"
         inputMode="numeric"
