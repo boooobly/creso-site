@@ -175,8 +175,8 @@ export default function StandsServicePage() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {advantages.map((item) => (
-            <article key={item} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start gap-3">
+            <article key={item} className="flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-3">
                 <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600">
                   <ShieldCheck className="size-4" aria-hidden="true" />
                 </span>

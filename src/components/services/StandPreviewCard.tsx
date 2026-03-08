@@ -23,7 +23,12 @@ export default function StandPreviewCard({ title, description, label, variant = 
         isOutdoor ? 'min-h-[270px] p-6 md:p-7' : '',
       ].join(' ')}
     >
-      <div className="relative z-20 transition-opacity duration-300 md:group-hover:opacity-0 md:group-focus-visible:opacity-0">
+      <div
+        className={[
+          'relative z-20 transition-opacity duration-300 md:group-hover:opacity-0 md:group-focus-visible:opacity-0',
+          isOutdoor ? 'pb-[9.5rem]' : 'pb-[8.5rem]',
+        ].join(' ')}
+      >
         <div className="flex items-start justify-between gap-3">
           <p className={isOutdoor ? 'inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600' : 'inline-flex rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600'}>{label}</p>
           <span className="inline-flex size-7 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-400 transition-colors duration-300 group-hover:border-red-200 group-hover:text-red-500 group-focus-visible:border-red-200 group-focus-visible:text-red-500">
@@ -31,7 +36,7 @@ export default function StandPreviewCard({ title, description, label, variant = 
           </span>
         </div>
 
-        <div className={isOutdoor ? 'mt-3 min-h-[6.75rem] space-y-2' : 'mt-3 min-h-[6.25rem] space-y-2'}>
+        <div className={isOutdoor ? 'mt-3 min-h-[7.75rem] space-y-2' : 'mt-3 min-h-[7.25rem] space-y-2'}>
           <h3 className={isOutdoor ? 'text-xl font-semibold' : 'text-lg font-semibold'}>{title}</h3>
           <p className="text-sm text-neutral-600">{description}</p>
         </div>
