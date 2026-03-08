@@ -26,7 +26,7 @@ export default function StandPreviewCard({ title, description, label, variant = 
       <div
         className={[
           'relative z-20 transition-opacity duration-300 md:group-hover:opacity-0 md:group-focus-visible:opacity-0',
-          isOutdoor ? 'pb-[9.5rem]' : 'pb-[8.5rem]',
+          isOutdoor ? 'pb-[8.5rem]' : 'pb-[7.5rem]',
         ].join(' ')}
       >
         <div className="flex items-start justify-between gap-3">
@@ -36,7 +36,7 @@ export default function StandPreviewCard({ title, description, label, variant = 
           </span>
         </div>
 
-        <div className={isOutdoor ? 'mt-3 min-h-[7.75rem] space-y-2' : 'mt-3 min-h-[7.25rem] space-y-2'}>
+        <div className={isOutdoor ? 'mt-2.5 min-h-[6.75rem] space-y-1.5' : 'mt-2.5 min-h-[6.25rem] space-y-1.5'}>
           <h3 className={isOutdoor ? 'text-xl font-semibold' : 'text-lg font-semibold'}>{title}</h3>
           <p className="text-sm text-neutral-600">{description}</p>
         </div>
