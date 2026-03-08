@@ -100,7 +100,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </div>
       </Section>
 
-      <Section className="border-y border-neutral-200/70 py-10 md:py-12" background="muted">
+      <Section className="border-y border-neutral-200/70 py-10 md:py-12" background="muted" fullBleed>
         <div className="mb-6 space-y-2 md:mb-7">
           <p className="t-eyebrow">ПОЧЕМУ НАМ ДОВЕРЯЮТ</p>
           <h2 className="t-h2">Прозрачная работа и предсказуемый результат</h2>
@@ -130,7 +130,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.div>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/60 py-12 md:py-16">
+      <Section background="muted" className="border-y border-neutral-200/60 py-12 md:py-16" fullBleed>
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-8">
           <div className="space-y-2">
             <p className="t-eyebrow">ПОРТФОЛИО</p>
@@ -168,7 +168,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         </motion.ol>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/60 py-12 md:py-16">
+      <Section background="muted" className="border-y border-neutral-200/60 py-12 md:py-16" fullBleed>
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-8">
           <div className="space-y-2">
             <p className="t-eyebrow">FAQ</p>

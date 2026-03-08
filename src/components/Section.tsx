@@ -10,6 +10,7 @@ type SectionProps = PropsWithChildren<{
   containerClassName?: string;
   id?: string;
   background?: 'default' | 'muted';
+  fullBleed?: boolean;
 }>;
 
 const backgroundStyles: Record<NonNullable<SectionProps['background']>, string> = {
@@ -23,13 +24,15 @@ export default function Section({
   containerClassName = '',
   id,
   background = 'default',
+  fullBleed = false,
 }: SectionProps) {
   const shouldReduceMotion = useReducedMotion();
+  const bleedClassName = fullBleed ? 'relative left-1/2 right-1/2 w-screen -translate-x-1/2' : '';
 
   return (
     <motion.section
       id={id}
-      className={`py-12 md:py-20 ${backgroundStyles[background]} ${className}`.trim()}
+      className={`py-12 md:py-20 ${bleedClassName} ${backgroundStyles[background]} ${className}`.trim()}
       initial={shouldReduceMotion ? false : 'hidden'}
       whileInView={shouldReduceMotion ? undefined : 'show'}
       viewport={viewportOnce}
