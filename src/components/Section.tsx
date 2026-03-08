@@ -27,7 +27,7 @@ export default function Section({
   fullBleed = false,
 }: SectionProps) {
   const shouldReduceMotion = useReducedMotion();
-  const bleedClassName = fullBleed ? 'relative left-1/2 right-1/2 w-screen -translate-x-1/2' : '';
+  const bleedClassName = fullBleed ? 'relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]' : '';
 
   return (
     <motion.section
