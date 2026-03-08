@@ -14,7 +14,6 @@ const indoorStands = [
   { title: 'Охрана труда', description: 'Наглядные материалы для производственных зон.', previewTag: 'Производство', previewHint: 'Нормативы, инструкции и чек-листы для персонала.' },
   { title: 'Первая помощь', description: 'Памятки и алгоритмы действий в экстренных случаях.', previewTag: 'Медицина', previewHint: 'Алгоритмы оказания помощи и контактные номера.' },
   { title: 'Гражданская оборона и ЧС', description: 'Информационные блоки для обучения персонала.', previewTag: 'ГО и ЧС', previewHint: 'Порядок действий при внештатных ситуациях.' },
-  { title: 'Стенды о коронавирусе', description: 'Памятки и правила для сотрудников и посетителей.', previewTag: 'Памятка', previewHint: 'Рекомендации и санитарные правила размещения.' },
 ] as const;
 
 const outdoorStands = [
@@ -65,7 +64,7 @@ export default function StandsServicePage() {
               </Link>
             </div>
 
-            <div className="mt-5 flex flex-wrap gap-2.5">
+            <div className="mt-5 grid max-w-xl grid-cols-2 gap-2.5">
               {heroChips.map((chip) => (
                 <span key={chip} className="chip-elevated rounded-full px-3 py-1.5 text-xs font-semibold text-neutral-700">
                   {chip}
@@ -88,7 +87,7 @@ export default function StandsServicePage() {
         </div>
       </Section>
 
-      <Section id="stands-catalog" background="muted" className="border-y border-neutral-200/70 py-12 md:py-16">
+      <Section id="stands-catalog" background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Стенды для помещений</h2>
           <p className="t-body max-w-3xl">Базовые и специализированные стенды для ежедневной работы, инструктажей и внутренней коммуникации.</p>
@@ -129,7 +128,7 @@ export default function StandsServicePage() {
         </div>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/70 py-12 md:py-16">
+      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Как изготавливаем стенды</h2>
           <p className="t-body max-w-3xl">Подбираем конструкцию с учётом места установки, условий эксплуатации и частоты обновления информации.</p>
@@ -168,7 +167,7 @@ export default function StandsServicePage() {
         </div>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/70 py-12 md:py-16">
+      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Почему заказывают у нас</h2>
           <p className="t-body max-w-3xl">Работаем в привычном для клиентов формате: от идеи и макета до готовой поставки и монтажа.</p>
@@ -176,8 +175,8 @@ export default function StandsServicePage() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {advantages.map((item) => (
-            <article key={item} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start gap-3">
+            <article key={item} className="flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-3">
                 <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600">
                   <ShieldCheck className="size-4" aria-hidden="true" />
                 </span>
@@ -202,8 +201,8 @@ export default function StandsServicePage() {
         </div>
       </Section>
 
-      <Section id="stands-lead-form" background="muted" className="pt-0">
-        <div className="card rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-6 md:p-8">
+      <Section id="stands-lead-form" background="muted" fullBleed className="pt-0">
+        <div className="card rounded-2xl border border-neutral-200/80 bg-white p-6 md:p-8">
           <h2 className="text-2xl font-bold">Рассчитать стоимость стенда</h2>
           <p className="mt-2 text-sm text-neutral-600 md:text-base">
             Опишите, какой стенд нужен, где он будет размещаться и требуются ли карманы, стойки или монтаж — подготовим расчёт и варианты.
