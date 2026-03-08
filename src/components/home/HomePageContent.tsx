@@ -43,19 +43,10 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
   return (
     <div>
       <Section className="relative overflow-hidden pb-12 pt-14 md:pb-14 md:pt-20">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(212,28,28,0.1),transparent_60%)]" aria-hidden="true" />
-
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute right-[-9rem] top-8 hidden h-[23rem] w-[23rem] rounded-[56%_44%_60%_40%/42%_58%_42%_58%] bg-[var(--brand-red)]/8 blur-3xl lg:block"
-          animate={shouldReduceMotion ? undefined : { x: [0, 8, 0], y: [0, -6, 0], rotate: [0, 2, 0] }}
-          transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
         <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
             <div className="space-y-5">
-              <p className="t-eyebrow inline-flex rounded-full border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/5 px-4 py-1.5">
+              <p className="t-eyebrow inline-flex rounded-full border border-[#efb9b9] bg-[#fff7f7] px-4 py-1.5 text-[var(--brand-red)]">
                 ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
               </p>
               <h1 className="t-h1 max-w-5xl">
@@ -145,7 +136,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-8">
           <div className="space-y-2">
             <p className="t-eyebrow">ПОРТФОЛИО</p>
-            <h2 className="t-h2">Избранные проекты</h2>
+            <h2 className="t-h2">Примеры работ</h2>
             <p className="t-body text-muted-foreground max-w-2xl">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
           </div>
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>

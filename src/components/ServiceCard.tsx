@@ -28,8 +28,7 @@ export default function ServiceCard({
           Основное направление
         </span>
       )}
-      <div className="flex items-start gap-2.5">
-        <span className="card-dot mt-1" />
+      <div>
         <h3 className={`t-h3 leading-snug transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
       </div>
       <p className="t-body text-muted-foreground mt-3 line-clamp-3">{desc}</p>
