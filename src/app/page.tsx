@@ -39,6 +39,8 @@ export default async function Home() {
     if (isHeatTransferService) return '/heat-transfer';
     const isMugsService = service?.id === 'mugs' || service?.title === 'Печать на кружках';
     if (isMugsService) return '/services/mugs';
+    const isStandsService = service?.id === 'stands' || service?.title === 'Изготовление стендов';
+    if (isStandsService) return '/services/stands';
     const isOutdoorService = service?.id === 'outdoor' || service?.title === 'Наружная реклама';
     if (isOutdoorService) return '/outdoor-advertising';
     return `/${service.slug}`;
