@@ -159,7 +159,7 @@ export default function LeadForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {submitError && <p className="t-small text-red-500">{submitError}</p>}
 
       <input type="hidden" {...register('service')} />
@@ -175,14 +175,14 @@ export default function LeadForm({
 
       <div>
         <input
-          className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+          className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
           placeholder="Имя"
           {...register('name')}
         />
         {errors.name && <p className="mt-1 t-small text-red-500">{errors.name.message}</p>}
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Controller
             name="phone"
@@ -201,7 +201,7 @@ export default function LeadForm({
         </div>
         <div>
           <input
-            className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+            className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             placeholder="E-mail"
             {...register('email')}
           />
@@ -212,7 +212,7 @@ export default function LeadForm({
       {showMessageField ? (
         <div>
           <textarea
-            className="min-h-[120px] w-full rounded-xl border border-neutral-300 bg-white p-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+            className="min-h-[120px] w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             placeholder="Комментарий"
             {...register('message')}
           />
@@ -220,9 +220,9 @@ export default function LeadForm({
       ) : (
         <p className="t-small text-muted-foreground">Укажите телефон или e-mail — как вам удобнее.</p>
       )}
-      <p className="t-small text-muted-foreground">Ответим в течение 30 минут. Без спама.</p>
+      <p className="t-small rounded-lg border border-neutral-200 bg-white/80 px-3.5 py-2.5 text-muted-foreground">Ответим в течение 30 минут. Без спама.</p>
 
-      <label className="flex items-start gap-2 text-sm font-medium">
+      <label className="flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium">
         <input type="checkbox" className="mt-1" {...register('consent')} />
         <span>
           Я согласен с <Link href="/privacy" className="underline hover:no-underline">политикой обработки персональных данных</Link>
@@ -232,7 +232,7 @@ export default function LeadForm({
 
       <button
         disabled={isSubmitting}
-        className="w-full rounded-xl bg-[var(--brand-red)] px-5 py-3 font-semibold text-white shadow-md transition hover:bg-[#b52a2a] disabled:cursor-not-allowed disabled:opacity-70"
+        className="w-full rounded-xl bg-[var(--brand-red)] px-5 py-3.5 font-semibold text-white shadow-md transition hover:bg-[#b52a2a] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
         type="submit"
       >
         {isSubmitting ? 'Отправка...' : t.lead.submit}
