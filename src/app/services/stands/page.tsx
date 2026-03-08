@@ -2,24 +2,25 @@ import Link from 'next/link';
 import { Building2, CheckCircle2, ClipboardList, PackageCheck, Ruler, School, ShieldCheck, Sparkles, Wrench } from 'lucide-react';
 import LeadForm from '@/components/LeadForm';
 import Section from '@/components/Section';
+import StandPreviewCard from '@/components/services/StandPreviewCard';
 import { messages } from '@/lib/messages';
 
 const heroChips = ['Собственное производство', 'Карманы и сменные блоки', 'Изготовление по размерам', 'Доставка и монтаж'] as const;
 
 const indoorStands = [
-  { title: 'Стенд «Информация»', description: 'Универсальное решение для объявлений и инструкций.' },
-  { title: 'Уголок потребителя', description: 'Для торговых точек, салонов и офисов.' },
-  { title: 'Пожарные стенды', description: 'Схемы, регламенты и инструкции по безопасности.' },
-  { title: 'Охрана труда', description: 'Наглядные материалы для производственных зон.' },
-  { title: 'Первая помощь', description: 'Памятки и алгоритмы действий в экстренных случаях.' },
-  { title: 'Гражданская оборона и ЧС', description: 'Информационные блоки для обучения персонала.' },
-  { title: 'Стенды о коронавирусе', description: 'Памятки и правила для сотрудников и посетителей.' },
+  { title: 'Стенд «Информация»', description: 'Универсальное решение для объявлений и инструкций.', previewTag: 'Интерьер', previewHint: 'Типовая компоновка с карманами А4 и шапкой.' },
+  { title: 'Уголок потребителя', description: 'Для торговых точек, салонов и офисов.', previewTag: 'Ритейл', previewHint: 'Блоки с документами, реквизитами и правилами.' },
+  { title: 'Пожарные стенды', description: 'Схемы, регламенты и инструкции по безопасности.', previewTag: 'Безопасность', previewHint: 'Схема эвакуации и обязательные памятки.' },
+  { title: 'Охрана труда', description: 'Наглядные материалы для производственных зон.', previewTag: 'Производство', previewHint: 'Нормативы, инструкции и чек-листы для персонала.' },
+  { title: 'Первая помощь', description: 'Памятки и алгоритмы действий в экстренных случаях.', previewTag: 'Медицина', previewHint: 'Алгоритмы оказания помощи и контактные номера.' },
+  { title: 'Гражданская оборона и ЧС', description: 'Информационные блоки для обучения персонала.', previewTag: 'ГО и ЧС', previewHint: 'Порядок действий при внештатных ситуациях.' },
+  { title: 'Стенды о коронавирусе', description: 'Памятки и правила для сотрудников и посетителей.', previewTag: 'Памятка', previewHint: 'Рекомендации и санитарные правила размещения.' },
 ] as const;
 
 const outdoorStands = [
-  { title: 'Уличные информационные стенды', description: 'Антивандальные решения с защитой от погоды.' },
-  { title: 'Стенды «Наше Подмосковье»', description: 'Оформление в фирменных требованиях муниципалитетов.' },
-  { title: 'На детские площадки', description: 'Яркие и безопасные конструкции для дворов и парков.' },
+  { title: 'Уличные информационные стенды', description: 'Антивандальные решения с защитой от погоды.', previewTag: 'Outdoor', previewHint: 'Усиленная рама и защищённая зона размещения листов.' },
+  { title: 'Стенды «Наше Подмосковье»', description: 'Оформление в фирменных требованиях муниципалитетов.', previewTag: 'Муниципальный', previewHint: 'Формат с бренд-зоной и нормативной структурой.' },
+  { title: 'На детские площадки', description: 'Яркие и безопасные конструкции для дворов и парков.', previewTag: 'Дворовая среда', previewHint: 'Визуально читаемый стенд для жителей и родителей.' },
 ] as const;
 
 const materials = [
@@ -95,11 +96,14 @@ export default function StandsServicePage() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {indoorStands.map((item) => (
-            <article key={item.title} className="premium-card rounded-2xl p-5">
-              <p className="inline-flex rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600">Для помещений</p>
-              <h3 className="mt-3 text-lg font-semibold">{item.title}</h3>
-              <p className="mt-2 text-sm text-neutral-600">{item.description}</p>
-            </article>
+            <StandPreviewCard
+              key={item.title}
+              label="Для помещений"
+              title={item.title}
+              description={item.description}
+              previewTag={item.previewTag}
+              previewHint={item.previewHint}
+            />
           ))}
         </div>
       </Section>
@@ -112,12 +116,15 @@ export default function StandsServicePage() {
 
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           {outdoorStands.map((item) => (
-            <article key={item.title} className="premium-card rounded-2xl p-6 md:p-7">
-              <p className="inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600">Для улицы</p>
-              <h3 className="mt-3 text-xl font-semibold">{item.title}</h3>
-              <p className="mt-2 text-sm text-neutral-600">{item.description}</p>
-              <div className="mt-4 h-20 rounded-xl border border-dashed border-neutral-200 bg-neutral-50" aria-hidden="true" />
-            </article>
+            <StandPreviewCard
+              key={item.title}
+              variant="outdoor"
+              label="Для улицы"
+              title={item.title}
+              description={item.description}
+              previewTag={item.previewTag}
+              previewHint={item.previewHint}
+            />
           ))}
         </div>
       </Section>
