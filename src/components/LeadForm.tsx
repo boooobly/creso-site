@@ -159,7 +159,7 @@ export default function LeadForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4.5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {submitError && <p className="t-small text-red-500">{submitError}</p>}
 
       <input type="hidden" {...register('service')} />
@@ -182,7 +182,7 @@ export default function LeadForm({
         {errors.name && <p className="mt-1 t-small text-red-500">{errors.name.message}</p>}
       </div>
 
-      <div className="grid gap-3.5 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Controller
             name="phone"
@@ -220,9 +220,9 @@ export default function LeadForm({
       ) : (
         <p className="t-small text-muted-foreground">Укажите телефон или e-mail — как вам удобнее.</p>
       )}
-      <p className="t-small rounded-lg border border-neutral-200 bg-white/70 px-3 py-2 text-muted-foreground">Ответим в течение 30 минут. Без спама.</p>
+      <p className="t-small rounded-lg border border-neutral-200 bg-white/80 px-3.5 py-2.5 text-muted-foreground">Ответим в течение 30 минут. Без спама.</p>
 
-      <label className="flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium">
+      <label className="flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium">
         <input type="checkbox" className="mt-1" {...register('consent')} />
         <span>
           Я согласен с <Link href="/privacy" className="underline hover:no-underline">политикой обработки персональных данных</Link>

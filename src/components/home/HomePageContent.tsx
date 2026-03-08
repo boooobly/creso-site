@@ -185,14 +185,14 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
       </Section>
 
       <Section id="lead-form" className="py-12 md:py-14">
-        <motion.div className="grid gap-8 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm md:gap-10 md:p-10 lg:grid-cols-[1fr_1.05fr]" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          <div className="space-y-5">
-            <div className="space-y-2">
+        <motion.div className="grid items-center gap-6 rounded-[28px] border border-neutral-200 bg-white p-5 shadow-sm sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+          <div className="space-y-4 lg:max-w-[30rem]">
+            <div className="space-y-3">
               <p className="t-eyebrow">ЗАЯВКА</p>
               <h2 className="t-h2 font-extrabold">{messages.lead.title}</h2>
               <p className="t-body text-muted-foreground max-w-md">Опишите задачу — предложим формат, сроки и стоимость.</p>
             </div>
-            <ul className="space-y-2.5">
+            <ul className="space-y-2">
               {leadPoints.map((point) => (
                 <li key={point} className="flex items-start gap-2.5 text-sm text-neutral-700">
                   <CheckCircle2 className="mt-0.5 size-4 text-[var(--brand-red)]" />
@@ -201,7 +201,7 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5 md:p-6">
+          <div className="h-full rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5 md:p-6 lg:p-7">
             <LeadForm t={messages} showMessageField />
           </div>
         </motion.div>
