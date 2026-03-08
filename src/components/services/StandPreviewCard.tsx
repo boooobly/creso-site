@@ -30,10 +30,12 @@ export default function StandPreviewCard({ title, description, label, variant = 
         </span>
       </div>
 
-      <h3 className={isOutdoor ? 'mt-3 text-xl font-semibold' : 'mt-3 text-lg font-semibold'}>{title}</h3>
-      <p className="mt-2 text-sm text-neutral-600">{description}</p>
+      <div className={isOutdoor ? 'mt-3 min-h-[6.75rem] space-y-2' : 'mt-3 min-h-[6.25rem] space-y-2'}>
+        <h3 className={isOutdoor ? 'text-xl font-semibold' : 'text-lg font-semibold'}>{title}</h3>
+        <p className="text-sm text-neutral-600">{description}</p>
+      </div>
 
-      <div className={isOutdoor ? 'mt-5 h-32 overflow-hidden rounded-xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-white' : 'mt-5 h-28 overflow-hidden rounded-xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-white'}>
+      <div className={isOutdoor ? 'mt-auto h-32 overflow-hidden rounded-xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-white' : 'mt-auto h-28 overflow-hidden rounded-xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-white'}>
         <div
           className={[
             'flex h-full w-full flex-col justify-between p-3 transition-all duration-300 ease-out',
