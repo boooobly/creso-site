@@ -182,8 +182,8 @@ export default function LeadForm({
         {errors.name && <p className="mt-1 t-small text-red-500">{errors.name.message}</p>}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="w-full">
           <Controller
             name="phone"
             control={control}
@@ -199,7 +199,7 @@ export default function LeadForm({
           />
           {errors.phone && <p className="mt-1 t-small text-red-500">{errors.phone.message}</p>}
         </div>
-        <div>
+        <div className="w-full">
           <input
             className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             placeholder="E-mail"
