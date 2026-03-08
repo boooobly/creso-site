@@ -15,23 +15,25 @@ export default function ServiceCard({
   return (
     <Link
       href={href}
-      className={`premium-card group flex h-full flex-col justify-between p-5 md:p-6 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 ${
-        featured ? 'bg-[rgba(212,28,28,0.04)]' : ''
+      className={`premium-card group flex h-full flex-col p-5 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 md:p-6 ${
+        featured ? 'bg-[rgba(212,28,28,0.04)]' : 'bg-white'
       }`}
     >
+      <div className={`mb-5 overflow-hidden rounded-2xl border ${featured ? 'border-[var(--brand-red)]/20 bg-white/80' : 'border-neutral-200 bg-neutral-50/80'} p-3`}>
+        <div className={`h-20 rounded-xl ${featured ? 'bg-gradient-to-r from-[var(--brand-red)]/20 to-transparent' : 'bg-gradient-to-r from-neutral-200 to-neutral-100'}`} />
+      </div>
+
       {featured && (
-        <span className="mb-3 inline-flex rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 t-eyebrow text-[var(--brand-red)]">
+        <span className="mb-3 inline-flex w-fit rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 t-eyebrow text-[var(--brand-red)]">
           Основное направление
         </span>
       )}
-      <div className="flex items-start gap-2">
-        <span className="card-dot" />
-        <h3 className={`t-h3 leading-snug transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'md:text-[1.625rem]' : ''}`}>
-          {title}
-        </h3>
+      <div className="flex items-start gap-2.5">
+        <span className="card-dot mt-1" />
+        <h3 className={`t-h3 leading-snug transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
       </div>
       <p className="t-body text-muted-foreground mt-3 line-clamp-3">{desc}</p>
-      <div className="t-link mt-auto pt-4">
+      <div className="t-link mt-auto pt-5">
         Подробнее <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
       </div>
     </Link>
