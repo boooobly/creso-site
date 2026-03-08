@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -85,18 +86,16 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
               aria-hidden="true"
               className="pointer-events-none absolute inset-x-[12%] top-[16%] h-[58%] rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.14)_0%,rgba(212,28,28,0.06)_40%,transparent_75%)] blur-2xl"
             />
-            <motion.div
-              className="relative ml-2 sm:ml-6 lg:ml-10"
-              animate={shouldReduceMotion ? undefined : { y: [0, -6, 0] }}
-              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <img
-                src="/images/home_page/hero"
+            <div className="relative ml-2 sm:ml-6 lg:ml-10">
+              <Image
+                src="/images/home_page/hero.png"
                 alt="Рекламный световой лайтбокс"
-                loading="eager"
+                width={980}
+                height={760}
+                priority
                 className="h-auto w-full object-contain drop-shadow-[0_30px_40px_rgba(15,23,42,0.24)]"
               />
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </Section>
