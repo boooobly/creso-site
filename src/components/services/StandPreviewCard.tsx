@@ -18,43 +18,53 @@ export default function StandPreviewCard({ title, description, label, variant = 
       className={[
         'group relative flex h-full min-h-[250px] flex-col overflow-hidden rounded-2xl border bg-white p-5 outline-none transition-all duration-300',
         'border-neutral-200 shadow-[0_8px_24px_-22px_rgba(15,23,42,0.45)]',
-        'hover:-translate-y-0.5 hover:border-red-200 hover:shadow-[0_18px_30px_-22px_rgba(15,23,42,0.35)]',
-        'focus-visible:-translate-y-0.5 focus-visible:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500/30 focus-visible:shadow-[0_18px_30px_-22px_rgba(15,23,42,0.35)]',
+        'hover:-translate-y-0.5 hover:border-red-200 hover:shadow-[0_18px_34px_-22px_rgba(15,23,42,0.4)]',
+        'focus-visible:-translate-y-0.5 focus-visible:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500/30 focus-visible:shadow-[0_18px_34px_-22px_rgba(15,23,42,0.4)]',
         isOutdoor ? 'min-h-[270px] p-6 md:p-7' : '',
       ].join(' ')}
     >
-      <div className="flex items-start justify-between gap-3">
-        <p className={isOutdoor ? 'inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600' : 'inline-flex rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600'}>{label}</p>
-        <span className="inline-flex size-7 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-400 transition-colors duration-300 group-hover:border-red-200 group-hover:text-red-500 group-focus-visible:border-red-200 group-focus-visible:text-red-500">
-          <PanelsTopLeft className="size-3.5" aria-hidden="true" />
-        </span>
+      <div className="relative z-20 transition-opacity duration-300 md:group-hover:opacity-0 md:group-focus-visible:opacity-0">
+        <div className="flex items-start justify-between gap-3">
+          <p className={isOutdoor ? 'inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600' : 'inline-flex rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600'}>{label}</p>
+          <span className="inline-flex size-7 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-400 transition-colors duration-300 group-hover:border-red-200 group-hover:text-red-500 group-focus-visible:border-red-200 group-focus-visible:text-red-500">
+            <PanelsTopLeft className="size-3.5" aria-hidden="true" />
+          </span>
+        </div>
+
+        <div className={isOutdoor ? 'mt-3 min-h-[6.75rem] space-y-2' : 'mt-3 min-h-[6.25rem] space-y-2'}>
+          <h3 className={isOutdoor ? 'text-xl font-semibold' : 'text-lg font-semibold'}>{title}</h3>
+          <p className="text-sm text-neutral-600">{description}</p>
+        </div>
       </div>
 
-      <h3 className={isOutdoor ? 'mt-3 text-xl font-semibold' : 'mt-3 text-lg font-semibold'}>{title}</h3>
-      <p className="mt-2 text-sm text-neutral-600">{description}</p>
+      <div
+        className={[
+          'pointer-events-none absolute z-10 overflow-hidden border border-neutral-200 bg-gradient-to-br from-neutral-100 to-white transition-all duration-300 ease-out',
+          'left-5 right-5 bottom-5 h-28 rounded-xl',
+          'md:group-hover:inset-0 md:group-hover:h-auto md:group-hover:rounded-none md:group-hover:border-transparent',
+          'md:group-focus-visible:inset-0 md:group-focus-visible:h-auto md:group-focus-visible:rounded-none md:group-focus-visible:border-transparent',
+          isOutdoor ? 'left-6 right-6 bottom-6 h-32' : '',
+        ].join(' ')}
+        aria-hidden="true"
+      >
+        <div className="relative flex h-full w-full items-end p-3 md:p-4">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.9),rgba(245,245,245,0.55)_42%,rgba(229,229,229,0.65)_100%)]" />
 
-      <div className={isOutdoor ? 'mt-5 h-32 overflow-hidden rounded-xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-white' : 'mt-5 h-28 overflow-hidden rounded-xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-white'}>
-        <div
-          className={[
-            'flex h-full w-full flex-col justify-between p-3 transition-all duration-300 ease-out',
-            'opacity-100 translate-y-0 md:opacity-0 md:translate-y-2 md:group-hover:opacity-100 md:group-hover:translate-y-0 md:group-focus-visible:opacity-100 md:group-focus-visible:translate-y-0',
-          ].join(' ')}
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="rounded-md bg-white/85 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-600">{previewTag}</span>
-            <span className="rounded-md border border-red-100 bg-red-50 px-2 py-1 text-[11px] font-medium text-red-600">Превью</span>
+          <div className="absolute inset-x-3 top-3 space-y-1.5 md:inset-x-4 md:top-4">
+            <div className="h-1.5 w-3/4 rounded-full bg-neutral-300/80" />
+            <div className="h-1.5 w-2/3 rounded-full bg-neutral-300/70" />
+            <div className="h-1.5 w-1/2 rounded-full bg-neutral-300/60" />
           </div>
 
-          <div className="grid grid-cols-[1fr_auto] items-end gap-3">
-            <div className="space-y-2">
-              <div className="h-1.5 w-3/4 rounded-full bg-neutral-300/80" />
-              <div className="h-1.5 w-2/3 rounded-full bg-neutral-300/70" />
-              <div className="h-1.5 w-1/2 rounded-full bg-neutral-300/60" />
-            </div>
+          <div className="relative z-10 flex w-full items-end justify-between gap-3">
+            <span className="rounded-md border border-neutral-200 bg-white/85 px-2 py-1 text-[11px] font-medium text-neutral-600">{previewTag}</span>
             <div className={isOutdoor ? 'h-14 w-12 rounded-md border border-neutral-300 bg-white/90 shadow-sm' : 'h-12 w-10 rounded-md border border-neutral-300 bg-white/90 shadow-sm'} />
           </div>
 
-          <p className="text-[11px] text-neutral-500">{previewHint}</p>
+          <div className="absolute inset-x-0 bottom-0 z-20 translate-y-1 bg-gradient-to-t from-black/45 via-black/20 to-transparent px-4 pb-4 pt-10 opacity-0 transition-all duration-300 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-visible:translate-y-0 md:group-focus-visible:opacity-100">
+            <p className="text-xs font-medium uppercase tracking-wide text-white/85">{previewHint}</p>
+            <p className="mt-1 text-sm font-semibold text-white">{title}</p>
+          </div>
         </div>
       </div>
     </article>
