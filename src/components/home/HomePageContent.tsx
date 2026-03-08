@@ -76,27 +76,26 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           </motion.div>
 
           <motion.div
-            className="relative"
+            className="relative mx-auto w-full max-w-[36rem] lg:mr-0 lg:max-w-[42rem]"
             initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
             viewport={viewportOnce}
           >
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-[12%] top-[16%] h-[58%] rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.14)_0%,rgba(212,28,28,0.06)_40%,transparent_75%)] blur-2xl"
+            />
             <motion.div
-              className="relative mx-auto w-full max-w-[38rem] overflow-hidden rounded-[30px] border border-neutral-200/80 bg-white/90 p-4 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.55)] backdrop-blur-sm sm:p-5"
+              className="relative ml-2 sm:ml-6 lg:ml-10"
               animate={shouldReduceMotion ? undefined : { y: [0, -6, 0] }}
               transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <div className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-neutral-200/80 bg-gradient-to-br from-neutral-100 via-white to-neutral-100">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(212,28,28,0.12),transparent_45%)]" />
-                <div className="absolute inset-x-5 top-5 h-7 rounded-full border border-neutral-200/80 bg-white/80" />
-                <div className="absolute inset-x-5 bottom-5 top-16 rounded-2xl border border-dashed border-neutral-300/90 bg-white/70" />
-                <div className="absolute left-8 top-24 h-3.5 w-24 rounded-full bg-neutral-200" />
-                <div className="absolute left-8 top-32 h-2.5 w-36 rounded-full bg-neutral-200/80" />
-                <div className="absolute bottom-8 left-8 inline-flex items-center gap-2 rounded-full border border-[var(--brand-red)]/25 bg-white px-3 py-1.5 text-[11px] font-semibold text-[var(--brand-red)]">
-                  <span className="size-1.5 rounded-full bg-[var(--brand-red)]" />
-                  Медиа-зона для кейсов и проектов
-                </div>
-              </div>
+              <img
+                src="/images/home_page/hero"
+                alt="Рекламный световой лайтбокс"
+                loading="eager"
+                className="h-auto w-full object-contain drop-shadow-[0_30px_40px_rgba(15,23,42,0.24)]"
+              />
             </motion.div>
           </motion.div>
         </div>
