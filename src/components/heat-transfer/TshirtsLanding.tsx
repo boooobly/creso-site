@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { Brush, CheckCheck, ChevronDown, Palette, Shirt, Sparkles, Timer, UploadCloud } from 'lucide-react';
 import { CSSProperties, ReactNode, useState } from 'react';
@@ -63,20 +64,17 @@ const galleryCards = [
   {
     title: 'Логотип на груди',
     description: 'Компактное нанесение логотипа на футболки для формы, персонала и промо.',
-    printClass: 'h-[26%] w-[38%] bg-sky-500',
-    printPosition: 'left-6 top-6',
+    imageSrc: '/images/t-shirt/logo.png',
   },
   {
     title: 'Мерч для команды',
     description: 'Единый стиль для сотрудников, команд и мероприятий с аккуратным переносом.',
-    printClass: 'h-[40%] w-[48%] bg-violet-500',
-    printPosition: 'left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2',
+    imageSrc: '/images/t-shirt/eurochem.png',
   },
   {
     title: 'Надпись термоплёнкой',
     description: 'Контрастные надписи и простая графика с чистой и стойкой посадкой на ткани.',
-    printClass: 'h-[18%] w-[64%] bg-emerald-500',
-    printPosition: 'left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2',
+    imageSrc: '/images/t-shirt/termoplenka.png',
   },
 ] as const;
 
@@ -175,17 +173,19 @@ function AnimatedCard({ index, reveal, className, children }: { index: number; r
   );
 }
 
-function ExampleMockup({ printClass, printPosition }: { printClass: string; printPosition: string }) {
+function ExampleMockup({ title, description, imageSrc }: { title: string; description: string; imageSrc: string }) {
   return (
-    <div className="relative aspect-[16/10] overflow-hidden border-b border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 p-4 dark:border-neutral-800 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
-      <div className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:radial-gradient(circle_at_1px_1px,rgba(115,115,115,0.5)_1px,transparent_0)] [background-size:12px_12px] dark:opacity-[0.12]" />
-      <div className="relative mx-auto mt-8 h-[66%] w-[72%] rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
-        <div className={`absolute rounded-md ${printClass} ${printPosition}`} />
+    <div className="relative aspect-[16/10] overflow-hidden">
+      <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+        <h3 className="t-h3 line-clamp-2 leading-snug text-white">{title}</h3>
+        <p className="mt-2 text-sm text-white/90">{description}</p>
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/[0.06] motion-reduce:transition-none" />
     </div>
   );
 }
+
 
 export default function TshirtsLanding() {
   const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.12 });
@@ -291,13 +291,9 @@ export default function TshirtsLanding() {
                 key={card.title}
                 index={index}
                 reveal={reveal}
-                className="premium-card group flex h-full flex-col overflow-hidden"
+                className="premium-card group h-full overflow-hidden"
               >
-                <ExampleMockup printClass={card.printClass} printPosition={card.printPosition} />
-                <div className="flex flex-1 flex-col gap-3 p-5">
-                  <h3 className="t-h3 line-clamp-2 leading-snug">{card.title}</h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-300">{card.description}</p>
-                </div>
+                <ExampleMockup title={card.title} description={card.description} imageSrc={card.imageSrc} />
               </AnimatedCard>
             ))}
           </div>
