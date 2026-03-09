@@ -1,28 +1,16 @@
 import HomePageContent from '@/components/home/HomePageContent';
 import servicesLocal from '@/data/services.json';
-import portfolioLocal from '@/data/portfolio.json';
 import faqLocal from '@/data/faq.json';
-import { getServices, getPortfolio, getFaq } from '@/lib/contentful';
+import { getServices, getFaq } from '@/lib/contentful';
 import { messages } from '@/lib/messages';
 
-const trustBadges = ['Более 10 лет на рынке', 'Собственное производство', 'Контроль качества на каждом этапе', 'Сроки от 2 дней'];
-
-const processSteps = [
-  { title: 'Бриф и расчёт', description: 'Уточняем задачу, сроки и бюджет. Предлагаем лучший формат и материалы.' },
-  { title: 'Макет и согласование', description: 'Подготавливаем визуализацию и корректируем детали до финального согласования.' },
-  { title: 'Производство', description: 'Запускаем проект на собственных мощностях, соблюдая стандарты качества.' },
-  { title: 'Монтаж и передача', description: 'Организуем доставку, установку или передачу готового тиража.' },
-];
-
 export default async function Home() {
-  const [sCMS, pCMS, fCMS] = await Promise.all([
+  const [sCMS, fCMS] = await Promise.all([
     getServices().catch(() => null),
-    getPortfolio().catch(() => null),
     getFaq().catch(() => null),
   ]);
 
   const services = (sCMS ?? servicesLocal) as any[];
-  const portfolio = (pCMS ?? portfolioLocal) as any[];
   const faq = (fCMS ?? faqLocal) as any[];
 
   const resolveServiceHref = (service: any) => {
@@ -53,11 +41,5 @@ export default async function Home() {
     href: resolveServiceHref(service),
   }));
 
-  const portfolioPreview = portfolio.map((item) => ({
-    id: String(item.id),
-    title: String(item.title),
-    category: String(item.category ?? 'Проект'),
-  }));
-
-  return <HomePageContent services={servicesWithHref} portfolio={portfolioPreview} faq={faq} messages={messages} />;
+  return <HomePageContent services={servicesWithHref} faq={faq} messages={messages} />;
 }
