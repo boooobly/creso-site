@@ -37,6 +37,19 @@ const processSteps = [
 
 const leadPoints = ['Расчёт стоимости и сроков в день обращения', 'Подбор материалов под бюджет и задачу', 'Один менеджер на всём цикле проекта'];
 
+
+const serviceImageById: Record<string, string> = {
+  baget: '/images/services/bagget.png',
+  cnc: '/images/services/milling.png',
+  print: '/images/services/printing.png',
+  plotter: '/images/services/plotter.png',
+  thermo: '/images/services/t-shirt.png',
+  mugs: '/images/services/glasses.png',
+  stands: '/images/services/stends.png',
+  outdoor: '/images/services/outdoor.png',
+  polygraphy: '/images/services/cards.png',
+};
+
 const featuredWorkExamples = [
   {
     id: 'som',
@@ -147,7 +160,7 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
         <motion.div className="grid items-stretch gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {services.map((s) => (
             <motion.div key={s.id} variants={fadeUp(16)} className="h-full">
-              <ServiceCard title={s.title} desc={s.description} href={s.href} />
+              <ServiceCard title={s.title} desc={s.description} href={s.href} imageSrc={serviceImageById[s.id]} />
             </motion.div>
           ))}
         </motion.div>
