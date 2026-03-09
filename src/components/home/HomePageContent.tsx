@@ -15,7 +15,6 @@ import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
 
 type HomePageContentProps = {
   services: Array<{ id: string; title: string; description: string; href: string }>;
-  portfolio: Array<{ id: string; title: string; category: string }>;
   faq: any[];
   messages: SiteMessages;
 };
@@ -38,7 +37,31 @@ const processSteps = [
 
 const leadPoints = ['Расчёт стоимости и сроков в день обращения', 'Подбор материалов под бюджет и задачу', 'Один менеджер на всём цикле проекта'];
 
-export default function HomePageContent({ services, portfolio, faq, messages }: HomePageContentProps) {
+const featuredWorkExamples = [
+  {
+    id: 'som',
+    category: 'OUTDOOR',
+    title: 'Рекламная стела для СОМ',
+    description: 'Многоуровневая рекламная конструкция с яркими рекламными блоками для сети строительных материалов.',
+    imageSrc: '/images/home_page/examples_of_work/som.png',
+  },
+  {
+    id: 'nevinnomyssk',
+    category: 'OUTDOOR',
+    title: 'Въездная стела Невинномысск',
+    description: 'Крупная городская конструкция с объемными элементами и чистой современной подачей.',
+    imageSrc: '/images/home_page/examples_of_work/nevinnomyssk.png',
+  },
+  {
+    id: 'apple-time',
+    category: 'OUTDOOR',
+    title: 'Световой лайтбокс Apple Time',
+    description: 'Подвесной световой короб для торговой точки с аккуратной подсветкой и читаемой навигацией.',
+    imageSrc: '/images/home_page/examples_of_work/apple.png',
+  },
+];
+
+export default function HomePageContent({ services, faq, messages }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -121,10 +144,10 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <h2 className="t-h2">Комплексные решения для рекламы и печати</h2>
           <p className="t-body text-muted-foreground max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
-        <motion.div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {services.map((s, index) => (
-            <motion.div key={s.id} variants={fadeUp(16)} className={index === 0 ? 'h-full md:col-span-2 xl:col-span-2' : 'h-full'}>
-              <ServiceCard title={s.title} desc={s.description} href={s.href} featured={index === 0} />
+        <motion.div className="grid items-stretch gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+          {services.map((s) => (
+            <motion.div key={s.id} variants={fadeUp(16)} className="h-full">
+              <ServiceCard title={s.title} desc={s.description} href={s.href} />
             </motion.div>
           ))}
         </motion.div>
@@ -140,9 +163,9 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>
         <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {portfolio.slice(0, 3).map((item) => (
+          {featuredWorkExamples.map((item) => (
             <motion.div key={item.id} variants={fadeUp(18)} transition={{ duration: 0.2 }} className="h-full">
-              <FeatureCard title={item.title} category={item.category} href="/portfolio" />
+              <FeatureCard title={item.title} category={item.category} description={item.description} imageSrc={item.imageSrc} />
             </motion.div>
           ))}
         </motion.div>
