@@ -177,10 +177,10 @@ function ExampleMockup({ title, description, imageSrc }: { title: string; descri
   return (
     <div className="relative aspect-[16/10] overflow-hidden">
       <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-        <h3 className="t-h3 line-clamp-2 leading-snug text-white">{title}</h3>
-        <p className="mt-2 text-sm text-white/90">{description}</p>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 text-white">
+        <h3 className="max-w-[26ch] text-[1.1rem] font-semibold leading-snug text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.45)] sm:text-[1.2rem]">{title}</h3>
+        <p className="mt-2 max-w-[34ch] text-xs leading-relaxed text-white/90 [text-shadow:0_1px_2px_rgba(0,0,0,0.35)] sm:text-sm">{description}</p>
       </div>
     </div>
   );
