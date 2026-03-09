@@ -53,21 +53,18 @@ const serviceImageById: Record<string, string> = {
 const featuredWorkExamples = [
   {
     id: 'som',
-    category: 'OUTDOOR',
     title: 'Рекламная стела для СОМ',
     description: 'Многоуровневая рекламная конструкция с яркими рекламными блоками для сети строительных материалов.',
     imageSrc: '/images/home_page/examples_of_work/som.png',
   },
   {
     id: 'nevinnomyssk',
-    category: 'OUTDOOR',
     title: 'Въездная стела Невинномысск',
     description: 'Крупная городская конструкция с объемными элементами и чистой современной подачей.',
     imageSrc: '/images/home_page/examples_of_work/nevinnomyssk.png',
   },
   {
     id: 'apple-time',
-    category: 'OUTDOOR',
     title: 'Световой лайтбокс Apple Time',
     description: 'Подвесной световой короб для торговой точки с аккуратной подсветкой и читаемой навигацией.',
     imageSrc: '/images/home_page/examples_of_work/apple.png',
@@ -79,7 +76,7 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
 
   return (
     <div>
-      <Section className="relative overflow-hidden pb-12 pt-14 md:pb-14 md:pt-20">
+      <Section className="relative overflow-hidden pb-8 pt-14 md:pb-10 md:pt-20">
         <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
             <div className="space-y-5">
@@ -178,7 +175,7 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
         <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {featuredWorkExamples.map((item) => (
             <motion.div key={item.id} variants={fadeUp(18)} transition={{ duration: 0.2 }} className="h-full">
-              <FeatureCard title={item.title} category={item.category} description={item.description} imageSrc={item.imageSrc} />
+              <FeatureCard title={item.title} description={item.description} imageSrc={item.imageSrc} />
             </motion.div>
           ))}
         </motion.div>
