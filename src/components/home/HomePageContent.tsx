@@ -121,10 +121,10 @@ export default function HomePageContent({ services, portfolio, faq, messages }: 
           <h2 className="t-h2">Комплексные решения для рекламы и печати</h2>
           <p className="t-body text-muted-foreground max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
-        <motion.div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {services.map((s, index) => (
-            <motion.div key={s.id} variants={fadeUp(16)} className={index === 0 ? 'h-full md:col-span-2 xl:col-span-2' : 'h-full'}>
-              <ServiceCard title={s.title} desc={s.description} href={s.href} featured={index === 0} />
+        <motion.div className="grid items-stretch gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+          {services.map((s) => (
+            <motion.div key={s.id} variants={fadeUp(16)} className="h-full">
+              <ServiceCard title={s.title} desc={s.description} href={s.href} />
             </motion.div>
           ))}
         </motion.div>
