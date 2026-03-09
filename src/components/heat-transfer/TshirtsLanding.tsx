@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { Brush, CheckCheck, ChevronDown, Palette, Shirt, Sparkles, Timer, UploadCloud } from 'lucide-react';
 import { CSSProperties, ReactNode, useState } from 'react';
@@ -60,12 +61,21 @@ const printTechnologyCards = [
 ] as const;
 
 const galleryCards = [
-  { title: 'Логотип на груди', tag: 'A4', printClass: 'h-[26%] w-[38%] bg-sky-500', printPosition: 'left-6 top-6' },
-  { title: 'Спина A4', tag: 'СПИНА', printClass: 'h-[52%] w-[56%] bg-indigo-500', printPosition: 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' },
-  { title: 'Надпись термоплёнкой', tag: 'ТЕРМОПЛЁНКА', printClass: 'h-[18%] w-[64%] bg-emerald-500', printPosition: 'left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2' },
-  { title: 'Парные футболки', tag: 'ПАРА', printClass: 'h-[34%] w-[28%] bg-rose-500', printPosition: 'left-[18%] top-[34%]' },
-  { title: 'Мерч для команды', tag: 'МЕРЧ', printClass: 'h-[40%] w-[48%] bg-violet-500', printPosition: 'left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2' },
-  { title: 'Индивидуальный принт', tag: 'КАСТОМ', printClass: 'h-[30%] w-[50%] bg-amber-500', printPosition: 'left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2' },
+  {
+    title: 'Логотип на груди',
+    description: 'Компактное нанесение логотипа на футболки для формы, персонала и промо.',
+    imageSrc: '/images/t-shirt/logo.png',
+  },
+  {
+    title: 'Мерч для команды',
+    description: 'Единый стиль для сотрудников, команд и мероприятий с аккуратным переносом.',
+    imageSrc: '/images/t-shirt/eurochem.png',
+  },
+  {
+    title: 'Надпись термоплёнкой',
+    description: 'Контрастные надписи и простая графика с чистой и стойкой посадкой на ткани.',
+    imageSrc: '/images/t-shirt/termoplenka.png',
+  },
 ] as const;
 
 const steps = ['Пришлите макет или опишите задачу', 'Мы уточним детали и подтвердим стоимость', 'Печать и выдача/доставка'];
@@ -163,20 +173,19 @@ function AnimatedCard({ index, reveal, className, children }: { index: number; r
   );
 }
 
-function ExampleMockup({ tag, printClass, printPosition }: { tag: string; printClass: string; printPosition: string }) {
+function ExampleMockup({ title, description, imageSrc }: { title: string; description: string; imageSrc: string }) {
   return (
-    <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl border-b border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 p-4 dark:border-neutral-800 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
-      <div className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:radial-gradient(circle_at_1px_1px,rgba(115,115,115,0.5)_1px,transparent_0)] [background-size:12px_12px] dark:opacity-[0.12]" />
-      <span className="absolute left-4 top-4 rounded-full border border-red-300 bg-white/95 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-red-700 dark:border-red-900 dark:bg-neutral-900 dark:text-red-200">
-        {tag}
-      </span>
-      <div className="relative mx-auto mt-8 h-[66%] w-[72%] rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
-        <div className={`absolute rounded-md ${printClass} ${printPosition}`} />
+    <div className="relative aspect-[16/10] overflow-hidden">
+      <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 text-white">
+        <h3 className="max-w-[26ch] text-[1.1rem] font-semibold leading-snug text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.45)] sm:text-[1.2rem]">{title}</h3>
+        <p className="mt-2 max-w-[34ch] text-xs leading-relaxed text-white/90 [text-shadow:0_1px_2px_rgba(0,0,0,0.35)] sm:text-sm">{description}</p>
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/[0.06] motion-reduce:transition-none" />
     </div>
   );
 }
+
 
 export default function TshirtsLanding() {
   const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.12 });
@@ -276,18 +285,15 @@ export default function TshirtsLanding() {
 
       <SectionBlock title="Примеры работ">
         {(reveal) => (
-          <div id="examples" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div id="examples" className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {galleryCards.map((card, index) => (
               <AnimatedCard
                 key={card.title}
                 index={index}
                 reveal={reveal}
-                className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg motion-reduce:transition-none dark:border-neutral-800 dark:bg-neutral-900"
+                className="premium-card group h-full overflow-hidden"
               >
-                <ExampleMockup tag={card.tag} printClass={card.printClass} printPosition={card.printPosition} />
-                <div className="p-4">
-                  <p className="text-sm font-semibold transition-colors duration-300 group-hover:text-red-600 dark:group-hover:text-red-300">{card.title}</p>
-                </div>
+                <ExampleMockup title={card.title} description={card.description} imageSrc={card.imageSrc} />
               </AnimatedCard>
             ))}
           </div>
