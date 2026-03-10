@@ -76,7 +76,7 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
 
   return (
     <div>
-      <Section className="relative overflow-hidden pb-10 pt-10 md:pb-12 md:pt-14">
+      <Section className="relative overflow-hidden pb-10 pt-4 md:pb-12 md:pt-6">
         <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
             <div className="space-y-5">

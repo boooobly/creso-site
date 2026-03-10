@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${onest.variable} font-sans bg-white dark:bg-neutral-950`}>
         <SiteHeader />
-        <main className="container py-8">{children}</main>
+        <main className="main-layout container py-8">{children}</main>
         <SiteFooter />
       </body>
     </html>

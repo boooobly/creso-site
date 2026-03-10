@@ -41,5 +41,9 @@ export default async function Home() {
     href: resolveServiceHref(service),
   }));
 
-  return <HomePageContent services={servicesWithHref} faq={faq} messages={messages} />;
+  return (
+    <div className="home-page-root">
+      <HomePageContent services={servicesWithHref} faq={faq} messages={messages} />
+    </div>
+  );
 }
