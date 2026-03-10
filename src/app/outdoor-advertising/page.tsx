@@ -11,16 +11,16 @@ import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import { messages } from '@/lib/messages';
 
 const services: Array<{ title: string; image: string; featured?: boolean }> = [
-  { title: 'Световые короба', image: '/images/outdoor/lightboxes.jpg', featured: true },
-  { title: 'Объемные буквы', image: '/images/outdoor/channel-letters.jpg' },
-  { title: 'Контражурные буквы', image: '/images/outdoor/backlit-letters.jpg' },
-  { title: 'Крышные установки', image: '/images/outdoor/roof-signs.jpg' },
-  { title: 'Баннеры на фасад', image: '/images/outdoor/facade-banners.jpg' },
-  { title: 'Лайтбоксы', image: '/images/outdoor/lightbox-panels.jpg' },
-  { title: 'Гибкий неон', image: '/images/outdoor/neon.jpg' },
-  { title: 'Стелы', image: '/images/outdoor/pylons.jpg' },
-  { title: 'Таблички', image: '/images/outdoor/signplates.jpg' },
-  { title: 'Сложные конструкции любой сложности', image: '/images/outdoor/custom-structures.jpg' },
+  { title: 'Световые короба', image: '/images/outdoor_examples/lightbox.png', featured: true },
+  { title: 'Объемные буквы', image: '/images/outdoor_examples/dimensional_letters.png' },
+  { title: 'Контражурные буквы', image: '/images/outdoor_examples/backlit_sign.png' },
+  { title: 'Крышные установки', image: '/images/outdoor_examples/roof_sign.png' },
+  { title: 'Баннеры', image: '/images/outdoor_examples/banner.png' },
+  { title: 'Лайтбоксы', image: '/images/outdoor_examples/lightbox_cube.png' },
+  { title: 'Гибкий неон', image: '/images/outdoor_examples/neon.png' },
+  { title: 'Стелы', image: '/images/outdoor_examples/stela.png' },
+  { title: 'Адресные таблички', image: '/images/outdoor_examples/adress_sign.png' },
+  { title: 'Сложные конструкции любой сложности', image: '/images/outdoor_examples/custom.png' },
 ] as const;
 
 const strengths: { label: string; icon: LucideIcon }[] = [
