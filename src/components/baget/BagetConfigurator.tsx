@@ -14,7 +14,7 @@ import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToP
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
 import { normalizeBagetTextureUrl } from '@/lib/baget/normalizeBagetTextureUrl';
 import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
-import { getInitialBagetPrintRequirement, type BagetTransferSource } from '@/lib/baget/printRequirement';
+import { getInitialBagetPrintRequirement, type BagetPrintRequirement, type BagetTransferSource } from '@/lib/baget/printRequirement';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
@@ -127,7 +127,7 @@ export default function BagetConfigurator({
     ...initialMaterials,
     ...(initialWorkType ? { workType: initialWorkType } : {}),
   });
-  const [printRequirement] = useState(() => getInitialBagetPrintRequirement(initialTransferSource));
+  const [printRequirement, setPrintRequirement] = useState<BagetPrintRequirement>(() => getInitialBagetPrintRequirement(initialTransferSource));
   const catalogItems = useMemo<CatalogBagetItem[]>(
     () =>
       items.map((item) => {
@@ -357,6 +357,17 @@ export default function BagetConfigurator({
       setMaterials((prev) => ({ ...prev, glazing: 'none' }));
     }
   }, [isGlazingAllowed, materials.glazing]);
+
+  useEffect(() => {
+    if (!printRequirement.requiresPrint && printRequirement.printMaterial !== null) {
+      setPrintRequirement((prev) => ({ ...prev, printMaterial: null }));
+      return;
+    }
+
+    if (printRequirement.requiresPrint && printRequirement.printMaterial === null) {
+      setPrintRequirement((prev) => ({ ...prev, printMaterial: 'canvas' }));
+    }
+  }, [printRequirement.printMaterial, printRequirement.requiresPrint]);
 
   useEffect(() => {
     if (materials.workType === 'stretchedCanvas' && !stretcherNarrowAllowed && materials.stretcherType === 'narrow') {
@@ -631,6 +642,8 @@ export default function BagetConfigurator({
           setFilters={setFilters}
           materials={materials}
           setMaterials={setMaterials}
+          printRequirement={printRequirement}
+          setPrintRequirement={setPrintRequirement}
           colors={colors}
           styles={styles}
           standAllowed={standAllowed}

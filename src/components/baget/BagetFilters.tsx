@@ -3,6 +3,7 @@
 import { ChevronDown } from 'lucide-react';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import AccessoryHelpTooltip from './AccessoryHelpTooltip';
+import type { BagetPrintMaterial, BagetPrintRequirement } from '@/lib/baget/printRequirement';
 
 export type FilterState = {
   color: string;
@@ -71,6 +72,8 @@ type BagetFiltersProps = {
   setFilters: (next: FilterState) => void;
   materials: MaterialsState;
   setMaterials: (next: MaterialsState) => void;
+  printRequirement: BagetPrintRequirement;
+  setPrintRequirement: (next: BagetPrintRequirement) => void;
   colors: string[];
   styles: string[];
   standAllowed: boolean;
@@ -107,6 +110,8 @@ export default function BagetFilters({
   setFilters,
   materials,
   setMaterials,
+  printRequirement,
+  setPrintRequirement,
   colors,
   styles,
   standAllowed,
@@ -280,6 +285,39 @@ export default function BagetFilters({
             </SelectWithChevron>
           </label>
           {!glazingAllowed && glazingDisabledReason ? <p className="text-xs text-amber-700">{glazingDisabledReason}</p> : null}
+
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={printRequirement.requiresPrint}
+              onChange={(e) =>
+                setPrintRequirement({
+                  ...printRequirement,
+                  requiresPrint: e.target.checked,
+                  printMaterial: e.target.checked ? (printRequirement.printMaterial ?? 'canvas') : null,
+                })
+              }
+            />
+            Требуется печать
+          </label>
+
+          {printRequirement.requiresPrint ? (
+            <label className="block space-y-1">
+              <span>Материал печати</span>
+              <SelectWithChevron
+                value={printRequirement.printMaterial ?? 'canvas'}
+                onChange={(e) =>
+                  setPrintRequirement({
+                    ...printRequirement,
+                    printMaterial: e.target.value as BagetPrintMaterial,
+                  })
+                }
+              >
+                <option value="paper">Бумага</option>
+                <option value="canvas">Холст</option>
+              </SelectWithChevron>
+            </label>
+          ) : null}
 
           <label className="flex items-center gap-2">
             <input

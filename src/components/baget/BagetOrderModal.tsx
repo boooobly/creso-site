@@ -408,14 +408,21 @@ export default function BagetOrderModal({
                     </dd>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Печать</dt>
-                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                      {orderSummary.printRequirement.requiresPrint
-                        ? `${orderSummary.printRequirement.printMaterial === 'paper' ? 'На бумаге' : 'На холсте'} (${orderSummary.printRequirement.printCost.toLocaleString('ru-RU')} ₽)`
-                        : 'Не требуется'}
-                    </dd>
-                  </div>
+                  {orderSummary.printRequirement.requiresPrint ? (
+                    <>
+                      <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                        <dt className="text-sm text-neutral-500 dark:text-neutral-400">Требуется печать</dt>
+                        <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">Да</dd>
+                      </div>
+
+                      <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                        <dt className="text-sm text-neutral-500 dark:text-neutral-400">Материал печати</dt>
+                        <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                          {orderSummary.printRequirement.printMaterial === 'paper' ? 'Бумага' : 'Холст'}
+                        </dd>
+                      </div>
+                    </>
+                  ) : null}
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
                     <dt className="text-sm text-neutral-500 dark:text-neutral-400">Ножка-подставка</dt>
