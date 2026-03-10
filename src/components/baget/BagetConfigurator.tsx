@@ -2,6 +2,7 @@
 
 import {
   ChangeEvent,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -17,6 +18,7 @@ import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
 import BagetPreview from './BagetPreview';
+import InfoTooltip from './InfoTooltip';
 
 const ITEMS_PER_PAGE = 16;
 
@@ -32,7 +34,6 @@ const GLAZING_LABELS: Record<MaterialsState['glazing'], string> = {
   none: 'Без остекления',
   glass: 'Стекло',
   antiReflectiveGlass: 'Антибликовое стекло',
-  museumGlass: 'Музейное стекло',
   plexiglass: 'Оргстекло',
   pet1mm: 'ПЭТ 1мм',
 };
@@ -266,6 +267,62 @@ export default function BagetConfigurator({
   const effectiveHeightMm = quote.effectiveSize.height;
   const calcMeta = quote.meta ?? {};
   const autoAdditions = calcMeta.autoAdditions;
+
+
+  const summaryCostRows = useMemo<Array<{
+    key: string;
+    label: ReactNode;
+    value: number;
+    note?: ReactNode;
+  }>>(() => {
+    const rows = [
+      {
+        key: 'materials',
+        label: 'Материалы:',
+        value: Number(calcMeta.materialsCost ?? 0),
+      },
+      {
+        key: 'pvc',
+        label: 'ПВХ:',
+        value: Number(calcMeta.pvcCost ?? 0),
+        note: autoAdditions?.pvcType !== 'none' ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : undefined,
+      },
+      {
+        key: 'orabond',
+        label: (
+          <span className="inline-flex items-center gap-1">
+            Orabond:
+            <InfoTooltip
+              text="Orabond - клеевой материал для накатки изображения на основу. Нужен для надежной фиксации изображения без пузырей и отслоений."
+              ariaLabel="Что такое Orabond"
+            />
+          </span>
+        ),
+        value: Number(calcMeta.orabondCost ?? 0),
+        note: autoAdditions?.addOrabond ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : undefined,
+      },
+      {
+        key: 'hanging',
+        label: `${String(calcMeta.hangingLabel ?? '')}:`,
+        value: Number(calcMeta.hangingCost ?? 0),
+      },
+      {
+        key: 'stand',
+        label: 'Ножка-подставка:',
+        value: Number(calcMeta.standCost ?? 0),
+      },
+      {
+        key: 'stretcher',
+        label: 'Подрамник:',
+        value: Number(calcMeta.stretcherCost ?? 0),
+        note: materials.workType === 'stretchedCanvas'
+          ? <span className="ml-2 text-xs text-neutral-500">{materials.stretcherType === 'narrow' ? 'Узкий (2 см)' : 'Широкий (4 см)'}</span>
+          : undefined,
+      },
+    ];
+
+    return rows.filter((row) => row.value > 0);
+  }, [autoAdditions?.addOrabond, autoAdditions?.pvcType, calcMeta.hangingCost, calcMeta.hangingLabel, calcMeta.materialsCost, calcMeta.orabondCost, calcMeta.pvcCost, calcMeta.standCost, calcMeta.stretcherCost, materials.stretcherType, materials.workType]);
 
   useEffect(() => {
     if (!standAllowed && materials.stand) {
@@ -681,29 +738,12 @@ export default function BagetConfigurator({
                   {selectedBagetForQuote?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
                 </li>
               ) : null}
-              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500">Материалы:</span> {Math.round(Number(calcMeta.materialsCost ?? 0)).toLocaleString('ru-RU')} ₽
-              </li>
-              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500">ПВХ:</span> {Math.round(Number(calcMeta.pvcCost ?? 0)).toLocaleString('ru-RU')} ₽
-                {autoAdditions?.pvcType !== 'none' ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : null}
-              </li>
-              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500">Orabond:</span> {Math.round(Number(calcMeta.orabondCost ?? 0)).toLocaleString('ru-RU')} ₽
-                {autoAdditions?.addOrabond ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : null}
-              </li>
-              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500">{String(calcMeta.hangingLabel ?? '')}:</span> {Math.round(Number(calcMeta.hangingCost ?? 0)).toLocaleString('ru-RU')} ₽
-              </li>
-              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500">Ножка-подставка:</span> {Math.round(Number(calcMeta.standCost ?? 0)).toLocaleString('ru-RU')} ₽
-              </li>
-              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500">Подрамник:</span> {Math.round(Number(calcMeta.stretcherCost ?? 0)).toLocaleString('ru-RU')} ₽
-                {materials.workType === 'stretchedCanvas' ? (
-                  <span className="ml-2 text-xs text-neutral-500">{materials.stretcherType === 'narrow' ? 'Узкий (2 см)' : 'Широкий (4 см)'}</span>
-                ) : null}
-              </li>
+              {summaryCostRows.map((row) => (
+                <li key={row.key} className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                  <span className="text-neutral-500">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
+                  {row.note ?? null}
+                </li>
+              ))}
               {autoAdditions?.forceCardboard ? (
                 <li className="text-xs text-neutral-500">Картон (задник): Добавлено автоматически</li>
               ) : null}

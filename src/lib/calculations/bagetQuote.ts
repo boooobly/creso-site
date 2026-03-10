@@ -22,7 +22,6 @@ const STRETCHER_PRICE_PER_METER: Record<StretcherType, number> = {
 const MATERIAL_PRICING = {
   glass: { areaPricePerM2: 3705, cuttingPricePerM: 30 },
   antiReflectiveGlass: { areaPricePerM2: 6000, cuttingPricePerM: 30 },
-  museumGlass: { areaPricePerM2: 4200, cuttingPricePerM: 30 },
   plexiglass: { areaPricePerM2: 2575, cuttingPricePerM: 30 },
   pet1mm: { areaPricePerM2: 1200, cuttingPricePerM: 30 },
   passepartout: { areaPricePerM2: 2325, cuttingPricePerM: 30 },
