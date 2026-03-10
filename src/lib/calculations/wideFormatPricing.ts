@@ -6,20 +6,10 @@ import {
 import { parseNumericInput } from './shared';
 import type { BannerDensity, WideFormatMaterialType } from './types';
 
-const BANNER_MATERIALS: ReadonlySet<WideFormatMaterialType> = new Set([
-  'banner_240_gloss_3_2m',
-  'banner_330',
-  'banner_440',
-  'banner_460_cast_3_2m',
-  'banner_mesh_380_3_2m',
-  'banner_510_cast_3_2m',
-  'customer_roll_textured',
-  'customer_roll_smooth',
-]);
-
 export type WideFormatWidthWarningCode =
   | 'invalid_width'
   | 'max_width_exceeded'
+  | 'canvas_max_width_exceeded'
   | null;
 
 export type WideFormatPricingInput = {
@@ -42,6 +32,7 @@ export type WideFormatCalculationResult = {
   parsedValuesValid: boolean;
   positiveInputs: boolean;
   widthWarningCode: WideFormatWidthWarningCode;
+  requiresJoinSeam: boolean;
   areaPerUnit: number;
   billableAreaPerUnit: number;
   perimeterPerUnit: number;
@@ -56,17 +47,23 @@ export type WideFormatCalculationResult = {
   totalCost: number;
 };
 
-export function getWideFormatWidthWarningCode(_material: WideFormatMaterialType, width: number): WideFormatWidthWarningCode {
+export function getWideFormatWidthWarningCode(material: WideFormatMaterialType, width: number): WideFormatWidthWarningCode {
   if (!Number.isFinite(width)) return 'invalid_width';
-  if (width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
+
+  const isCanvasMaterial = material.includes('canvas');
+  const exceedsCanvasSingleLayoutWidth = width > WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth;
+  if (isCanvasMaterial && exceedsCanvasSingleLayoutWidth) {
+    return 'canvas_max_width_exceeded';
+  }
+
+  const isBanner = isBannerMaterial(material);
+  if (!isBanner && width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
 
   return null;
 }
 
 function getMaterialPricePerM2(material: WideFormatMaterialType): number {
   if (material === 'customer_roll_textured' || material === 'customer_roll_smooth') {
-    // Для "Свой материал" стоимость задаётся за м² за 1 проход,
-    // поэтому переводим в эффективную цену за м² с учётом стандартных 6 проходов.
     const customerRollPerPass = material === 'customer_roll_textured'
       ? WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured
       : WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth;
@@ -89,6 +86,8 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
   const areaPerUnit = width * height;
   const billableAreaPerUnit = Math.max(areaPerUnit, 1);
   const perimeterPerUnit = (width + height) * 2;
+  const isBanner = isBannerMaterial(input.material);
+  const requiresJoinSeam = isBanner && width > WIDE_FORMAT_PRICING_CONFIG.bannerJoinSeamWidthThreshold;
 
   const materialPricePerM2 = getMaterialPricePerM2(input.material);
 
@@ -96,12 +95,12 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     ? billableAreaPerUnit * quantity * materialPricePerM2
     : 0;
 
-  const edgeGluingCost = input.edgeGluing && isBannerMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
+  const edgeGluingCost = input.edgeGluing && isBanner && parsedValuesValid && positiveInputs && widthWarningCode === null
     ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.edgeGluingPerimeterPrice
     : 0;
 
-  const imageWeldingCost = input.imageWelding && width > WIDE_FORMAT_PRICING_CONFIG.maxWidth && parsedValuesValid && positiveInputs && widthWarningCode === null
-    ? perimeterPerUnit * quantity * WIDE_FORMAT_PRICING_CONFIG.imageWeldingPerimeterPrice
+  const imageWeldingCost = requiresJoinSeam && parsedValuesValid && positiveInputs && widthWarningCode === null
+    ? height * quantity * WIDE_FORMAT_PRICING_CONFIG.imageWeldingPerimeterPrice
     : 0;
 
   const plotterCutEstimatedCost = input.plotterCutByRegistrationMarks && isFilmMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
@@ -111,13 +110,13 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     )
     : 0;
 
-  const grommetsCount = input.grommets && isBannerMaterial(input.material) && parsedValuesValid && positiveInputs && widthWarningCode === null
+  const grommetsCount = input.grommets && isBanner && parsedValuesValid && positiveInputs && widthWarningCode === null
     ? Math.ceil(perimeterPerUnit / WIDE_FORMAT_PRICING_CONFIG.grommetStepM)
     : 0;
 
   const grommetsCost = grommetsCount * WIDE_FORMAT_PRICING_CONFIG.grommetPrice * quantity;
 
-  const positioningMarksCutCost = input.cutByPositioningMarks && !isBannerMaterial(input.material) && basePrintCost > 0
+  const positioningMarksCutCost = input.cutByPositioningMarks && !isBanner && basePrintCost > 0
     ? basePrintCost * WIDE_FORMAT_PRICING_CONFIG.positioningMarksCutPercent
     : 0;
 
@@ -130,6 +129,7 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     parsedValuesValid,
     positiveInputs,
     widthWarningCode,
+    requiresJoinSeam,
     areaPerUnit,
     billableAreaPerUnit,
     perimeterPerUnit,
