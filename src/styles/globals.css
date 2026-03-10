@@ -151,3 +151,7 @@ a { @apply underline-offset-4; }
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+
+.main-layout:has(> .home-page-root) {
+  padding-top: 0;
+}

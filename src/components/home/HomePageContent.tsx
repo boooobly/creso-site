@@ -19,13 +19,13 @@ type HomePageContentProps = {
   messages: SiteMessages;
 };
 
-const trustBadges = ['Собственное производство', 'Монтажная бригада', 'НДС и договор', 'Гарантия 5 лет'];
+const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
 
 const trustHighlights = [
-  { title: 'Собственное производство', description: 'Контроль качества и сроков без посредников.' },
-  { title: 'Монтажная бригада', description: 'Доставка и установка силами штатной команды.' },
-  { title: 'Работаем по договору', description: 'Прозрачные сметы, НДС и фиксированные этапы.' },
-  { title: 'Гарантия 5 лет', description: 'Сопровождаем проекты и после сдачи.' },
+  { title: 'Собственное производство', description: 'Контролируем качество и сроки на каждом этапе.' },
+  { title: 'Монтажная бригада', description: 'Доставка и установка силами собственной команды.' },
+  { title: 'Работаем по договору', description: 'Четкие условия, фиксированные этапы и прозрачная смета.' },
+  { title: 'Гарантия 5 лет', description: 'Поддержка и обслуживание после сдачи проекта.' },
 ];
 
 const processSteps = [
@@ -76,17 +76,17 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
 
   return (
     <div>
-      <Section className="relative overflow-hidden pb-8 pt-14 md:pb-10 md:pt-20">
+      <Section className="relative overflow-hidden pb-10 pt-4 md:pb-12 md:pt-6">
         <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
             <div className="space-y-5">
               <p className="t-eyebrow inline-flex rounded-full border border-[#efb9b9] bg-[#fff7f7] px-4 py-1.5 text-[var(--brand-red)]">
                 ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
               </p>
-              <h1 className="t-h1 max-w-5xl">
-                Реклама и производство<br className="hidden md:block" /> под ключ без срывов сроков
+              <h1 className="t-h1 max-w-[16ch]">
+                Производство рекламы<br className="hidden md:block" /> под ключ
               </h1>
-              <p className="t-body text-muted-foreground max-w-[40rem]">{messages.hero.subtitle}</p>
+              <p className="t-body text-muted-foreground max-w-[40rem]">Вывески, печать, конструкции и монтаж. От идеи до установки.</p>
             </div>
 
             <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end">
@@ -133,14 +133,14 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
         </div>
       </Section>
 
-      <Section className="border-y border-neutral-200/70 py-10 md:py-12" background="muted" fullBleed>
+      <Section className="border-y border-neutral-200/70 py-12 md:py-14" background="muted" fullBleed>
         <div className="mb-6 space-y-2 md:mb-7">
           <p className="t-eyebrow">ПОЧЕМУ НАМ ДОВЕРЯЮТ</p>
-          <h2 className="t-h2">Прозрачная работа и предсказуемый результат</h2>
+          <h2 className="t-h2">Почему нам доверяют</h2>
         </div>
         <motion.ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {trustHighlights.map((item) => (
-            <motion.li key={item.title} variants={fadeUp(14)} className="h-full rounded-2xl border border-neutral-200/80 bg-white/90 p-5">
+            <motion.li key={item.title} variants={fadeUp(14)} className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition duration-200 ease-out hover:-translate-y-[3px] hover:border-neutral-300">
               <p className="text-sm font-semibold text-neutral-900">{item.title}</p>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.description}</p>
             </motion.li>
