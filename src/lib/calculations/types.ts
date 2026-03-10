@@ -7,8 +7,6 @@ export type WideFormatMaterialType =
   | 'banner_330'
   | 'banner_440'
   | 'banner_460_cast_3_2m'
-  | 'banner_mesh_380_3_2m'
-  | 'banner_510_cast_3_2m'
   | 'self_adhesive_film_gloss'
   | 'perforated_film_1_37'
   | 'paper_dupaper_blue_120'
