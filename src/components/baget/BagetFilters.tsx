@@ -1,5 +1,7 @@
 'use client';
 
+import { ChevronDown } from 'lucide-react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import AccessoryHelpTooltip from './AccessoryHelpTooltip';
 
 export type FilterState = {
@@ -11,7 +13,7 @@ export type FilterState = {
   priceMax: number;
 };
 
-export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlass' | 'plexiglass' | 'pet1mm';
+export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'plexiglass' | 'pet1mm';
 export type HangingType = 'crocodile' | 'wire';
 export type WorkType = 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
 export type StretcherType = 'narrow' | 'wide';
@@ -80,7 +82,25 @@ type BagetFiltersProps = {
 };
 
 const selectClassName =
-  'w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100';
+  'w-full appearance-none rounded-xl border border-neutral-300 bg-white p-2 pr-10 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 disabled:cursor-not-allowed disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100';
+
+type SelectWithChevronProps = ComponentPropsWithoutRef<'select'> & {
+  children: ReactNode;
+};
+
+function SelectWithChevron({ children, className = '', ...props }: SelectWithChevronProps) {
+  return (
+    <div className="relative">
+      <select className={`${selectClassName} ${className}`.trim()} {...props}>
+        {children}
+      </select>
+      <ChevronDown
+        className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400"
+        aria-hidden="true"
+      />
+    </div>
+  );
+}
 
 export default function BagetFilters({
   filters,
@@ -103,10 +123,9 @@ export default function BagetFilters({
         <div className="space-y-3">
           <label className="block space-y-1 text-sm">
             <span>Цвет</span>
-            <select
+            <SelectWithChevron
               value={filters.color}
               onChange={(e) => setFilters({ ...filters, color: e.target.value })}
-              className={selectClassName}
             >
               <option value="all">Все</option>
               {colors.map((color) => (
@@ -114,15 +133,14 @@ export default function BagetFilters({
                   {COLOR_LABELS[color] ?? color}
                 </option>
               ))}
-            </select>
+            </SelectWithChevron>
           </label>
 
           <label className="block space-y-1 text-sm">
             <span>Стиль</span>
-            <select
+            <SelectWithChevron
               value={filters.style}
               onChange={(e) => setFilters({ ...filters, style: e.target.value })}
-              className={selectClassName}
             >
               <option value="all">Все</option>
               {styles.map((style) => (
@@ -130,7 +148,7 @@ export default function BagetFilters({
                   {STYLE_LABELS[style] ?? style}
                 </option>
               ))}
-            </select>
+            </SelectWithChevron>
           </label>
 
           <div className="grid grid-cols-2 gap-2">
@@ -249,19 +267,17 @@ export default function BagetFilters({
 
           <label className="block space-y-1">
             <span>Остекление</span>
-            <select
+            <SelectWithChevron
               value={materials.glazing}
               disabled={!glazingAllowed}
               onChange={(e) => setMaterials({ ...materials, glazing: e.target.value as GlazingType })}
-              className={selectClassName}
             >
               <option value="none">Без остекления</option>
               <option value="glass">Стекло</option>
               <option value="antiReflectiveGlass">Антибликовое стекло</option>
-              <option value="museumGlass">Музейное стекло</option>
               <option value="plexiglass">Оргстекло</option>
               <option value="pet1mm">ПЭТ 1мм</option>
-            </select>
+            </SelectWithChevron>
           </label>
           {!glazingAllowed && glazingDisabledReason ? <p className="text-xs text-amber-700">{glazingDisabledReason}</p> : null}
 
@@ -300,10 +316,9 @@ export default function BagetFilters({
               </label>
               <label className="block space-y-1 md:col-span-2">
                 <span>Цвет паспарту</span>
-                <select
+                <SelectWithChevron
                   value={materials.passepartoutColor}
                   onChange={(e) => setMaterials({ ...materials, passepartoutColor: e.target.value as PassepartoutColor })}
-                  className={selectClassName}
                 >
                   <option value="white">Белый</option>
                   <option value="cream">Кремовый</option>
@@ -319,7 +334,7 @@ export default function BagetFilters({
                   <option value="darkBlue">Темно-синий</option>
                   <option value="burgundy">Бордовый</option>
                   <option value="olive">Оливковый</option>
-                </select>
+                </SelectWithChevron>
               </label>
             </div>
           ) : null}

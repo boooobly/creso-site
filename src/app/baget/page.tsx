@@ -1,5 +1,6 @@
 import BagetConfigurator from '@/components/baget/BagetConfigurator';
 import { isWideFormatCanvasBagetTransfer } from '@/lib/baget/transfer';
+import type { BagetTransferSource } from '@/lib/baget/printRequirement';
 import { loadBagetCatalog } from '@/lib/baget/sheetsCatalog';
 
 type BagetPageProps = {
@@ -13,6 +14,7 @@ type BagetPageProps = {
 export default async function BagetPage({ searchParams }: BagetPageProps) {
   const { items, source } = await loadBagetCatalog();
   const shouldUseStretchedCanvasPreset = isWideFormatCanvasBagetTransfer(searchParams?.transferSource);
+  const initialTransferSource: BagetTransferSource = shouldUseStretchedCanvasPreset ? 'wide-format' : 'manual';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,6 +27,7 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
           initialWidth={searchParams?.width}
           initialHeight={searchParams?.height}
           initialWorkType={shouldUseStretchedCanvasPreset ? 'stretchedCanvas' : undefined}
+          initialTransferSource={initialTransferSource}
         />
       </main>
     </div>

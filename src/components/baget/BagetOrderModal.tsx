@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { BagetQuoteResult } from '@/lib/calculations/bagetQuote';
 import type { FrameMode } from './BagetFilters';
+import type { BagetPrintMaterial, BagetTransferSource } from '@/lib/baget/printRequirement';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 type SizeMm = {
@@ -42,6 +43,12 @@ export type BagetOrderSummary = {
   frameMode: FrameMode;
   hanging: HangingSelection;
   stand: boolean;
+  printRequirement: {
+    requiresPrint: boolean;
+    printMaterial: BagetPrintMaterial | null;
+    transferSource: BagetTransferSource | null;
+    printCost: number;
+  };
 };
 
 export type BagetOrderRequestBagetInput = {
@@ -50,7 +57,7 @@ export type BagetOrderRequestBagetInput = {
   quantity: number;
   selectedBagetId?: string | null;
   workType: 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
-  glazing: 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlass' | 'plexiglass' | 'pet1mm';
+  glazing: 'none' | 'glass' | 'antiReflectiveGlass' | 'plexiglass' | 'pet1mm';
   hasPassepartout: boolean;
   passepartoutSize?: number;
   passepartoutBottomSize?: number;
@@ -59,6 +66,10 @@ export type BagetOrderRequestBagetInput = {
   stand: boolean;
   stretcherType?: 'narrow' | 'wide' | null;
   frameMode?: 'framed' | 'noFrame' | null;
+  requiresPrint: boolean;
+  printMaterial: BagetPrintMaterial | null;
+  transferSource: BagetTransferSource | null;
+  printCost?: number;
 };
 
 type BagetOrderModalProps = {
@@ -281,12 +292,12 @@ export default function BagetOrderModal({
           ✕
         </button>
 
-        <div className="sticky top-0 z-[1] rounded-t-2xl border-b border-neutral-200 bg-white/95 px-5 py-4 pr-14 backdrop-blur-sm dark:border-neutral-700 dark:bg-neutral-900/95 sm:px-6">
+        <div className="sticky top-0 z-[1] rounded-t-2xl border-b border-neutral-200 bg-white/95 px-5 py-4 pr-20 backdrop-blur-sm dark:border-neutral-700 dark:bg-neutral-900/95 sm:px-6 sm:pr-24">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h3 id="baget-order-title" className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
               Оформление заказа
             </h3>
-            <p className="inline-flex self-start rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
+            <p className="mr-2 inline-flex self-start rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 sm:mr-0">
               Заказ: {serverResult?.orderNumber ?? 'будет присвоен после отправки'}
             </p>
           </div>
@@ -325,16 +336,16 @@ export default function BagetOrderModal({
 
                 <h4 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Состав заказа</h4>
 
-                <dl className="grid grid-cols-1 gap-2">
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">📐 Размер работы</dt>
+                <dl className="grid grid-cols-1 gap-1">
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Размер работы</dt>
                     <dd className="rounded-lg bg-neutral-100 px-2 py-1 text-right text-sm font-medium text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                       {orderSummary.workSizeMm.wMm} × {orderSummary.workSizeMm.hMm} мм
                     </dd>
                   </div>
 
                   {orderSummary.passepartout?.enabled ? (
-                    <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
                       <dt className="text-sm text-neutral-500 dark:text-neutral-400">Размер с паспарту</dt>
                       <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                         {effectiveSize.wMm} × {effectiveSize.hMm} мм
@@ -343,7 +354,7 @@ export default function BagetOrderModal({
                   ) : null}
 
                   {outerSize ? (
-                    <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
                       <dt className="text-sm text-neutral-500 dark:text-neutral-400">Габарит с рамкой</dt>
                       <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                         {outerSize.wMm} × {outerSize.hMm} мм
@@ -351,8 +362,8 @@ export default function BagetOrderModal({
                     </div>
                   ) : null}
 
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🖼 Багет</dt>
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Багет</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.selectedBaget
                         ? `${orderSummary.selectedBaget.title || 'Выбран'} (${orderSummary.selectedBaget.article || 'без артикула'})`
@@ -364,8 +375,8 @@ export default function BagetOrderModal({
                     </dd>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🎨 Паспарту</dt>
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Паспарту</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.passepartout?.enabled
                         ? `${orderSummary.passepartout.color}, верх/бок ${orderSummary.passepartout.topMm} мм, низ ${orderSummary.passepartout.bottomMm} мм`
@@ -373,31 +384,40 @@ export default function BagetOrderModal({
                     </dd>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🪟 Остекление</dt>
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Остекление</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.glazing}</dd>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🧱 Материалы</dt>
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Материалы</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.materials.join(', ') || '—'}
                     </dd>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
                     <dt className="text-sm text-neutral-500 dark:text-neutral-400">Тип работы</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.workType}</dd>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">🔩 Подвес</dt>
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Подвес</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.hanging.label} × {orderSummary.hanging.quantity}
                     </dd>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Печать</dt>
+                    <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {orderSummary.printRequirement.requiresPrint
+                        ? `${orderSummary.printRequirement.printMaterial === 'paper' ? 'На бумаге' : 'На холсте'} (${orderSummary.printRequirement.printCost.toLocaleString('ru-RU')} ₽)`
+                        : 'Не требуется'}
+                    </dd>
+                  </div>
+
+                  <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
                     <dt className="text-sm text-neutral-500 dark:text-neutral-400">Ножка-подставка</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.stand ? 'Да' : 'Нет'}</dd>
                   </div>
