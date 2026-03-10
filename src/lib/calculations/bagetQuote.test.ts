@@ -29,7 +29,7 @@ describe('bagetQuote', () => {
     });
 
     expect(result.effectiveSize).toEqual({ width: 500, height: 700 });
-    expect(result.total).toBe(3050);
+    expect(result.total).toBe(3027);
     expect(result.items.map((item) => item.key)).toEqual(['baget', 'materials', 'hanging']);
   });
 
@@ -120,6 +120,64 @@ describe('bagetQuote', () => {
 
     expect(result.meta?.autoAdditions?.pvcType).toBe('none');
     expect(result.items.some((item) => item.key === 'pvc')).toBe(false);
+  });
+
+
+
+  it('uses wire pricing by width and auto-includes 2 loops', () => {
+    const result = bagetQuote({
+      width: 800,
+      height: 400,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'wire',
+      stand: false,
+      stretcherType: 'narrow',
+    });
+
+    expect(result.meta?.hangingCost).toBe(54);
+  });
+
+  it('uses updated stretcher and stand prices', () => {
+    const result = bagetQuote({
+      width: 300,
+      height: 300,
+      quantity: 1,
+      selectedBaget,
+      workType: 'stretchedCanvas',
+      frameMode: 'noFrame',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'wire',
+      stand: true,
+      stretcherType: 'narrow',
+    });
+
+    expect(result.meta?.stretcherCost).toBe(240);
+    expect(result.meta?.standCost).toBe(120);
+  });
+
+  it('uses updated area + cutting material prices', () => {
+    const result = bagetQuote({
+      width: 1000,
+      height: 500,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'glass',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+    });
+
+    expect(result.meta?.materialsCost).toBeCloseTo(1942.5, 5);
   });
 
   it('allows stretched canvas without baget in no-frame mode and keeps stretcher cost', () => {
