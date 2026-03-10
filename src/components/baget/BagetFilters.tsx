@@ -11,7 +11,7 @@ export type FilterState = {
   priceMax: number;
 };
 
-export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'museumGlass' | 'plexiglass' | 'pet1mm';
+export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'plexiglass' | 'pet1mm';
 export type HangingType = 'crocodile' | 'wire';
 export type WorkType = 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
 export type StretcherType = 'narrow' | 'wide';
@@ -80,7 +80,7 @@ type BagetFiltersProps = {
 };
 
 const selectClassName =
-  'w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100';
+  `w-full appearance-none rounded-xl border border-neutral-300 bg-white bg-[url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236b7280' stroke-width='1.8'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E")] bg-[length:1rem_1rem] bg-[right_0.75rem_center] bg-no-repeat p-2 pr-9 text-neutral-900 transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100`;
 
 export default function BagetFilters({
   filters,
@@ -258,7 +258,6 @@ export default function BagetFilters({
               <option value="none">Без остекления</option>
               <option value="glass">Стекло</option>
               <option value="antiReflectiveGlass">Антибликовое стекло</option>
-              <option value="museumGlass">Музейное стекло</option>
               <option value="plexiglass">Оргстекло</option>
               <option value="pet1mm">ПЭТ 1мм</option>
             </select>
