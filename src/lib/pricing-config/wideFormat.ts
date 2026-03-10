@@ -113,6 +113,19 @@ export function getWideFormatMaterialLabel(material: WideFormatMaterialType): st
   return WIDE_FORMAT_MATERIAL_LABELS[material] ?? material;
 }
 
+
+export type BagetPrintMaterial = 'paper' | 'canvas';
+
+const BAGET_PRINT_WIDE_FORMAT_MATERIAL_MAP: Record<BagetPrintMaterial, WideFormatMaterialType> = {
+  paper: 'photo_paper_220',
+  canvas: 'canvas_cotton_350',
+};
+
+export function getBagetPrintPricePerM2(material: BagetPrintMaterial): number {
+  const wideFormatMaterial = BAGET_PRINT_WIDE_FORMAT_MATERIAL_MAP[material];
+  return WIDE_FORMAT_PRICING_CONFIG.pricesRUBPerM2[wideFormatMaterial];
+}
+
 export const WIDE_FORMAT_PRICING_CONFIG = {
   maxWidth: 3.2,
   bannerJoinSeamWidthThreshold: 3.1,

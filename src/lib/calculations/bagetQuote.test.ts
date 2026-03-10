@@ -180,6 +180,30 @@ describe('bagetQuote', () => {
     expect(result.meta?.materialsCost).toBeCloseTo(1942.5, 5);
   });
 
+
+
+  it('adds print cost as a separate line when print is required', () => {
+    const result = bagetQuote({
+      width: 800,
+      height: 600,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+      requiresPrint: true,
+      printMaterial: 'canvas',
+      transferSource: 'wide-format',
+    });
+
+    expect(result.items.some((item) => item.key === 'print')).toBe(true);
+    expect(result.meta?.printCost).toBe(1500);
+  });
+
   it('allows stretched canvas without baget in no-frame mode and keeps stretcher cost', () => {
     const result = bagetQuote({
       width: 1200,

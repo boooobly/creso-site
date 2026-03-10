@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { BagetQuoteResult } from '@/lib/calculations/bagetQuote';
 import type { FrameMode } from './BagetFilters';
+import type { BagetPrintMaterial, BagetTransferSource } from '@/lib/baget/printRequirement';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 
 type SizeMm = {
@@ -42,6 +43,12 @@ export type BagetOrderSummary = {
   frameMode: FrameMode;
   hanging: HangingSelection;
   stand: boolean;
+  printRequirement: {
+    requiresPrint: boolean;
+    printMaterial: BagetPrintMaterial | null;
+    transferSource: BagetTransferSource | null;
+    printCost: number;
+  };
 };
 
 export type BagetOrderRequestBagetInput = {
@@ -59,6 +66,10 @@ export type BagetOrderRequestBagetInput = {
   stand: boolean;
   stretcherType?: 'narrow' | 'wide' | null;
   frameMode?: 'framed' | 'noFrame' | null;
+  requiresPrint: boolean;
+  printMaterial: BagetPrintMaterial | null;
+  transferSource: BagetTransferSource | null;
+  printCost?: number;
 };
 
 type BagetOrderModalProps = {
@@ -396,6 +407,22 @@ export default function BagetOrderModal({
                       {orderSummary.hanging.label} × {orderSummary.hanging.quantity}
                     </dd>
                   </div>
+
+                  {orderSummary.printRequirement.requiresPrint ? (
+                    <>
+                      <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                        <dt className="text-sm text-neutral-500 dark:text-neutral-400">Требуется печать</dt>
+                        <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">Да</dd>
+                      </div>
+
+                      <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
+                        <dt className="text-sm text-neutral-500 dark:text-neutral-400">Материал печати</dt>
+                        <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                          {orderSummary.printRequirement.printMaterial === 'paper' ? 'Бумага' : 'Холст'}
+                        </dd>
+                      </div>
+                    </>
+                  ) : null}
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
                     <dt className="text-sm text-neutral-500 dark:text-neutral-400">Ножка-подставка</dt>

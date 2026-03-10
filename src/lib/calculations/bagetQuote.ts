@@ -6,6 +6,7 @@ import type {
   StretcherType,
   WorkType,
 } from '@/components/baget/BagetFilters';
+import { getBagetPrintPricePerM2, type BagetPrintMaterial } from '@/lib/pricing-config/wideFormat';
 
 const CROCODILE_PRICE = 20;
 const WIRE_PRICE_PER_METER_WIDTH = 30;
@@ -54,6 +55,9 @@ export interface BagetQuoteInput {
   stand: boolean;
   stretcherType?: StretcherType | null;
   frameMode?: FrameMode | null;
+  requiresPrint?: boolean;
+  printMaterial?: BagetPrintMaterial | null;
+  transferSource?: 'manual' | 'wide-format' | null;
 }
 
 export interface QuoteLineItem {
@@ -130,6 +134,8 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
   const width = Number(input.width);
   const height = Number(input.height);
   const quantity = Math.max(1, Math.round(input.quantity) || 1);
+  const requiresPrint = Boolean(input.requiresPrint);
+  const printMaterial = input.printMaterial ?? null;
   const validSize = Number.isFinite(width) && Number.isFinite(height) && width >= 50 && height >= 50;
   const passepartoutSize = Math.max(0, input.passepartoutSize ?? 0);
   const passepartoutBottomSize = Math.max(0, input.passepartoutBottomSize ?? 0);
@@ -195,6 +201,7 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
   const bagetWidthMm = requiresBaget ? (input.selectedBaget?.width_mm ?? 0) : 0;
   const areaM2 = (effectiveWidth * effectiveHeight) / 1_000_000;
   const perimeterM = (2 * (effectiveWidth + effectiveHeight)) / 1000;
+  const printAreaM2 = (width * height) / 1_000_000;
   const bagetMeters = requiresBaget
     ? ((2 * (effectiveWidth + effectiveHeight) + 8 * bagetWidthMm) / 1000) * 1.05
     : 0;
@@ -228,6 +235,9 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
   const stretcherCost = input.workType === 'stretchedCanvas'
     ? stretcherMeters * STRETCHER_PRICE_PER_METER[effectiveStretcherType]
     : 0;
+  const printCost = requiresPrint && printMaterial
+    ? Math.max(printAreaM2, 1) * getBagetPrintPricePerM2(printMaterial)
+    : 0;
 
   const rawItems: QuoteLineItem[] = [
     {
@@ -236,6 +246,13 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
       qty: quantity,
       unitPrice: Math.round(bagetCost),
       total: bagetCost * quantity,
+    },
+    {
+      key: 'print',
+      title: printMaterial === 'paper' ? 'Печать на бумаге' : 'Печать на холсте',
+      qty: quantity,
+      unitPrice: Math.round(printCost),
+      total: printCost * quantity,
     },
     {
       key: 'materials',
@@ -304,6 +321,10 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
       framedHeightMm: effectiveHeight + 2 * bagetWidthMm,
       bagetMeters,
       bagetCost,
+      printCost,
+      printMaterial,
+      requiresPrint,
+      transferSource: input.transferSource ?? null,
       materialsCost,
       pvcCost,
       orabondCost,

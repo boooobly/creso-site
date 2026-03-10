@@ -14,6 +14,7 @@ import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToP
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
 import { normalizeBagetTextureUrl } from '@/lib/baget/normalizeBagetTextureUrl';
 import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
+import { getInitialBagetPrintRequirement, type BagetPrintRequirement, type BagetTransferSource } from '@/lib/baget/printRequirement';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
@@ -101,6 +102,7 @@ type BagetConfiguratorProps = {
   initialWidth?: string;
   initialHeight?: string;
   initialWorkType?: MaterialsState['workType'];
+  initialTransferSource?: BagetTransferSource;
 };
 
 function normalizeInitialDimension(value: string | undefined, fallback: string): string {
@@ -116,6 +118,7 @@ export default function BagetConfigurator({
   initialWidth,
   initialHeight,
   initialWorkType,
+  initialTransferSource,
 }: BagetConfiguratorProps) {
   const [widthInput, setWidthInput] = useState(() => normalizeInitialDimension(initialWidth, '500'));
   const [heightInput, setHeightInput] = useState(() => normalizeInitialDimension(initialHeight, '700'));
@@ -124,6 +127,7 @@ export default function BagetConfigurator({
     ...initialMaterials,
     ...(initialWorkType ? { workType: initialWorkType } : {}),
   });
+  const [printRequirement, setPrintRequirement] = useState<BagetPrintRequirement>(() => getInitialBagetPrintRequirement(initialTransferSource));
   const catalogItems = useMemo<CatalogBagetItem[]>(
     () =>
       items.map((item) => {
@@ -243,6 +247,9 @@ export default function BagetConfigurator({
         hangerType: materials.hanging,
         stand: materials.stand,
         stretcherType: materials.stretcherType,
+        requiresPrint: printRequirement.requiresPrint,
+        printMaterial: printRequirement.printMaterial,
+        transferSource: printRequirement.transferSource,
       }),
     [
       heightMm,
@@ -256,6 +263,9 @@ export default function BagetConfigurator({
       materials.workType,
       passepartoutBottomMm,
       passepartoutMm,
+      printRequirement.printMaterial,
+      printRequirement.requiresPrint,
+      printRequirement.transferSource,
       selectedBagetForQuote,
       widthMm,
     ],
@@ -276,6 +286,11 @@ export default function BagetConfigurator({
     note?: ReactNode;
   }>>(() => {
     const rows = [
+      {
+        key: 'print',
+        label: calcMeta.printMaterial === 'paper' ? 'Печать на бумаге:' : 'Печать на холсте:',
+        value: Number(calcMeta.printCost ?? 0),
+      },
       {
         key: 'materials',
         label: 'Материалы:',
@@ -322,7 +337,7 @@ export default function BagetConfigurator({
     ];
 
     return rows.filter((row) => row.value > 0);
-  }, [autoAdditions?.addOrabond, autoAdditions?.pvcType, calcMeta.hangingCost, calcMeta.hangingLabel, calcMeta.materialsCost, calcMeta.orabondCost, calcMeta.pvcCost, calcMeta.standCost, calcMeta.stretcherCost, materials.stretcherType, materials.workType]);
+  }, [autoAdditions?.addOrabond, autoAdditions?.pvcType, calcMeta.hangingCost, calcMeta.hangingLabel, calcMeta.materialsCost, calcMeta.orabondCost, calcMeta.printCost, calcMeta.printMaterial, calcMeta.pvcCost, calcMeta.standCost, calcMeta.stretcherCost, materials.stretcherType, materials.workType]);
 
   useEffect(() => {
     if (!standAllowed && materials.stand) {
@@ -342,6 +357,17 @@ export default function BagetConfigurator({
       setMaterials((prev) => ({ ...prev, glazing: 'none' }));
     }
   }, [isGlazingAllowed, materials.glazing]);
+
+  useEffect(() => {
+    if (!printRequirement.requiresPrint && printRequirement.printMaterial !== null) {
+      setPrintRequirement((prev) => ({ ...prev, printMaterial: null }));
+      return;
+    }
+
+    if (printRequirement.requiresPrint && printRequirement.printMaterial === null) {
+      setPrintRequirement((prev) => ({ ...prev, printMaterial: 'canvas' }));
+    }
+  }, [printRequirement.printMaterial, printRequirement.requiresPrint]);
 
   useEffect(() => {
     if (materials.workType === 'stretchedCanvas' && !stretcherNarrowAllowed && materials.stretcherType === 'narrow') {
@@ -503,6 +529,12 @@ export default function BagetConfigurator({
         quantity: hangingQuantity,
       },
       stand: materials.stand && standAllowed,
+      printRequirement: {
+        requiresPrint: printRequirement.requiresPrint,
+        printMaterial: printRequirement.printMaterial,
+        transferSource: printRequirement.transferSource,
+        printCost: Math.round(Number(calcMeta.printCost ?? 0)),
+      },
     };
   }, [
     effectiveWidthMm,
@@ -517,6 +549,9 @@ export default function BagetConfigurator({
     selectedBagetForQuote,
     standAllowed,
     summaryMaterials,
+    printRequirement.printMaterial,
+    printRequirement.requiresPrint,
+    printRequirement.transferSource,
     quote.meta,
     widthMm,
     heightMm,
@@ -544,6 +579,10 @@ export default function BagetConfigurator({
         stand: materials.stand,
         stretcherType: materials.stretcherType,
         frameMode: materials.workType === 'stretchedCanvas' ? materials.frameMode : 'framed',
+        requiresPrint: printRequirement.requiresPrint,
+        printMaterial: printRequirement.printMaterial,
+        transferSource: printRequirement.transferSource,
+        printCost: Math.round(Number(calcMeta.printCost ?? 0)),
       },
       fulfillmentType: 'pickup',
     };
@@ -560,8 +599,12 @@ export default function BagetConfigurator({
     materials.workType,
     passepartoutBottomMm,
     passepartoutMm,
+    printRequirement.printMaterial,
+    printRequirement.requiresPrint,
+    printRequirement.transferSource,
     selectedBagetForQuote,
     widthMm,
+    calcMeta.printCost,
   ]);
 
   return (
@@ -599,6 +642,8 @@ export default function BagetConfigurator({
           setFilters={setFilters}
           materials={materials}
           setMaterials={setMaterials}
+          printRequirement={printRequirement}
+          setPrintRequirement={setPrintRequirement}
           colors={colors}
           styles={styles}
           standAllowed={standAllowed}
