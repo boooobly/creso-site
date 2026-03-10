@@ -3,6 +3,19 @@ import servicesLocal from '@/data/services.json';
 import Section from '@/components/Section';
 import ServiceCard from '@/components/ServiceCard';
 
+
+const serviceImageById: Record<string, string> = {
+  baget: '/images/services/bagget.png',
+  cnc: '/images/services/milling.png',
+  print: '/images/services/printing.png',
+  plotter: '/images/services/plotter.png',
+  thermo: '/images/services/t-shirt.png',
+  mugs: '/images/services/glasses.png',
+  stands: '/images/services/stends.png',
+  outdoor: '/images/services/outdoor.png',
+  polygraphy: '/images/services/cards.png',
+};
+
 export default async function ServicesPage() {
   const sCMS = await getServices().catch(() => null);
   const services = sCMS ?? (servicesLocal as any[]);
@@ -30,8 +43,8 @@ export default async function ServicesPage() {
 
   return (
     <>
-      <Section className="py-10 md:py-12">
-        <div className="space-y-3">
+      <Section className="pt-6 pb-6 md:pt-8 md:pb-7">
+        <div className="space-y-2">
           <p className="t-eyebrow">УСЛУГИ</p>
           <h1 className="t-h2">Список услуг</h1>
           <p className="t-body text-muted-foreground max-w-3xl">
@@ -40,10 +53,10 @@ export default async function ServicesPage() {
         </div>
       </Section>
 
-      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
+      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-8 md:py-10">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {services.map((s: any) => (
-            <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} />
+            <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} imageSrc={serviceImageById[s.id]} />
           ))}
         </div>
       </Section>

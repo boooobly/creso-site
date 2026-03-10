@@ -1,23 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
-import {
-  BadgeCheck,
-  Building2,
-  FileCheck2,
-  HardHat,
-  Landmark,
-  Lightbulb,
-  MapPinned,
-  PanelsTopLeft,
-  RectangleHorizontal,
-  ShieldCheck,
-  Sparkles,
-  Sticker,
-  Truck,
-  Users,
-  Wrench,
-} from 'lucide-react';
+import { Building2, FileCheck2, HardHat, ShieldCheck, Truck, Users, Wrench } from 'lucide-react';
 import Section from '@/components/Section';
 import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
@@ -26,18 +10,18 @@ import ProductionTrustBlock from '@/components/ProductionTrustBlock';
 import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import { messages } from '@/lib/messages';
 
-const services: { label: string; icon: LucideIcon }[] = [
-  { label: 'Световые короба', icon: Lightbulb },
-  { label: 'Объёмные буквы', icon: PanelsTopLeft },
-  { label: 'Контражурные буквы', icon: Sparkles },
-  { label: 'Крышные установки', icon: Landmark },
-  { label: 'Баннеры на фасад', icon: RectangleHorizontal },
-  { label: 'Лайтбоксы', icon: Lightbulb },
-  { label: 'Гибкий неон', icon: Sticker },
-  { label: 'Стелы', icon: MapPinned },
-  { label: 'Таблички', icon: BadgeCheck },
-  { label: 'Кастомные конструкции любой сложности', icon: Wrench },
-];
+const services: Array<{ title: string; image: string; featured?: boolean }> = [
+  { title: 'Световые короба', image: '/images/outdoor_examples/lightbox.png', featured: true },
+  { title: 'Объемные буквы', image: '/images/outdoor_examples/dimensional_letters.png' },
+  { title: 'Контражурные буквы', image: '/images/outdoor_examples/backlit_sign.png' },
+  { title: 'Крышные установки', image: '/images/outdoor_examples/roof_sign.png' },
+  { title: 'Баннеры', image: '/images/outdoor_examples/banner.png' },
+  { title: 'Лайтбоксы', image: '/images/outdoor_examples/lightbox_cube.png' },
+  { title: 'Гибкий неон', image: '/images/outdoor_examples/neon.png' },
+  { title: 'Стелы', image: '/images/outdoor_examples/stela.png' },
+  { title: 'Адресные таблички', image: '/images/outdoor_examples/adress_sign.png' },
+  { title: 'Сложные конструкции любой сложности', image: '/images/outdoor_examples/custom.png' },
+] as const;
 
 const strengths: { label: string; icon: LucideIcon }[] = [
   { label: 'Собственная производственная база', icon: Building2 },
@@ -194,15 +178,22 @@ export default function OutdoorAdvertisingPage() {
       <Section className="pt-0" background="default">
         <RevealOnScroll>
           <h2 className="mb-6 text-2xl font-bold">Что изготавливаем</h2>
-          <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
               <article
-                key={service.label}
-                className="card flex min-h-[136px] rounded-xl p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-black/10"
+                key={service.title}
+                className={`card group relative overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-black/15 ${service.featured ? 'min-h-[240px] md:col-span-2 lg:col-span-3 lg:min-h-[300px]' : 'min-h-[180px]'}`}
               >
-                <div className="flex items-start gap-3">
-                  <service.icon className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" aria-hidden="true" />
-                  <p className="text-[15px] font-semibold leading-relaxed">{service.label}</p>
+                <Image
+                  src={service.image}
+                  alt={service.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+                  sizes={service.featured ? '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 95vw' : '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'}
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5">
+                  <p className="text-base font-semibold leading-snug text-white md:text-lg">{service.title}</p>
                 </div>
               </article>
             ))}
