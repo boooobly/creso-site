@@ -49,10 +49,19 @@ const WORK_TYPE_LABELS: Record<MaterialsState['workType'], string> = {
 
 const PASSEPARTOUT_COLOR_LABELS: Record<MaterialsState['passepartoutColor'], string> = {
   white: 'Белый',
+  cream: 'Кремовый',
   ivory: 'Слоновая кость',
+  lightBeige: 'Светло-бежевый',
   beige: 'Бежевый',
+  sand: 'Песочный',
+  lightGray: 'Светло-серый',
   gray: 'Серый',
+  graphite: 'Графит',
   black: 'Чёрный',
+  brown: 'Коричневый',
+  darkBlue: 'Темно-синий',
+  burgundy: 'Бордовый',
+  olive: 'Оливковый',
 };
 
 const initialFilters: FilterState = {
@@ -212,6 +221,9 @@ export default function BagetConfigurator({
   const passepartoutMm = Math.max(0, materials.passepartoutMm);
   const passepartoutBottomMm = Math.max(0, materials.passepartoutBottomMm);
   const isNoFrameStretchedCanvas = materials.workType === 'stretchedCanvas' && materials.frameMode === 'noFrame';
+  const isPassepartoutSizeAllowed = Number.isFinite(widthMm) && Number.isFinite(heightMm) ? widthMm <= 1000 && heightMm <= 700 : true;
+  const isPassepartoutAllowed = !isNoFrameStretchedCanvas && isPassepartoutSizeAllowed;
+  const isGlazingAllowed = !isNoFrameStretchedCanvas;
   const selectedBagetForQuote = isNoFrameStretchedCanvas ? null : selectedBaget;
   const quote = useMemo(
     () =>
@@ -260,6 +272,19 @@ export default function BagetConfigurator({
       setMaterials((prev) => ({ ...prev, stand: false }));
     }
   }, [materials.stand, standAllowed]);
+
+
+  useEffect(() => {
+    if (!isPassepartoutAllowed && materials.passepartout) {
+      setMaterials((prev) => ({ ...prev, passepartout: false }));
+    }
+  }, [isPassepartoutAllowed, materials.passepartout]);
+
+  useEffect(() => {
+    if (!isGlazingAllowed && materials.glazing !== 'none') {
+      setMaterials((prev) => ({ ...prev, glazing: 'none' }));
+    }
+  }, [isGlazingAllowed, materials.glazing]);
 
   useEffect(() => {
     if (materials.workType === 'stretchedCanvas' && !stretcherNarrowAllowed && materials.stretcherType === 'narrow') {
@@ -521,6 +546,16 @@ export default function BagetConfigurator({
           styles={styles}
           standAllowed={standAllowed}
           stretcherNarrowAllowed={stretcherNarrowAllowed}
+          passepartoutAllowed={isPassepartoutAllowed}
+          glazingAllowed={isGlazingAllowed}
+          passepartoutDisabledReason={
+            isNoFrameStretchedCanvas
+              ? 'Паспарту недоступно для холста на подрамнике без рамки.'
+              : !isPassepartoutSizeAllowed
+                ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
+                : undefined
+          }
+          glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
         />
       </aside>
 

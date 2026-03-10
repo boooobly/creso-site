@@ -24,10 +24,19 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 const PASSEPARTOUT_COLORS: Record<PassepartoutColor, string> = {
   white: '#f8fafc',
+  cream: '#f6f0e5',
   ivory: '#f7f1de',
+  lightBeige: '#efe3cf',
   beige: '#ece0c8',
+  sand: '#dcc9a1',
+  lightGray: '#e5e7eb',
   gray: '#d4d4d8',
+  graphite: '#4b5563',
   black: '#1f2937',
+  brown: '#7c5a3c',
+  darkBlue: '#1e3a5f',
+  burgundy: '#6f1d2b',
+  olive: '#5f6b3d',
 };
 
 export default function BagetPreview({
