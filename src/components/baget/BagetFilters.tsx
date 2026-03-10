@@ -16,7 +16,21 @@ export type HangingType = 'crocodile' | 'wire';
 export type WorkType = 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
 export type StretcherType = 'narrow' | 'wide';
 export type FrameMode = 'framed' | 'noFrame';
-export type PassepartoutColor = 'white' | 'ivory' | 'beige' | 'gray' | 'black';
+export type PassepartoutColor =
+  | 'white'
+  | 'cream'
+  | 'ivory'
+  | 'lightBeige'
+  | 'beige'
+  | 'sand'
+  | 'lightGray'
+  | 'gray'
+  | 'graphite'
+  | 'black'
+  | 'brown'
+  | 'darkBlue'
+  | 'burgundy'
+  | 'olive';
 
 export type MaterialsState = {
   glazing: GlazingType;
@@ -59,6 +73,10 @@ type BagetFiltersProps = {
   styles: string[];
   standAllowed: boolean;
   stretcherNarrowAllowed: boolean;
+  passepartoutAllowed: boolean;
+  glazingAllowed: boolean;
+  passepartoutDisabledReason?: string;
+  glazingDisabledReason?: string;
 };
 
 const selectClassName =
@@ -73,6 +91,10 @@ export default function BagetFilters({
   styles,
   standAllowed,
   stretcherNarrowAllowed,
+  passepartoutAllowed,
+  glazingAllowed,
+  passepartoutDisabledReason,
+  glazingDisabledReason,
 }: BagetFiltersProps) {
   return (
     <div className="space-y-4">
@@ -229,6 +251,7 @@ export default function BagetFilters({
             <span>Остекление</span>
             <select
               value={materials.glazing}
+              disabled={!glazingAllowed}
               onChange={(e) => setMaterials({ ...materials, glazing: e.target.value as GlazingType })}
               className={selectClassName}
             >
@@ -240,20 +263,23 @@ export default function BagetFilters({
               <option value="pet1mm">ПЭТ 1мм</option>
             </select>
           </label>
+          {!glazingAllowed && glazingDisabledReason ? <p className="text-xs text-amber-700">{glazingDisabledReason}</p> : null}
 
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={materials.passepartout}
+              disabled={!passepartoutAllowed}
               onChange={(e) => setMaterials({ ...materials, passepartout: e.target.checked })}
             />
             Паспарту
           </label>
+          {!passepartoutAllowed && passepartoutDisabledReason ? <p className="text-xs text-amber-700">{passepartoutDisabledReason}</p> : null}
 
           {materials.passepartout ? (
-            <div className="grid grid-cols-2 gap-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
+            <div className="grid grid-cols-1 gap-3 rounded-xl border border-neutral-200 p-3 md:grid-cols-2 md:items-end dark:border-neutral-700">
               <label className="space-y-1">
-                <span>Поля, мм (верх/лево/право)</span>
+                <span className="block min-h-[2.5rem]">Поля, мм (верх/лево/право)</span>
                 <input
                   type="number"
                   min={0}
@@ -263,7 +289,7 @@ export default function BagetFilters({
                 />
               </label>
               <label className="space-y-1">
-                <span>Нижнее поле, мм</span>
+                <span className="block min-h-[2.5rem]">Нижнее поле, мм</span>
                 <input
                   type="number"
                   min={0}
@@ -272,7 +298,7 @@ export default function BagetFilters({
                   className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
                 />
               </label>
-              <label className="col-span-2 block space-y-1">
+              <label className="block space-y-1 md:col-span-2">
                 <span>Цвет паспарту</span>
                 <select
                   value={materials.passepartoutColor}
@@ -280,10 +306,19 @@ export default function BagetFilters({
                   className={selectClassName}
                 >
                   <option value="white">Белый</option>
+                  <option value="cream">Кремовый</option>
                   <option value="ivory">Слоновая кость</option>
+                  <option value="lightBeige">Светло-бежевый</option>
                   <option value="beige">Бежевый</option>
+                  <option value="sand">Песочный</option>
+                  <option value="lightGray">Светло-серый</option>
                   <option value="gray">Серый</option>
+                  <option value="graphite">Графит</option>
                   <option value="black">Чёрный</option>
+                  <option value="brown">Коричневый</option>
+                  <option value="darkBlue">Темно-синий</option>
+                  <option value="burgundy">Бордовый</option>
+                  <option value="olive">Оливковый</option>
                 </select>
               </label>
             </div>

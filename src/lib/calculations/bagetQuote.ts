@@ -99,7 +99,7 @@ function resolveAutoAdditions(workType: WorkType): AutoAdditions {
 
   if (workType === 'photo') {
     return {
-      pvcType: 'pvc3',
+      pvcType: 'none',
       addOrabond: true,
       forceCardboard: true,
       stretchingRequired: false,

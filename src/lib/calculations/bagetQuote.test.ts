@@ -102,6 +102,26 @@ describe('bagetQuote', () => {
     expect(forcedWide.total).toBeGreaterThan(narrow.total);
   });
 
+
+  it('does not auto-add PVC for photo work type', () => {
+    const result = bagetQuote({
+      width: 400,
+      height: 500,
+      quantity: 1,
+      selectedBaget,
+      workType: 'photo',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: true,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+    });
+
+    expect(result.meta?.autoAdditions?.pvcType).toBe('none');
+    expect(result.items.some((item) => item.key === 'pvc')).toBe(false);
+  });
+
   it('allows stretched canvas without baget in no-frame mode and keeps stretcher cost', () => {
     const result = bagetQuote({
       width: 1200,
