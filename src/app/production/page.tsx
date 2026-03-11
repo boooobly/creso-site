@@ -88,43 +88,43 @@ export default function ProductionPage() {
   return (
     <div>
       <Section>
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
-          <div className="space-y-7">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-14">
+          <div className="space-y-8">
             <p className="inline-flex rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-neutral-700">
               СОБСТВЕННОЕ ПРОИЗВОДСТВО
             </p>
             <h1 className="max-w-3xl text-3xl font-bold leading-[1.1] md:text-5xl">Собственное производство рекламы</h1>
             <p className="max-w-2xl text-base leading-relaxed text-neutral-700 md:text-lg md:leading-relaxed">
-              Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Работаем без посредников и
-              контролируем качество на каждом этапе.
+              Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Без посредников, с
+              контролем качества на каждом этапе.
             </p>
 
-            <div className="flex flex-wrap gap-2.5 md:gap-3">
+            <div className="flex flex-wrap gap-3 md:gap-3.5">
               {capabilityBadges.map((badge) => (
                 <span
                   key={badge}
-                  className="inline-flex h-10 items-center rounded-full border border-neutral-200 bg-white/95 px-4 text-sm font-medium text-neutral-800 shadow-sm"
+                  className="inline-flex h-11 items-center rounded-full border border-neutral-200 bg-white px-5 text-sm font-medium text-neutral-800 shadow-sm"
                 >
                   {badge}
                 </span>
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-3">
               <Link href="/contacts" className="btn-primary inline-flex no-underline">
                 Обсудить проект
               </Link>
               <a
                 href="#production-gallery"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 px-5 text-sm font-semibold text-neutral-800 transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 shadow-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50"
               >
                 Смотреть производство
               </a>
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-1.5 shadow-[0_16px_38px_rgba(17,24,39,0.12)]">
-            <div className="relative aspect-[5/4] w-full">
+          <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-1.5 shadow-[0_18px_38px_rgba(17,24,39,0.12)]">
+            <div className="relative aspect-[6/5] w-full">
               <Image
                 src="/images/outdoor_advertising/manufacturing.png"
                 alt="Собственное производство рекламы"
@@ -143,10 +143,10 @@ export default function ProductionPage() {
           <div className="grid gap-4 md:grid-cols-2">
             {equipment.map((item) => (
               <RevealOnScroll key={item.title}>
-                <article className="flex min-h-[230px] flex-col rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-md">
+                <article className="flex min-h-[248px] flex-col rounded-2xl border border-neutral-200 bg-white p-8 md:p-9 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md">
                   <h3 className="text-xl font-semibold leading-tight text-neutral-900 md:text-2xl">{item.title}</h3>
                   <p className="mt-4 text-sm leading-relaxed text-neutral-700 md:text-base">{item.text}</p>
-                  <span className="mt-6 inline-flex self-start rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-700">
+                  <span className="mt-7 inline-flex self-start rounded-full border border-neutral-300 bg-neutral-50 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-neutral-700">
                     {item.tag}
                   </span>
                 </article>
