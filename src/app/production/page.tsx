@@ -29,12 +29,30 @@ const equipment = [
 ] as const;
 
 const products = [
-  'Вывески и объемные буквы',
-  'Световые короба',
-  'Баннеры и широкоформатная печать',
-  'Стелы и конструкции',
-  'Оформление картин и багет',
-  'Индивидуальные проекты',
+  {
+    title: 'Вывески и объемные буквы',
+    text: 'Фасадные рекламные конструкции любой сложности.',
+  },
+  {
+    title: 'Световые короба',
+    text: 'Классические и нестандартные лайтбоксы.',
+  },
+  {
+    title: 'Баннеры и широкоформатная печать',
+    text: 'Печать для фасадов, стендов и рекламных конструкций.',
+  },
+  {
+    title: 'Стелы и конструкции',
+    text: 'Изготовление рекламных стел и пилонов.',
+  },
+  {
+    title: 'Оформление картин и багет',
+    text: 'Изготовление рам и оформление работ.',
+  },
+  {
+    title: 'Индивидуальные проекты',
+    text: 'Нестандартные рекламные конструкции под задачу клиента.',
+  },
 ] as const;
 
 const gallery = [
@@ -73,7 +91,7 @@ const gallery = [
 const workSteps = [
   { title: 'Замер', text: 'Выезд на объект и точные размеры.' },
   { title: 'Проектирование', text: 'Подготовка макета и технического решения.' },
-  { title: 'Производство', text: 'Изготовление конструкции.' },
+  { title: 'Производство', text: 'Изготовление конструкции в цеху.' },
   { title: 'Монтаж', text: 'Установка и подключение рекламы.' },
 ] as const;
 
@@ -159,14 +177,14 @@ export default function ProductionPage() {
       <Section className="pt-0">
         <div className="space-y-5">
           <h2 className="text-2xl font-semibold md:text-3xl">Что мы производим</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((item) => (
               <article
-                key={item}
-                className="flex min-h-[150px] flex-col justify-between rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md"
+                key={item.title}
+                className="flex min-h-[188px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 md:p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-md"
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.1em] text-neutral-500">Продукция</p>
-                <h3 className="mt-4 text-lg font-semibold leading-snug text-neutral-900">{item}</h3>
+                <h3 className="text-lg font-semibold leading-snug text-neutral-900">{item.title}</h3>
+                <p className="mt-4 text-sm leading-relaxed text-neutral-700 md:text-base">{item.text}</p>
               </article>
             ))}
           </div>
@@ -224,14 +242,14 @@ export default function ProductionPage() {
         <div className="space-y-5">
           <h2 className="text-2xl font-semibold md:text-3xl">Как проходит работа</h2>
           <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="pointer-events-none absolute left-0 right-0 top-8 hidden h-px bg-neutral-200 lg:block" />
+            <div className="pointer-events-none absolute left-12 right-12 top-10 hidden h-px bg-neutral-200 lg:block" />
             {workSteps.map((step, index) => (
-              <div key={step.title} className="relative flex min-h-[200px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <span className="relative z-10 mb-5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-neutral-900 text-sm font-semibold text-white shadow-sm">
+              <div key={step.title} className="relative flex min-h-[232px] flex-col rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm">
+                <span className="relative z-10 mb-6 inline-flex h-11 w-11 items-center justify-center rounded-full bg-neutral-900 text-base font-semibold text-white shadow-sm ring-4 ring-white">
                   {index + 1}
                 </span>
                 <h3 className="text-lg font-semibold text-neutral-900">{step.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-neutral-700">{step.text}</p>
+                <p className="mt-3 text-sm leading-relaxed text-neutral-700 md:text-base">{step.text}</p>
               </div>
             ))}
           </div>
