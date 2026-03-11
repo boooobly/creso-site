@@ -192,32 +192,32 @@ export default function ProductionPage() {
       </Section>
 
       <Section id="production-gallery" className="pt-0">
-        <div className="space-y-6">
+        <div className="space-y-7">
           <h2 className="text-2xl font-semibold md:text-3xl">Производство в работе</h2>
           <div className="space-y-5">
             <div className="grid gap-5 sm:grid-cols-2">
               {gallery.slice(0, 2).map((item) => (
                 <div
                   key={item.src}
-                  className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 ${item.className}`}
+                  className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 shadow-[0_6px_18px_rgba(17,24,39,0.06)] ${item.className}`}
                 >
-                  <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                    <p className="text-sm font-medium text-white">{item.caption}</p>
+                  <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5">
+                    <p className="text-sm font-semibold tracking-[0.01em] text-white">{item.caption}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 ${gallery[2].className}`}>
+            <div className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 shadow-[0_6px_18px_rgba(17,24,39,0.06)] ${gallery[2].className}`}>
               <Image
                 src={gallery[2].src}
                 alt={gallery[2].alt}
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
               />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                <p className="text-sm font-medium text-white">{gallery[2].caption}</p>
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5">
+                <p className="text-sm font-semibold tracking-[0.01em] text-white">{gallery[2].caption}</p>
               </div>
             </div>
 
@@ -225,11 +225,11 @@ export default function ProductionPage() {
               {gallery.slice(3).map((item) => (
                 <div
                   key={item.src}
-                  className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 ${item.className}`}
+                  className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 shadow-[0_6px_18px_rgba(17,24,39,0.06)] ${item.className}`}
                 >
-                  <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                    <p className="text-sm font-medium text-white">{item.caption}</p>
+                  <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5">
+                    <p className="text-sm font-semibold tracking-[0.01em] text-white">{item.caption}</p>
                   </div>
                 </div>
               ))}
@@ -257,12 +257,12 @@ export default function ProductionPage() {
       </Section>
 
       <Section className="pt-0">
-        <div className="rounded-3xl border border-neutral-200 bg-neutral-50/80 p-6 md:p-9">
+        <div className="rounded-3xl border border-neutral-300 bg-neutral-50 p-6 md:p-10">
           <div className="space-y-6">
-            <h2 className="text-2xl font-semibold md:text-3xl">Почему нам доверяют производство</h2>
+            <h2 className="text-2xl font-semibold md:text-3xl">Почему нам доверяют</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {trustPoints.map((item) => (
-                <article key={item.title} className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <article key={item.title} className="flex min-h-[172px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 md:p-7">
                   <h3 className="text-lg font-semibold text-neutral-900">{item.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-neutral-700">{item.text}</p>
                 </article>
@@ -273,14 +273,14 @@ export default function ProductionPage() {
       </Section>
 
       <Section className="pt-0 pb-0">
-        <div className="card flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:gap-10 md:p-9">
-          <div className="space-y-3">
-            <h2 className="text-2xl font-semibold md:text-3xl">Готовы обсудить задачу?</h2>
-            <p className="max-w-2xl text-neutral-700 md:text-lg">
+        <div className="card flex flex-col gap-6 p-7 md:flex-row md:items-center md:justify-between md:gap-8 md:p-10">
+          <div className="max-w-2xl space-y-3.5">
+            <h2 className="text-2xl font-semibold leading-tight md:text-3xl">Готовы обсудить задачу?</h2>
+            <p className="text-neutral-700 md:text-lg">
               Подскажем по материалам, подготовим расчет и предложим оптимальное решение под ваш проект.
             </p>
           </div>
-          <Link href="/contacts" className="btn-primary inline-flex w-fit shrink-0 no-underline">
+          <Link href="/contacts" className="btn-primary inline-flex w-fit shrink-0 self-start no-underline md:self-center">
             Получить расчет
           </Link>
         </div>
