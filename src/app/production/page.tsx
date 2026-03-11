@@ -187,6 +187,33 @@ export default function ProductionPage() {
 
       <Section className="pt-0">
         <div className="space-y-5">
+          <h2 className="text-2xl font-semibold md:text-3xl">Производство в работе</h2>
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {gallery.slice(0, 2).map((item) => (
+                <div key={item.src} className={`relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 ${item.className}`}>
+                  <Image src={item.src} alt={item.alt} fill className="object-cover" />
+                </div>
+              ))}
+            </div>
+
+            <div className={`relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 ${gallery[2].className}`}>
+              <Image src={gallery[2].src} alt={gallery[2].alt} fill className="object-cover" />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {gallery.slice(3).map((item) => (
+                <div key={item.src} className={`relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 ${item.className}`}>
+                  <Image src={item.src} alt={item.alt} fill className="object-cover" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div className="space-y-5">
           <h2 className="text-2xl font-semibold md:text-3xl">Как проходит работа</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {workSteps.map((step, index) => (
