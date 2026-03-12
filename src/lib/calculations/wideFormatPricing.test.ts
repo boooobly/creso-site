@@ -20,7 +20,7 @@ describe('calculateWideFormatPricing', () => {
     expect(quote.extrasCost).toBe(0);
   });
 
-  it('keeps banners calculable within 3.2m and adds one auto join seam when width > 3.1m', () => {
+  it('keeps banners calculable and adds one auto join seam when width > 3.1m', () => {
     const quote = calculateWideFormatPricing({
       material: 'banner_440_matte_3_2m',
       bannerDensity: 300,
@@ -58,8 +58,25 @@ describe('calculateWideFormatPricing', () => {
     expect(quote.imageWeldingCost).toBe(0);
   });
 
-  it('returns max width warning when selected material width is exceeded', () => {
-    expect(getWideFormatWidthWarningCode('canvas_cotton_350', 1.51)).toBe('max_width_exceeded');
-    expect(getWideFormatWidthWarningCode('polyester_fabric_100_0_9', 1)).toBe('max_width_exceeded');
+  it('validates non-banner roll materials by smaller side to support rotation', () => {
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 1.5, 50)).toBeNull();
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 3.2, 1.4)).toBeNull();
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 10, 0.8)).toBeNull();
+
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 1.6, 1.6)).toBe('max_width_exceeded');
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 2, 3)).toBe('max_width_exceeded');
+  });
+
+  it('applies roll width validation for paper, backlit, fabric and canvas', () => {
+    expect(getWideFormatWidthWarningCode('paper_trans_skylight', 4, 1.6)).toBeNull();
+    expect(getWideFormatWidthWarningCode('backlit_1_07', 4, 1)).toBeNull();
+    expect(getWideFormatWidthWarningCode('backlit_1_07', 1.2, 1.2)).toBe('max_width_exceeded');
+    expect(getWideFormatWidthWarningCode('polyester_fabric_100_0_9', 10, 0.9)).toBeNull();
+    expect(getWideFormatWidthWarningCode('canvas_cotton_350', 2, 1.4)).toBeNull();
+    expect(getWideFormatWidthWarningCode('canvas_cotton_350', 1.51, 1.6)).toBe('max_width_exceeded');
+  });
+
+  it('does not block banners with large dimensions due to seam capability', () => {
+    expect(getWideFormatWidthWarningCode('banner_240_gloss_3_2m', 4, 4)).toBeNull();
   });
 });

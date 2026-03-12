@@ -68,7 +68,7 @@ const SCROLL_OFFSET_PX = 90;
 
 const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, (maxWidth?: number) => string> = {
   invalid_width: () => 'Введите корректную ширину.',
-  max_width_exceeded: (maxWidth) => `Максимальная ширина — ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
+  max_width_exceeded: (maxWidth) => `Размер не помещается в ширину рулона ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м. Одна из сторон макета должна быть не больше ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
 };
 
 const EMPTY_QUOTE: WideFormatQuote = {
@@ -414,7 +414,6 @@ export default function WideFormatPricingCalculator() {
               id="width"
               type="number"
               min={0}
-              max={maxWidthForCurrentMaterial}
               step="0.01"
               value={width}
               onChange={(e) => setWidth(e.target.value)}

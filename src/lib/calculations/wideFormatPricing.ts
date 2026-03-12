@@ -47,14 +47,21 @@ export type WideFormatCalculationResult = {
   totalCost: number;
 };
 
-export function getWideFormatWidthWarningCode(material: WideFormatMaterialType, width: number): WideFormatWidthWarningCode {
-  if (!Number.isFinite(width)) return 'invalid_width';
+export function getWideFormatWidthWarningCode(
+  material: WideFormatMaterialType,
+  width: number,
+  height: number,
+): WideFormatWidthWarningCode {
+  if (!Number.isFinite(width) || !Number.isFinite(height)) return 'invalid_width';
+
+  if (isBannerMaterial(material)) {
+    return null;
+  }
 
   const materialMaxWidth = getWideFormatMaterialMaxWidth(material);
-  const isBanner = isBannerMaterial(material);
+  const smallerSide = Math.min(width, height);
 
-  if (!isBanner && width > materialMaxWidth) return 'max_width_exceeded';
-  if (isBanner && width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
+  if (smallerSide > materialMaxWidth) return 'max_width_exceeded';
 
   return null;
 }
@@ -70,7 +77,7 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
 
   const parsedValuesValid = [width, height, quantity].every((value) => Number.isFinite(value));
   const positiveInputs = width > 0 && height > 0 && quantity > 0;
-  const widthWarningCode = getWideFormatWidthWarningCode(input.material, width);
+  const widthWarningCode = getWideFormatWidthWarningCode(input.material, width, height);
 
   const areaPerUnit = width * height;
   const billableAreaPerUnit = Math.max(areaPerUnit, 1);
