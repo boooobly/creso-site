@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ClipboardList, Clock3, Cog, KeyRound, PencilRuler, Search, Truck, Wallet } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Section from '@/components/Section';
 import ServiceCard from '@/components/ServiceCard';
@@ -22,17 +22,33 @@ type HomePageContentProps = {
 const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
 
 const trustHighlights = [
-  { title: 'Собственное производство', description: 'Контролируем качество и сроки на каждом этапе.' },
-  { title: 'Монтажная бригада', description: 'Доставка и установка силами собственной команды.' },
-  { title: 'Работаем по договору', description: 'Четкие условия, фиксированные этапы и прозрачная смета.' },
-  { title: 'Гарантия 5 лет', description: 'Поддержка и обслуживание после сдачи проекта.' },
+  { title: 'Берём задачу под ключ', description: 'От замера и макета до производства и монтажа.', icon: KeyRound },
+  { title: 'Подбираем решение под бюджет', description: 'Предлагаем оптимальный вариант под вашу задачу.', icon: Wallet },
+  { title: 'Держим сроки', description: 'Сразу говорим реальные сроки без лишних обещаний.', icon: Clock3 },
+  { title: 'Всегда можно уточнить детали', description: 'Помогаем по материалам, размерам и конструкции.', icon: Search },
 ];
 
 const processSteps = [
-  { title: 'Бриф и расчёт', description: 'Уточняем задачу, сроки и бюджет. Предлагаем лучший формат и материалы.' },
-  { title: 'Макет и согласование', description: 'Подготавливаем визуализацию и корректируем детали до финального согласования.' },
-  { title: 'Производство', description: 'Запускаем проект на собственных мощностях, соблюдая стандарты качества.' },
-  { title: 'Монтаж и передача', description: 'Организуем доставку, установку или передачу готового тиража.' },
+  {
+    title: 'Бриф и расчёт',
+    description: 'Уточняем задачу, сроки и бюджет. Подбираем формат, материалы и решение.',
+    icon: ClipboardList,
+  },
+  {
+    title: 'Макет и согласование',
+    description: 'Готовим визуализацию, уточняем детали и согласовываем финальный вариант.',
+    icon: PencilRuler,
+  },
+  {
+    title: 'Производство',
+    description: 'Запускаем проект на собственных мощностях и контролируем качество на каждом этапе.',
+    icon: Cog,
+  },
+  {
+    title: 'Монтаж и передача',
+    description: 'Организуем доставку, установку или передачу готового тиража.',
+    icon: Truck,
+  },
 ];
 
 const leadPoints = ['Расчёт стоимости и сроков в день обращения', 'Подбор материалов под бюджет и задачу', 'Один менеджер на всём цикле проекта'];
@@ -136,15 +152,26 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
       <Section className="border-y border-neutral-200/70 py-12 md:py-14" background="muted" fullBleed>
         <div className="mb-6 space-y-2 md:mb-7">
           <p className="t-eyebrow">ПОЧЕМУ НАМ ДОВЕРЯЮТ</p>
-          <h2 className="t-h2">Почему нам доверяют</h2>
+          <h2 className="t-h2">С нами проще работать</h2>
         </div>
         <motion.ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {trustHighlights.map((item) => (
-            <motion.li key={item.title} variants={fadeUp(14)} className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition duration-200 ease-out hover:-translate-y-[3px] hover:border-neutral-300">
-              <p className="text-sm font-semibold text-neutral-900">{item.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.description}</p>
-            </motion.li>
-          ))}
+          {trustHighlights.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <motion.li
+                key={item.title}
+                variants={fadeUp(14)}
+                className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+              >
+                <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                  <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                </div>
+                <p className="text-sm font-semibold text-neutral-900">{item.title}</p>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+              </motion.li>
+            );
+          })}
         </motion.ul>
       </Section>
 
@@ -185,19 +212,27 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
         <div className="mb-5 space-y-2 md:mb-8">
           <p className="t-eyebrow">ПРОЦЕСС</p>
           <h2 className="t-h2">Как мы запускаем ваш проект</h2>
-          <p className="t-body text-muted-foreground max-w-2xl">Прозрачные этапы, понятные сроки и контроль качества на каждом шаге.</p>
+          <p className="t-body text-muted-foreground max-w-2xl">Понятные этапы, реальные сроки и контроль качества на каждом шаге.</p>
         </div>
-        <motion.ol className="relative grid gap-4 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          <div aria-hidden="true" className="absolute left-0 right-0 top-8 hidden h-px bg-neutral-200 xl:block" />
-          {processSteps.map((step, index) => (
-            <motion.li key={step.title} variants={fadeUp(16)} className="relative h-full rounded-2xl border border-neutral-200 bg-white px-5 pb-5 pt-4 shadow-sm md:px-6 md:pb-6">
-              <div className="mb-4 inline-flex size-12 items-center justify-center rounded-xl border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-base font-bold text-[var(--brand-red)]">
-                0{index + 1}
-              </div>
-              <h3 className="t-h3">{step.title}</h3>
-              <p className="t-body mt-2">{step.description}</p>
-            </motion.li>
-          ))}
+        <motion.ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+          {processSteps.map((step, index) => {
+            const Icon = step.icon;
+
+            return (
+              <motion.li
+                key={step.title}
+                variants={fadeUp(16)}
+                className="relative h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+              >
+                <span className="absolute right-5 top-5 text-xs font-semibold text-neutral-400">0{index + 1}</span>
+                <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                  <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                </div>
+                <h3 className="t-h3">{step.title}</h3>
+                <p className="t-body mt-2">{step.description}</p>
+              </motion.li>
+            );
+          })}
         </motion.ol>
       </Section>
 
