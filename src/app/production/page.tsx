@@ -61,7 +61,7 @@ const products = [
 
 const gallery = [
   {
-    src: '/images/outdoor_advertising/manufacturing.png',
+    src: '/images/production/hero.png',
     alt: 'Производственный участок с оборудованием',
     caption: 'Производство и сборка',
     className: 'aspect-[4/3]',
