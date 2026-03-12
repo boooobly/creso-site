@@ -1,4 +1,5 @@
 import { PanelsTopLeft } from 'lucide-react';
+import Image from 'next/image';
 
 type StandPreviewCardProps = {
   title: string;
@@ -7,9 +8,10 @@ type StandPreviewCardProps = {
   variant?: 'indoor' | 'outdoor';
   previewHint: string;
   previewTag: string;
+  imageSrc: string;
 };
 
-export default function StandPreviewCard({ title, description, label, variant = 'indoor', previewHint, previewTag }: StandPreviewCardProps) {
+export default function StandPreviewCard({ title, description, label, variant = 'indoor', previewHint, previewTag, imageSrc }: StandPreviewCardProps) {
   const isOutdoor = variant === 'outdoor';
 
   return (
@@ -53,7 +55,8 @@ export default function StandPreviewCard({ title, description, label, variant = 
         aria-hidden="true"
       >
         <div className="relative flex h-full w-full items-end p-3 md:p-4">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.9),rgba(245,245,245,0.55)_42%,rgba(229,229,229,0.65)_100%)]" />
+          <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/5 to-white/5" />
 
           <div className="absolute inset-x-3 top-3 space-y-1.5 md:inset-x-4 md:top-4">
             <div className="h-1.5 w-3/4 rounded-full bg-neutral-300/80" />
