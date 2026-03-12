@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  engineUiCatalog,
   type BannerDensity,
   type WideFormatMaterialType,
   type WideFormatWidthWarningCode,
@@ -19,6 +18,7 @@ import {
   isExtrasAllowedForWideFormat,
   isBannerMaterial,
   isFilmMaterial,
+  getWideFormatMaterialMaxWidth,
   WIDE_FORMAT_PRICING_CONFIG,
 } from '@/lib/pricing-config/wideFormat';
 import {
@@ -46,6 +46,9 @@ type WideFormatQuote = {
   areaPerUnit: number;
   billableAreaPerUnit: number;
   perimeterPerUnit: number;
+  materialPricePerM2: number;
+  regularMaterialCost: number;
+  minimumPrintPriceApplied: boolean;
   basePrintCost: number;
   edgeGluingCost: number;
   imageWeldingCost: number;
@@ -66,10 +69,9 @@ type TransferredBagetImagePayload = {
 const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
 const SCROLL_OFFSET_PX = 90;
 
-const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
-  invalid_width: 'Введите корректную ширину.',
-  max_width_exceeded: `Максимальная ширина — ${WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
-  canvas_max_width_exceeded: 'Максимальная ширина печати холста одним макетом - 1,45 м',
+const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, (maxWidth?: number) => string> = {
+  invalid_width: () => 'Введите корректную ширину.',
+  max_width_exceeded: (maxWidth) => `Размер не помещается в ширину рулона ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м. Одна из сторон макета должна быть не больше ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
 };
 
 const EMPTY_QUOTE: WideFormatQuote = {
@@ -82,6 +84,9 @@ const EMPTY_QUOTE: WideFormatQuote = {
   areaPerUnit: 0,
   billableAreaPerUnit: 0,
   perimeterPerUnit: 0,
+  materialPricePerM2: 0,
+  regularMaterialCost: 0,
+  minimumPrintPriceApplied: false,
   basePrintCost: 0,
   edgeGluingCost: 0,
   imageWeldingCost: 0,
@@ -128,9 +133,7 @@ export default function WideFormatPricingCalculator() {
   const [pricePulse, setPricePulse] = useState(false);
 
   const isCanvasMaterial = material.includes('canvas');
-  const maxWidthForCurrentMaterial = isCanvasMaterial
-    ? WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth
-    : engineUiCatalog.wideFormat.maxWidth;
+  const maxWidthForCurrentMaterial = getWideFormatMaterialMaxWidth(material);
 
   const isBanner = isBannerMaterial(material);
   const isFilm = isFilmMaterial(material);
@@ -224,15 +227,6 @@ export default function WideFormatPricingCalculator() {
   }, [canShowWelding, imageWelding]);
 
   useEffect(() => {
-    if (!isCanvasMaterial) return;
-
-    const parsedCanvasWidth = Number(width);
-    if (Number.isFinite(parsedCanvasWidth) && parsedCanvasWidth > WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth) {
-      setWidth(String(WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth));
-    }
-  }, [isCanvasMaterial, width]);
-
-  useEffect(() => {
     if (!isFilm && plotterCutByRegistrationMarks) setPlotterCutByRegistrationMarks(false);
   }, [isFilm, plotterCutByRegistrationMarks]);
 
@@ -303,10 +297,12 @@ export default function WideFormatPricingCalculator() {
     };
   }, [debouncedQuoteRequest]);
 
-  const widthWarning = quote.widthWarningCode ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode] : '';
+  const widthWarning = quote.widthWarningCode
+    ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode](maxWidthForCurrentMaterial)
+    : '';
   const canShowPricingDetails = quote.parsedValuesValid && quote.positiveInputs && quote.widthWarningCode === null;
-  const pricePerM2 = canShowPricingDetails && quote.billableAreaPerUnit > 0 && quote.quantity > 0
-    ? quote.basePrintCost / (quote.billableAreaPerUnit * quote.quantity)
+  const pricePerM2 = canShowPricingDetails && quote.materialPricePerM2 > 0
+    ? quote.materialPricePerM2
     : null;
   const totalPerUnit = quote.quantity > 0 ? quote.totalCost / quote.quantity : null;
 
@@ -424,7 +420,6 @@ export default function WideFormatPricingCalculator() {
               id="width"
               type="number"
               min={0}
-              max={maxWidthForCurrentMaterial}
               step="0.01"
               value={width}
               onChange={(e) => setWidth(e.target.value)}
@@ -520,23 +515,29 @@ export default function WideFormatPricingCalculator() {
         <h2 className="text-xl font-semibold">Расчёт</h2>
         <div className="space-y-2 text-sm">
           <SummaryRow label="Фактическая площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
-          {quote.parsedValuesValid && quote.billableAreaPerUnit !== quote.areaPerUnit && (
-            <SummaryRow label="Тарифицируемая площадь" value={`${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²`} />
-          )}
+          <SummaryRow label="Тарифицируемая площадь" value={quote.parsedValuesValid ? `${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
           <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
             <p className="text-sm font-medium">Материал</p>
             <p className="text-xs text-neutral-600 dark:text-neutral-400">({(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м² × {pricePerM2 ? formatRubles(pricePerM2) : '—'})</p>
-            <p className="text-sm font-semibold">= {formatRubles(quote.basePrintCost)}</p>
+            <p className="text-sm font-semibold">= {formatRubles(quote.regularMaterialCost)}</p>
             {pricePerM2 && (
               <p className="text-right text-xs text-neutral-500 dark:text-neutral-400">
                 {formatRubles(pricePerM2)} / м²
               </p>
             )}
           </div>
-          <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
-            <p className="text-sm font-medium">Доп. услуги</p>
-            <p className="text-sm font-semibold">= {formatRubles(quote.extrasCost)}</p>
-          </div>
+          {quote.extrasCost > 0 && (
+            <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
+              <p className="text-sm font-medium">Доп. услуги</p>
+              <p className="text-sm font-semibold">= {formatRubles(quote.extrasCost)}</p>
+            </div>
+          )}
+          {quote.minimumPrintPriceApplied && (
+            <SummaryRow
+              label="Минимальная стоимость печати"
+              value={`${WIDE_FORMAT_PRICING_CONFIG.minimumPrintPriceRUB.toLocaleString('ru-RU')} ₽`}
+            />
+          )}
           {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.imageWeldingCost > 0 && <SummaryRow label={`— Проклейка стыка полотен${quote.requiresJoinSeam ? ' (авто)' : ''}`} value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
           {plotterCutByRegistrationMarks && <SummaryRow label="— Резка по меткам" value={`от ${WIDE_FORMAT_PRICING_CONFIG.plotterCutMinimumFee.toLocaleString('ru-RU')} ₽ (оценочно, рассчитает менеджер)`} />}
