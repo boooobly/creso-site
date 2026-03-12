@@ -148,7 +148,7 @@ export default function ProductionPage() {
           <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-1.5 shadow-[0_18px_38px_rgba(17,24,39,0.12)]">
             <div className="relative aspect-[6/5] w-full">
               <Image
-                src="/images/outdoor_advertising/manufacturing.png"
+                src="/images/production/hero.png"
                 alt="Собственное производство рекламы"
                 fill
                 className="rounded-[1.35rem] object-cover"
