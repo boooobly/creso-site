@@ -22,10 +22,10 @@ type HomePageContentProps = {
 const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
 
 const trustHighlights = [
-  { title: 'Собственное производство', description: 'Контролируем качество и сроки на каждом этапе.' },
-  { title: 'Монтажная бригада', description: 'Доставка и установка силами собственной команды.' },
-  { title: 'Работаем по договору', description: 'Четкие условия, фиксированные этапы и прозрачная смета.' },
-  { title: 'Гарантия 5 лет', description: 'Поддержка и обслуживание после сдачи проекта.' },
+  { title: 'Берём задачу под ключ', description: 'От замера и макета до производства и монтажа.' },
+  { title: 'Подбираем решение под бюджет', description: 'Предлагаем оптимальный вариант под вашу задачу.' },
+  { title: 'Держим сроки', description: 'Сразу говорим реальные сроки без лишних обещаний.' },
+  { title: 'Всегда можно уточнить детали', description: 'Помогаем по материалам, размерам и конструкции.' },
 ];
 
 const processSteps = [
@@ -136,7 +136,7 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
       <Section className="border-y border-neutral-200/70 py-12 md:py-14" background="muted" fullBleed>
         <div className="mb-6 space-y-2 md:mb-7">
           <p className="t-eyebrow">ПОЧЕМУ НАМ ДОВЕРЯЮТ</p>
-          <h2 className="t-h2">Почему нам доверяют</h2>
+          <h2 className="t-h2">С нами проще работать</h2>
         </div>
         <motion.ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {trustHighlights.map((item) => (
