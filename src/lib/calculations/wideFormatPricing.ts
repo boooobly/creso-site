@@ -7,7 +7,6 @@ import {
 import { parseNumericInput } from './shared';
 import type { BannerDensity, WideFormatMaterialType } from './types';
 
-const WIDE_FORMAT_MIN_PRINT_PRICE_RUB = 400;
 
 export type WideFormatWidthWarningCode =
   | 'invalid_width'
@@ -38,6 +37,9 @@ export type WideFormatCalculationResult = {
   areaPerUnit: number;
   billableAreaPerUnit: number;
   perimeterPerUnit: number;
+  materialPricePerM2: number;
+  regularMaterialCost: number;
+  minimumPrintPriceApplied: boolean;
   basePrintCost: number;
   edgeGluingCost: number;
   imageWeldingCost: number;
@@ -91,12 +93,14 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
 
   const materialPricePerM2 = getMaterialPricePerM2(input.material);
 
-  const calculatedMaterialCost = parsedValuesValid && positiveInputs && widthWarningCode === null
+  const regularMaterialCost = parsedValuesValid && positiveInputs && widthWarningCode === null
     ? billableAreaTotal * materialPricePerM2
     : 0;
 
-  const basePrintCost = calculatedMaterialCost > 0
-    ? Math.max(calculatedMaterialCost, WIDE_FORMAT_MIN_PRINT_PRICE_RUB)
+  const minimumPrintPriceApplied = regularMaterialCost > 0 && regularMaterialCost < WIDE_FORMAT_PRICING_CONFIG.minimumPrintPriceRUB;
+
+  const basePrintCost = regularMaterialCost > 0
+    ? Math.max(regularMaterialCost, WIDE_FORMAT_PRICING_CONFIG.minimumPrintPriceRUB)
     : 0;
 
   const edgeGluingCost = input.edgeGluing && isBanner && parsedValuesValid && positiveInputs && widthWarningCode === null
@@ -137,6 +141,9 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
     areaPerUnit,
     billableAreaPerUnit,
     perimeterPerUnit,
+    materialPricePerM2,
+    regularMaterialCost,
+    minimumPrintPriceApplied,
     basePrintCost,
     edgeGluingCost,
     imageWeldingCost,

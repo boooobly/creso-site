@@ -132,6 +132,7 @@ export const WIDE_FORMAT_PRICING_CONFIG = {
   plotterCutPerimeterPrice: 25,
   plotterCutMinimumFee: 250,
   positioningMarksCutPercent: 0.3,
+  minimumPrintPriceRUB: 400,
   pricesRUBPerM2: {
     banner_240_gloss_3_2m: 450,
     banner_340_matte_3_2m: 450,

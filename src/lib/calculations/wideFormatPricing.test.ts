@@ -111,9 +111,17 @@ describe('calculateWideFormatPricing', () => {
     expect(medium.billableAreaPerUnit).toBeCloseTo(0.24, 6);
     expect(large.billableAreaPerUnit).toBeCloseTo(0.42, 6);
 
+    expect(small.regularMaterialCost).toBeCloseTo(90, 6);
+    expect(medium.regularMaterialCost).toBeCloseTo(360, 6);
+    expect(large.regularMaterialCost).toBeCloseTo(630, 6);
+
     expect(small.basePrintCost).toBeCloseTo(400, 6);
     expect(medium.basePrintCost).toBeCloseTo(400, 6);
     expect(large.basePrintCost).toBeCloseTo(630, 6);
+
+    expect(small.minimumPrintPriceApplied).toBe(true);
+    expect(medium.minimumPrintPriceApplied).toBe(true);
+    expect(large.minimumPrintPriceApplied).toBe(false);
 
     expect(small.basePrintCost).toBeLessThanOrEqual(medium.basePrintCost);
     expect(medium.basePrintCost).toBeLessThan(large.basePrintCost);
@@ -135,6 +143,8 @@ describe('calculateWideFormatPricing', () => {
 
     expect(quote.areaPerUnit * quote.quantity).toBeCloseTo(0.24, 6);
     expect(quote.billableAreaPerUnit * quote.quantity).toBeCloseTo(0.24, 6);
+    expect(quote.regularMaterialCost).toBeCloseTo(120, 6);
     expect(quote.basePrintCost).toBeCloseTo(400, 6);
+    expect(quote.minimumPrintPriceApplied).toBe(true);
   });
 });

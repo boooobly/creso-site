@@ -46,6 +46,9 @@ type WideFormatQuote = {
   areaPerUnit: number;
   billableAreaPerUnit: number;
   perimeterPerUnit: number;
+  materialPricePerM2: number;
+  regularMaterialCost: number;
+  minimumPrintPriceApplied: boolean;
   basePrintCost: number;
   edgeGluingCost: number;
   imageWeldingCost: number;
@@ -81,6 +84,9 @@ const EMPTY_QUOTE: WideFormatQuote = {
   areaPerUnit: 0,
   billableAreaPerUnit: 0,
   perimeterPerUnit: 0,
+  materialPricePerM2: 0,
+  regularMaterialCost: 0,
+  minimumPrintPriceApplied: false,
   basePrintCost: 0,
   edgeGluingCost: 0,
   imageWeldingCost: 0,
@@ -295,8 +301,8 @@ export default function WideFormatPricingCalculator() {
     ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode](maxWidthForCurrentMaterial)
     : '';
   const canShowPricingDetails = quote.parsedValuesValid && quote.positiveInputs && quote.widthWarningCode === null;
-  const pricePerM2 = canShowPricingDetails && quote.billableAreaPerUnit > 0 && quote.quantity > 0
-    ? quote.basePrintCost / (quote.billableAreaPerUnit * quote.quantity)
+  const pricePerM2 = canShowPricingDetails && quote.materialPricePerM2 > 0
+    ? quote.materialPricePerM2
     : null;
   const totalPerUnit = quote.quantity > 0 ? quote.totalCost / quote.quantity : null;
 
@@ -509,13 +515,11 @@ export default function WideFormatPricingCalculator() {
         <h2 className="text-xl font-semibold">Расчёт</h2>
         <div className="space-y-2 text-sm">
           <SummaryRow label="Фактическая площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
-          {quote.parsedValuesValid && quote.billableAreaPerUnit !== quote.areaPerUnit && (
-            <SummaryRow label="Тарифицируемая площадь" value={`${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²`} />
-          )}
+          <SummaryRow label="Тарифицируемая площадь" value={quote.parsedValuesValid ? `${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
           <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
             <p className="text-sm font-medium">Материал</p>
             <p className="text-xs text-neutral-600 dark:text-neutral-400">({(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м² × {pricePerM2 ? formatRubles(pricePerM2) : '—'})</p>
-            <p className="text-sm font-semibold">= {formatRubles(quote.basePrintCost)}</p>
+            <p className="text-sm font-semibold">= {formatRubles(quote.regularMaterialCost)}</p>
             {pricePerM2 && (
               <p className="text-right text-xs text-neutral-500 dark:text-neutral-400">
                 {formatRubles(pricePerM2)} / м²
@@ -527,6 +531,12 @@ export default function WideFormatPricingCalculator() {
               <p className="text-sm font-medium">Доп. услуги</p>
               <p className="text-sm font-semibold">= {formatRubles(quote.extrasCost)}</p>
             </div>
+          )}
+          {quote.minimumPrintPriceApplied && (
+            <SummaryRow
+              label="Минимальная стоимость печати"
+              value={`${WIDE_FORMAT_PRICING_CONFIG.minimumPrintPriceRUB.toLocaleString('ru-RU')} ₽`}
+            />
           )}
           {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.imageWeldingCost > 0 && <SummaryRow label={`— Проклейка стыка полотен${quote.requiresJoinSeam ? ' (авто)' : ''}`} value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
