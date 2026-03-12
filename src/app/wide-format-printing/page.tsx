@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
+import { Building2, ClipboardCheck, Droplets, FileText } from 'lucide-react';
 import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 import OrderWideFormatForm from '@/components/OrderWideFormatForm';
@@ -15,19 +15,23 @@ export default function WideFormatPrintingPage() {
   const features = [
     {
       title: 'Собственное производство',
-      description: 'Полный цикл печати без посредников',
+      description: 'Полный цикл печати без посредников.',
+      icon: Building2,
     },
     {
       title: 'Проверка макета',
-      description: 'Проверяем файлы перед запуском в печать',
+      description: 'Проверяем файл перед запуском в печать.',
+      icon: ClipboardCheck,
     },
     {
       title: 'Контроль цвета',
-      description: 'Калиброванное оборудование и точность передачи',
+      description: 'Калиброванное оборудование и точность передачи.',
+      icon: Droplets,
     },
     {
       title: 'Работа по договору',
-      description: 'Заключаем официальный договор при необходимости',
+      description: 'Заключаем официальный договор при необходимости.',
+      icon: FileText,
     },
   ];
 
@@ -63,22 +67,25 @@ export default function WideFormatPrintingPage() {
             </div>
           </div>
 
-          <section className="mt-10 rounded-2xl border-2 border-muted-foreground/20 bg-muted/40 p-6 shadow-sm md:p-8">
-            <div className="mb-4 h-1 w-16 rounded-full bg-red-500/80" />
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <h3 className="text-xl font-semibold md:text-2xl">📌 Почему выбирают нас</h3>
-              <p className="inline-flex items-center rounded-full border bg-white/70 px-3 py-1 text-xs text-muted-foreground">
-                4 причины
-              </p>
-            </div>
-            <div className="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {features.map((feature) => (
-                <div key={feature.title} className="rounded-xl border bg-white p-6 shadow-sm transition hover:shadow-md">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
-                  <h3 className="mt-3 text-lg font-semibold">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
-                </div>
-              ))}
+          <section className="mt-10 rounded-2xl border border-neutral-200/70 bg-muted/30 p-6 md:p-8">
+            <h3 className="text-xl font-semibold md:text-2xl">Почему выбирают нас</h3>
+            <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {features.map((feature) => {
+                const Icon = feature.icon;
+
+                return (
+                  <div
+                    key={feature.title}
+                    className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+                  >
+                    <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                      <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-neutral-900">{feature.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-600">{feature.description}</p>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
