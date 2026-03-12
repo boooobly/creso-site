@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Building2, CheckCircle2, ClipboardList, PackageCheck, Ruler, School, ShieldCheck, Sparkles, Wrench } from 'lucide-react';
 import LeadForm from '@/components/LeadForm';
 import Section from '@/components/Section';
@@ -9,18 +10,18 @@ import { messages } from '@/lib/messages';
 const heroChips = ['Собственное производство', 'Карманы и сменные блоки', 'Изготовление по размерам', 'Доставка и монтаж'] as const;
 
 const indoorStands = [
-  { title: 'Стенд «Информация»', description: 'Универсальное решение для объявлений и инструкций.', previewTag: 'Интерьер', previewHint: 'Типовая компоновка с карманами А4 и шапкой.' },
-  { title: 'Уголок потребителя', description: 'Для торговых точек, салонов и офисов.', previewTag: 'Ритейл', previewHint: 'Блоки с документами, реквизитами и правилами.' },
-  { title: 'Пожарные стенды', description: 'Схемы, регламенты и инструкции по безопасности.', previewTag: 'Безопасность', previewHint: 'Схема эвакуации и обязательные памятки.' },
-  { title: 'Охрана труда', description: 'Наглядные материалы для производственных зон.', previewTag: 'Производство', previewHint: 'Нормативы, инструкции и чек-листы для персонала.' },
-  { title: 'Первая помощь', description: 'Памятки и алгоритмы действий в экстренных случаях.', previewTag: 'Медицина', previewHint: 'Алгоритмы оказания помощи и контактные номера.' },
-  { title: 'Гражданская оборона и ЧС', description: 'Информационные блоки для обучения персонала.', previewTag: 'ГО и ЧС', previewHint: 'Порядок действий при внештатных ситуациях.' },
+  { title: 'Стенд «Информация»', description: 'Универсальное решение для объявлений и инструкций.', previewHint: 'Типовая компоновка с карманами А4 и шапкой.', imageSrc: '/images/stands/info.png' },
+  { title: 'Уголок потребителя', description: 'Для торговых точек, салонов и офисов.', previewHint: 'Блоки с документами, реквизитами и правилами.', imageSrc: '/images/stands/consumer_corner.png' },
+  { title: 'Пожарные стенды', description: 'Схемы, регламенты и инструкции по безопасности.', previewHint: 'Схема эвакуации и обязательные памятки.', imageSrc: '/images/stands/fire_safety.png' },
+  { title: 'Охрана труда', description: 'Наглядные материалы для производственных зон.', previewHint: 'Нормативы, инструкции и чек-листы для персонала.', imageSrc: '/images/stands/labor_protection.png' },
+  { title: 'Первая помощь', description: 'Памятки и алгоритмы действий в экстренных случаях.', previewHint: 'Алгоритмы оказания помощи и контактные номера.', imageSrc: '/images/stands/first_aid.png' },
+  { title: 'Гражданская оборона и ЧС', description: 'Информационные блоки для обучения персонала.', previewHint: 'Порядок действий при внештатных ситуациях.', imageSrc: '/images/stands/civil_defense.png' },
 ] as const;
 
 const outdoorStands = [
-  { title: 'Уличные информационные стенды', description: 'Антивандальные решения с защитой от погоды.', previewTag: 'Outdoor', previewHint: 'Усиленная рама и защищённая зона размещения листов.' },
-  { title: 'Уличные городские стенды', description: 'Оформление в фирменных требованиях муниципалитетов.', previewTag: 'Муниципальный', previewHint: 'Формат с бренд-зоной и нормативной структурой.' },
-  { title: 'На детские площадки', description: 'Яркие и безопасные конструкции для дворов и парков.', previewTag: 'Дворовая среда', previewHint: 'Визуально читаемый стенд для жителей и родителей.' },
+  { title: 'Уличные информационные стенды', description: 'Антивандальные решения с защитой от погоды.', previewHint: 'Усиленная рама и защищённая зона размещения листов.', imageSrc: '/images/stands/street_stand.png' },
+  { title: 'Уличные городские стенды', description: 'Оформление в фирменных требованиях муниципалитетов.', previewHint: 'Формат с бренд-зоной и нормативной структурой.', imageSrc: '/images/stands/city_stand.png' },
+  { title: 'На детские площадки', description: 'Яркие и безопасные конструкции для дворов и парков.', previewHint: 'Визуально читаемый стенд для жителей и родителей.', imageSrc: '/images/stands/playgrounds.png' },
 ] as const;
 
 const materials = [
@@ -90,13 +91,16 @@ export default function StandsServicePage() {
 
           <div className="relative">
             <div className="rounded-3xl border border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100/90 to-white p-5 md:p-6">
-              <div className="flex aspect-[4/3] items-center justify-center rounded-2xl border border-neutral-200 bg-white/80">
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-neutral-700">Зона под визуал стенда</p>
-                  <p className="mt-1 text-xs text-neutral-500">Здесь можно подключить фото или mockup в следующем этапе.</p>
-                </div>
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-white/80">
+                <Image
+                  src="/images/stands/hero.png"
+                  alt="Изготовление стендов"
+                  fill
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 45vw, 100vw"
+                  priority
+                />
               </div>
-              <p className="mt-3 text-xs text-neutral-500">Подготовили аккуратный placeholder для будущих превью и рендеров.</p>
             </div>
           </div>
         </div>
@@ -115,8 +119,8 @@ export default function StandsServicePage() {
               label="Для помещений"
               title={item.title}
               description={item.description}
-              previewTag={item.previewTag}
               previewHint={item.previewHint}
+              imageSrc={item.imageSrc}
             />
           ))}
         </div>
@@ -136,8 +140,8 @@ export default function StandsServicePage() {
               label="Для улицы"
               title={item.title}
               description={item.description}
-              previewTag={item.previewTag}
               previewHint={item.previewHint}
+              imageSrc={item.imageSrc}
             />
           ))}
         </div>
