@@ -67,7 +67,7 @@ describe('calculateWideFormatPricing', () => {
     expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 2, 3)).toBe('max_width_exceeded');
   });
 
-  it('uses actual area as billed area for qty=1 and keeps monotonic pricing', () => {
+  it('uses actual area as billed area for qty=1 and applies 400 ₽ minimum print price', () => {
     const small = calculateWideFormatPricing({
       material: 'canvas_cotton_350',
       bannerDensity: 300,
@@ -111,15 +111,15 @@ describe('calculateWideFormatPricing', () => {
     expect(medium.billableAreaPerUnit).toBeCloseTo(0.24, 6);
     expect(large.billableAreaPerUnit).toBeCloseTo(0.42, 6);
 
-    expect(small.basePrintCost).toBeCloseTo(90, 6);
-    expect(medium.basePrintCost).toBeCloseTo(360, 6);
+    expect(small.basePrintCost).toBeCloseTo(400, 6);
+    expect(medium.basePrintCost).toBeCloseTo(400, 6);
     expect(large.basePrintCost).toBeCloseTo(630, 6);
 
-    expect(small.basePrintCost).toBeLessThan(medium.basePrintCost);
+    expect(small.basePrintCost).toBeLessThanOrEqual(medium.basePrintCost);
     expect(medium.basePrintCost).toBeLessThan(large.basePrintCost);
   });
 
-  it('uses actual area as billed area for small multi-quantity orders without inflation', () => {
+  it('uses actual area as billed area for small multi-quantity orders and applies minimum', () => {
     const quote = calculateWideFormatPricing({
       material: 'self_adhesive_film_matte_1_5',
       bannerDensity: 300,
@@ -135,6 +135,6 @@ describe('calculateWideFormatPricing', () => {
 
     expect(quote.areaPerUnit * quote.quantity).toBeCloseTo(0.24, 6);
     expect(quote.billableAreaPerUnit * quote.quantity).toBeCloseTo(0.24, 6);
-    expect(quote.basePrintCost).toBeCloseTo(120, 6);
+    expect(quote.basePrintCost).toBeCloseTo(400, 6);
   });
 });
