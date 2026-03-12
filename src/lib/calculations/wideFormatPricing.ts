@@ -1,4 +1,5 @@
 import {
+  getWideFormatMaterialMaxWidth,
   isBannerMaterial,
   isFilmMaterial,
   WIDE_FORMAT_PRICING_CONFIG,
@@ -9,7 +10,6 @@ import type { BannerDensity, WideFormatMaterialType } from './types';
 export type WideFormatWidthWarningCode =
   | 'invalid_width'
   | 'max_width_exceeded'
-  | 'canvas_max_width_exceeded'
   | null;
 
 export type WideFormatPricingInput = {
@@ -50,27 +50,16 @@ export type WideFormatCalculationResult = {
 export function getWideFormatWidthWarningCode(material: WideFormatMaterialType, width: number): WideFormatWidthWarningCode {
   if (!Number.isFinite(width)) return 'invalid_width';
 
-  const isCanvasMaterial = material.includes('canvas');
-  const exceedsCanvasSingleLayoutWidth = width > WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth;
-  if (isCanvasMaterial && exceedsCanvasSingleLayoutWidth) {
-    return 'canvas_max_width_exceeded';
-  }
-
+  const materialMaxWidth = getWideFormatMaterialMaxWidth(material);
   const isBanner = isBannerMaterial(material);
-  if (!isBanner && width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
+
+  if (!isBanner && width > materialMaxWidth) return 'max_width_exceeded';
+  if (isBanner && width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
 
   return null;
 }
 
 function getMaterialPricePerM2(material: WideFormatMaterialType): number {
-  if (material === 'customer_roll_textured' || material === 'customer_roll_smooth') {
-    const customerRollPerPass = material === 'customer_roll_textured'
-      ? WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured
-      : WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth;
-
-    return customerRollPerPass * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
-  }
-
   return WIDE_FORMAT_PRICING_CONFIG.pricesRUBPerM2[material];
 }
 

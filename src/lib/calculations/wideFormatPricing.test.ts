@@ -4,7 +4,7 @@ import { calculateWideFormatPricing, getWideFormatWidthWarningCode } from './wid
 describe('calculateWideFormatPricing', () => {
   it('does not apply positioning marks cut cost for banner materials', () => {
     const quote = calculateWideFormatPricing({
-      material: 'banner_330',
+      material: 'banner_340_matte_3_2m',
       bannerDensity: 300,
       widthInput: '2',
       heightInput: '1',
@@ -20,11 +20,11 @@ describe('calculateWideFormatPricing', () => {
     expect(quote.extrasCost).toBe(0);
   });
 
-  it('keeps banners calculable above single-print max width and adds one auto join seam when width > 3.1m', () => {
+  it('keeps banners calculable within 3.2m and adds one auto join seam when width > 3.1m', () => {
     const quote = calculateWideFormatPricing({
-      material: 'banner_440',
+      material: 'banner_440_matte_3_2m',
       bannerDensity: 300,
-      widthInput: '3.5',
+      widthInput: '3.15',
       heightInput: '2',
       quantityInput: '2',
       edgeGluing: false,
@@ -42,7 +42,7 @@ describe('calculateWideFormatPricing', () => {
 
   it('does not add auto join seam for banners with width up to 3.1m', () => {
     const quote = calculateWideFormatPricing({
-      material: 'banner_440',
+      material: 'banner_440_matte_3_2m',
       bannerDensity: 300,
       widthInput: '3.1',
       heightInput: '2',
@@ -58,7 +58,8 @@ describe('calculateWideFormatPricing', () => {
     expect(quote.imageWeldingCost).toBe(0);
   });
 
-  it('returns dedicated warning when canvas width exceeds 1.45m', () => {
-    expect(getWideFormatWidthWarningCode('canvas_cotton_350', 1.46)).toBe('canvas_max_width_exceeded');
+  it('returns max width warning when selected material width is exceeded', () => {
+    expect(getWideFormatWidthWarningCode('canvas_cotton_350', 1.51)).toBe('max_width_exceeded');
+    expect(getWideFormatWidthWarningCode('polyester_fabric_100_0_9', 1)).toBe('max_width_exceeded');
   });
 });
