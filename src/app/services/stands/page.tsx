@@ -150,9 +150,9 @@ export default function StandsServicePage() {
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {materials.map((item, index) => (
-            <RevealOnScroll key={item.title} className={getRevealDelayClass(index)}>
-              <article className="group rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]">
+          {materials.map((item) => (
+            <RevealOnScroll key={item.title} className="h-full">
+              <article className="group h-full rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]">
                 <span className="inline-flex size-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
                   <item.icon className="size-4" aria-hidden="true" />
                 </span>
