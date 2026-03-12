@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Brush, CheckCheck, ChevronDown, Palette, Shirt, Sparkles, Timer, UploadCloud } from 'lucide-react';
+import { Brush, CheckCheck, ChevronDown, ClipboardCheck, FileUp, Palette, Shirt, Sparkles, Timer, Truck, UploadCloud } from 'lucide-react';
 import { CSSProperties, ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
 import FloatingTshirtsCTA from '@/components/heat-transfer/FloatingTshirtsCTA';
@@ -78,7 +78,23 @@ const galleryCards = [
   },
 ] as const;
 
-const steps = ['Пришлите макет или опишите задачу', 'Мы уточним детали и подтвердим стоимость', 'Печать и выдача/доставка'];
+const steps = [
+  {
+    title: 'Присылаете макет или задачу',
+    description: 'Отправляете файл или описание, а мы помогаем подобрать формат нанесения.',
+    icon: FileUp,
+  },
+  {
+    title: 'Уточняем детали и подтверждаем стоимость',
+    description: 'Согласовываем тираж, размер, тип ткани и итоговую цену перед запуском.',
+    icon: ClipboardCheck,
+  },
+  {
+    title: 'Печать и выдача / доставка',
+    description: 'Изготавливаем заказ и передаём готовые изделия или отправляем доставкой.',
+    icon: Truck,
+  },
+] as const;
 
 const advantages = [
   { text: 'Работаем по вашим файлам', icon: UploadCloud },
@@ -302,19 +318,25 @@ export default function TshirtsLanding() {
 
       <SectionBlock title="Как это работает">
         {(reveal) => (
-          <div className="relative grid gap-4 md:grid-cols-3">
-            <div className="pointer-events-none absolute left-[16.5%] right-[16.5%] top-6 hidden h-px bg-gradient-to-r from-transparent via-red-300/80 to-transparent md:block dark:via-red-900/70" aria-hidden="true" />
-            {steps.map((step, index) => (
-              <AnimatedCard
-                key={step}
-                index={index}
-                reveal={reveal}
-                className="relative rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm hover:-translate-y-1 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
-              >
-                <span className="mb-3 inline-flex size-10 items-center justify-center rounded-full border border-red-200 bg-red-50 text-sm font-bold text-red-600 dark:border-red-900 dark:bg-red-950/40">{index + 1}</span>
-                <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300">{step}</p>
-              </AnimatedCard>
-            ))}
+          <div className="grid gap-4 md:grid-cols-3">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+
+              return (
+                <AnimatedCard
+                  key={step.title}
+                  index={index}
+                  reveal={reveal}
+                  className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900"
+                >
+                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                    <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
+                </AnimatedCard>
+              );
+            })}
           </div>
         )}
       </SectionBlock>
