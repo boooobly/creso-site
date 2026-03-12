@@ -7,11 +7,10 @@ type StandPreviewCardProps = {
   label: string;
   variant?: 'indoor' | 'outdoor';
   previewHint: string;
-  previewTag: string;
   imageSrc: string;
 };
 
-export default function StandPreviewCard({ title, description, label, variant = 'indoor', previewHint, previewTag, imageSrc }: StandPreviewCardProps) {
+export default function StandPreviewCard({ title, description, label, variant = 'indoor', previewHint, imageSrc }: StandPreviewCardProps) {
   const isOutdoor = variant === 'outdoor';
 
   return (
@@ -57,17 +56,6 @@ export default function StandPreviewCard({ title, description, label, variant = 
         <div className="relative flex h-full w-full items-end p-3 md:p-4">
           <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/5 to-white/5" />
-
-          <div className="absolute inset-x-3 top-3 space-y-1.5 md:inset-x-4 md:top-4">
-            <div className="h-1.5 w-3/4 rounded-full bg-neutral-300/80" />
-            <div className="h-1.5 w-2/3 rounded-full bg-neutral-300/70" />
-            <div className="h-1.5 w-1/2 rounded-full bg-neutral-300/60" />
-          </div>
-
-          <div className="relative z-10 flex w-full items-end justify-between gap-3">
-            <span className="rounded-md border border-neutral-200 bg-white/85 px-2 py-1 text-[11px] font-medium text-neutral-600">{previewTag}</span>
-            <div className={isOutdoor ? 'h-14 w-12 rounded-md border border-neutral-300 bg-white/90 shadow-sm' : 'h-12 w-10 rounded-md border border-neutral-300 bg-white/90 shadow-sm'} />
-          </div>
 
           <div className="absolute inset-x-0 bottom-0 z-20 translate-y-1 bg-gradient-to-t from-black/45 via-black/20 to-transparent px-4 pb-4 pt-10 opacity-0 transition-all duration-300 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-visible:translate-y-0 md:group-focus-visible:opacity-100">
             <p className="text-xs font-medium uppercase tracking-wide text-white/85">{previewHint}</p>
