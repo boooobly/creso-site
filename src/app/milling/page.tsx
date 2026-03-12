@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import {
   CheckCircle2,
   ClipboardCheck,
+  Cog,
+  FileUp,
   Layers3,
   Maximize,
   ShieldCheck,
@@ -34,9 +36,21 @@ const heroKpi = [
 ];
 
 const steps = [
-  'Отправляете макет',
-  'Проверяем и подтверждаем стоимость',
-  'Запускаем фрезеровку',
+  {
+    title: 'Отправляете макет',
+    description: 'Загружаете файл, указываете материал и основные параметры заказа.',
+    icon: FileUp,
+  },
+  {
+    title: 'Проверяем и подтверждаем стоимость',
+    description: 'Сверяем макет, толщину, материал и сообщаем итоговую цену.',
+    icon: ClipboardCheck,
+  },
+  {
+    title: 'Запускаем фрезеровку',
+    description: 'Передаём заказ в работу и изготавливаем детали на оборудовании.',
+    icon: Cog,
+  },
 ];
 
 const galleryItems = [
@@ -163,16 +177,23 @@ export default function MillingPage() {
       <Section className="pt-0">
         <div ref={howReveal.ref} className={`card p-6 md:p-8 ${revealClass(howReveal.isVisible)}`}>
           <h2 className="mb-6 text-2xl font-semibold">Как проходит заказ</h2>
-          <div className="relative grid gap-4 md:grid-cols-3">
-            <div className="absolute left-[16%] right-[16%] top-5 hidden h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent md:block dark:via-neutral-700" />
-            {steps.map((step, index) => (
-              <div key={step} className="relative rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
-                <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-sm font-semibold text-red-700 dark:bg-red-500/20 dark:text-red-300">
-                  {index + 1}
-                </span>
-                <p className="text-sm font-medium text-neutral-800 dark:text-neutral-100">{step}</p>
-              </div>
-            ))}
+          <div className="grid gap-4 md:grid-cols-3">
+            {steps.map((step) => {
+              const Icon = step.icon;
+
+              return (
+                <div
+                  key={step.title}
+                  className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900"
+                >
+                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                    <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </Section>

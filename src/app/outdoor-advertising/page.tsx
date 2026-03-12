@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
-import { Building2, FileCheck2, HardHat, ShieldCheck, Truck, Users, Wrench } from 'lucide-react';
+import { BadgeCheck, Building2, Clock3, FileCheck2, HardHat, ShieldCheck, Truck, Users } from 'lucide-react';
 import Section from '@/components/Section';
 import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
@@ -23,14 +23,47 @@ const services: Array<{ title: string; image: string; featured?: boolean }> = [
   { title: 'Сложные конструкции любой сложности', image: '/images/outdoor_examples/custom.png' },
 ] as const;
 
-const strengths: { label: string; icon: LucideIcon }[] = [
-  { label: 'Собственная производственная база', icon: Building2 },
-  { label: 'Монтажная бригада', icon: Users },
-  { label: 'Автовышка', icon: HardHat },
-  { label: 'Работа на высоте', icon: Wrench },
-  { label: 'Доставка по краю', icon: Truck },
-  { label: 'Заключаем договор', icon: FileCheck2 },
-  { label: 'Гарантия 5 лет', icon: ShieldCheck },
+const strengths: Array<{ title: string; description: string; icon: LucideIcon }> = [
+  {
+    title: 'Собственное производство',
+    description: 'Контролируем качество и сроки без посредников.',
+    icon: Building2,
+  },
+  {
+    title: 'Монтажная бригада',
+    description: 'Доставка и установка силами собственной команды.',
+    icon: Users,
+  },
+  {
+    title: 'Автовышка',
+    description: 'Работаем с высотными объектами и сложным монтажом.',
+    icon: HardHat,
+  },
+  {
+    title: 'Работа на высоте',
+    description: 'Выполняем монтажные работы на фасадах и крышах.',
+    icon: ShieldCheck,
+  },
+  {
+    title: 'Доставка по краю',
+    description: 'Работаем по Ставропольскому краю и ближайшим городам.',
+    icon: Truck,
+  },
+  {
+    title: 'Заключаем договор',
+    description: 'Фиксируем условия, этапы и стоимость работ.',
+    icon: FileCheck2,
+  },
+  {
+    title: 'Гарантия 5 лет',
+    description: 'Сопровождаем проект и после установки.',
+    icon: BadgeCheck,
+  },
+  {
+    title: 'Более 15 лет на рынке',
+    description: 'Опыт в изготовлении и монтаже рекламных конструкций.',
+    icon: Clock3,
+  },
 ];
 
 const fullCycleItems = [
@@ -203,22 +236,24 @@ export default function OutdoorAdvertisingPage() {
 
       <Section className="pt-0" background="muted">
         <RevealOnScroll>
-          <h2 className="mb-2 text-2xl font-bold">Почему выбирают нас</h2>
-          <p className="mb-6 text-sm text-neutral-600 dark:text-neutral-300">Без посредников - отвечаем за результат</p>
-          <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {strengths.map((item) => (
-              <article
-                key={item.label}
-                className="card flex min-h-[124px] rounded-xl border-neutral-200/90 bg-white/90 p-5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
-                    <item.icon className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                  <p className="text-sm font-semibold leading-relaxed">{item.label}</p>
-                </div>
-              </article>
-            ))}
+          <h2 className="mb-6 text-2xl font-bold">Почему выбирают нас</h2>
+          <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {strengths.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <article
+                  key={item.title}
+                  className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+                >
+                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                    <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-neutral-900">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+                </article>
+              );
+            })}
           </div>
         </RevealOnScroll>
       </Section>

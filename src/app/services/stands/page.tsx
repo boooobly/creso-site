@@ -3,6 +3,7 @@ import { Building2, CheckCircle2, ClipboardList, PackageCheck, Ruler, School, Sh
 import LeadForm from '@/components/LeadForm';
 import Section from '@/components/Section';
 import StandPreviewCard from '@/components/services/StandPreviewCard';
+import RevealOnScroll from '@/components/RevealOnScroll';
 import { messages } from '@/lib/messages';
 
 const heroChips = ['Собственное производство', 'Карманы и сменные блоки', 'Изготовление по размерам', 'Доставка и монтаж'] as const;
@@ -41,6 +42,20 @@ const advantages = [
   'Доставка и монтаж',
   'Работаем с единичными и тиражными заказами',
 ] as const;
+
+
+const revealDelayClasses = [
+  '',
+  'delay-75',
+  'delay-150',
+  'delay-200',
+  'delay-300',
+  'delay-[360ms]',
+  'delay-[420ms]',
+  'delay-[480ms]',
+] as const;
+
+const getRevealDelayClass = (index: number) => revealDelayClasses[index] ?? revealDelayClasses[revealDelayClasses.length - 1];
 
 export default function StandsServicePage() {
   return (
@@ -135,14 +150,16 @@ export default function StandsServicePage() {
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {materials.map((item) => (
-            <article key={item.title} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <span className="inline-flex size-9 items-center justify-center rounded-lg bg-red-50 text-red-600">
-                <item.icon className="size-4" aria-hidden="true" />
-              </span>
-              <h3 className="mt-3 text-base font-semibold">{item.title}</h3>
-              <p className="mt-2 text-sm text-neutral-600">{item.description}</p>
-            </article>
+          {materials.map((item, index) => (
+            <RevealOnScroll key={item.title} className={getRevealDelayClass(index)}>
+              <article className="group rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]">
+                <span className="inline-flex size-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
+                  <item.icon className="size-4" aria-hidden="true" />
+                </span>
+                <h3 className="mt-3 text-base font-semibold">{item.title}</h3>
+                <p className="mt-2 text-sm text-neutral-600">{item.description}</p>
+              </article>
+            </RevealOnScroll>
           ))}
         </div>
       </Section>
@@ -174,15 +191,17 @@ export default function StandsServicePage() {
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {advantages.map((item) => (
-            <article key={item} className="flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600">
-                  <ShieldCheck className="size-4" aria-hidden="true" />
-                </span>
-                <p className="text-sm font-semibold leading-relaxed text-neutral-800">{item}</p>
-              </div>
-            </article>
+          {advantages.map((item, index) => (
+            <RevealOnScroll key={item} className={getRevealDelayClass(index)}>
+              <article className="group flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
+                    <ShieldCheck className="size-4" aria-hidden="true" />
+                  </span>
+                  <p className="text-sm font-semibold leading-relaxed text-neutral-800">{item}</p>
+                </div>
+              </article>
+            </RevealOnScroll>
           ))}
         </div>
       </Section>
