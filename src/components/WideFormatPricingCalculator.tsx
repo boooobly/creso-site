@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  engineUiCatalog,
   type BannerDensity,
   type WideFormatMaterialType,
   type WideFormatWidthWarningCode,
@@ -19,6 +18,7 @@ import {
   isExtrasAllowedForWideFormat,
   isBannerMaterial,
   isFilmMaterial,
+  getWideFormatMaterialMaxWidth,
   WIDE_FORMAT_PRICING_CONFIG,
 } from '@/lib/pricing-config/wideFormat';
 import {
@@ -66,10 +66,9 @@ type TransferredBagetImagePayload = {
 const BAGET_TRANSFER_IMAGE_KEY = 'baget:transferred-image';
 const SCROLL_OFFSET_PX = 90;
 
-const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, string> = {
-  invalid_width: 'Введите корректную ширину.',
-  max_width_exceeded: `Максимальная ширина — ${WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
-  canvas_max_width_exceeded: 'Максимальная ширина печати холста одним макетом - 1,45 м',
+const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, (maxWidth?: number) => string> = {
+  invalid_width: () => 'Введите корректную ширину.',
+  max_width_exceeded: (maxWidth) => `Размер не помещается в ширину рулона ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м. Одна из сторон макета должна быть не больше ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
 };
 
 const EMPTY_QUOTE: WideFormatQuote = {
@@ -128,9 +127,7 @@ export default function WideFormatPricingCalculator() {
   const [pricePulse, setPricePulse] = useState(false);
 
   const isCanvasMaterial = material.includes('canvas');
-  const maxWidthForCurrentMaterial = isCanvasMaterial
-    ? WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth
-    : engineUiCatalog.wideFormat.maxWidth;
+  const maxWidthForCurrentMaterial = getWideFormatMaterialMaxWidth(material);
 
   const isBanner = isBannerMaterial(material);
   const isFilm = isFilmMaterial(material);
@@ -224,15 +221,6 @@ export default function WideFormatPricingCalculator() {
   }, [canShowWelding, imageWelding]);
 
   useEffect(() => {
-    if (!isCanvasMaterial) return;
-
-    const parsedCanvasWidth = Number(width);
-    if (Number.isFinite(parsedCanvasWidth) && parsedCanvasWidth > WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth) {
-      setWidth(String(WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth));
-    }
-  }, [isCanvasMaterial, width]);
-
-  useEffect(() => {
     if (!isFilm && plotterCutByRegistrationMarks) setPlotterCutByRegistrationMarks(false);
   }, [isFilm, plotterCutByRegistrationMarks]);
 
@@ -303,7 +291,9 @@ export default function WideFormatPricingCalculator() {
     };
   }, [debouncedQuoteRequest]);
 
-  const widthWarning = quote.widthWarningCode ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode] : '';
+  const widthWarning = quote.widthWarningCode
+    ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode](maxWidthForCurrentMaterial)
+    : '';
   const canShowPricingDetails = quote.parsedValuesValid && quote.positiveInputs && quote.widthWarningCode === null;
   const pricePerM2 = canShowPricingDetails && quote.billableAreaPerUnit > 0 && quote.quantity > 0
     ? quote.basePrintCost / (quote.billableAreaPerUnit * quote.quantity)
@@ -424,7 +414,6 @@ export default function WideFormatPricingCalculator() {
               id="width"
               type="number"
               min={0}
-              max={maxWidthForCurrentMaterial}
               step="0.01"
               value={width}
               onChange={(e) => setWidth(e.target.value)}
