@@ -66,6 +66,59 @@ export function getWideFormatWidthWarningCode(
   return null;
 }
 
+
+
+type RollLayoutOption = {
+  itemsPerRow: number;
+  itemAcross: number;
+  itemAlong: number;
+};
+
+function getRollLayoutOption(rollWidth: number, itemAcross: number, itemAlong: number): RollLayoutOption | null {
+  const itemsPerRow = Math.floor(rollWidth / itemAcross);
+  if (itemsPerRow < 1) return null;
+
+  return {
+    itemsPerRow,
+    itemAcross,
+    itemAlong,
+  };
+}
+
+function getBilledAreaTotal(
+  material: WideFormatMaterialType,
+  width: number,
+  height: number,
+  quantity: number,
+): number {
+  const actualAreaTotal = width * height * quantity;
+
+  if (isBannerMaterial(material)) {
+    return actualAreaTotal;
+  }
+
+  const rollWidth = getWideFormatMaterialMaxWidth(material);
+  const orientationA = getRollLayoutOption(rollWidth, width, height);
+  const orientationB = getRollLayoutOption(rollWidth, height, width);
+
+  const chosenOrientation = [orientationA, orientationB]
+    .filter((orientation): orientation is RollLayoutOption => orientation !== null)
+    .sort((a, b) => {
+      if (b.itemsPerRow !== a.itemsPerRow) return b.itemsPerRow - a.itemsPerRow;
+      return a.itemAlong - b.itemAlong;
+    })[0];
+
+  if (!chosenOrientation) {
+    return actualAreaTotal;
+  }
+
+  const rowsNeeded = Math.ceil(quantity / chosenOrientation.itemsPerRow);
+  const occupiedPrintWidth = chosenOrientation.itemsPerRow * chosenOrientation.itemAcross;
+  const printLength = rowsNeeded * chosenOrientation.itemAlong;
+
+  return occupiedPrintWidth * printLength;
+}
+
 function getMaterialPricePerM2(material: WideFormatMaterialType): number {
   return WIDE_FORMAT_PRICING_CONFIG.pricesRUBPerM2[material];
 }
@@ -80,7 +133,8 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
   const widthWarningCode = getWideFormatWidthWarningCode(input.material, width, height);
 
   const areaPerUnit = width * height;
-  const billableAreaPerUnit = Math.max(areaPerUnit, 1);
+  const billableAreaTotal = getBilledAreaTotal(input.material, width, height, quantity);
+  const billableAreaPerUnit = quantity > 0 ? billableAreaTotal / quantity : 0;
   const perimeterPerUnit = (width + height) * 2;
   const isBanner = isBannerMaterial(input.material);
   const requiresJoinSeam = isBanner && width > WIDE_FORMAT_PRICING_CONFIG.bannerJoinSeamWidthThreshold;
@@ -88,7 +142,7 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
   const materialPricePerM2 = getMaterialPricePerM2(input.material);
 
   const basePrintCost = parsedValuesValid && positiveInputs && widthWarningCode === null
-    ? billableAreaPerUnit * quantity * materialPricePerM2
+    ? billableAreaTotal * materialPricePerM2
     : 0;
 
   const edgeGluingCost = input.edgeGluing && isBanner && parsedValuesValid && positiveInputs && widthWarningCode === null

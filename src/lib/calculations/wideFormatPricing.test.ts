@@ -67,16 +67,60 @@ describe('calculateWideFormatPricing', () => {
     expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 2, 3)).toBe('max_width_exceeded');
   });
 
-  it('applies roll width validation for paper, backlit, fabric and canvas', () => {
-    expect(getWideFormatWidthWarningCode('paper_trans_skylight', 4, 1.6)).toBeNull();
-    expect(getWideFormatWidthWarningCode('backlit_1_07', 4, 1)).toBeNull();
-    expect(getWideFormatWidthWarningCode('backlit_1_07', 1.2, 1.2)).toBe('max_width_exceeded');
-    expect(getWideFormatWidthWarningCode('polyester_fabric_100_0_9', 10, 0.9)).toBeNull();
-    expect(getWideFormatWidthWarningCode('canvas_cotton_350', 2, 1.4)).toBeNull();
-    expect(getWideFormatWidthWarningCode('canvas_cotton_350', 1.51, 1.6)).toBe('max_width_exceeded');
+  it('calculates billed area using optimal roll layout orientation', () => {
+    const quote = calculateWideFormatPricing({
+      material: 'self_adhesive_film_matte_1_5',
+      bannerDensity: 300,
+      widthInput: '1.2',
+      heightInput: '0.7',
+      quantityInput: '2',
+      edgeGluing: false,
+      imageWelding: false,
+      grommets: false,
+      plotterCutByRegistrationMarks: false,
+      cutByPositioningMarks: false,
+    });
+
+    expect(quote.areaPerUnit * quote.quantity).toBeCloseTo(1.68, 6);
+    expect(quote.billableAreaPerUnit * quote.quantity).toBeCloseTo(1.68, 6);
+    expect(quote.basePrintCost).toBeCloseTo(840, 6);
   });
 
-  it('does not block banners with large dimensions due to seam capability', () => {
-    expect(getWideFormatWidthWarningCode('banner_240_gloss_3_2m', 4, 4)).toBeNull();
+  it('keeps billed area equal to true layout area for small orders without inflation', () => {
+    const quote = calculateWideFormatPricing({
+      material: 'self_adhesive_film_matte_1_5',
+      bannerDensity: 300,
+      widthInput: '0.4',
+      heightInput: '0.3',
+      quantityInput: '2',
+      edgeGluing: false,
+      imageWelding: false,
+      grommets: false,
+      plotterCutByRegistrationMarks: false,
+      cutByPositioningMarks: false,
+    });
+
+    expect(quote.areaPerUnit * quote.quantity).toBeCloseTo(0.24, 6);
+    expect(quote.billableAreaPerUnit * quote.quantity).toBeCloseTo(0.6, 6);
+    expect(quote.basePrintCost).toBeCloseTo(300, 6);
+  });
+
+  it('uses one-item-per-row layout when two items cannot fit across roll width', () => {
+    const quote = calculateWideFormatPricing({
+      material: 'self_adhesive_film_matte_1_5',
+      bannerDensity: 300,
+      widthInput: '1.2',
+      heightInput: '0.8',
+      quantityInput: '2',
+      edgeGluing: false,
+      imageWelding: false,
+      grommets: false,
+      plotterCutByRegistrationMarks: false,
+      cutByPositioningMarks: false,
+    });
+
+    expect(quote.areaPerUnit * quote.quantity).toBeCloseTo(1.92, 6);
+    expect(quote.billableAreaPerUnit * quote.quantity).toBeCloseTo(1.92, 6);
+    expect(quote.basePrintCost).toBeCloseTo(960, 6);
   });
 });

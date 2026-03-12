@@ -522,10 +522,12 @@ export default function WideFormatPricingCalculator() {
               </p>
             )}
           </div>
-          <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
-            <p className="text-sm font-medium">Доп. услуги</p>
-            <p className="text-sm font-semibold">= {formatRubles(quote.extrasCost)}</p>
-          </div>
+          {quote.extrasCost > 0 && (
+            <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
+              <p className="text-sm font-medium">Доп. услуги</p>
+              <p className="text-sm font-semibold">= {formatRubles(quote.extrasCost)}</p>
+            </div>
+          )}
           {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.imageWeldingCost > 0 && <SummaryRow label={`— Проклейка стыка полотен${quote.requiresJoinSeam ? ' (авто)' : ''}`} value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
           {plotterCutByRegistrationMarks && <SummaryRow label="— Резка по меткам" value={`от ${WIDE_FORMAT_PRICING_CONFIG.plotterCutMinimumFee.toLocaleString('ru-RU')} ₽ (оценочно, рассчитает менеджер)`} />}
