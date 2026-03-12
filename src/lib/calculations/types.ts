@@ -4,22 +4,20 @@ export type PrintType = 'single' | 'double';
 
 export type WideFormatMaterialType =
   | 'banner_240_gloss_3_2m'
-  | 'banner_330'
-  | 'banner_440'
+  | 'banner_340_matte_3_2m'
+  | 'banner_440_matte_3_2m'
   | 'banner_460_cast_3_2m'
-  | 'self_adhesive_film_gloss'
+  | 'self_adhesive_film_matte_1_5'
+  | 'self_adhesive_film_gloss_1_5'
   | 'perforated_film_1_37'
-  | 'paper_dupaper_blue_120'
+  | 'clear_film_matte_1_5'
   | 'paper_trans_skylight'
-  | 'trans_film_1_27'
-  | 'polyester_fabric_140'
-  | 'flag_fabric_with_liner'
+  | 'polyester_fabric_140_1_5'
+  | 'polyester_fabric_100_0_9'
   | 'canvas_cotton_350'
-  | 'canvas_poly_260'
+  | 'canvas_poly_250'
   | 'backlit_1_07'
-  | 'photo_paper_220'
-  | 'customer_roll_textured'
-  | 'customer_roll_smooth';
+  | 'fxflex_translucent_banner_1_07';
 
 export type BannerDensity = 220 | 300 | 440;
 

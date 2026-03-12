@@ -1,4 +1,5 @@
 import {
+  getWideFormatMaterialMaxWidth,
   isBannerMaterial,
   isFilmMaterial,
   WIDE_FORMAT_PRICING_CONFIG,
@@ -6,10 +7,11 @@ import {
 import { parseNumericInput } from './shared';
 import type { BannerDensity, WideFormatMaterialType } from './types';
 
+const WIDE_FORMAT_MIN_PRINT_PRICE_RUB = 400;
+
 export type WideFormatWidthWarningCode =
   | 'invalid_width'
   | 'max_width_exceeded'
-  | 'canvas_max_width_exceeded'
   | null;
 
 export type WideFormatPricingInput = {
@@ -47,30 +49,26 @@ export type WideFormatCalculationResult = {
   totalCost: number;
 };
 
-export function getWideFormatWidthWarningCode(material: WideFormatMaterialType, width: number): WideFormatWidthWarningCode {
-  if (!Number.isFinite(width)) return 'invalid_width';
+export function getWideFormatWidthWarningCode(
+  material: WideFormatMaterialType,
+  width: number,
+  height: number,
+): WideFormatWidthWarningCode {
+  if (!Number.isFinite(width) || !Number.isFinite(height)) return 'invalid_width';
 
-  const isCanvasMaterial = material.includes('canvas');
-  const exceedsCanvasSingleLayoutWidth = width > WIDE_FORMAT_PRICING_CONFIG.canvasSingleLayoutMaxWidth;
-  if (isCanvasMaterial && exceedsCanvasSingleLayoutWidth) {
-    return 'canvas_max_width_exceeded';
+  if (isBannerMaterial(material)) {
+    return null;
   }
 
-  const isBanner = isBannerMaterial(material);
-  if (!isBanner && width > WIDE_FORMAT_PRICING_CONFIG.maxWidth) return 'max_width_exceeded';
+  const materialMaxWidth = getWideFormatMaterialMaxWidth(material);
+  const smallerSide = Math.min(width, height);
+
+  if (smallerSide > materialMaxWidth) return 'max_width_exceeded';
 
   return null;
 }
 
 function getMaterialPricePerM2(material: WideFormatMaterialType): number {
-  if (material === 'customer_roll_textured' || material === 'customer_roll_smooth') {
-    const customerRollPerPass = material === 'customer_roll_textured'
-      ? WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.textured
-      : WIDE_FORMAT_PRICING_CONFIG.customerRollPerPass.smooth;
-
-    return customerRollPerPass * WIDE_FORMAT_PRICING_CONFIG.passesStandard;
-  }
-
   return WIDE_FORMAT_PRICING_CONFIG.pricesRUBPerM2[material];
 }
 
@@ -81,18 +79,24 @@ export function calculateWideFormatPricing(input: WideFormatPricingInput): WideF
 
   const parsedValuesValid = [width, height, quantity].every((value) => Number.isFinite(value));
   const positiveInputs = width > 0 && height > 0 && quantity > 0;
-  const widthWarningCode = getWideFormatWidthWarningCode(input.material, width);
+  const widthWarningCode = getWideFormatWidthWarningCode(input.material, width, height);
 
   const areaPerUnit = width * height;
-  const billableAreaPerUnit = Math.max(areaPerUnit, 1);
+  const actualAreaTotal = areaPerUnit * quantity;
+  const billableAreaTotal = actualAreaTotal;
+  const billableAreaPerUnit = quantity > 0 ? billableAreaTotal / quantity : 0;
   const perimeterPerUnit = (width + height) * 2;
   const isBanner = isBannerMaterial(input.material);
   const requiresJoinSeam = isBanner && width > WIDE_FORMAT_PRICING_CONFIG.bannerJoinSeamWidthThreshold;
 
   const materialPricePerM2 = getMaterialPricePerM2(input.material);
 
-  const basePrintCost = parsedValuesValid && positiveInputs && widthWarningCode === null
-    ? billableAreaPerUnit * quantity * materialPricePerM2
+  const calculatedMaterialCost = parsedValuesValid && positiveInputs && widthWarningCode === null
+    ? billableAreaTotal * materialPricePerM2
+    : 0;
+
+  const basePrintCost = calculatedMaterialCost > 0
+    ? Math.max(calculatedMaterialCost, WIDE_FORMAT_MIN_PRINT_PRICE_RUB)
     : 0;
 
   const edgeGluingCost = input.edgeGluing && isBanner && parsedValuesValid && positiveInputs && widthWarningCode === null

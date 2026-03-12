@@ -4,7 +4,7 @@ import { calculateWideFormatPricing, getWideFormatWidthWarningCode } from './wid
 describe('calculateWideFormatPricing', () => {
   it('does not apply positioning marks cut cost for banner materials', () => {
     const quote = calculateWideFormatPricing({
-      material: 'banner_330',
+      material: 'banner_340_matte_3_2m',
       bannerDensity: 300,
       widthInput: '2',
       heightInput: '1',
@@ -20,11 +20,11 @@ describe('calculateWideFormatPricing', () => {
     expect(quote.extrasCost).toBe(0);
   });
 
-  it('keeps banners calculable above single-print max width and adds one auto join seam when width > 3.1m', () => {
+  it('keeps banners calculable and adds one auto join seam when width > 3.1m', () => {
     const quote = calculateWideFormatPricing({
-      material: 'banner_440',
+      material: 'banner_440_matte_3_2m',
       bannerDensity: 300,
-      widthInput: '3.5',
+      widthInput: '3.15',
       heightInput: '2',
       quantityInput: '2',
       edgeGluing: false,
@@ -42,7 +42,7 @@ describe('calculateWideFormatPricing', () => {
 
   it('does not add auto join seam for banners with width up to 3.1m', () => {
     const quote = calculateWideFormatPricing({
-      material: 'banner_440',
+      material: 'banner_440_matte_3_2m',
       bannerDensity: 300,
       widthInput: '3.1',
       heightInput: '2',
@@ -58,7 +58,83 @@ describe('calculateWideFormatPricing', () => {
     expect(quote.imageWeldingCost).toBe(0);
   });
 
-  it('returns dedicated warning when canvas width exceeds 1.45m', () => {
-    expect(getWideFormatWidthWarningCode('canvas_cotton_350', 1.46)).toBe('canvas_max_width_exceeded');
+  it('validates non-banner roll materials by smaller side to support rotation', () => {
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 1.5, 50)).toBeNull();
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 3.2, 1.4)).toBeNull();
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 10, 0.8)).toBeNull();
+
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 1.6, 1.6)).toBe('max_width_exceeded');
+    expect(getWideFormatWidthWarningCode('self_adhesive_film_matte_1_5', 2, 3)).toBe('max_width_exceeded');
+  });
+
+  it('uses actual area as billed area for qty=1 and applies 400 ₽ minimum print price', () => {
+    const small = calculateWideFormatPricing({
+      material: 'canvas_cotton_350',
+      bannerDensity: 300,
+      widthInput: '0.1',
+      heightInput: '0.6',
+      quantityInput: '1',
+      edgeGluing: false,
+      imageWelding: false,
+      grommets: false,
+      plotterCutByRegistrationMarks: false,
+      cutByPositioningMarks: false,
+    });
+
+    const medium = calculateWideFormatPricing({
+      material: 'canvas_cotton_350',
+      bannerDensity: 300,
+      widthInput: '0.4',
+      heightInput: '0.6',
+      quantityInput: '1',
+      edgeGluing: false,
+      imageWelding: false,
+      grommets: false,
+      plotterCutByRegistrationMarks: false,
+      cutByPositioningMarks: false,
+    });
+
+    const large = calculateWideFormatPricing({
+      material: 'canvas_cotton_350',
+      bannerDensity: 300,
+      widthInput: '0.7',
+      heightInput: '0.6',
+      quantityInput: '1',
+      edgeGluing: false,
+      imageWelding: false,
+      grommets: false,
+      plotterCutByRegistrationMarks: false,
+      cutByPositioningMarks: false,
+    });
+
+    expect(small.billableAreaPerUnit).toBeCloseTo(0.06, 6);
+    expect(medium.billableAreaPerUnit).toBeCloseTo(0.24, 6);
+    expect(large.billableAreaPerUnit).toBeCloseTo(0.42, 6);
+
+    expect(small.basePrintCost).toBeCloseTo(400, 6);
+    expect(medium.basePrintCost).toBeCloseTo(400, 6);
+    expect(large.basePrintCost).toBeCloseTo(630, 6);
+
+    expect(small.basePrintCost).toBeLessThanOrEqual(medium.basePrintCost);
+    expect(medium.basePrintCost).toBeLessThan(large.basePrintCost);
+  });
+
+  it('uses actual area as billed area for small multi-quantity orders and applies minimum', () => {
+    const quote = calculateWideFormatPricing({
+      material: 'self_adhesive_film_matte_1_5',
+      bannerDensity: 300,
+      widthInput: '0.4',
+      heightInput: '0.3',
+      quantityInput: '2',
+      edgeGluing: false,
+      imageWelding: false,
+      grommets: false,
+      plotterCutByRegistrationMarks: false,
+      cutByPositioningMarks: false,
+    });
+
+    expect(quote.areaPerUnit * quote.quantity).toBeCloseTo(0.24, 6);
+    expect(quote.billableAreaPerUnit * quote.quantity).toBeCloseTo(0.24, 6);
+    expect(quote.basePrintCost).toBeCloseTo(400, 6);
   });
 });
