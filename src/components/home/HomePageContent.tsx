@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Clock3, KeyRound, Search, Wallet } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Section from '@/components/Section';
 import ServiceCard from '@/components/ServiceCard';
@@ -22,10 +22,10 @@ type HomePageContentProps = {
 const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
 
 const trustHighlights = [
-  { title: 'Берём задачу под ключ', description: 'От замера и макета до производства и монтажа.' },
-  { title: 'Подбираем решение под бюджет', description: 'Предлагаем оптимальный вариант под вашу задачу.' },
-  { title: 'Держим сроки', description: 'Сразу говорим реальные сроки без лишних обещаний.' },
-  { title: 'Всегда можно уточнить детали', description: 'Помогаем по материалам, размерам и конструкции.' },
+  { title: 'Берём задачу под ключ', description: 'От замера и макета до производства и монтажа.', icon: KeyRound },
+  { title: 'Подбираем решение под бюджет', description: 'Предлагаем оптимальный вариант под вашу задачу.', icon: Wallet },
+  { title: 'Держим сроки', description: 'Сразу говорим реальные сроки без лишних обещаний.', icon: Clock3 },
+  { title: 'Всегда можно уточнить детали', description: 'Помогаем по материалам, размерам и конструкции.', icon: Search },
 ];
 
 const processSteps = [
@@ -139,12 +139,23 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
           <h2 className="t-h2">С нами проще работать</h2>
         </div>
         <motion.ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {trustHighlights.map((item) => (
-            <motion.li key={item.title} variants={fadeUp(14)} className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition duration-200 ease-out hover:-translate-y-[3px] hover:border-neutral-300">
-              <p className="text-sm font-semibold text-neutral-900">{item.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.description}</p>
-            </motion.li>
-          ))}
+          {trustHighlights.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <motion.li
+                key={item.title}
+                variants={fadeUp(14)}
+                className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+              >
+                <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                  <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                </div>
+                <p className="text-sm font-semibold text-neutral-900">{item.title}</p>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+              </motion.li>
+            );
+          })}
         </motion.ul>
       </Section>
 
