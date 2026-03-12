@@ -10,21 +10,25 @@ const equipment = [
     title: 'Фрезерный станок',
     text: 'Рабочее поле 2×4 м. Обработка ПВХ, композита и пластика.',
     tag: 'Поле 2×4 м',
+    image: '/images/production/milling.png',
   },
   {
     title: 'Широкоформатный принтер',
     text: 'Экосольвентная печать для баннеров, пленки и холста.',
     tag: 'Печать до 3.2 м',
+    image: '/images/production/printer.png',
   },
   {
     title: 'Плоттерная резка',
     text: 'Контурная резка пленок, аппликаций и наклеек.',
     tag: 'Точная резка',
+    image: '/images/production/plotter.png',
   },
   {
     title: 'Багетная мастерская',
     text: 'Изготовление рам и оформление работ под заказ.',
     tag: 'Оформление и сборка',
+    image: '/images/production/bagget.png',
   },
 ] as const;
 
@@ -161,12 +165,21 @@ export default function ProductionPage() {
           <div className="grid gap-4 md:grid-cols-2">
             {equipment.map((item) => (
               <RevealOnScroll key={item.title}>
-                <article className="flex min-h-[248px] flex-col rounded-2xl border border-neutral-200 bg-white p-8 md:p-9 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md">
-                  <h3 className="text-xl font-semibold leading-tight text-neutral-900 md:text-2xl">{item.title}</h3>
-                  <p className="mt-4 text-sm leading-relaxed text-neutral-700 md:text-base">{item.text}</p>
-                  <span className="mt-7 inline-flex self-start rounded-full border border-neutral-300 bg-neutral-50 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-neutral-700">
-                    {item.tag}
-                  </span>
+                <article className="group relative min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
+                  <div className="absolute inset-x-4 bottom-4 space-y-3 md:inset-x-5 md:bottom-5">
+                    <h3 className="text-xl font-semibold leading-tight text-white md:text-2xl">{item.title}</h3>
+                    <p className="max-w-[36ch] text-sm leading-relaxed text-white/85 md:text-base">{item.text}</p>
+                    <span className="inline-flex self-start rounded-full border border-white/35 bg-white/20 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur-[2px]">
+                      {item.tag}
+                    </span>
+                  </div>
                 </article>
               </RevealOnScroll>
             ))}
