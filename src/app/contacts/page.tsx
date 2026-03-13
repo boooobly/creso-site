@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { ComponentType } from 'react';
-import { MessageCircle, Mail, Phone, Send, Clock3 } from 'lucide-react';
+import { Calculator, Clock3, FileCheck2, Mail, MessageCircle, MessageSquare, Package, Phone, Send } from 'lucide-react';
 import ContactsLeadCapture from '@/components/ContactsLeadCapture';
 import MapSection from '@/components/MapSection';
 import { BRAND } from '@/lib/constants';
@@ -43,11 +43,27 @@ const trustItems = [
 ];
 
 const processSteps = [
-  { title: 'Оставляете заявку' },
-  { title: 'Рассчитываем стоимость' },
-  { title: 'Согласуем макет' },
-  { title: 'Изготавливаем и передаем', caption: 'Есть доставка' },
-];
+  {
+    title: 'Оставляете заявку',
+    description: 'Пишете или звоните, рассказываете задачу и пожелания.',
+    icon: MessageSquare,
+  },
+  {
+    title: 'Рассчитываем стоимость',
+    description: 'Уточняем материалы, объём работы и подготавливаем расчёт.',
+    icon: Calculator,
+  },
+  {
+    title: 'Согласуем макет',
+    description: 'Подтверждаем детали, макет и финальные условия перед запуском.',
+    icon: FileCheck2,
+  },
+  {
+    title: 'Изготавливаем и передаём',
+    description: 'Выполняем заказ и передаём готовую работу. Доставка доступна.',
+    icon: Package,
+  },
+] as const;
 
 export default function ContactsPage() {
   return (
@@ -105,12 +121,18 @@ export default function ContactsPage() {
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Как мы работаем</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {processSteps.map((step, index) => (
-            <div key={step.title} className="card rounded-xl p-4">
-              <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand-red)]/10 font-semibold text-[var(--brand-red)]">{index + 1}</div>
-              <p className="text-sm font-medium">{step.title}</p>
-              {step.caption ? <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{step.caption}</p> : null}
+            <div
+              key={step.title}
+              className="relative flex h-full flex-col rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+            >
+              <span className="absolute right-5 top-5 text-xs font-semibold text-neutral-400">0{index + 1}</span>
+              <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                <step.icon size={18} strokeWidth={1.9} aria-hidden="true" />
+              </div>
+              <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</p>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
             </div>
           ))}
         </div>
