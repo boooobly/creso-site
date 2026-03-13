@@ -10,6 +10,7 @@ import FAQ from '@/components/FAQ';
 import LeadForm from '@/components/LeadForm';
 import BadgeChip from '@/components/home/BadgeChip';
 import FeatureCard from '@/components/home/FeatureCard';
+import AnimatedBlurHeadline from '@/components/home/AnimatedBlurHeadline';
 import type { SiteMessages } from '@/lib/messages';
 import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
 
@@ -99,9 +100,7 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
               <p className="t-eyebrow inline-flex rounded-full border border-[#efb9b9] bg-[#fff7f7] px-4 py-1.5 text-[var(--brand-red)]">
                 ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
               </p>
-              <h1 className="t-h1 max-w-[16ch]">
-                Производство рекламы<br className="hidden md:block" /> под ключ
-              </h1>
+              <AnimatedBlurHeadline className="t-h1 max-w-[16ch]" text="Производство рекламы под ключ" breakAfterWord={1} />
               <p className="t-body text-muted-foreground max-w-[40rem]">Вывески, печать, конструкции и монтаж. От идеи до установки.</p>
             </div>
 
