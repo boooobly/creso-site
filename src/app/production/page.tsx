@@ -118,34 +118,36 @@ export default function ProductionPage() {
     <div>
       <Section>
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
-          <div className="max-w-[38rem] space-y-7">
-            <p className="inline-flex rounded-full border border-neutral-200 bg-neutral-50 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-700">
+          <div className="max-w-[38.5rem] space-y-8 lg:pr-3">
+            <p className="inline-flex rounded-full border border-red-200/80 bg-red-50/60 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700">
               СОБСТВЕННОЕ ПРОИЗВОДСТВО
             </p>
-            <h1 className="max-w-3xl text-3xl font-bold leading-[1.08] md:text-5xl">Собственное производство рекламы</h1>
-            <p className="max-w-[34rem] text-base leading-relaxed text-neutral-700 md:text-[1.05rem] md:leading-relaxed">
-              Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Без посредников, с
-              контролем качества на каждом этапе.
-            </p>
+            <div className="space-y-4">
+              <h1 className="max-w-3xl text-3xl font-bold leading-[1.08] md:text-5xl">Собственное производство рекламы</h1>
+              <p className="max-w-[33rem] text-base leading-relaxed text-neutral-700 md:text-[1.05rem] md:leading-relaxed">
+                Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Без посредников, с
+                контролем качества на каждом этапе.
+              </p>
+            </div>
 
-            <div className="flex flex-wrap gap-2.5 md:gap-3">
+            <div className="grid max-w-[34rem] grid-cols-1 gap-2.5 sm:grid-cols-2">
               {capabilityBadges.map((badge) => (
                 <span
                   key={badge}
-                  className="inline-flex h-10 items-center rounded-full border border-neutral-200 bg-white px-4.5 text-sm font-medium text-neutral-700 shadow-[0_1px_2px_rgba(17,24,39,0.06)]"
+                  className="inline-flex h-11 items-center rounded-xl border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-700 shadow-[0_1px_2px_rgba(17,24,39,0.06)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900"
                 >
                   {badge}
                 </span>
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-1.5">
-              <Link href="/contacts" className="btn-primary inline-flex h-11 items-center no-underline">
+            <div className="flex flex-wrap items-center gap-3.5 pt-1">
+              <Link href="/contacts" className="btn-primary inline-flex h-11 items-center rounded-full px-5 no-underline">
                 Обсудить проект
               </Link>
               <a
                 href="#production-gallery"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 shadow-sm transition-colors duration-200 hover:border-neutral-400 hover:bg-neutral-50"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] transition-all duration-200 hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]"
               >
                 Смотреть производство
               </a>
@@ -156,9 +158,9 @@ export default function ProductionPage() {
             <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
               <Image src="/images/production/hero.png" alt="Собственное производство рекламы" fill className="object-cover" priority />
             </div>
-            <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/70 bg-white/88 px-3.5 py-2 backdrop-blur-sm shadow-[0_10px_25px_rgba(17,24,39,0.12)] md:bottom-5 md:left-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600">Собственный цех</p>
-              <p className="mt-0.5 text-sm font-semibold text-neutral-900">Полный цикл производства</p>
+            <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/80 bg-white/92 px-3.5 py-2.5 backdrop-blur-md shadow-[0_10px_25px_rgba(17,24,39,0.14)] md:bottom-5 md:left-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500">Собственный цех</p>
+              <p className="mt-1 text-sm font-semibold text-neutral-900">Полный цикл производства</p>
             </div>
           </div>
         </div>
