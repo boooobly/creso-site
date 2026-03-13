@@ -14,6 +14,24 @@ import AnimatedBlurHeadline from '@/components/home/AnimatedBlurHeadline';
 import type { SiteMessages } from '@/lib/messages';
 import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
 
+const heroChipVariants = {
+  hidden: (index: number) => ({
+    opacity: 0,
+    x: index === 0 ? 0 : -48,
+    y: index === 0 ? 6 : 0,
+  }),
+  show: (index: number) => ({
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      duration: index === 0 ? 0.42 : 0.56,
+      delay: index === 0 ? 0.04 : 0.22 + (index - 1) * 0.1,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
+};
+
 type HomePageContentProps = {
   services: Array<{ id: string; title: string; description: string; href: string }>;
   faq: any[];
@@ -117,9 +135,9 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
               </motion.div>
             </div>
 
-            <motion.ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.07)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-              {trustBadges.map((badge) => (
-                <BadgeChip key={badge} label={badge} />
+            <motion.ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4" initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+              {trustBadges.map((badge, index) => (
+                <BadgeChip key={badge} label={badge} index={index} variants={heroChipVariants} />
               ))}
             </motion.ul>
           </motion.div>
