@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import Section from '@/components/layout/Section';
+import { ClipboardCheck, Cog, Factory, FileText, Frame, Lightbulb, PanelsTopLeft, PencilRuler, Printer, Ruler, ShieldCheck, Sparkles, Type, Wrench } from 'lucide-react';
 
 const capabilityBadges = ['Фрезерный станок 2×4 м', 'Печать до 3.2 м', 'Плоттерная резка', 'Багетная мастерская'] as const;
 
@@ -36,26 +37,32 @@ const products = [
   {
     title: 'Вывески и объемные буквы',
     text: 'Фасадные рекламные конструкции любой сложности.',
+    icon: Type,
   },
   {
     title: 'Световые короба',
     text: 'Классические и нестандартные лайтбоксы.',
+    icon: Lightbulb,
   },
   {
     title: 'Баннеры и широкоформатная печать',
     text: 'Печать для фасадов, стендов и рекламных конструкций.',
+    icon: Printer,
   },
   {
     title: 'Стелы и конструкции',
     text: 'Изготовление рекламных стел и пилонов.',
+    icon: PanelsTopLeft,
   },
   {
     title: 'Оформление картин и багет',
     text: 'Изготовление рам и оформление работ.',
+    icon: Frame,
   },
   {
     title: 'Индивидуальные проекты',
     text: 'Нестандартные рекламные конструкции под задачу клиента.',
+    icon: Sparkles,
   },
 ] as const;
 
@@ -93,67 +100,67 @@ const gallery = [
 ] as const;
 
 const workSteps = [
-  { title: 'Замер', text: 'Выезд на объект и точные размеры.' },
-  { title: 'Проектирование', text: 'Подготовка макета и технического решения.' },
-  { title: 'Производство', text: 'Изготовление конструкции в цеху.' },
-  { title: 'Монтаж', text: 'Установка и подключение рекламы.' },
+  { title: 'Замер', text: 'Выезд на объект и точные размеры.', icon: Ruler },
+  { title: 'Проектирование', text: 'Подготовка макета и технического решения.', icon: PencilRuler },
+  { title: 'Производство', text: 'Изготовление конструкции в цеху.', icon: Cog },
+  { title: 'Монтаж', text: 'Установка и подключение рекламы.', icon: Wrench },
 ] as const;
 
 const trustPoints = [
-  { title: 'Собственный цех', text: 'Контролируем сроки и качество без посредников.' },
-  { title: 'Работаем по договору', text: 'Фиксируем условия, этапы и стоимость.' },
-  { title: 'Согласуем макет', text: 'Утверждаем решение до запуска в работу.' },
-  { title: 'Гарантия на изделия', text: 'Сопровождаем проект и после монтажа.' },
+  { title: 'Собственный цех', text: 'Контролируем сроки и качество без посредников.', icon: Factory },
+  { title: 'Работаем по договору', text: 'Фиксируем условия, этапы и стоимость.', icon: FileText },
+  { title: 'Согласуем макет', text: 'Утверждаем решение до запуска в работу.', icon: ClipboardCheck },
+  { title: 'Гарантия на изделия', text: 'Сопровождаем проект и после монтажа.', icon: ShieldCheck },
 ] as const;
 
 export default function ProductionPage() {
   return (
     <div>
       <Section>
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-14">
-          <div className="space-y-8">
-            <p className="inline-flex rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-neutral-700">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
+          <div className="max-w-[38.5rem] space-y-8 lg:pr-3">
+            <p className="inline-flex rounded-full border border-red-200/80 bg-red-50/60 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700">
               СОБСТВЕННОЕ ПРОИЗВОДСТВО
             </p>
-            <h1 className="max-w-3xl text-3xl font-bold leading-[1.1] md:text-5xl">Собственное производство рекламы</h1>
-            <p className="max-w-2xl text-base leading-relaxed text-neutral-700 md:text-lg md:leading-relaxed">
-              Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Без посредников, с
-              контролем качества на каждом этапе.
-            </p>
+            <div className="space-y-4">
+              <h1 className="max-w-3xl text-3xl font-bold leading-[1.08] md:text-5xl">Собственное производство рекламы</h1>
+              <p className="max-w-[33rem] text-base leading-relaxed text-neutral-700 md:text-[1.05rem] md:leading-relaxed">
+                Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Без посредников, с
+                контролем качества на каждом этапе.
+              </p>
+            </div>
 
-            <div className="flex flex-wrap gap-3 md:gap-3.5">
+            <div className="grid max-w-[34rem] grid-cols-1 gap-2.5 sm:grid-cols-2">
               {capabilityBadges.map((badge) => (
                 <span
                   key={badge}
-                  className="inline-flex h-11 items-center rounded-full border border-neutral-200 bg-white px-5 text-sm font-medium text-neutral-800 shadow-sm"
+                  className="inline-flex h-11 items-center rounded-xl border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-700 shadow-[0_1px_2px_rgba(17,24,39,0.06)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900"
                 >
                   {badge}
                 </span>
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-3">
-              <Link href="/contacts" className="btn-primary inline-flex no-underline">
+            <div className="flex flex-wrap items-center gap-3.5 pt-1">
+              <Link href="/contacts" className="btn-primary inline-flex h-11 items-center rounded-full px-5 no-underline">
                 Обсудить проект
               </Link>
               <a
                 href="#production-gallery"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 shadow-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] transition-all duration-200 hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]"
               >
                 Смотреть производство
               </a>
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-1.5 shadow-[0_18px_38px_rgba(17,24,39,0.12)]">
-            <div className="relative aspect-[6/5] w-full">
-              <Image
-                src="/images/production/hero.png"
-                alt="Собственное производство рекламы"
-                fill
-                className="rounded-[1.35rem] object-cover"
-                priority
-              />
+          <div className="relative overflow-hidden rounded-[1.8rem] border border-neutral-200/90 bg-neutral-100 p-1.5 shadow-[0_20px_44px_rgba(17,24,39,0.12)]">
+            <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
+              <Image src="/images/production/hero.png" alt="Собственное производство рекламы" fill className="object-cover" priority />
+            </div>
+            <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/80 bg-white/92 px-3.5 py-2.5 backdrop-blur-md shadow-[0_10px_25px_rgba(17,24,39,0.14)] md:bottom-5 md:left-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500">Собственный цех</p>
+              <p className="mt-1 text-sm font-semibold text-neutral-900">Полный цикл производства</p>
             </div>
           </div>
         </div>
@@ -165,15 +172,15 @@ export default function ProductionPage() {
           <div className="grid gap-4 md:grid-cols-2">
             {equipment.map((item) => (
               <RevealOnScroll key={item.title}>
-                <article className="group relative min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
-                  <div className="absolute inset-x-4 bottom-4 space-y-3 md:inset-x-5 md:bottom-5">
+                <article className="group relative isolate min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-md">
+                  <div className="absolute -inset-px overflow-hidden rounded-[inherit]">
+                    <div className="relative h-full w-full rounded-[inherit]">
+                      <Image src={item.image} alt={item.title} fill className="rounded-[inherit] object-cover" />
+                    </div>
+                  </div>
+                  <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
+                  <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/80 via-black/45 to-black/15 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100" />
+                  <div className="absolute inset-x-4 bottom-4 z-10 space-y-3 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 md:inset-x-5 md:bottom-5">
                     <h3 className="text-xl font-semibold leading-tight text-white md:text-2xl">{item.title}</h3>
                     <p className="max-w-[36ch] text-sm leading-relaxed text-white/85 md:text-base">{item.text}</p>
                     <span className="inline-flex self-start rounded-full border border-white/35 bg-white/20 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur-[2px]">
@@ -191,15 +198,24 @@ export default function ProductionPage() {
         <div className="space-y-5">
           <h2 className="text-2xl font-semibold md:text-3xl">Что мы производим</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((item) => (
-              <article
-                key={item.title}
-                className="flex min-h-[188px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 md:p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-md"
-              >
-                <h3 className="text-lg font-semibold leading-snug text-neutral-900">{item.title}</h3>
-                <p className="mt-4 text-sm leading-relaxed text-neutral-700 md:text-base">{item.text}</p>
-              </article>
-            ))}
+            {products.map((item, index) => {
+              const Icon = item.icon;
+
+              return (
+                <RevealOnScroll key={item.title}>
+                  <article
+                    style={{ transitionDelay: `${index * 55}ms` }}
+                    className="flex min-h-[204px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] md:p-7"
+                  >
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
+                      <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-5 text-lg font-semibold leading-snug text-neutral-900">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-neutral-700 md:text-base">{item.text}</p>
+                  </article>
+                </RevealOnScroll>
+              );
+            })}
           </div>
         </div>
       </Section>
@@ -254,17 +270,28 @@ export default function ProductionPage() {
       <Section className="pt-0">
         <div className="space-y-5">
           <h2 className="text-2xl font-semibold md:text-3xl">Как проходит работа</h2>
-          <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="pointer-events-none absolute left-12 right-12 top-10 hidden h-px bg-neutral-200 lg:block" />
-            {workSteps.map((step, index) => (
-              <div key={step.title} className="relative flex min-h-[232px] flex-col rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm">
-                <span className="relative z-10 mb-6 inline-flex h-11 w-11 items-center justify-center rounded-full bg-neutral-900 text-base font-semibold text-white shadow-sm ring-4 ring-white">
-                  {index + 1}
-                </span>
-                <h3 className="text-lg font-semibold text-neutral-900">{step.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-neutral-700 md:text-base">{step.text}</p>
-              </div>
-            ))}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {workSteps.map((step, index) => {
+              const Icon = step.icon;
+
+              return (
+                <RevealOnScroll key={step.title}>
+                  <article
+                    style={{ transitionDelay: `${index * 70}ms` }}
+                    className="flex min-h-[232px] flex-col rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+                  >
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div className="mt-5 flex items-baseline gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</span>
+                    </div>
+                    <h3 className="mt-2 text-lg font-semibold text-neutral-900">{step.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-neutral-700 md:text-base">{step.text}</p>
+                  </article>
+                </RevealOnScroll>
+              );
+            })}
           </div>
         </div>
       </Section>
@@ -274,12 +301,24 @@ export default function ProductionPage() {
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold md:text-3xl">Почему нам доверяют</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {trustPoints.map((item) => (
-                <article key={item.title} className="flex min-h-[172px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 md:p-7">
-                  <h3 className="text-lg font-semibold text-neutral-900">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-neutral-700">{item.text}</p>
-                </article>
-              ))}
+              {trustPoints.map((item, index) => {
+                const Icon = item.icon;
+
+                return (
+                  <RevealOnScroll key={item.title}>
+                    <article
+                      style={{ transitionDelay: `${index * 65}ms` }}
+                      className={`flex min-h-[184px] flex-col rounded-2xl border bg-white p-6 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] md:p-7 ${index === 0 ? 'border-neutral-300' : 'border-neutral-200'}`}
+                    >
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
+                        <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+                      </span>
+                      <h3 className="mt-5 text-lg font-semibold text-neutral-900">{item.title}</h3>
+                      <p className="mt-3 text-sm leading-relaxed text-neutral-700">{item.text}</p>
+                    </article>
+                  </RevealOnScroll>
+                );
+              })}
             </div>
           </div>
         </div>
