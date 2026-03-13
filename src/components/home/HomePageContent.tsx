@@ -251,16 +251,16 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
       </Section>
 
       <Section id="lead-form" className="py-12 md:py-14">
-        <motion.div className="grid items-center gap-6 overflow-hidden rounded-[28px] border border-neutral-200 bg-white p-5 shadow-sm sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          <div className="relative isolate space-y-4 rounded-2xl px-1 py-1 lg:max-w-[30rem]">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 -z-10 rounded-2xl bg-[radial-gradient(120%_95%_at_18%_12%,rgba(212,28,28,0.20)_0%,rgba(212,28,28,0.10)_38%,rgba(255,255,255,0.94)_72%)]"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-20 bg-gradient-to-r from-transparent via-white/92 to-white"
-            />
+        <motion.div className="relative grid items-center gap-6 overflow-hidden rounded-[28px] border border-neutral-200 bg-white p-5 shadow-sm sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-20 top-1/2 z-0 h-[19rem] w-[25rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.16)_0%,rgba(212,28,28,0.07)_34%,rgba(212,28,28,0.02)_58%,transparent_76%)] blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-[44%] z-0 w-[12rem] bg-gradient-to-r from-transparent via-white/92 to-white"
+          />
+          <div className="relative z-10 space-y-4 lg:max-w-[30rem]">
             <div className="space-y-3">
               <p className="t-eyebrow">ЗАЯВКА</p>
               <h2 className="t-h2 font-extrabold">{messages.lead.title}</h2>
