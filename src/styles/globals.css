@@ -111,8 +111,9 @@ a { @apply underline-offset-4; }
 }
 
 .card-dot {
-  @apply inline-block size-1.5 rounded-full;
+  @apply inline-block h-1.5 w-1.5 min-h-1.5 min-w-1.5 shrink-0 rounded-full;
   background-color: rgba(212, 28, 28, 0.8);
+  line-height: 0;
 }
 
 .chip-elevated {
