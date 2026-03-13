@@ -166,12 +166,12 @@ export default function ProductionPage() {
             {equipment.map((item) => (
               <RevealOnScroll key={item.title}>
                 <article className="group relative isolate min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md">
-                  <div className="absolute inset-0">
-                    <div className="relative h-full w-full transition-transform duration-500 ease-out group-hover:scale-[1.04]">
-                      <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+                    <div className="relative h-full w-full rounded-[inherit] transition-transform duration-500 ease-out group-hover:scale-[1.04]">
+                      <Image src={item.image} alt={item.title} fill className="rounded-[inherit] object-cover" />
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
+                  <div className="absolute inset-0 rounded-[inherit] bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
                   <div className="absolute inset-x-4 bottom-4 z-10 space-y-3 md:inset-x-5 md:bottom-5">
                     <h3 className="text-xl font-semibold leading-tight text-white md:text-2xl">{item.title}</h3>
                     <p className="max-w-[36ch] text-sm leading-relaxed text-white/85 md:text-base">{item.text}</p>
