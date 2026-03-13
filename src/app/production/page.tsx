@@ -165,9 +165,9 @@ export default function ProductionPage() {
           <div className="grid gap-4 md:grid-cols-2">
             {equipment.map((item) => (
               <RevealOnScroll key={item.title}>
-                <article className="group relative isolate min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md">
+                <article className="group relative isolate min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-200 hover:border-neutral-300 hover:shadow-md">
                   <div className="absolute -inset-px overflow-hidden rounded-[inherit]">
-                    <div className="relative h-full w-full rounded-[inherit] transition-transform duration-500 ease-out group-hover:scale-[1.04]">
+                    <div className="relative h-full w-full rounded-[inherit]">
                       <Image src={item.image} alt={item.title} fill className="rounded-[inherit] object-cover" />
                     </div>
                   </div>
