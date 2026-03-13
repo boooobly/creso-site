@@ -142,7 +142,7 @@ export default function ProductionPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3.5 pt-1">
-              <Link href="/contacts" className="btn-primary inline-flex h-11 items-center rounded-full px-5 no-underline">
+              <Link href="/contacts" className="btn-primary inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold no-underline">
                 Обсудить проект
               </Link>
               <a
@@ -158,9 +158,9 @@ export default function ProductionPage() {
             <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
               <Image src="/images/production/hero.png" alt="Собственное производство рекламы" fill className="object-cover" priority />
             </div>
-            <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/80 bg-white/92 px-3.5 py-2.5 backdrop-blur-md shadow-[0_10px_25px_rgba(17,24,39,0.14)] md:bottom-5 md:left-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500">Собственный цех</p>
-              <p className="mt-1 text-sm font-semibold text-neutral-900">Полный цикл производства</p>
+            <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/90 bg-white/95 px-4 py-3 backdrop-blur-lg shadow-[0_12px_30px_rgba(17,24,39,0.16)] md:bottom-5 md:left-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600">Собственный цех</p>
+              <p className="mt-1 text-sm font-bold text-neutral-950">Полный цикл производства</p>
             </div>
           </div>
         </div>
