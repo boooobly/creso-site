@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle2, ClipboardList, Clock3, Cog, KeyRound, PencilRuler, Search, Truck, Wallet } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import Section from '@/components/Section';
 import ServiceCard from '@/components/ServiceCard';
 import FAQ from '@/components/FAQ';
@@ -11,6 +12,7 @@ import LeadForm from '@/components/LeadForm';
 import BadgeChip from '@/components/home/BadgeChip';
 import FeatureCard from '@/components/home/FeatureCard';
 import AnimatedBlurHeadline from '@/components/home/AnimatedBlurHeadline';
+import LightRays from '@/components/effects/LightRays';
 import type { SiteMessages } from '@/lib/messages';
 import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
 
@@ -90,10 +92,44 @@ const featuredWorkExamples = [
 
 export default function HomePageContent({ services, faq, messages }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
+  const [enableRays, setEnableRays] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+
+    const updateRaysAvailability = () => {
+      setEnableRays(!shouldReduceMotion && mediaQuery.matches);
+    };
+
+    updateRaysAvailability();
+    mediaQuery.addEventListener('change', updateRaysAvailability);
+
+    return () => mediaQuery.removeEventListener('change', updateRaysAvailability);
+  }, [shouldReduceMotion]);
 
   return (
     <div>
       <Section className="relative overflow-hidden pb-10 pt-4 md:pb-12 md:pt-6">
+        {enableRays && (
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+            <LightRays
+              raysOrigin="top-center"
+              raysColor="#d41c1c"
+              raysSpeed={0.8}
+              lightSpread={0.7}
+              rayLength={3}
+              followMouse={true}
+              mouseInfluence={0.1}
+              noiseAmount={0}
+              distortion={0}
+              className="custom-rays"
+              pulsating={false}
+              fadeDistance={1}
+              saturation={1}
+            />
+          </div>
+        )}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] bg-white/45" />
         <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
             <div className="space-y-5">

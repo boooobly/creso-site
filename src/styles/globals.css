@@ -156,3 +156,7 @@ a { @apply underline-offset-4; }
 .main-layout:has(> .home-page-root) {
   padding-top: 0;
 }
+
+.custom-rays {
+  opacity: 0.26;
+}
