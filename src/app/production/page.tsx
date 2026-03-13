@@ -114,6 +114,9 @@ const trustPoints = [
 ] as const;
 
 export default function ProductionPage() {
+  const heroCtaBaseClass =
+    'inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold leading-none transition-all duration-200';
+
   return (
     <div>
       <Section>
@@ -142,12 +145,15 @@ export default function ProductionPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3.5 pt-1">
-              <Link href="/contacts" className="btn-primary inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold no-underline">
+              <Link
+                href="/contacts"
+                className={`${heroCtaBaseClass} border border-red-600 bg-red-600 text-white shadow-[0_8px_20px_rgba(220,38,38,0.24)] no-underline hover:border-red-700 hover:bg-red-700 hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]`}
+              >
                 Обсудить проект
               </Link>
               <a
                 href="#production-gallery"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] transition-all duration-200 hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]"
+                className={`${heroCtaBaseClass} border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]`}
               >
                 Смотреть производство
               </a>
