@@ -54,23 +54,26 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
   const [formError, setFormError] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
-  const payloadMeta = useMemo(() => ({
-    product: 'Business cards',
-    quantity: summary.quantity,
-    printSide: summary.printSide,
-    lamination: summary.lamination,
-    needDesign: summary.needDesign,
-    unitPrice: summary.unitPrice,
-    totalPrice: summary.totalPrice,
-    turnaround: '7–10 business days',
-    fixedSpecs: {
-      size: '90x50',
-      stock: '300 gsm',
-      printType: 'offset',
-    },
-    notes: FIXED_NOTES,
-    flyersRequested: values.flyersRequested,
-  }), [summary, values.flyersRequested]);
+  const payloadMeta = useMemo(
+    () => ({
+      product: 'Business cards',
+      quantity: summary.quantity,
+      printSide: summary.printSide,
+      lamination: summary.lamination,
+      needDesign: summary.needDesign,
+      unitPrice: summary.unitPrice,
+      totalPrice: summary.totalPrice,
+      turnaround: '7–10 business days',
+      fixedSpecs: {
+        size: '90x50',
+        stock: '300 gsm',
+        printType: 'offset',
+      },
+      notes: FIXED_NOTES,
+      flyersRequested: values.flyersRequested,
+    }),
+    [summary, values.flyersRequested],
+  );
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -164,15 +167,22 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
     }
   };
 
-  const inputClass = (field: keyof FormValues) => `h-11 w-full rounded-xl border px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 focus:bg-white dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-red-500 dark:focus:ring-red-500/30 ${
-    errors[field] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-neutral-300 bg-neutral-50'
-  }`;
+  const inputClass = (field: keyof FormValues) => {
+    const hasError = Boolean(errors[field]);
+
+    return [
+      'h-11 w-full rounded-xl border bg-white/95 px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200',
+      'placeholder:text-neutral-400 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/25 focus:border-red-500',
+      'dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100 dark:hover:border-neutral-500',
+      hasError ? 'border-red-500 focus:ring-red-500/30' : 'border-neutral-300',
+    ].join(' ');
+  };
 
   return (
-    <div id="business-cards-form" className="card rounded-2xl p-6 shadow-sm transition-all duration-300 md:p-8">
-      <div className="mb-5">
-        <h2 className="text-2xl font-bold">Отправить заявку</h2>
-        <p className="mt-1.5 text-sm text-neutral-600">Оставьте контакты и приложите макет — менеджер подтвердит детали и сроки.</p>
+    <div className="card rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-[0_10px_30px_rgba(20,20,20,0.06)] md:p-6 dark:border-neutral-800 dark:bg-neutral-950/40">
+      <div className="mb-4 rounded-xl border border-neutral-200/80 bg-neutral-50/80 p-4 dark:border-neutral-800 dark:bg-neutral-900/50">
+        <h2 className="text-xl font-bold tracking-tight">Отправить заявку</h2>
+        <p className="mt-1.5 text-sm text-neutral-600 dark:text-neutral-300">Оставьте контакты и приложите макет — менеджер подтвердит детали и сроки.</p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
@@ -221,41 +231,46 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
               ]}
               allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
               invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
-              className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
-              helperTextClassName="mt-1 t-small text-muted-foreground"
-              icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
+              className="rounded-xl border border-neutral-300/90 bg-neutral-50/80 p-3 transition-all duration-200 hover:border-red-400 dark:border-neutral-700 dark:bg-neutral-900/40"
+              helperTextClassName="mt-1 t-small text-neutral-500 dark:text-neutral-400"
+              icon={<Upload className="h-5 w-5 text-neutral-500" aria-hidden="true" />}
             />
-            <p className="t-small text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
+            <p className="t-small text-neutral-500 dark:text-neutral-400">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="flex items-center gap-3 cursor-pointer">
+        <div className="space-y-1.5 rounded-xl border border-neutral-200/80 bg-neutral-50/75 p-3 dark:border-neutral-800 dark:bg-neutral-900/40">
+          <label className="flex cursor-pointer items-center gap-3">
             <input
               type="checkbox"
               checked={values.flyersRequested}
               onChange={(e) => setValues((prev) => ({ ...prev, flyersRequested: e.target.checked }))}
-              className="h-4 w-4"
+              className="h-4 w-4 rounded border-neutral-400 text-red-600 focus:ring-red-500/40"
             />
             <span className="text-sm font-medium">Флаеры (расчёт по согласованию)</span>
           </label>
-          <p className="t-small text-muted-foreground">Укажите желаемый формат, бумагу и тираж в комментарии.</p>
+          <p className="t-small text-neutral-500 dark:text-neutral-400">Укажите желаемый формат, бумагу и тираж в комментарии.</p>
           {values.flyersRequested && !values.comment.trim() && (
             <p className="t-small text-amber-700 dark:text-amber-300">Подсказка: добавьте в комментарии параметры флаеров для точного расчёта.</p>
           )}
         </div>
 
-        <label className="space-y-1.5 block">
+        <label className="block space-y-1.5">
           <span className="text-sm font-medium">Комментарий</span>
           <textarea className={`${inputClass('comment')} min-h-[110px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
         </label>
 
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900/60 space-y-0.5">
-          <p><b>Тираж:</b> {summary.quantity.toLocaleString('ru-RU')} шт.</p>
-          <p><b>Печать:</b> {summary.printSide === 'single' ? 'Односторонняя' : 'Двусторонняя'}</p>
-          <p><b>Ламинация:</b> {summary.lamination ? 'Да' : 'Нет'}</p>
-          <p><b>Нужен дизайн:</b> {summary.needDesign ? 'Да' : 'Нет'}</p>
-          <p><b>Итого:</b> {summary.totalPrice.toLocaleString('ru-RU')} ₽</p>
+        <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3.5 text-sm dark:border-neutral-700 dark:bg-neutral-900/70">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Параметры заказа</p>
+          <div className="grid gap-y-1.5 sm:grid-cols-2">
+            <p><span className="text-neutral-500">Тираж:</span> <b>{summary.quantity.toLocaleString('ru-RU')} шт.</b></p>
+            <p><span className="text-neutral-500">Печать:</span> <b>{summary.printSide === 'single' ? 'Односторонняя' : 'Двусторонняя'}</b></p>
+            <p><span className="text-neutral-500">Ламинация:</span> <b>{summary.lamination ? 'Да' : 'Нет'}</b></p>
+            <p><span className="text-neutral-500">Нужен дизайн:</span> <b>{summary.needDesign ? 'Да' : 'Нет'}</b></p>
+          </div>
+          <div className="mt-2 border-t border-neutral-200/90 pt-2 dark:border-neutral-700">
+            <p className="text-base font-semibold tabular-nums">Итого: {summary.totalPrice.toLocaleString('ru-RU')} ₽</p>
+          </div>
         </div>
 
         <input
@@ -267,11 +282,11 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           aria-hidden="true"
         />
 
-        <div className="pt-1 flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex flex-col gap-3 pt-1 md:flex-row md:items-center">
           <button
             type="submit"
             disabled={isSending}
-            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-red-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[200px]"
+            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-red-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[200px]"
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
