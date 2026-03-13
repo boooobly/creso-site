@@ -117,50 +117,48 @@ export default function ProductionPage() {
   return (
     <div>
       <Section>
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-14">
-          <div className="space-y-8">
-            <p className="inline-flex rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-neutral-700">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
+          <div className="max-w-[38rem] space-y-7">
+            <p className="inline-flex rounded-full border border-neutral-200 bg-neutral-50 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-700">
               СОБСТВЕННОЕ ПРОИЗВОДСТВО
             </p>
-            <h1 className="max-w-3xl text-3xl font-bold leading-[1.1] md:text-5xl">Собственное производство рекламы</h1>
-            <p className="max-w-2xl text-base leading-relaxed text-neutral-700 md:text-lg md:leading-relaxed">
+            <h1 className="max-w-3xl text-3xl font-bold leading-[1.08] md:text-5xl">Собственное производство рекламы</h1>
+            <p className="max-w-[34rem] text-base leading-relaxed text-neutral-700 md:text-[1.05rem] md:leading-relaxed">
               Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Без посредников, с
               контролем качества на каждом этапе.
             </p>
 
-            <div className="flex flex-wrap gap-3 md:gap-3.5">
+            <div className="flex flex-wrap gap-2.5 md:gap-3">
               {capabilityBadges.map((badge) => (
                 <span
                   key={badge}
-                  className="inline-flex h-11 items-center rounded-full border border-neutral-200 bg-white px-5 text-sm font-medium text-neutral-800 shadow-sm"
+                  className="inline-flex h-10 items-center rounded-full border border-neutral-200 bg-white px-4.5 text-sm font-medium text-neutral-700 shadow-[0_1px_2px_rgba(17,24,39,0.06)]"
                 >
                   {badge}
                 </span>
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-3">
-              <Link href="/contacts" className="btn-primary inline-flex no-underline">
+            <div className="flex flex-wrap items-center gap-3 pt-1.5">
+              <Link href="/contacts" className="btn-primary inline-flex h-11 items-center no-underline">
                 Обсудить проект
               </Link>
               <a
                 href="#production-gallery"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 shadow-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 shadow-sm transition-colors duration-200 hover:border-neutral-400 hover:bg-neutral-50"
               >
                 Смотреть производство
               </a>
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-1.5 shadow-[0_18px_38px_rgba(17,24,39,0.12)]">
-            <div className="relative aspect-[6/5] w-full">
-              <Image
-                src="/images/production/hero.png"
-                alt="Собственное производство рекламы"
-                fill
-                className="rounded-[1.35rem] object-cover"
-                priority
-              />
+          <div className="relative overflow-hidden rounded-[1.8rem] border border-neutral-200/90 bg-neutral-100 p-1.5 shadow-[0_20px_44px_rgba(17,24,39,0.12)]">
+            <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
+              <Image src="/images/production/hero.png" alt="Собственное производство рекламы" fill className="object-cover" priority />
+            </div>
+            <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/70 bg-white/88 px-3.5 py-2 backdrop-blur-sm shadow-[0_10px_25px_rgba(17,24,39,0.12)] md:bottom-5 md:left-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600">Собственный цех</p>
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900">Полный цикл производства</p>
             </div>
           </div>
         </div>
