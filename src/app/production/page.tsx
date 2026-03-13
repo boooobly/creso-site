@@ -165,14 +165,15 @@ export default function ProductionPage() {
           <div className="grid gap-4 md:grid-cols-2">
             {equipment.map((item) => (
               <RevealOnScroll key={item.title}>
-                <article className="group relative isolate min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-200 hover:border-neutral-300 hover:shadow-md">
+                <article className="group relative isolate min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-md">
                   <div className="absolute -inset-px overflow-hidden rounded-[inherit]">
                     <div className="relative h-full w-full rounded-[inherit]">
                       <Image src={item.image} alt={item.title} fill className="rounded-[inherit] object-cover" />
                     </div>
                   </div>
                   <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
-                  <div className="absolute inset-x-4 bottom-4 z-10 space-y-3 md:inset-x-5 md:bottom-5">
+                  <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/80 via-black/45 to-black/15 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100" />
+                  <div className="absolute inset-x-4 bottom-4 z-10 space-y-3 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 md:inset-x-5 md:bottom-5">
                     <h3 className="text-xl font-semibold leading-tight text-white md:text-2xl">{item.title}</h3>
                     <p className="max-w-[36ch] text-sm leading-relaxed text-white/85 md:text-base">{item.text}</p>
                     <span className="inline-flex self-start rounded-full border border-white/35 bg-white/20 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur-[2px]">
