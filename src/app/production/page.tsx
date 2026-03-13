@@ -170,9 +170,9 @@ export default function ProductionPage() {
                     src={item.image}
                     alt={item.title}
                     fill
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                    className="rounded-[inherit] object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
+                  <div className="absolute inset-0 rounded-[inherit] bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
                   <div className="absolute inset-x-4 bottom-4 space-y-3 md:inset-x-5 md:bottom-5">
                     <h3 className="text-xl font-semibold leading-tight text-white md:text-2xl">{item.title}</h3>
                     <p className="max-w-[36ch] text-sm leading-relaxed text-white/85 md:text-base">{item.text}</p>
