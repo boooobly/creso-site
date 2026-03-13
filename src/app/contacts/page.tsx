@@ -67,9 +67,9 @@ const processSteps = [
 
 export default function ContactsPage() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <section className="space-y-4">
-        <h1 className="text-2xl font-bold">Контакты</h1>
+        <h1 className="t-h2">Контакты</h1>
         <p className="text-neutral-700 dark:text-neutral-300">Адрес: {BRAND.address}</p>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {quickContacts.map((item) => {
@@ -95,14 +95,14 @@ export default function ContactsPage() {
 
             if ('href' in item) {
               return (
-                <a key={item.title} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined} className="card flex h-full flex-col gap-3 rounded-xl p-5 no-underline transition hover:-translate-y-0.5 hover:shadow-md">
+                <a key={item.title} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined} className="premium-card flex h-full flex-col gap-3 p-5 no-underline">
                   {cardContent}
                 </a>
               );
             }
 
             return (
-              <div key={item.title} className="card flex h-full flex-col gap-3 rounded-xl p-5">
+              <div key={item.title} className="premium-card flex h-full flex-col gap-3 p-5">
                 {cardContent}
               </div>
             );
@@ -110,7 +110,7 @@ export default function ContactsPage() {
         </div>
       </section>
 
-      <section className="card space-y-4 rounded-xl p-6">
+      <section className="section-shell space-y-4">
         <h2 className="text-xl font-semibold">Работаем официально</h2>
         <div className="flex flex-wrap gap-2">
           {trustItems.map((item) => (
@@ -125,28 +125,28 @@ export default function ContactsPage() {
           {processSteps.map((step, index) => (
             <div
               key={step.title}
-              className="relative flex h-full flex-col rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+              className="premium-card relative flex h-full flex-col p-6"
             >
               <span className="absolute right-5 top-5 text-xs font-semibold text-neutral-400">0{index + 1}</span>
               <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                 <step.icon size={18} strokeWidth={1.9} aria-hidden="true" />
               </div>
-              <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
+              <p className="text-[15px] font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</p>
+              <p className="t-body mt-2 dark:text-neutral-300">{step.description}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="card rounded-xl p-6">
-        <h2 className="mb-2 text-2xl font-bold">{messages.lead.title}</h2>
+      <section className="section-shell">
+        <h2 className="mb-2 t-h2">{messages.lead.title}</h2>
         <p className="mb-4 text-neutral-700 dark:text-neutral-300">Оставьте контакты и короткое описание задачи.</p>
         <div id="contact-form"><ContactsLeadCapture t={messages} /></div>
       </section>
 
       <section className="grid items-start gap-6 md:grid-cols-2">
         <div>
-          <h2 className="text-2xl font-bold">Как нас найти</h2>
+          <h2 className="t-h2">Как нас найти</h2>
           <p className="mt-2 text-neutral-700 dark:text-neutral-300">Адрес: {BRAND.address}</p>
           <p className="text-neutral-700 dark:text-neutral-300">Тел: {BRAND.phone}</p>
           <p className="text-neutral-700 dark:text-neutral-300">E-mail: {BRAND.email}</p>
@@ -155,8 +155,8 @@ export default function ContactsPage() {
         <MapSection />
       </section>
 
-      <section className="space-y-3 rounded-2xl bg-[var(--brand-red)]/10 p-6 text-center">
-        <h2 className="text-2xl font-bold">Нужна консультация?</h2>
+      <section className="section-shell space-y-3 text-center">
+        <h2 className="t-h2">Нужна консультация?</h2>
         <p className="text-neutral-700 dark:text-neutral-300">Ответим в течение 15 минут в рабочее время.</p>
         <Link href="/contacts#contact-form" className="btn-primary inline-flex no-underline">Перезвоните мне</Link>
       </section>

@@ -15,7 +15,7 @@ type SectionProps = PropsWithChildren<{
 
 const backgroundStyles: Record<NonNullable<SectionProps['background']>, string> = {
   default: 'bg-white',
-  muted: 'bg-neutral-50/70',
+  muted: 'bg-[linear-gradient(180deg,rgba(249,249,250,0.9)_0%,rgba(244,245,246,0.75)_100%)]',
 };
 
 export default function Section({
@@ -32,7 +32,7 @@ export default function Section({
   return (
     <motion.section
       id={id}
-      className={`py-12 md:py-20 ${bleedClassName} ${backgroundStyles[background]} ${className}`.trim()}
+      className={`py-14 md:py-20 lg:py-24 ${bleedClassName} ${backgroundStyles[background]} ${className}`.trim()}
       initial={shouldReduceMotion ? false : 'hidden'}
       whileInView={shouldReduceMotion ? undefined : 'show'}
       viewport={viewportOnce}
