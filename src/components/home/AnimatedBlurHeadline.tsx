@@ -36,7 +36,7 @@ export default function AnimatedBlurHeadline({ className, text, breakAfterWord }
         hidden: {},
         show: {
           transition: {
-            staggerChildren: 0.07,
+            staggerChildren: 0.25,
           },
         },
       }}
@@ -55,7 +55,7 @@ export default function AnimatedBlurHeadline({ className, text, breakAfterWord }
                 y: 0,
                 filter: 'blur(0px)',
                 transition: {
-                  duration: 0.42,
+                  duration: 0.76,
                   ease: [0.22, 1, 0.36, 1],
                 },
               },
