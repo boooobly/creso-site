@@ -18,12 +18,12 @@ const heroChipVariants = {
   hidden: (index: number) => ({
     opacity: 0,
     x: index === 0 ? 0 : -48,
-    y: index === 0 ? 6 : 0,
+    scale: index === 0 ? 0.985 : 1,
   }),
   show: (index: number) => ({
     opacity: 1,
     x: 0,
-    y: 0,
+    scale: 1,
     transition: {
       duration: index === 0 ? 0.42 : 0.56,
       delay: index === 0 ? 0.04 : 0.22 + (index - 1) * 0.1,
