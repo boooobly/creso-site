@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
       page: query.get('page') ?? undefined,
       pageSize: query.get('pageSize') ?? undefined,
       category: query.get('category') ?? undefined,
-      published: query.get('published') === null ? undefined : query.get('published') === 'true'
+      published: query.get('published') === null ? undefined : query.get('published') === 'true',
+      search: query.get('search') ?? undefined
     });
 
     return NextResponse.json({ ok: true, ...result });

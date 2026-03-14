@@ -42,10 +42,14 @@ type AdminShellProps = {
 
 export default function AdminShell({ children }: AdminShellProps) {
   const pathname = usePathname();
-  const pageMeta = pageTitles[pathname] ?? {
+  const fallbackMeta = {
     title: 'Админ-панель',
     subtitle: 'Управление сайтом'
   };
+
+  const pageMeta = pathname.startsWith('/admin/portfolio')
+    ? pageTitles['/admin/portfolio']
+    : pageTitles[pathname] ?? fallbackMeta;
 
   return (
     <div className="mx-auto -mt-8 w-screen max-w-none bg-slate-100">

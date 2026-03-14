@@ -6,14 +6,25 @@ type PortfolioFilters = {
   pageSize?: unknown;
   category?: string;
   published?: boolean;
+  search?: string;
 };
 
 export async function listPortfolioItems(filters: PortfolioFilters) {
   const pagination = listQuerySchema.parse(filters);
 
+  const search = filters.search?.trim();
   const where = {
     ...(filters.category ? { category: filters.category } : {}),
-    ...(typeof filters.published === 'boolean' ? { published: filters.published } : {})
+    ...(typeof filters.published === 'boolean' ? { published: filters.published } : {}),
+    ...(search
+      ? {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' as const } },
+            { category: { contains: search, mode: 'insensitive' as const } },
+            { shortDescription: { contains: search, mode: 'insensitive' as const } }
+          ]
+        }
+      : {})
   };
 
   const [items, total] = await Promise.all([
@@ -27,6 +38,10 @@ export async function listPortfolioItems(filters: PortfolioFilters) {
   ]);
 
   return { items, total, page: pagination.page, pageSize: pagination.pageSize };
+}
+
+export async function getPortfolioItemById(id: string) {
+  return prisma.portfolioItem.findUnique({ where: { id } });
 }
 
 export async function createPortfolioItem(payload: unknown) {
