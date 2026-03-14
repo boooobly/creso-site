@@ -1,0 +1,134 @@
+'use server';
+
+import { Prisma } from '@prisma/client';
+import { ZodError } from 'zod';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import {
+  createPriceCategory,
+  createPriceItem,
+  deletePriceCategory,
+  deletePriceItem,
+  updatePriceCategory,
+  updatePriceItem,
+} from '@/lib/admin/price-catalog-service';
+
+function parseBoolean(value: FormDataEntryValue | null) {
+  return value === 'on' || value === 'true' || value === '1';
+}
+
+function parseSortOrder(value: FormDataEntryValue | null) {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function redirectWithError(error: unknown) {
+  if (error instanceof ZodError) {
+    const message = error.issues[0]?.message ?? 'Проверьте заполнение формы.';
+    redirect(`/admin/pricing?error=${encodeURIComponent(message)}`);
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    redirect('/admin/pricing?error=%D0%A2%D0%B0%D0%BA%D0%BE%D0%B9+slug+%D1%83%D0%B6%D0%B5+%D0%B7%D0%B0%D0%BD%D1%8F%D1%82.+%D0%A3%D0%BA%D0%B0%D0%B6%D0%B8%D1%82%D0%B5+%D0%B4%D1%80%D1%83%D0%B3%D0%BE%D0%B9.');
+  }
+
+  if (error instanceof Error && error.message) {
+    redirect(`/admin/pricing?error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect('/admin/pricing?error=%D0%9D%D0%B5+%D1%83%D0%B4%D0%B0%D0%BB%D0%BE%D1%81%D1%8C+%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D0%B8%D1%82%D1%8C+%D0%B8%D0%B7%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F.');
+}
+
+export async function createPriceCategoryAction(formData: FormData) {
+  try {
+    await createPriceCategory({
+      name: String(formData.get('name') ?? '').trim(),
+      slug: String(formData.get('slug') ?? '').trim(),
+      description: String(formData.get('description') ?? '').trim() || undefined,
+      kind: String(formData.get('kind') ?? 'general').trim() === 'baguette_extras' ? 'baguette_extras' : 'general',
+      isActive: parseBoolean(formData.get('isActive')),
+      sortOrder: parseSortOrder(formData.get('sortOrder')),
+    });
+
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=category-created');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
+
+export async function updatePriceCategoryAction(id: string, formData: FormData) {
+  try {
+    await updatePriceCategory(id, {
+      name: String(formData.get('name') ?? '').trim(),
+      slug: String(formData.get('slug') ?? '').trim(),
+      description: String(formData.get('description') ?? '').trim() || undefined,
+      kind: String(formData.get('kind') ?? 'general').trim() === 'baguette_extras' ? 'baguette_extras' : 'general',
+      isActive: parseBoolean(formData.get('isActive')),
+      sortOrder: parseSortOrder(formData.get('sortOrder')),
+    });
+
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=category-updated');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
+
+export async function deletePriceCategoryAction(id: string) {
+  try {
+    await deletePriceCategory(id);
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=category-deleted');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
+
+export async function createPriceItemAction(formData: FormData) {
+  try {
+    await createPriceItem({
+      categoryId: String(formData.get('categoryId') ?? '').trim(),
+      title: String(formData.get('title') ?? '').trim(),
+      price: String(formData.get('price') ?? '0').trim(),
+      unit: String(formData.get('unit') ?? '').trim(),
+      description: String(formData.get('description') ?? '').trim() || undefined,
+      isActive: parseBoolean(formData.get('isActive')),
+      sortOrder: parseSortOrder(formData.get('sortOrder')),
+    });
+
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=item-created');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
+
+export async function updatePriceItemAction(id: string, formData: FormData) {
+  try {
+    await updatePriceItem(id, {
+      categoryId: String(formData.get('categoryId') ?? '').trim(),
+      title: String(formData.get('title') ?? '').trim(),
+      price: String(formData.get('price') ?? '0').trim(),
+      unit: String(formData.get('unit') ?? '').trim(),
+      description: String(formData.get('description') ?? '').trim() || undefined,
+      isActive: parseBoolean(formData.get('isActive')),
+      sortOrder: parseSortOrder(formData.get('sortOrder')),
+    });
+
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=item-updated');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
+
+export async function deletePriceItemAction(id: string) {
+  try {
+    await deletePriceItem(id);
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=item-deleted');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
