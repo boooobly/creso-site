@@ -153,13 +153,15 @@ export function getServerEnv(): ServerEnv {
 }
 
 export function requireDatabaseEnv(): void {
-  const env = getServerEnv();
+  const enabledRaw = process.env.ENABLE_DATABASE;
+  const isEnabled = typeof enabledRaw === 'string' ? enabledRaw.trim().toLowerCase() === 'true' : enabledRaw === true;
 
-  if (!env.ENABLE_DATABASE) {
+  if (!isEnabled) {
     throw new Error('[env] Database is disabled. Set ENABLE_DATABASE=true to use Prisma/database routes.');
   }
 
-  if (!env.DATABASE_URL) {
+  const databaseUrl = process.env.DATABASE_URL?.trim();
+  if (!databaseUrl) {
     throw new Error('[env] DATABASE_URL is required when ENABLE_DATABASE=true.');
   }
 }

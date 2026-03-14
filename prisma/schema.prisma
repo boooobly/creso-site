@@ -9,15 +9,15 @@ datasource db {
 
 model Order {
   // Internal immutable identifier (UUID) to avoid coupling storage identity to public order numbers
-  id             String   @id @default(uuid())
-  number         String   @unique
-  source         String
-  status         String   @default("new")
-  customerName   String?
-  phone          String?
-  email          String?
-  comment        String?
-  total          Int
+  id              String   @id @default(uuid())
+  number          String   @unique
+  source          String
+  status          String   @default("new")
+  customerName    String?
+  phone           String?
+  email           String?
+  comment         String?
+  total           Int
   prepayRequired  Boolean  @default(false)
   prepayAmount    Int?
   paymentStatus   String   @default("unpaid")
@@ -45,4 +45,130 @@ model Review {
 
   @@index([status, createdAt])
   @@index([rating])
+}
+
+model PortfolioItem {
+  id               String   @id @default(cuid())
+  title            String
+  slug             String   @unique
+  category         String
+  shortDescription String?
+  coverImage       String?
+  galleryImages    Json     @default("[]")
+  featured         Boolean  @default(false)
+  published        Boolean  @default(false)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([category, published])
+  @@index([sortOrder, createdAt])
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  type        String   @default("string")
+  group       String   @default("general")
+  label       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([group])
+}
+
+model PageContent {
+  id          String   @id @default(cuid())
+  pageKey     String
+  sectionKey  String
+  fieldKey    String
+  value       Json
+  type        String   @default("string")
+  label       String
+  description String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([pageKey, sectionKey, fieldKey])
+  @@index([pageKey, sectionKey, sortOrder])
+}
+
+model PricingEntry {
+  id          String   @id @default(cuid())
+  category    String
+  subcategory String   @default("")
+  key         String
+  label       String
+  value       Json
+  unit        String?
+  type        String   @default("number")
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([category, subcategory, key])
+  @@index([category, isActive, sortOrder])
+}
+
+
+enum PriceCategoryKind {
+  general
+  baguette_extras
+}
+
+enum MediaAssetKind {
+  image
+  document
+}
+
+model PriceCategory {
+  id          String            @id @default(cuid())
+  name        String
+  slug        String            @unique
+  description String?
+  kind        PriceCategoryKind @default(general)
+  isActive    Boolean           @default(true)
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  items       PriceItem[]
+
+  @@index([kind, isActive, sortOrder])
+}
+
+model PriceItem {
+  id          String        @id @default(cuid())
+  categoryId  String
+  category    PriceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title       String
+  price       Decimal       @db.Decimal(10, 2)
+  unit        String
+  description String?
+  isActive    Boolean       @default(true)
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([categoryId, isActive, sortOrder])
+}
+
+model MediaAsset {
+  id          String         @id @default(cuid())
+  title       String
+  kind        MediaAssetKind @default(image)
+  url         String
+  fileName    String?
+  altText     String?
+  mimeType    String?
+  sizeBytes   Int?
+  isActive    Boolean        @default(true)
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([kind, isActive, sortOrder])
 }
