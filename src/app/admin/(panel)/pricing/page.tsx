@@ -1,26 +1,280 @@
-import AdminSectionScaffold from '@/components/admin/AdminSectionScaffold';
+import { listPriceCatalog } from '@/lib/admin/price-catalog-service';
+import ConfirmSubmitButton from '@/components/admin/pricing/ConfirmSubmitButton';
+import {
+  createPriceCategoryAction,
+  createPriceItemAction,
+  deletePriceCategoryAction,
+  deletePriceItemAction,
+  updatePriceCategoryAction,
+  updatePriceItemAction,
+} from './actions';
 
-export default function AdminPricingPage() {
+const successMessages: Record<string, string> = {
+  'category-created': 'Категория успешно создана.',
+  'category-updated': 'Категория успешно обновлена.',
+  'category-deleted': 'Категория удалена.',
+  'item-created': 'Позиция успешно добавлена.',
+  'item-updated': 'Позиция успешно обновлена.',
+  'item-deleted': 'Позиция удалена.',
+};
+
+type AdminPricingPageProps = {
+  searchParams?: {
+    success?: string;
+    error?: string;
+  };
+};
+
+export default async function AdminPricingPage({ searchParams }: AdminPricingPageProps) {
+  const categories = await listPriceCatalog();
+  const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
+
   return (
     <div className="space-y-6">
-      <AdminSectionScaffold
-        title="Prices"
-        description="Общие цены услуг и дополнительных материалов. Поля будут простыми: «Название», «Цена», «Единица измерения»."
-        blocks={[
-          { title: 'Категории цен', description: 'Например: печать, вывески, монтаж, дополнительные услуги.' },
-          { title: 'Позиции внутри категории', description: 'Каждая строка: название, цена, единица, краткое описание.' },
-          { title: 'Включено/скрыто', description: 'Можно временно скрыть позицию, не удаляя ее из системы.' },
-          { title: 'Порядок отображения', description: 'Простая настройка порядка вывода на сайте.' }
-        ]}
-      />
-
-      <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 sm:p-6">
-        <h3 className="text-sm font-semibold text-amber-900">Важно: багет и цены</h3>
-        <p className="mt-2 text-sm text-amber-800">
-          Каталог багета и базовые цены рам остаются в Google Sheets. В админке редактируются только дополнительные
-          материалы: стекло, ПВХ, картон, паспарту, подвесы, задники и другие доп. опции.
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h1 className="text-xl font-semibold text-slate-900">Управление ценами</h1>
+        <p className="mt-2 text-sm text-slate-600">
+          Здесь можно управлять категориями и позициями цен на сайте. Поля подписаны простым языком: «Название», «Цена»,
+          «Единица измерения», «Описание», «Показывать на сайте», «Порядок».
         </p>
+
+        <div className="mt-4 rounded-lg border-2 border-amber-300 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-900">Важно по багету</p>
+          <p className="mt-1 text-sm text-amber-800">
+            Цены на сам багет и карточки багета редактируются в Google Sheets. Здесь редактируются только дополнительные
+            материалы: стекло, ПВХ, паспарту, картон, подвесы, задники и другие доп. опции.
+          </p>
+        </div>
+
+        {successMessage ? (
+          <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMessage}</p>
+        ) : null}
+
+        {searchParams?.error ? (
+          <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{searchParams.error}</p>
+        ) : null}
       </section>
+
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Новая категория</h2>
+        <form action={createPriceCategoryAction} className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700" htmlFor="new-category-name">Название</label>
+            <input id="new-category-name" name="name" required className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Например: Широкоформатная печать" />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700" htmlFor="new-category-slug">Внутренний код (slug)</label>
+            <input id="new-category-slug" name="slug" required className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="wide-format-printing" />
+          </div>
+
+          <div className="space-y-1 md:col-span-2">
+            <label className="text-sm font-medium text-slate-700" htmlFor="new-category-description">Описание</label>
+            <textarea id="new-category-description" name="description" rows={2} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Короткое пояснение для сотрудников" />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700" htmlFor="new-category-kind">Тип категории</label>
+            <select id="new-category-kind" name="kind" defaultValue="general" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+              <option value="general">Обычная категория</option>
+              <option value="baguette_extras">Доп. материалы для багета</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700" htmlFor="new-category-order">Порядок</label>
+            <input id="new-category-order" name="sortOrder" type="number" min={0} defaultValue={0} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+          </div>
+
+          <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+            <input type="checkbox" name="isActive" defaultChecked className="h-4 w-4" />
+            Показывать на сайте
+          </label>
+
+          <div className="md:col-span-2">
+            <button type="submit" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">Создать категорию</button>
+          </div>
+        </form>
+      </section>
+
+      {categories.length === 0 ? (
+        <section className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+          Пока нет категорий цен. Добавьте первую категорию выше.
+        </section>
+      ) : null}
+
+      {categories.map((category) => {
+        const updateCategory = updatePriceCategoryAction.bind(null, category.id);
+        const removeCategory = deletePriceCategoryAction.bind(null, category.id);
+
+        return (
+          <section key={category.id} className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-slate-900">{category.name}</h2>
+              <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600">slug: {category.slug}</span>
+              {category.kind === 'baguette_extras' ? (
+                <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">Раздел доп. материалов багета</span>
+              ) : null}
+            </div>
+
+            {category.kind === 'baguette_extras' ? (
+              <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                Напоминание: базовые цены и карточки багета остаются в Google Sheets. Здесь только доп. материалы и опции.
+              </p>
+            ) : null}
+
+            <form action={updateCategory} className="grid gap-4 md:grid-cols-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-700">Название</label>
+                <input name="name" required defaultValue={category.name} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-700">Внутренний код (slug)</label>
+                <input name="slug" required defaultValue={category.slug} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+              </div>
+
+              <div className="space-y-1 md:col-span-2">
+                <label className="text-sm font-medium text-slate-700">Описание</label>
+                <textarea name="description" rows={2} defaultValue={category.description ?? ''} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-700">Тип категории</label>
+                <select name="kind" defaultValue={category.kind} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                  <option value="general">Обычная категория</option>
+                  <option value="baguette_extras">Доп. материалы для багета</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-700">Порядок</label>
+                <input name="sortOrder" type="number" min={0} defaultValue={category.sortOrder} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+              </div>
+
+              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                <input type="checkbox" name="isActive" defaultChecked={category.isActive} className="h-4 w-4" />
+                Показывать на сайте
+              </label>
+
+              <div className="md:col-span-2 flex flex-wrap gap-2">
+                <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">Сохранить категорию</button>
+              </div>
+            </form>
+
+            <ConfirmSubmitButton
+              action={removeCategory}
+              confirmText="Удалить категорию? Если в ней есть позиции, удаление будет запрещено."
+              idleLabel="Удалить категорию"
+              pendingLabel="Удаляем..."
+              className="rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+            />
+
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-slate-800">Позиции в категории</h3>
+
+              {category.items.length === 0 ? (
+                <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                  В этой категории пока нет позиций.
+                </p>
+              ) : null}
+
+              {category.items.map((item) => {
+                const updateItem = updatePriceItemAction.bind(null, item.id);
+                const removeItem = deletePriceItemAction.bind(null, item.id);
+
+                return (
+                  <div key={item.id} className="space-y-2 rounded-lg border border-slate-200 p-4">
+                    <form action={updateItem} className="grid gap-3 md:grid-cols-6">
+                      <input type="hidden" name="categoryId" value={category.id} />
+
+                      <div className="space-y-1 md:col-span-2">
+                        <label className="text-xs font-medium text-slate-600">Название</label>
+                        <input name="title" required defaultValue={item.title} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-slate-600">Цена</label>
+                        <input name="price" required type="number" min={0} step="0.01" defaultValue={item.price.toString()} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-slate-600">Единица измерения</label>
+                        <input name="unit" required defaultValue={item.unit} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="₽/шт" />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-slate-600">Порядок</label>
+                        <input name="sortOrder" type="number" min={0} defaultValue={item.sortOrder} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                      </div>
+
+                      <label className="inline-flex items-center gap-2 self-end text-sm text-slate-700">
+                        <input type="checkbox" name="isActive" defaultChecked={item.isActive} className="h-4 w-4" />
+                        Показывать на сайте
+                      </label>
+
+                      <div className="space-y-1 md:col-span-4">
+                        <label className="text-xs font-medium text-slate-600">Описание</label>
+                        <input name="description" defaultValue={item.description ?? ''} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Краткий комментарий для сотрудников" />
+                      </div>
+
+                      <div className="md:col-span-2 flex items-end justify-end">
+                        <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">Сохранить</button>
+                      </div>
+                    </form>
+
+                    <ConfirmSubmitButton
+                      action={removeItem}
+                      confirmText="Удалить эту позицию? Действие нельзя отменить."
+                      idleLabel="Удалить позицию"
+                      pendingLabel="Удаляем..."
+                      className="rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+                    />
+                  </div>
+                );
+              })}
+
+              <form action={createPriceItemAction} className="grid gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 md:grid-cols-6">
+                <input type="hidden" name="categoryId" value={category.id} />
+
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-xs font-medium text-slate-700">Название</label>
+                  <input name="title" required className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Новая позиция" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-700">Цена</label>
+                  <input name="price" required type="number" min={0} step="0.01" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-700">Единица измерения</label>
+                  <input name="unit" required className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="₽/шт" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-700">Порядок</label>
+                  <input name="sortOrder" type="number" min={0} defaultValue={0} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                </div>
+
+                <label className="inline-flex items-center gap-2 self-end text-sm text-slate-700">
+                  <input type="checkbox" name="isActive" defaultChecked className="h-4 w-4" />
+                  Показывать на сайте
+                </label>
+
+                <div className="space-y-1 md:col-span-4">
+                  <label className="text-xs font-medium text-slate-700">Описание</label>
+                  <input name="description" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Например: опция к заказу" />
+                </div>
+
+                <div className="md:col-span-2 flex items-end justify-end">
+                  <button type="submit" className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-800">Добавить позицию</button>
+                </div>
+              </form>
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

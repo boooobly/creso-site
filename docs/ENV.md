@@ -9,7 +9,10 @@ Use this matrix when configuring variables in Vercel:
 | Variable | Local | Preview | Production | Notes |
 | --- | --- | --- | --- | --- |
 | `DATABASE_URL` | Required for API routes that touch DB | Required at runtime | Required at runtime | Prisma/database connection string. |
-| `ADMIN_TOKEN` | Required at runtime | Required at runtime | Required at runtime | Used for protected admin endpoints. |
+| `ADMIN_PASSWORD` | Optional (uses development fallback) | Required at runtime for admin login | **Required at runtime** | Password for `/admin/login` (single-admin model). |
+| `ADMIN_SESSION_SECRET` | Optional (uses development fallback) | Required at runtime for admin auth | **Required at runtime** | Secret used to sign and verify admin session cookies. |
+| `ADMIN_SESSION_TTL_SECONDS` | Optional | Optional | Optional | Session lifetime in seconds. Defaults to `86400` (24h). |
+| `ADMIN_TOKEN` | Required at runtime | Required at runtime | Required at runtime | Service token used by non-browser internal API flows (for example order PDF bearer access). Not used by `/api/admin/*` browser session auth. |
 | `MAIL_TO` | Required at runtime | Required at runtime | Required at runtime | Primary recipient for incoming request notifications. |
 | `PUBLIC_BASE_URL` | Optional (falls back to `http://localhost:3000` in development) | Optional | **Required at runtime** | Must be set in production runtime. |
 | `SEND_CUSTOMER_EMAILS` | Optional | Optional | Optional | Boolean flag, defaults to `false` when omitted. |
@@ -22,4 +25,5 @@ Use this matrix when configuring variables in Vercel:
 
 - Keep **Production** values separate from **Preview** values in Vercel.
 - For local development, copy `.env.example` to `.env.local` and fill in the values you need.
+- In production, missing `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` fail fast with clear `[env] ... must be configured in production.` errors.
 - If a required runtime variable is missing, API routes fail fast with a clear `[env] Invalid environment configuration: ...` error.

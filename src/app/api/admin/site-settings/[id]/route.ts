@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const unauthorized = requireAdminApiAuth(request);
+    const unauthorized = await requireAdminApiAuth(request);
     if (unauthorized) return unauthorized;
 
     const payload = await request.json();
@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const unauthorized = requireAdminApiAuth(request);
+    const unauthorized = await requireAdminApiAuth(request);
     if (unauthorized) return unauthorized;
 
     await deleteSiteSetting(params.id);

@@ -10,7 +10,7 @@ const statusSchema = z.enum(['pending', 'approved', 'rejected']);
 
 export async function GET(request: NextRequest) {
   try {
-    const unauthorized = requireAdminApiAuth(request);
+    const unauthorized = await requireAdminApiAuth(request);
     if (unauthorized) return unauthorized;
 
     const parsed = statusSchema.safeParse(request.nextUrl.searchParams.get('status') || 'pending');

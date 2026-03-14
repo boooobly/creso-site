@@ -12,7 +12,7 @@ const actionSchema = z.object({
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const unauthorized = requireAdminApiAuth(request);
+    const unauthorized = await requireAdminApiAuth(request);
     if (unauthorized) return unauthorized;
 
     const payload = await request.json().catch(() => null);
