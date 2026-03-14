@@ -1,15 +1,30 @@
-import { cookies } from 'next/headers';
-
 export const ADMIN_SESSION_COOKIE = 'admin_session';
 
 const DEFAULT_SESSION_TTL_SECONDS = 60 * 60 * 24;
 const SESSION_VERSION = 'v1';
 const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
 
 type AdminSessionPayload = {
   sub: 'admin';
   iat: number;
   exp: number;
+};
+
+type CookieStore = {
+  get(name: string): { value: string } | undefined;
+  set(
+    name: string,
+    value: string,
+    options: {
+      httpOnly: boolean;
+      sameSite: 'lax' | 'strict' | 'none';
+      secure: boolean;
+      path: string;
+      maxAge: number;
+    }
+  ): void;
+  delete(name: string): void;
 };
 
 function getEnvValue(key: 'ADMIN_PASSWORD' | 'ADMIN_SESSION_SECRET', fallback: string) {
@@ -77,6 +92,11 @@ function toBase64Url(input: string | Uint8Array): string {
     .replace(/=+$/g, '');
 }
 
+
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+}
+
 function fromBase64Url(value: string): Uint8Array {
   const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
   const padding = '='.repeat((4 - (base64.length % 4)) % 4);
@@ -114,12 +134,12 @@ async function verifySessionSignature(data: string, signature: string, secret: s
     ['verify']
   );
 
-  return crypto.subtle.verify('HMAC', key, signatureBytes, textEncoder.encode(data));
+  return crypto.subtle.verify('HMAC', key, toArrayBuffer(signatureBytes), textEncoder.encode(data));
 }
 
 function decodeSessionPayload(payloadPart: string): AdminSessionPayload | null {
   try {
-    const payloadJson = new TextDecoder().decode(fromBase64Url(payloadPart));
+    const payloadJson = textDecoder.decode(fromBase64Url(payloadPart));
     const payload = JSON.parse(payloadJson) as AdminSessionPayload;
 
     if (payload.sub !== 'admin') return null;
@@ -132,6 +152,11 @@ function decodeSessionPayload(payloadPart: string): AdminSessionPayload | null {
   }
 }
 
+async function getCookieStore(): Promise<CookieStore> {
+  const { cookies } = await import('next/headers');
+  return cookies() as CookieStore;
+}
+
 export function getAdminPassword() {
   return getEnvValue('ADMIN_PASSWORD', 'change-me-admin-password');
 }
@@ -140,9 +165,13 @@ export function getAdminSessionSecret() {
   return getEnvValue('ADMIN_SESSION_SECRET', 'change-me-admin-secret');
 }
 
+export function getAdminSessionTtlSeconds() {
+  return parseSessionTtlSeconds();
+}
+
 export async function createSignedAdminSessionToken() {
   const issuedAt = Math.floor(Date.now() / 1000);
-  const ttlSeconds = parseSessionTtlSeconds();
+  const ttlSeconds = getAdminSessionTtlSeconds();
   const payload: AdminSessionPayload = {
     sub: 'admin',
     iat: issuedAt,
@@ -180,14 +209,14 @@ export async function verifyAdminSessionToken(token: string | undefined): Promis
 }
 
 export async function isAdminAuthenticated() {
-  const cookieStore = cookies();
+  const cookieStore = await getCookieStore();
   const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
 
   return verifyAdminSessionToken(token);
 }
 
 export async function createAdminSession() {
-  const cookieStore = cookies();
+  const cookieStore = await getCookieStore();
   const token = await createSignedAdminSessionToken();
 
   cookieStore.set(ADMIN_SESSION_COOKIE, token, {
@@ -195,11 +224,11 @@ export async function createAdminSession() {
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    maxAge: parseSessionTtlSeconds()
+    maxAge: getAdminSessionTtlSeconds(),
   });
 }
 
 export async function clearAdminSession() {
-  const cookieStore = cookies();
+  const cookieStore = await getCookieStore();
   cookieStore.delete(ADMIN_SESSION_COOKIE);
 }
