@@ -1,24 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { ADMIN_SESSION_COOKIE, isValidAdminSession } from '@/lib/admin-auth';
+import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from '@/lib/admin-auth';
 
-function isAdminApiAuthorized(request: NextRequest) {
+async function isAdminApiAuthorized(request: NextRequest) {
   const sessionCookie = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-  if (isValidAdminSession(sessionCookie)) {
-    return true;
-  }
-
-  const adminToken = process.env.ADMIN_TOKEN?.trim();
-  const headerToken = request.headers.get('x-admin-token')?.trim();
-
-  return Boolean(adminToken && headerToken === adminToken);
+  return verifyAdminSessionToken(sessionCookie);
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/api/admin')) {
-    if (!isAdminApiAuthorized(request)) {
+    if (!(await isAdminApiAuthorized(request))) {
       return NextResponse.json({ ok: false, error: 'Требуется авторизация администратора.' }, { status: 401 });
     }
 
@@ -31,7 +24,7 @@ export function middleware(request: NextRequest) {
 
   const isLoginPage = pathname === '/admin/login';
   const sessionCookie = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-  const isAuthenticated = isValidAdminSession(sessionCookie);
+  const isAuthenticated = await verifyAdminSessionToken(sessionCookie);
 
   if (!isAuthenticated && !isLoginPage) {
     const loginUrl = new URL('/admin/login', request.url);
