@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ADMIN_SESSION_COOKIE, isValidAdminSession } from '@/lib/admin-auth';
+import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from '@/lib/admin-auth';
 
-export function requireAdminApiAuth(request: NextRequest): NextResponse | null {
+export async function requireAdminApiAuth(request: NextRequest): Promise<NextResponse | null> {
   const sessionCookie = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-  if (isValidAdminSession(sessionCookie)) {
-    return null;
-  }
 
-  const adminToken = process.env.ADMIN_TOKEN?.trim();
-  const headerToken = request.headers.get('x-admin-token')?.trim();
-
-  if (adminToken && headerToken === adminToken) {
+  if (await verifyAdminSessionToken(sessionCookie)) {
     return null;
   }
 
