@@ -71,3 +71,35 @@ export const listQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20)
 });
+
+
+export const priceCategorySchema = z.object({
+  name: z.string().trim().min(2, 'Укажите название категории.').max(180),
+  slug: z.string().trim().min(2, 'Укажите slug категории.').max(180),
+  description: optionalTrimmedString,
+  kind: z.enum(['general', 'baguette_extras']).default('general'),
+  isActive: z.boolean().default(true),
+  sortOrder: z.coerce.number().int().min(0).max(100000).default(0)
+});
+
+export const priceItemSchema = z.object({
+  categoryId: z.string().trim().min(2, 'Укажите категорию.'),
+  title: z.string().trim().min(2, 'Укажите название позиции.').max(180),
+  price: z.coerce.number().min(0, 'Цена не может быть отрицательной.'),
+  unit: z.string().trim().min(1, 'Укажите единицу измерения.').max(40),
+  description: optionalTrimmedString,
+  isActive: z.boolean().default(true),
+  sortOrder: z.coerce.number().int().min(0).max(100000).default(0)
+});
+
+export const mediaAssetSchema = z.object({
+  title: z.string().trim().min(2, 'Укажите название файла.').max(180),
+  kind: z.enum(['image', 'document']).default('image'),
+  url: z.string().trim().url('Укажите корректную ссылку на файл.'),
+  fileName: optionalTrimmedString,
+  altText: optionalTrimmedString,
+  mimeType: optionalTrimmedString,
+  sizeBytes: z.coerce.number().int().min(0).optional(),
+  isActive: z.boolean().default(true),
+  sortOrder: z.coerce.number().int().min(0).max(100000).default(0)
+});

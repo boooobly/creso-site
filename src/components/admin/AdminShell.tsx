@@ -7,32 +7,32 @@ import AdminTopbar from './AdminTopbar';
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/admin': {
-    title: 'Панель управления',
-    subtitle: 'Краткий обзор текущей активности на сайте'
-  },
-  '/admin/orders': {
-    title: 'Заказы',
-    subtitle: 'Новые обращения и статус обработки'
-  },
-  '/admin/reviews': {
-    title: 'Отзывы',
-    subtitle: 'Модерация и публикация отзывов клиентов'
-  },
-  '/admin/portfolio': {
-    title: 'Портфолио',
-    subtitle: 'Работы компании и их содержание'
-  },
-  '/admin/pricing': {
-    title: 'Прайс',
-    subtitle: 'Цены услуг и контроль актуальности'
+    title: 'Dashboard',
+    subtitle: 'Быстрый вход в ключевые разделы админ-панели'
   },
   '/admin/content': {
-    title: 'Контент',
-    subtitle: 'Тексты и блоки на страницах сайта'
+    title: 'Page Content',
+    subtitle: 'Тексты и подписи на страницах сайта'
+  },
+  '/admin/pricing': {
+    title: 'Prices',
+    subtitle: 'Цены услуг и дополнительных материалов'
+  },
+  '/admin/portfolio': {
+    title: 'Portfolio',
+    subtitle: 'Примеры выполненных работ для сайта'
+  },
+  '/admin/site-images': {
+    title: 'Site Images',
+    subtitle: 'Изображения и визуальные материалы сайта'
+  },
+  '/admin/reviews': {
+    title: 'Reviews',
+    subtitle: 'Отзывы клиентов и их модерация'
   },
   '/admin/settings': {
-    title: 'Настройки',
-    subtitle: 'Основные параметры панели и сайта'
+    title: 'Settings',
+    subtitle: 'Контакты компании и системные настройки'
   }
 };
 
@@ -40,16 +40,21 @@ type AdminShellProps = {
   children: ReactNode;
 };
 
+function resolvePageMeta(pathname: string) {
+  if (pathname.startsWith('/admin/portfolio')) return pageTitles['/admin/portfolio'];
+  if (pathname.startsWith('/admin/site-images')) return pageTitles['/admin/site-images'];
+
+  return (
+    pageTitles[pathname] ?? {
+      title: 'Админ-панель',
+      subtitle: 'Управление контентом сайта'
+    }
+  );
+}
+
 export default function AdminShell({ children }: AdminShellProps) {
   const pathname = usePathname();
-  const fallbackMeta = {
-    title: 'Админ-панель',
-    subtitle: 'Управление сайтом'
-  };
-
-  const pageMeta = pathname.startsWith('/admin/portfolio')
-    ? pageTitles['/admin/portfolio']
-    : pageTitles[pathname] ?? fallbackMeta;
+  const pageMeta = resolvePageMeta(pathname);
 
   return (
     <div className="mx-auto -mt-8 w-screen max-w-none bg-slate-100">

@@ -3,13 +3,13 @@ import AdminSectionScaffold from '@/components/admin/AdminSectionScaffold';
 export default function AdminReviewsPage() {
   return (
     <AdminSectionScaffold
-      title="Модерация отзывов"
-      description="Раздел для проверки новых отзывов перед публикацией на сайте."
+      title="Reviews"
+      description="Проверка отзывов перед публикацией. Интерфейс рассчитан на быструю ежедневную модерацию."
       blocks={[
-        { title: 'Очередь модерации', description: 'Список отзывов, ожидающих проверки администратором.' },
-        { title: 'Публикация', description: 'Кнопки одобрения, отклонения и скрытия неактуальных отзывов.' },
-        { title: 'Поиск и фильтры', description: 'Быстрый поиск по имени клиента, дате и оценке.' },
-        { title: 'История изменений', description: 'Журнал решений по каждому отзыву.' }
+        { title: 'Новые отзывы', description: 'Список отзывов, которые ожидают проверки.' },
+        { title: 'Решение по отзыву', description: 'Кнопки «Опубликовать» или «Отклонить».' },
+        { title: 'Поиск', description: 'Поиск по имени клиента и тексту отзыва.' },
+        { title: 'Архив', description: 'Просмотр уже обработанных отзывов.' }
       ]}
     />
   );

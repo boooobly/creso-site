@@ -6,7 +6,16 @@ const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
 
 function getEnvValue(key: 'ADMIN_PASSWORD' | 'ADMIN_SESSION_SECRET', fallback: string) {
   const value = process.env[key]?.trim();
-  return value && value.length > 0 ? value : fallback;
+
+  if (value && value.length > 0) {
+    return value;
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(`[env] ${key} must be configured in production.`);
+  }
+
+  return fallback;
 }
 
 export function getAdminPassword() {
@@ -17,9 +26,13 @@ export function getAdminSessionSecret() {
   return getEnvValue('ADMIN_SESSION_SECRET', 'change-me-admin-secret');
 }
 
+export function isValidAdminSession(value: string | undefined) {
+  return value === getAdminSessionSecret();
+}
+
 export async function isAdminAuthenticated() {
   const cookieStore = cookies();
-  return cookieStore.get(ADMIN_SESSION_COOKIE)?.value === getAdminSessionSecret();
+  return isValidAdminSession(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
 }
 
 export async function createAdminSession() {

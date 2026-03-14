@@ -113,3 +113,62 @@ model PricingEntry {
   @@unique([category, subcategory, key])
   @@index([category, isActive, sortOrder])
 }
+
+
+enum PriceCategoryKind {
+  general
+  baguette_extras
+}
+
+enum MediaAssetKind {
+  image
+  document
+}
+
+model PriceCategory {
+  id          String            @id @default(cuid())
+  name        String
+  slug        String            @unique
+  description String?
+  kind        PriceCategoryKind @default(general)
+  isActive    Boolean           @default(true)
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  items       PriceItem[]
+
+  @@index([kind, isActive, sortOrder])
+}
+
+model PriceItem {
+  id          String        @id @default(cuid())
+  categoryId  String
+  category    PriceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title       String
+  price       Decimal       @db.Decimal(10, 2)
+  unit        String
+  description String?
+  isActive    Boolean       @default(true)
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([categoryId, isActive, sortOrder])
+}
+
+model MediaAsset {
+  id          String         @id @default(cuid())
+  title       String
+  kind        MediaAssetKind @default(image)
+  url         String
+  fileName    String?
+  altText     String?
+  mimeType    String?
+  sizeBytes   Int?
+  isActive    Boolean        @default(true)
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([kind, isActive, sortOrder])
+}

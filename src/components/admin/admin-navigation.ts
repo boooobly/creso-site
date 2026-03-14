@@ -1,12 +1,12 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  ClipboardList,
   LayoutDashboard,
-  MessageSquareQuote,
-  Package,
-  Settings,
   FileText,
-  HandCoins
+  HandCoins,
+  Package,
+  Image,
+  MessageSquareQuote,
+  Settings
 } from 'lucide-react';
 
 export type AdminNavItem = {
@@ -16,11 +16,11 @@ export type AdminNavItem = {
 };
 
 export const adminNavigation: AdminNavItem[] = [
-  { href: '/admin', label: 'Панель', icon: LayoutDashboard },
-  { href: '/admin/orders', label: 'Заказы', icon: ClipboardList },
-  { href: '/admin/reviews', label: 'Отзывы', icon: MessageSquareQuote },
-  { href: '/admin/portfolio', label: 'Портфолио', icon: Package },
-  { href: '/admin/pricing', label: 'Прайс', icon: HandCoins },
-  { href: '/admin/content', label: 'Контент', icon: FileText },
-  { href: '/admin/settings', label: 'Настройки', icon: Settings }
+  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/content', label: 'Page Content', icon: FileText },
+  { href: '/admin/pricing', label: 'Prices', icon: HandCoins },
+  { href: '/admin/portfolio', label: 'Portfolio', icon: Package },
+  { href: '/admin/site-images', label: 'Site Images', icon: Image },
+  { href: '/admin/reviews', label: 'Reviews', icon: MessageSquareQuote },
+  { href: '/admin/settings', label: 'Settings', icon: Settings }
 ];

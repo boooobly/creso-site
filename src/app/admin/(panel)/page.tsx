@@ -1,71 +1,68 @@
-import { ArrowRight, MessageSquareQuote, Package, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { AdminPageSection } from '@/components/admin/AdminPageSection';
 
-const stats = [
+const sections = [
   {
-    title: 'Новые заказы',
-    value: '12',
-    hint: 'За последние 7 дней',
-    icon: ShoppingCart
+    href: '/admin/content',
+    title: 'Page Content',
+    description: 'Заголовки, подзаголовки, тексты кнопок и блоков на страницах сайта.'
   },
   {
-    title: 'Отзывы на модерации',
-    value: '4',
-    hint: 'Ожидают проверки',
-    icon: MessageSquareQuote
+    href: '/admin/pricing',
+    title: 'Prices',
+    description: 'Общие цены услуг и дополнительные материалы для багета (стекло, ПВХ, паспарту и т.д.).'
   },
   {
-    title: 'Позиции в портфолио',
-    value: '37',
-    hint: 'Опубликовано на сайте',
-    icon: Package
+    href: '/admin/portfolio',
+    title: 'Portfolio',
+    description: 'Примеры работ: добавление, редактирование, публикация и порядок показа.'
+  },
+  {
+    href: '/admin/site-images',
+    title: 'Site Images',
+    description: 'Загрузка и хранение изображений для страниц, баннеров и портфолио.'
+  },
+  {
+    href: '/admin/reviews',
+    title: 'Reviews',
+    description: 'Проверка и публикация клиентских отзывов.'
+  },
+  {
+    href: '/admin/settings',
+    title: 'Settings',
+    description: 'Контакты, адрес, рабочие часы, SEO-параметры по умолчанию и общие настройки.'
   }
-];
-
-const quickLinks = [
-  { href: '/admin/orders', label: 'Посмотреть новые заказы' },
-  { href: '/admin/reviews', label: 'Проверить отзывы' },
-  { href: '/admin/content', label: 'Обновить контент страниц' }
 ];
 
 export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 md:grid-cols-3">
-        {stats.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <article key={item.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-600">{item.title}</p>
-                <Icon size={18} className="text-slate-400" />
-              </div>
-              <p className="mt-4 text-3xl font-semibold text-slate-900">{item.value}</p>
-              <p className="mt-1 text-sm text-slate-500">{item.hint}</p>
-            </article>
-          );
-        })}
-      </section>
-
       <AdminPageSection
-        title="Быстрые действия"
-        description="Самые частые действия для ежедневной работы администратора."
+        title="С чего начать"
+        description="Выберите раздел. Подписи сделаны простым языком, чтобы быстро понять, что именно можно изменить."
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {quickLinks.map((item) => (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {sections.map((section) => (
             <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+              key={section.href}
+              href={section.href}
+              className="rounded-lg border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-300 hover:bg-slate-100"
             >
-              <span>{item.label}</span>
-              <ArrowRight size={16} />
+              <h3 className="text-sm font-semibold text-slate-900">{section.title}</h3>
+              <p className="mt-1 text-sm text-slate-600">{section.description}</p>
             </Link>
           ))}
         </div>
       </AdminPageSection>
+
+      <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 sm:p-6">
+        <h2 className="text-base font-semibold text-amber-900">Важно по разделу багета</h2>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-800">
+          <li>Каталог багета и базовые цены рам — ведутся в Google Sheets.</li>
+          <li>В этой админке редактируются только дополнительные материалы: стекло, ПВХ, картон, паспарту, подвесы и другие допы.</li>
+          <li>Пожалуйста, не переносите карточки багета и базовые цены рам в эту панель.</li>
+        </ul>
+      </section>
     </div>
   );
 }

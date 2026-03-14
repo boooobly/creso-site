@@ -11,8 +11,8 @@ export default function AdminSidebar() {
     <aside className="w-full border-b border-slate-200 bg-white lg:h-[calc(100vh-5rem)] lg:w-72 lg:shrink-0 lg:border-b-0 lg:border-r">
       <div className="flex h-full flex-col">
         <div className="border-b border-slate-100 px-4 py-4">
-          <h2 className="text-sm font-semibold text-slate-900">Админ-панель</h2>
-          <p className="mt-1 text-xs text-slate-500">Управление сайтом и контентом</p>
+          <h2 className="text-sm font-semibold text-slate-900">Внутренняя панель</h2>
+          <p className="mt-1 text-xs text-slate-500">Разделы для ежедневной работы офиса</p>
         </div>
 
         <nav className="grid gap-1 p-3 sm:grid-cols-2 lg:grid-cols-1">
