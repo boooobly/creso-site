@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
-    const unauthorized = requireAdminApiAuth(request);
+    const unauthorized = await requireAdminApiAuth(request);
     if (unauthorized) return unauthorized;
 
     const query = request.nextUrl.searchParams;
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const unauthorized = requireAdminApiAuth(request);
+    const unauthorized = await requireAdminApiAuth(request);
     if (unauthorized) return unauthorized;
 
     const payload = await request.json();
