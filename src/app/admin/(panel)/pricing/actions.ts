@@ -17,6 +17,19 @@ function parseBoolean(value: FormDataEntryValue | null) {
   return value === 'on' || value === 'true' || value === '1';
 }
 
+
+function slugify(value: string) {
+  const base = value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9а-яё\s-]/gi, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+  return base.length >= 2 ? base : `category-${Date.now()}`;
+}
+
 function parseSortOrder(value: FormDataEntryValue | null) {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -29,7 +42,7 @@ function redirectWithError(error: unknown) {
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-    redirect('/admin/pricing?error=%D0%A2%D0%B0%D0%BA%D0%BE%D0%B9+slug+%D1%83%D0%B6%D0%B5+%D0%B7%D0%B0%D0%BD%D1%8F%D1%82.+%D0%A3%D0%BA%D0%B0%D0%B6%D0%B8%D1%82%D0%B5+%D0%B4%D1%80%D1%83%D0%B3%D0%BE%D0%B9.');
+    redirect('/admin/pricing?error=%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F+%D1%81+%D1%82%D0%B0%D0%BA%D0%B8%D0%BC+%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%D0%BC+%D1%83%D0%B6%D0%B5+%D0%B5%D1%81%D1%82%D1%8C.+%D0%A3%D1%82%D0%BE%D1%87%D0%BD%D0%B8%D1%82%D0%B5+%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.');
   }
 
   if (error instanceof Error && error.message) {
@@ -43,7 +56,7 @@ export async function createPriceCategoryAction(formData: FormData) {
   try {
     await createPriceCategory({
       name: String(formData.get('name') ?? '').trim(),
-      slug: String(formData.get('slug') ?? '').trim(),
+      slug: slugify(String(formData.get('name') ?? '')),
       description: String(formData.get('description') ?? '').trim() || undefined,
       kind: String(formData.get('kind') ?? 'general').trim() === 'baguette_extras' ? 'baguette_extras' : 'general',
       isActive: parseBoolean(formData.get('isActive')),
@@ -61,7 +74,7 @@ export async function updatePriceCategoryAction(id: string, formData: FormData) 
   try {
     await updatePriceCategory(id, {
       name: String(formData.get('name') ?? '').trim(),
-      slug: String(formData.get('slug') ?? '').trim(),
+      slug: String(formData.get('slug') ?? '').trim() || slugify(String(formData.get('name') ?? '')),
       description: String(formData.get('description') ?? '').trim() || undefined,
       kind: String(formData.get('kind') ?? 'general').trim() === 'baguette_extras' ? 'baguette_extras' : 'general',
       isActive: parseBoolean(formData.get('isActive')),

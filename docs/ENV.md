@@ -8,7 +8,8 @@ Use this matrix when configuring variables in Vercel:
 
 | Variable | Local | Preview | Production | Notes |
 | --- | --- | --- | --- | --- |
-| `DATABASE_URL` | Required for API routes that touch DB | Required at runtime | Required at runtime | Prisma/database connection string. |
+| `DATABASE_URL` | Required for API routes that touch DB | Required at runtime | Required at runtime | **Pooled** Neon connection used by app runtime queries. |
+| `DATABASE_URL_UNPOOLED` | Optional for local (required when running Prisma migrations) | Required for deploy-time migrations | Required for deploy-time migrations | **Direct non-pooled** Neon connection used by Prisma `migrate deploy` via `directUrl`. |
 | `ADMIN_PASSWORD` | Optional (uses development fallback) | Required at runtime for admin login | **Required at runtime** | Password for `/admin/login` (single-admin model). |
 | `ADMIN_SESSION_SECRET` | Optional (uses development fallback) | Required at runtime for admin auth | **Required at runtime** | Secret used to sign and verify admin session cookies. |
 | `ADMIN_SESSION_TTL_SECONDS` | Optional | Optional | Optional | Session lifetime in seconds. Defaults to `86400` (24h). |
@@ -27,3 +28,7 @@ Use this matrix when configuring variables in Vercel:
 - For local development, copy `.env.example` to `.env.local` and fill in the values you need.
 - In production, missing `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` fail fast with clear `[env] ... must be configured in production.` errors.
 - If a required runtime variable is missing, API routes fail fast with a clear `[env] Invalid environment configuration: ...` error.
+
+- For Neon on Vercel: keep `DATABASE_URL` pointed at the pooler host (`-pooler`) for runtime, and set `DATABASE_URL_UNPOOLED` to the direct host for Prisma migrations.
+
+- Deploy behavior: Vercel runs Prisma migrations only when `VERCEL_ENV=production`; preview deployments skip migrations and run `npm run build` only to avoid shared-DB migration lock contention.
