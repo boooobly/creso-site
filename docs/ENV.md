@@ -30,3 +30,5 @@ Use this matrix when configuring variables in Vercel:
 - If a required runtime variable is missing, API routes fail fast with a clear `[env] Invalid environment configuration: ...` error.
 
 - For Neon on Vercel: keep `DATABASE_URL` pointed at the pooler host (`-pooler`) for runtime, and set `DATABASE_URL_UNPOOLED` to the direct host for Prisma migrations.
+
+- Deploy behavior: Vercel runs Prisma migrations only when `VERCEL_ENV=production`; preview deployments skip migrations and run `npm run build` only to avoid shared-DB migration lock contention.
