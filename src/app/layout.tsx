@@ -3,8 +3,6 @@ import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { Onest } from 'next/font/google';
 import { defaultMetadata } from '@/lib/seo';
-import SiteHeader from '@/components/layouts/SiteHeader';
-import SiteFooter from '@/components/layouts/SiteFooter';
 
 export const metadata: Metadata = defaultMetadata;
 
@@ -30,11 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className={`${onest.variable} font-sans bg-white dark:bg-neutral-950`}>
-        <SiteHeader />
-        <main className="main-layout container py-8">{children}</main>
-        <SiteFooter />
-      </body>
+      <body className={`${onest.variable} font-sans bg-white dark:bg-neutral-950`}>{children}</body>
     </html>
   );
 }
