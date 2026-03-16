@@ -2,9 +2,11 @@ import './styles.css';
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { Onest } from 'next/font/google';
-import { defaultMetadata } from '@/lib/seo';
+import { getDefaultMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = defaultMetadata;
+export async function generateMetadata(): Promise<Metadata> {
+  return getDefaultMetadata();
+}
 
 const onest = Onest({
   subsets: ['latin', 'cyrillic'],

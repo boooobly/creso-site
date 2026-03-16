@@ -3,14 +3,20 @@ const { PrismaClient, Prisma } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const defaultSiteSettings = [
-  { key: 'contact.phone', value: '', type: 'string', group: 'contact', label: 'Phone number', description: 'Основной номер телефона компании' },
-  { key: 'contact.email', value: '', type: 'string', group: 'contact', label: 'Email', description: 'Основной адрес электронной почты' },
-  { key: 'contact.address', value: '', type: 'string', group: 'contact', label: 'Address', description: 'Фактический адрес офиса или производства' },
-  { key: 'contact.workingHours', value: '', type: 'string', group: 'contact', label: 'Working hours', description: 'Режим работы для сайта' },
-  { key: 'company.inn', value: '', type: 'string', group: 'company', label: 'INN', description: 'ИНН юридического лица' },
-  { key: 'footer.telegram', value: '', type: 'string', group: 'messengers', label: 'Telegram link', description: 'Ссылка на Telegram для подвала сайта' },
-  { key: 'footer.whatsapp', value: '', type: 'string', group: 'messengers', label: 'WhatsApp link', description: 'Ссылка на WhatsApp для подвала сайта' },
-  { key: 'seo.defaultTitle', value: '', type: 'string', group: 'seo', label: 'Default SEO title', description: 'Заголовок по умолчанию для страниц' }
+  { key: 'company.name', value: 'CredoMir', type: 'string', group: 'business', label: 'Название компании', description: 'Полное название компании для публичных блоков.' },
+  { key: 'company.shortInfo', value: 'Рекламно-производственная компания полного цикла.', type: 'string', group: 'business', label: 'Коротко о компании', description: 'Короткий текст о компании для подвала сайта.' },
+  { key: 'contact.phone', value: '+7 (988) 731-74-04', type: 'string', group: 'contact', label: 'Телефон', description: 'Основной номер телефона компании.' },
+  { key: 'contact.whatsapp', value: '+7 (988) 731-74-04', type: 'string', group: 'contact', label: 'WhatsApp', description: 'Номер или ссылка WhatsApp для связи.' },
+  { key: 'contact.telegram', value: '@Credomir', type: 'string', group: 'contact', label: 'Telegram', description: 'Username или ссылка Telegram.' },
+  { key: 'contact.email', value: 'credomir26@mail.ru', type: 'string', group: 'contact', label: 'Email', description: 'Основной адрес электронной почты.' },
+  { key: 'contact.address', value: 'ул. Калинина, 106, Невинномысск', type: 'string', group: 'contact', label: 'Адрес', description: 'Фактический адрес офиса или производства.' },
+  { key: 'contact.workingHours', value: 'Пн–Пт: 9:00–17:30', type: 'string', group: 'contact', label: 'Режим работы', description: 'Режим работы для сайта.' },
+  { key: 'social.vk', value: '', type: 'string', group: 'social', label: 'Ссылка на VK', description: 'Ссылка на страницу компании в VK.' },
+  { key: 'footer.text', value: '© 2026 CredoMir. Все права защищены.', type: 'string', group: 'footer', label: 'Текст в подвале', description: 'Короткая строка внизу сайта.' },
+  { key: 'seo.defaultTitle', value: 'CredoMir — рекламно-производственная компания', type: 'string', group: 'seo', label: 'SEO заголовок', description: 'Базовый SEO-заголовок по умолчанию.' },
+  { key: 'seo.defaultDescription', value: 'Багетное оформление, фрезеровка, широкоформатная печать, наружная реклама в Невинномысске.', type: 'string', group: 'seo', label: 'SEO описание', description: 'Базовое SEO-описание по умолчанию.' },
+  { key: 'seo.siteName', value: 'CredoMir', type: 'string', group: 'seo', label: 'Краткое название бренда', description: 'Короткое имя бренда для метаданных.' },
+  { key: 'seo.ogImage', value: '/og-image.png', type: 'string', group: 'seo', label: 'OG image URL', description: 'Картинка предпросмотра для соцсетей.' }
 ];
 
 const defaultPageContent = [

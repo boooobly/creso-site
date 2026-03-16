@@ -3,10 +3,10 @@ import type { ComponentType } from 'react';
 import { Calculator, Clock3, FileCheck2, Mail, MessageCircle, MessageSquare, Package, Phone, Send } from 'lucide-react';
 import ContactsLeadCapture from '@/components/ContactsLeadCapture';
 import MapSection from '@/components/MapSection';
-import { BRAND } from '@/lib/constants';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { messages } from '@/lib/messages';
-
+import { getPublicSiteSettings } from '@/lib/site-settings';
+import { BRAND } from '@/lib/constants';
 
 type LinkedQuickContact = {
   title: string;
@@ -21,19 +21,6 @@ type HoursQuickContact = {
   helper: string;
   icon: ComponentType<{ className?: string }>;
 };
-
-const quickContacts: Array<LinkedQuickContact | HoursQuickContact> = [
-  { title: 'Позвонить', value: '+7 988 731 74 04', href: 'tel:+79887317404', icon: Phone },
-  { title: 'Telegram', value: '@Credomir', href: 'https://t.me/Credomir', icon: Send },
-  { title: 'Max Messenger', value: '+7 988 731 74 04', href: 'https://wa.me/79887317404', icon: MessageCircle },
-  { title: 'Email', value: 'credomir26@mail.ru', href: 'mailto:credomir26@mail.ru', icon: Mail },
-  {
-    title: 'График работы',
-    lines: ['Пн–Пт: 9:00–17:30', 'Сб–Вс: выходной'],
-    helper: 'Отвечаем в рабочее время.',
-    icon: Clock3,
-  },
-];
 
 const trustItems = [
   'ИП Кошелева Валентина Валерьевна',
@@ -66,17 +53,45 @@ const processSteps = [
   },
 ] as const;
 
+function toTelegramLink(value: string) {
+  if (!value) return '#';
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  return value.startsWith('@') ? `https://t.me/${value.slice(1)}` : `https://t.me/${value}`;
+}
+
+function toWhatsAppLink(value: string) {
+  if (!value) return '#';
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  const digits = value.replace(/\D/g, '');
+  return digits ? `https://wa.me/${digits}` : '#';
+}
+
 export default async function ContactsPage() {
-  const contentMap = await getPageContentMap('contacts');
+  const [contentMap, settings] = await Promise.all([getPageContentMap('contacts'), getPublicSiteSettings()]);
+
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Контакты');
   const ctaTitle = getPageContentValue(contentMap, 'cta', 'title', 'Нужна консультация?');
   const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Ответим в течение 15 минут в рабочее время.');
   const ctaButtonText = getPageContentValue(contentMap, 'cta', 'buttonText', 'Перезвоните мне');
+
+  const quickContacts: Array<LinkedQuickContact | HoursQuickContact> = [
+    { title: 'Позвонить', value: settings.phone, href: `tel:${settings.phoneHref}`, icon: Phone },
+    { title: 'Telegram', value: settings.telegram, href: toTelegramLink(settings.telegram), icon: Send },
+    { title: 'WhatsApp', value: settings.whatsapp, href: toWhatsAppLink(settings.whatsapp), icon: MessageCircle },
+    { title: 'Email', value: settings.email, href: `mailto:${settings.email}`, icon: Mail },
+    {
+      title: 'График работы',
+      lines: [settings.workingHours],
+      helper: 'Отвечаем в рабочее время.',
+      icon: Clock3,
+    },
+  ];
+
   return (
     <div className="space-y-10">
       <section className="space-y-4">
         <h1 className="text-2xl font-bold">{heroTitle}</h1>
-        <p className="text-neutral-700 dark:text-neutral-300">Адрес: {BRAND.address}</p>
+        <p className="text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {quickContacts.map((item) => {
             const Icon = item.icon;
@@ -153,9 +168,9 @@ export default async function ContactsPage() {
       <section className="grid items-start gap-6 md:grid-cols-2">
         <div>
           <h2 className="text-2xl font-bold">Как нас найти</h2>
-          <p className="mt-2 text-neutral-700 dark:text-neutral-300">Адрес: {BRAND.address}</p>
-          <p className="text-neutral-700 dark:text-neutral-300">Тел: {BRAND.phone}</p>
-          <p className="text-neutral-700 dark:text-neutral-300">E-mail: {BRAND.email}</p>
+          <p className="mt-2 text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
+          <p className="text-neutral-700 dark:text-neutral-300">Тел: {settings.phone}</p>
+          <p className="text-neutral-700 dark:text-neutral-300">E-mail: {settings.email}</p>
           <a className="btn-secondary mt-4 inline-block no-underline" href={BRAND.yandexRoute} target="_blank" rel="noreferrer">Маршрут в Яндекс.Картах</a>
         </div>
         <MapSection />

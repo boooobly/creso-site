@@ -1,16 +1,19 @@
 import type { Metadata } from 'next';
-import { BRAND } from './constants';
+import { getPublicSiteSettings } from '@/lib/site-settings';
 
-export const defaultMetadata: Metadata = {
-  title: `${BRAND.name} — рекламно-производственная компания`,
-  description:
-    'Багетное оформление, фрезеровка, широкоформатная печать, наружная реклама в Невинномысске.',
-  openGraph: {
-    title: `${BRAND.name} — рекламно-производственная компания`,
-    description:
-      'Багет, фрезеровка, широкоформатная печать, наружная реклама. Невинномысск.',
-    images: ['/og-image.png'],
-    type: 'website',
-  },
-  metadataBase: new URL('https://example.com'),
-};
+export async function getDefaultMetadata(): Promise<Metadata> {
+  const settings = await getPublicSiteSettings();
+
+  return {
+    title: settings.seoTitle,
+    description: settings.seoDescription,
+    openGraph: {
+      title: settings.seoTitle,
+      description: settings.seoDescription,
+      siteName: settings.seoSiteName,
+      images: [settings.seoOgImage],
+      type: 'website',
+    },
+    metadataBase: new URL('https://example.com'),
+  };
+}
