@@ -7,38 +7,12 @@ import type {
   WorkType,
 } from '@/components/baget/BagetFilters';
 import { getBagetPrintPricePerM2, type BagetPrintMaterial } from '@/lib/pricing-config/wideFormat';
-
-const CROCODILE_PRICE = 20;
-const WIRE_PRICE_PER_METER_WIDTH = 30;
-const WIRE_LOOP_PRICE = 15;
-const WIRE_LOOP_DEFAULT_QTY = 2;
-
-const STAND_PRICE = 120;
-
-const STRETCHER_PRICE_PER_METER: Record<StretcherType, number> = {
-  narrow: 200,
-  wide: 300,
-};
-
-const MATERIAL_PRICING = {
-  glass: { areaPricePerM2: 3705, cuttingPricePerM: 30 },
-  antiReflectiveGlass: { areaPricePerM2: 6000, cuttingPricePerM: 30 },
-  plexiglass: { areaPricePerM2: 2575, cuttingPricePerM: 30 },
-  pet1mm: { areaPricePerM2: 1200, cuttingPricePerM: 30 },
-  passepartout: { areaPricePerM2: 2325, cuttingPricePerM: 30 },
-  cardboard: { areaPricePerM2: 465, cuttingPricePerM: 30 },
-  pvc3: { areaPricePerM2: 1855, cuttingPricePerM: 30 },
-  pvc4: { areaPricePerM2: 2455, cuttingPricePerM: 35 },
-  orabond: { areaPricePerM2: 1200, cuttingPricePerM: 0 },
-} as const;
-
-type AutoAdditions = {
-  pvcType: 'none' | 'pvc3' | 'pvc4';
-  addOrabond: boolean;
-  forceCardboard: boolean;
-  stretchingRequired: boolean;
-  removeCardboard: boolean;
-};
+import {
+  getBaguetteExtrasDefaultConfig,
+  resolveAutoAdditionsFromConfig,
+  type AutoAdditionRule,
+  type BaguetteExtrasPricingConfig,
+} from '@/lib/baget/baguetteExtrasPricing';
 
 export interface BagetQuoteInput {
   width: number;
@@ -79,57 +53,7 @@ export interface BagetQuoteResult {
   meta?: Record<string, any>;
 }
 
-function resolveAutoAdditions(workType: WorkType): AutoAdditions {
-  if (workType === 'rhinestone') {
-    return {
-      pvcType: 'pvc3',
-      addOrabond: true,
-      forceCardboard: false,
-      stretchingRequired: false,
-      removeCardboard: false,
-    };
-  }
-
-  if (workType === 'embroidery' || workType === 'beads') {
-    return {
-      pvcType: 'pvc4',
-      addOrabond: false,
-      forceCardboard: true,
-      stretchingRequired: true,
-      removeCardboard: false,
-    };
-  }
-
-  if (workType === 'photo') {
-    return {
-      pvcType: 'none',
-      addOrabond: true,
-      forceCardboard: true,
-      stretchingRequired: false,
-      removeCardboard: false,
-    };
-  }
-
-  if (workType === 'stretchedCanvas') {
-    return {
-      pvcType: 'none',
-      addOrabond: false,
-      forceCardboard: false,
-      stretchingRequired: true,
-      removeCardboard: true,
-    };
-  }
-
-  return {
-    pvcType: 'none',
-    addOrabond: false,
-    forceCardboard: false,
-    stretchingRequired: false,
-    removeCardboard: false,
-  };
-}
-
-export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
+export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasPricingConfig = getBaguetteExtrasDefaultConfig()): BagetQuoteResult {
   const warnings: string[] = [];
   const width = Number(input.width);
   const height = Number(input.height);
@@ -142,10 +66,10 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
 
   const effectiveWidth = input.hasPassepartout ? width + 2 * passepartoutSize : width;
   const effectiveHeight = input.hasPassepartout ? height + passepartoutSize + passepartoutBottomSize : height;
-  const standAllowed = validSize && effectiveWidth <= 300 && effectiveHeight <= 300;
-  const stretcherNarrowAllowed = width <= 500 && height <= 500;
+  const standAllowed = validSize && effectiveWidth <= extrasConfig.stand.maxWidthMm && effectiveHeight <= extrasConfig.stand.maxHeightMm;
+  const stretcherNarrowAllowed = width <= extrasConfig.stretcher.narrowMaxWidthMm && height <= extrasConfig.stretcher.narrowMaxHeightMm;
 
-  const autoAdditions = resolveAutoAdditions(input.workType);
+  const autoAdditions: AutoAdditionRule = resolveAutoAdditionsFromConfig(input.workType, extrasConfig);
   const effectiveFrameMode: FrameMode = input.workType === 'stretchedCanvas'
     ? (input.frameMode ?? 'framed')
     : 'framed';
@@ -183,7 +107,7 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
         framedWidthMm: Number.isFinite(effectiveWidth) ? effectiveWidth : 0,
         framedHeightMm: Number.isFinite(effectiveHeight) ? effectiveHeight : 0,
         bagetMeters: 0,
-        hangingLabel: hangerType === 'crocodile' ? 'Крокодильчик × 1' : `Тросик (${WIRE_LOOP_DEFAULT_QTY} петли)`,
+        hangingLabel: hangerType === 'crocodile' ? 'Крокодильчик × 1' : `Тросик (${extrasConfig.hanging.wireLoopDefaultQty} петли)`,
         autoAdditions,
         standAllowed,
         stretcherNarrowAllowed,
@@ -211,29 +135,31 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
 
   let materialsCost = 0;
   if (input.glazing !== 'none') {
-    const glazingPricing = MATERIAL_PRICING[input.glazing];
+    const glazingPricing = extrasConfig.materials[input.glazing];
     materialsCost += areaM2 * glazingPricing.areaPricePerM2 + perimeterM * glazingPricing.cuttingPricePerM;
   }
   if (input.hasPassepartout) {
-    materialsCost += areaM2 * MATERIAL_PRICING.passepartout.areaPricePerM2 + perimeterM * MATERIAL_PRICING.passepartout.cuttingPricePerM;
+    materialsCost += areaM2 * extrasConfig.materials.passepartout.areaPricePerM2 + perimeterM * extrasConfig.materials.passepartout.cuttingPricePerM;
   }
   if (effectiveBackPanel) {
-    materialsCost += areaM2 * MATERIAL_PRICING.cardboard.areaPricePerM2 + perimeterM * MATERIAL_PRICING.cardboard.cuttingPricePerM;
+    materialsCost += areaM2 * extrasConfig.materials.cardboard.areaPricePerM2 + perimeterM * extrasConfig.materials.cardboard.cuttingPricePerM;
   }
 
   const pvcCost = autoAdditions.pvcType === 'none'
     ? 0
-    : areaM2 * MATERIAL_PRICING[autoAdditions.pvcType].areaPricePerM2 + perimeterM * MATERIAL_PRICING[autoAdditions.pvcType].cuttingPricePerM;
-  const orabondCost = autoAdditions.addOrabond ? areaM2 * MATERIAL_PRICING.orabond.areaPricePerM2 : 0;
-  const hangingQuantity = hangerType === 'crocodile' ? (effectiveWidth > 600 ? 2 : 1) : 1;
-  const wireLoopsCost = WIRE_LOOP_DEFAULT_QTY * WIRE_LOOP_PRICE;
+    : areaM2 * extrasConfig.materials[autoAdditions.pvcType].areaPricePerM2 + perimeterM * extrasConfig.materials[autoAdditions.pvcType].cuttingPricePerM;
+  const orabondCost = autoAdditions.addOrabond ? areaM2 * extrasConfig.materials.orabond.areaPricePerM2 : 0;
+  const hangingQuantity = hangerType === 'crocodile'
+    ? (effectiveWidth > extrasConfig.hanging.crocodileDoubleThresholdWidthMm ? 2 : 1)
+    : 1;
+  const wireLoopsCost = extrasConfig.hanging.wireLoopDefaultQty * extrasConfig.hanging.wireLoopPrice;
   const hangingCost = hangerType === 'wire'
-    ? (width / 1000) * WIRE_PRICE_PER_METER_WIDTH + wireLoopsCost
-    : CROCODILE_PRICE * hangingQuantity;
-  const standCost = effectiveStand ? STAND_PRICE : 0;
+    ? (width / 1000) * extrasConfig.hanging.wirePricePerMeterWidth + wireLoopsCost
+    : extrasConfig.hanging.crocodilePrice * hangingQuantity;
+  const standCost = effectiveStand ? extrasConfig.stand.price : 0;
   const stretcherMeters = (width * 2 + height * 2) / 1000;
   const stretcherCost = input.workType === 'stretchedCanvas'
-    ? stretcherMeters * STRETCHER_PRICE_PER_METER[effectiveStretcherType]
+    ? stretcherMeters * extrasConfig.stretcher.pricesPerMeter[effectiveStretcherType]
     : 0;
   const printCost = requiresPrint && printMaterial
     ? Math.max(printAreaM2, 1) * getBagetPrintPricePerM2(printMaterial)
@@ -277,7 +203,7 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
     },
     {
       key: 'hanging',
-      title: hangerType === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик + ${WIRE_LOOP_DEFAULT_QTY} петли`,
+      title: hangerType === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик + ${extrasConfig.hanging.wireLoopDefaultQty} петли`,
       qty: quantity,
       unitPrice: hangingCost,
       total: hangingCost * quantity,
@@ -329,7 +255,7 @@ export function bagetQuote(input: BagetQuoteInput): BagetQuoteResult {
       pvcCost,
       orabondCost,
       hangingCost,
-      hangingLabel: hangerType === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик + ${WIRE_LOOP_DEFAULT_QTY} петли`,
+      hangingLabel: hangerType === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик + ${extrasConfig.hanging.wireLoopDefaultQty} петли`,
       standCost,
       stretcherCost,
       autoBadges,

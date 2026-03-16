@@ -1,4 +1,5 @@
 import { listPriceCatalog } from '@/lib/admin/price-catalog-service';
+import { listBaguetteExtrasPricingAdminData } from '@/lib/admin/baguette-extras-pricing-service';
 import ConfirmSubmitButton from '@/components/admin/pricing/ConfirmSubmitButton';
 import {
   createPriceCategoryAction,
@@ -7,6 +8,7 @@ import {
   deletePriceItemAction,
   updatePriceCategoryAction,
   updatePriceItemAction,
+  updateBaguetteExtrasPricingEntryAction,
 } from './actions';
 
 const successMessages: Record<string, string> = {
@@ -16,6 +18,7 @@ const successMessages: Record<string, string> = {
   'item-created': 'Позиция успешно добавлена.',
   'item-updated': 'Позиция успешно обновлена.',
   'item-deleted': 'Позиция удалена.',
+  'baguette-config-updated': 'Конфигурация доп. материалов багета обновлена.',
 };
 
 type AdminPricingPageProps = {
@@ -26,7 +29,10 @@ type AdminPricingPageProps = {
 };
 
 export default async function AdminPricingPage({ searchParams }: AdminPricingPageProps) {
-  const categories = await listPriceCatalog();
+  const [categories, baguetteConfigData] = await Promise.all([
+    listPriceCatalog(),
+    listBaguetteExtrasPricingAdminData(),
+  ]);
   const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
 
   const baguetteCategories = categories.filter((category) => category.kind === 'baguette_extras');
@@ -121,6 +127,8 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
           </div>
         </form>
       </section>
+
+      <BaguetteExtrasConfigSection entries={baguetteConfigData.entries} histories={baguetteConfigData.histories} />
 
       {categories.length === 0 ? (
         <section className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
@@ -344,6 +352,89 @@ function CategoryCard({ category }: { category: Category }) {
             </button>
           </div>
         </form>
+      </div>
+    </section>
+  );
+}
+
+
+function BaguetteExtrasConfigSection({
+  entries,
+  histories,
+}: {
+  entries: Array<{
+    id: string;
+    label: string;
+    key: string;
+    subcategory: string;
+    type: string;
+    unit: string | null;
+    value: unknown;
+  }>;
+  histories: Array<{
+    id: string;
+    key: string;
+    subcategory: string;
+    oldValue: unknown;
+    newValue: unknown;
+    createdAt: Date;
+    note: string | null;
+  }>;
+}) {
+  return (
+    <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <h2 className="text-lg font-semibold text-slate-900">Конфигурация расчёта доп. материалов багета</h2>
+      <p className="text-sm text-slate-600">Редактируются только не-багетные значения калькулятора: материалы, подвесы, подрамник, пороги и автодобавления.</p>
+
+      <div className="space-y-3">
+        {entries.map((entry) => {
+          const action = updateBaguetteExtrasPricingEntryAction.bind(null, entry.id);
+          const formattedValue = entry.type === 'number'
+            ? String(entry.value)
+            : JSON.stringify(entry.value, null, 2);
+
+          return (
+            <form key={entry.id} action={action} className="grid gap-3 rounded-lg border border-slate-200 p-4 md:grid-cols-6">
+              <div className="space-y-1 md:col-span-2">
+                <p className="text-sm font-medium text-slate-900">{entry.label}</p>
+                <p className="text-xs text-slate-500">{entry.subcategory}.{entry.key}</p>
+              </div>
+
+              <div className="space-y-1 md:col-span-2">
+                <label className="text-xs font-medium text-slate-600">Значение ({entry.type}{entry.unit ? `, ${entry.unit}` : ''})</label>
+                {entry.type === 'number' ? (
+                  <input name="value" type="number" min={0} step="0.01" defaultValue={formattedValue} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                ) : (
+                  <textarea name="value" rows={4} defaultValue={formattedValue} className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-xs" />
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-600">Комментарий (опционально)</label>
+                <input name="note" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Причина изменения" />
+              </div>
+
+              <div className="md:col-span-1 flex items-end justify-end">
+                <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
+                  Сохранить
+                </button>
+              </div>
+            </form>
+          );
+        })}
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-slate-800">Последние изменения</h3>
+        {histories.length === 0 ? <p className="text-sm text-slate-500">Изменений пока нет.</p> : null}
+        {histories.slice(0, 20).map((history) => (
+          <div key={history.id} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+            <p className="font-medium">{history.subcategory}.{history.key} · {history.createdAt.toLocaleString('ru-RU')}</p>
+            <p>Было: <code>{JSON.stringify(history.oldValue)}</code></p>
+            <p>Стало: <code>{JSON.stringify(history.newValue)}</code></p>
+            {history.note ? <p>Комментарий: {history.note}</p> : null}
+          </div>
+        ))}
       </div>
     </section>
   );
