@@ -29,6 +29,7 @@ export const portfolioItemSchema = z.object({
   category: z.string().trim().min(2, 'Укажите категорию.').max(120),
   shortDescription: optionalTrimmedString,
   coverImage: optionalTrimmedString,
+  coverImageAssetId: optionalTrimmedString,
   galleryImages: z.array(z.string().trim().url('Изображение галереи должно быть валидным URL.')).max(30).default([]),
   featured: z.boolean().default(false),
   published: z.boolean().default(false),
@@ -95,6 +96,7 @@ export const priceItemSchema = z.object({
 export const mediaAssetSchema = z.object({
   title: z.string().trim().min(2, 'Укажите название файла.').max(180),
   kind: z.enum(['image', 'document']).default('image'),
+  scope: z.enum(['site', 'portfolio']).default('site'),
   url: z.string().trim().url('Укажите корректную ссылку на файл.'),
   fileName: optionalTrimmedString,
   altText: optionalTrimmedString,

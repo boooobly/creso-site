@@ -7,31 +7,31 @@ import AdminTopbar from './AdminTopbar';
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/admin': {
-    title: 'Dashboard',
+    title: 'Панель',
     subtitle: 'Быстрый вход в ключевые разделы админ-панели'
   },
   '/admin/content': {
-    title: 'Page Content',
+    title: 'Контент страниц',
     subtitle: 'Тексты и подписи на страницах сайта'
   },
   '/admin/pricing': {
-    title: 'Prices',
+    title: 'Цены',
     subtitle: 'Цены услуг и дополнительных материалов'
   },
   '/admin/portfolio': {
-    title: 'Portfolio',
+    title: 'Портфолио',
     subtitle: 'Примеры выполненных работ для сайта'
   },
   '/admin/site-images': {
-    title: 'Site Images',
+    title: 'Изображения сайта',
     subtitle: 'Изображения и визуальные материалы сайта'
   },
   '/admin/reviews': {
-    title: 'Reviews',
+    title: 'Отзывы',
     subtitle: 'Отзывы клиентов и их модерация'
   },
   '/admin/settings': {
-    title: 'Settings',
+    title: 'Настройки',
     subtitle: 'Контакты компании и системные настройки'
   }
 };
