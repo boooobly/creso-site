@@ -6,7 +6,7 @@ import type { BagetPrintMaterial } from '@/lib/baget/printRequirement';
 
 export const BAGUETTE_EXTRAS_PRICING_CATEGORY = 'baguette-extra-pricing';
 
-type RawDefaultEntry = {
+export type RawDefaultEntry = {
   category: string;
   subcategory: string;
   key: string;
@@ -20,9 +20,14 @@ type RawDefaultEntry = {
 
 export const BAGUETTE_EXTRAS_DEFAULT_ENTRIES = defaultsJson as RawDefaultEntry[];
 
+const nonNegativePriceSchema = z.number().min(0).max(1_000_000);
+const positiveAreaSchema = z.number().positive().max(50);
+const millimeterLimitSchema = z.number().min(0).max(10_000);
+const discreteQtySchema = z.number().int().min(1).max(10);
+
 const materialRateSchema = z.object({
-  areaPricePerM2: z.number().nonnegative(),
-  cuttingPricePerM: z.number().nonnegative(),
+  areaPricePerM2: nonNegativePriceSchema,
+  cuttingPricePerM: nonNegativePriceSchema,
 });
 
 const autoAdditionSchema = z.object({
@@ -85,8 +90,42 @@ export type BaguetteExtrasPricingConfig = {
 
 type ConfigKeyMap = Record<string, number | MaterialRate | AutoAdditionRule>;
 type FallbackReason = 'missing' | 'invalid';
+export type BaguettePricingFallbackItem = { key: string; reason: FallbackReason };
 type BuildDiagnostics = {
-  fallbackUsedKeys: Array<{ key: string; reason: FallbackReason }>;
+  fallbackUsedKeys: BaguettePricingFallbackItem[];
+};
+
+const BAGUETTE_KEY_SCHEMAS: Record<string, z.ZodTypeAny> = {
+  'hanging.crocodile_price': nonNegativePriceSchema,
+  'hanging.crocodile_double_threshold_width_mm': millimeterLimitSchema,
+  'hanging.wire_price_per_meter_width': nonNegativePriceSchema,
+  'hanging.wire_loop_price': nonNegativePriceSchema,
+  'hanging.wire_loop_default_qty': discreteQtySchema,
+  'stand.stand_price': nonNegativePriceSchema,
+  'stand.stand_max_width_mm': millimeterLimitSchema,
+  'stand.stand_max_height_mm': millimeterLimitSchema,
+  'print.paper_price_per_m2': nonNegativePriceSchema,
+  'print.canvas_price_per_m2': nonNegativePriceSchema,
+  'print.minimum_billable_area_m2': positiveAreaSchema,
+  'stretcher.stretcher_price_per_meter_narrow': nonNegativePriceSchema,
+  'stretcher.stretcher_price_per_meter_wide': nonNegativePriceSchema,
+  'stretcher.stretcher_narrow_max_width_mm': millimeterLimitSchema,
+  'stretcher.stretcher_narrow_max_height_mm': millimeterLimitSchema,
+  'materials.glass': materialRateSchema,
+  'materials.anti_reflective_glass': materialRateSchema,
+  'materials.plexiglass': materialRateSchema,
+  'materials.pet1mm': materialRateSchema,
+  'materials.passepartout': materialRateSchema,
+  'materials.cardboard': materialRateSchema,
+  'materials.pvc3': materialRateSchema,
+  'materials.pvc4': materialRateSchema,
+  'materials.orabond': materialRateSchema,
+  'auto_additions.default': autoAdditionSchema,
+  'auto_additions.rhinestone': autoAdditionSchema,
+  'auto_additions.embroidery': autoAdditionSchema,
+  'auto_additions.beads': autoAdditionSchema,
+  'auto_additions.photo': autoAdditionSchema,
+  'auto_additions.stretched_canvas': autoAdditionSchema,
 };
 
 function mapDefaultEntries(entries: RawDefaultEntry[]): ConfigKeyMap {
@@ -98,7 +137,35 @@ function mapDefaultEntries(entries: RawDefaultEntry[]): ConfigKeyMap {
 }
 
 const fallbackValues = mapDefaultEntries(BAGUETTE_EXTRAS_DEFAULT_ENTRIES);
-const allDefaultKeys = Object.keys(fallbackValues);
+export const BAGUETTE_PRICING_REQUIRED_KEYS = Object.keys(fallbackValues);
+
+export function getBaguettePricingValidationSchema(compositeKey: string): z.ZodTypeAny {
+  return BAGUETTE_KEY_SCHEMAS[compositeKey] ?? z.any();
+}
+
+export function parseAndValidateBaguettePricingValue(compositeKey: string, type: string, rawValue: string) {
+  const parsedInput = type === 'number' ? Number(rawValue) : JSON.parse(rawValue);
+  const schema = getBaguettePricingValidationSchema(compositeKey);
+  const parsed = schema.safeParse(parsedInput);
+
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0]?.message ?? 'Некорректное значение. Проверьте формат и диапазон.');
+  }
+
+  return parsed.data as number | MaterialRate | AutoAdditionRule;
+}
+
+export function checkBaguettePricingCompleteness(loadedKeys: string[]) {
+  const loadedSet = new Set(loadedKeys);
+  const missingRequiredKeys = BAGUETTE_PRICING_REQUIRED_KEYS.filter((key) => !loadedSet.has(key));
+  const unknownKeys = loadedKeys.filter((key) => !(key in fallbackValues));
+
+  return {
+    isComplete: missingRequiredKeys.length === 0,
+    missingRequiredKeys,
+    unknownKeys,
+  };
+}
 
 function readWithFallback<T>(
   source: ConfigKeyMap,
@@ -125,29 +192,29 @@ function buildConfig(source: ConfigKeyMap) {
 
   const config: BaguetteExtrasPricingConfig = {
     hanging: {
-      crocodilePrice: readWithFallback(source, 'hanging.crocodile_price', z.number().nonnegative(), diagnostics),
-      crocodileDoubleThresholdWidthMm: readWithFallback(source, 'hanging.crocodile_double_threshold_width_mm', z.number().nonnegative(), diagnostics),
-      wirePricePerMeterWidth: readWithFallback(source, 'hanging.wire_price_per_meter_width', z.number().nonnegative(), diagnostics),
-      wireLoopPrice: readWithFallback(source, 'hanging.wire_loop_price', z.number().nonnegative(), diagnostics),
-      wireLoopDefaultQty: Math.max(1, Math.round(readWithFallback(source, 'hanging.wire_loop_default_qty', z.number().nonnegative(), diagnostics))),
+      crocodilePrice: readWithFallback(source, 'hanging.crocodile_price', nonNegativePriceSchema, diagnostics),
+      crocodileDoubleThresholdWidthMm: readWithFallback(source, 'hanging.crocodile_double_threshold_width_mm', millimeterLimitSchema, diagnostics),
+      wirePricePerMeterWidth: readWithFallback(source, 'hanging.wire_price_per_meter_width', nonNegativePriceSchema, diagnostics),
+      wireLoopPrice: readWithFallback(source, 'hanging.wire_loop_price', nonNegativePriceSchema, diagnostics),
+      wireLoopDefaultQty: readWithFallback(source, 'hanging.wire_loop_default_qty', discreteQtySchema, diagnostics),
     },
     stand: {
-      price: readWithFallback(source, 'stand.stand_price', z.number().nonnegative(), diagnostics),
-      maxWidthMm: readWithFallback(source, 'stand.stand_max_width_mm', z.number().nonnegative(), diagnostics),
-      maxHeightMm: readWithFallback(source, 'stand.stand_max_height_mm', z.number().nonnegative(), diagnostics),
+      price: readWithFallback(source, 'stand.stand_price', nonNegativePriceSchema, diagnostics),
+      maxWidthMm: readWithFallback(source, 'stand.stand_max_width_mm', millimeterLimitSchema, diagnostics),
+      maxHeightMm: readWithFallback(source, 'stand.stand_max_height_mm', millimeterLimitSchema, diagnostics),
     },
     print: {
-      paperPricePerM2: readWithFallback(source, 'print.paper_price_per_m2', z.number().nonnegative(), diagnostics),
-      canvasPricePerM2: readWithFallback(source, 'print.canvas_price_per_m2', z.number().nonnegative(), diagnostics),
-      minimumBillableAreaM2: readWithFallback(source, 'print.minimum_billable_area_m2', z.number().positive(), diagnostics),
+      paperPricePerM2: readWithFallback(source, 'print.paper_price_per_m2', nonNegativePriceSchema, diagnostics),
+      canvasPricePerM2: readWithFallback(source, 'print.canvas_price_per_m2', nonNegativePriceSchema, diagnostics),
+      minimumBillableAreaM2: readWithFallback(source, 'print.minimum_billable_area_m2', positiveAreaSchema, diagnostics),
     },
     stretcher: {
       pricesPerMeter: {
-        narrow: readWithFallback(source, 'stretcher.stretcher_price_per_meter_narrow', z.number().nonnegative(), diagnostics),
-        wide: readWithFallback(source, 'stretcher.stretcher_price_per_meter_wide', z.number().nonnegative(), diagnostics),
+        narrow: readWithFallback(source, 'stretcher.stretcher_price_per_meter_narrow', nonNegativePriceSchema, diagnostics),
+        wide: readWithFallback(source, 'stretcher.stretcher_price_per_meter_wide', nonNegativePriceSchema, diagnostics),
       },
-      narrowMaxWidthMm: readWithFallback(source, 'stretcher.stretcher_narrow_max_width_mm', z.number().nonnegative(), diagnostics),
-      narrowMaxHeightMm: readWithFallback(source, 'stretcher.stretcher_narrow_max_height_mm', z.number().nonnegative(), diagnostics),
+      narrowMaxWidthMm: readWithFallback(source, 'stretcher.stretcher_narrow_max_width_mm', millimeterLimitSchema, diagnostics),
+      narrowMaxHeightMm: readWithFallback(source, 'stretcher.stretcher_narrow_max_height_mm', millimeterLimitSchema, diagnostics),
     },
     materials: {
       glass: readWithFallback(source, 'materials.glass', materialRateSchema, diagnostics),
@@ -198,7 +265,9 @@ export async function getBaguetteExtrasPricingConfig() {
   });
 
   const source = mapRowsToValues(rows);
+  const loadedKeys = Object.keys(source);
   const { config, diagnostics } = buildConfig(source);
+  const completeness = checkBaguettePricingCompleteness(loadedKeys);
 
   if (diagnostics.fallbackUsedKeys.length > 0) {
     const fallbackSummary = diagnostics.fallbackUsedKeys
@@ -207,11 +276,21 @@ export async function getBaguetteExtrasPricingConfig() {
     console.warn(`[baguette-pricing] Fallback defaults are used for keys: ${fallbackSummary}`);
   }
 
+  if (!completeness.isComplete) {
+    console.warn(`[baguette-pricing] Missing required admin keys: ${completeness.missingRequiredKeys.join(', ')}`);
+  }
+
+  if (completeness.unknownKeys.length > 0) {
+    console.warn(`[baguette-pricing] Unknown baguette pricing keys found in DB: ${completeness.unknownKeys.join(', ')}`);
+  }
+
   return {
     config,
-    loadedKeys: Object.keys(source),
+    loadedKeys,
     fallbackUsedKeys: diagnostics.fallbackUsedKeys,
-    missingKeys: allDefaultKeys.filter((key) => !(key in source)),
+    missingKeys: completeness.missingRequiredKeys,
+    unknownKeys: completeness.unknownKeys,
+    isComplete: completeness.isComplete,
   };
 }
 
