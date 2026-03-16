@@ -43,6 +43,8 @@ type HomePageContentProps = {
   heroSecondaryButtonText: string;
   portfolioBlockTitle: string;
   portfolioBlockDescription: string;
+  heroImageSrc: string;
+  heroImageAlt: string;
 };
 
 const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
@@ -93,7 +95,7 @@ const serviceImageById: Record<string, string> = {
 };
 
 
-export default function HomePageContent({ services, faq, messages, featuredPortfolioItems, heroTitle, heroDescription, heroPrimaryButtonText, heroSecondaryButtonText, portfolioBlockTitle, portfolioBlockDescription }: HomePageContentProps) {
+export default function HomePageContent({ services, faq, messages, featuredPortfolioItems, heroTitle, heroDescription, heroPrimaryButtonText, heroSecondaryButtonText, portfolioBlockTitle, portfolioBlockDescription, heroImageSrc, heroImageAlt }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -141,8 +143,8 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
             />
             <div className="relative ml-2 sm:ml-6 lg:ml-10">
               <Image
-                src="/images/home_page/hero.png"
-                alt="Рекламный световой лайтбокс"
+                src={heroImageSrc}
+                alt={heroImageAlt}
                 width={980}
                 height={760}
                 priority
