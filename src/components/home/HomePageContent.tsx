@@ -37,6 +37,12 @@ type HomePageContentProps = {
   faq: any[];
   messages: SiteMessages;
   featuredPortfolioItems: Array<{ id: string; title: string; description: string; imageSrc: string }>;
+  heroTitle: string;
+  heroDescription: string;
+  heroPrimaryButtonText: string;
+  heroSecondaryButtonText: string;
+  portfolioBlockTitle: string;
+  portfolioBlockDescription: string;
 };
 
 const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
@@ -87,7 +93,7 @@ const serviceImageById: Record<string, string> = {
 };
 
 
-export default function HomePageContent({ services, faq, messages, featuredPortfolioItems }: HomePageContentProps) {
+export default function HomePageContent({ services, faq, messages, featuredPortfolioItems, heroTitle, heroDescription, heroPrimaryButtonText, heroSecondaryButtonText, portfolioBlockTitle, portfolioBlockDescription }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -99,19 +105,19 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
               <p className="t-eyebrow inline-flex rounded-full border border-[#efb9b9] bg-[#fff7f7] px-4 py-1.5 text-[var(--brand-red)]">
                 ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
               </p>
-              <AnimatedBlurHeadline className="t-h1 max-w-[16ch]" text="Производство рекламы под ключ" breakAfterWord={1} />
-              <p className="t-body text-muted-foreground max-w-[40rem]">Вывески, печать, конструкции и монтаж. От идеи до установки.</p>
+              <AnimatedBlurHeadline className="t-h1 max-w-[16ch]" text={heroTitle} breakAfterWord={1} />
+              <p className="t-body text-muted-foreground max-w-[40rem]">{heroDescription}</p>
             </div>
 
             <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end">
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
                 <Link className="btn-primary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
-                  Рассчитать стоимость
+                  {heroPrimaryButtonText}
                 </Link>
               </motion.div>
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
                 <Link className="btn-secondary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/portfolio" aria-label="Перейти в портфолио">
-                  Смотреть портфолио
+                  {heroSecondaryButtonText}
                 </Link>
               </motion.div>
             </div>
@@ -192,8 +198,8 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-8">
           <div className="space-y-2">
             <p className="t-eyebrow">ПОРТФОЛИО</p>
-            <h2 className="t-h2">Примеры работ</h2>
-            <p className="t-body text-muted-foreground max-w-2xl">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
+            <h2 className="t-h2">{portfolioBlockTitle}</h2>
+            <p className="t-body text-muted-foreground max-w-2xl">{portfolioBlockDescription}</p>
           </div>
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>

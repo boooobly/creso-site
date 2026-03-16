@@ -4,12 +4,14 @@ import faqLocal from '@/data/faq.json';
 import { getServices, getFaq } from '@/lib/contentful';
 import { messages } from '@/lib/messages';
 import { getFeaturedPortfolioItems } from '@/lib/public-portfolio';
+import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 
 export default async function Home() {
-  const [sCMS, fCMS, featuredPortfolio] = await Promise.all([
+  const [sCMS, fCMS, featuredPortfolio, contentMap] = await Promise.all([
     getServices().catch(() => null),
     getFaq().catch(() => null),
     getFeaturedPortfolioItems(3).catch(() => []),
+    getPageContentMap('home'),
   ]);
 
   const services = (sCMS ?? servicesLocal) as any[];
@@ -68,6 +70,24 @@ export default async function Home() {
     imageSrc: item.image,
   }));
 
+
+  const homeHeroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Производство рекламы под ключ');
+  const homeHeroDescription = getPageContentValue(
+    contentMap,
+    'hero',
+    'description',
+    'Вывески, печать, конструкции и монтаж. От идеи до установки.'
+  );
+  const homeHeroPrimaryButtonText = getPageContentValue(contentMap, 'hero', 'primaryButtonText', 'Рассчитать стоимость');
+  const homeHeroSecondaryButtonText = getPageContentValue(contentMap, 'hero', 'secondaryButtonText', 'Смотреть портфолио');
+  const portfolioBlockTitle = getPageContentValue(contentMap, 'portfolio_preview', 'title', 'Примеры работ');
+  const portfolioBlockDescription = getPageContentValue(
+    contentMap,
+    'portfolio_preview',
+    'description',
+    'Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.'
+  );
+
   const servicesWithHref = services.map((service) => ({
     id: String(service.id),
     title: String(service.title),
@@ -82,6 +102,12 @@ export default async function Home() {
         faq={faq}
         messages={messages}
         featuredPortfolioItems={featuredPortfolioItems}
+        heroTitle={homeHeroTitle}
+        heroDescription={homeHeroDescription}
+        heroPrimaryButtonText={homeHeroPrimaryButtonText}
+        heroSecondaryButtonText={homeHeroSecondaryButtonText}
+        portfolioBlockTitle={portfolioBlockTitle}
+        portfolioBlockDescription={portfolioBlockDescription}
       />
     </div>
   );

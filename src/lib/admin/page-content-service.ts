@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { listQuerySchema, pageContentSchema } from './validation';
 
@@ -27,6 +28,65 @@ export async function listPageContentItems(filters: PageContentFilters) {
   ]);
 
   return { items, total, page: pagination.page, pageSize: pagination.pageSize };
+}
+
+export async function listPageContentByPageKey(pageKey: string) {
+  return prisma.pageContent.findMany({
+    where: { pageKey },
+    orderBy: [{ sectionKey: 'asc' }, { sortOrder: 'asc' }, { fieldKey: 'asc' }]
+  });
+}
+
+export function toPageContentStringMap(items: Array<{ sectionKey: string; fieldKey: string; value: Prisma.JsonValue }>) {
+  const map = new Map<string, string>();
+
+  for (const item of items) {
+    const key = `${item.sectionKey}.${item.fieldKey}`;
+    const value = typeof item.value === 'string' ? item.value : '';
+    map.set(key, value);
+  }
+
+  return map;
+}
+
+export async function upsertPageContentFields(
+  pageKey: string,
+  entries: Array<{
+    sectionKey: string;
+    fieldKey: string;
+    label: string;
+    value: string;
+    sortOrder: number;
+  }>
+) {
+  return prisma.$transaction(
+    entries.map((entry) =>
+      prisma.pageContent.upsert({
+        where: {
+          pageKey_sectionKey_fieldKey: {
+            pageKey,
+            sectionKey: entry.sectionKey,
+            fieldKey: entry.fieldKey
+          }
+        },
+        create: {
+          pageKey,
+          sectionKey: entry.sectionKey,
+          fieldKey: entry.fieldKey,
+          value: entry.value,
+          type: 'string',
+          label: entry.label,
+          sortOrder: entry.sortOrder
+        },
+        update: {
+          value: entry.value,
+          label: entry.label,
+          sortOrder: entry.sortOrder,
+          type: 'string'
+        }
+      })
+    )
+  );
 }
 
 export async function createPageContentItem(payload: unknown) {
