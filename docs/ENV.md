@@ -19,6 +19,7 @@ Use this matrix when configuring variables in Vercel:
 | `SEND_CUSTOMER_EMAILS` | Optional | Optional | Optional | Boolean flag, defaults to `false` when omitted. |
 | `PAYMENT_WEBHOOK_SECRET` | Optional* | Optional* | Optional* | Set this if/when payment webhook signature verification is enabled in your deployment. |
 | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Optional | Optional | Optional | If Telegram sending is enabled, both values must be set together. |
+| `BLOB_READ_WRITE_TOKEN` | Optional for local image upload testing | Required if admin image uploads are enabled | Required if admin image uploads are enabled | Vercel Blob token used by `/api/admin/upload-image` for portfolio and site images. |
 
 \* `PAYMENT_WEBHOOK_SECRET` is included here for deployment completeness, but only needs to be configured if your project/environment uses payment webhook signing.
 

@@ -48,6 +48,7 @@ function formDataToPayload(formData: FormData) {
     category: String(formData.get('category') ?? '').trim(),
     shortDescription: String(formData.get('shortDescription') ?? '').trim() || undefined,
     coverImage: String(formData.get('coverImage') ?? '').trim() || undefined,
+    coverImageAssetId: String(formData.get('coverImageAssetId') ?? '').trim() || undefined,
     galleryImages: parseGalleryImages(formData.get('galleryImages')),
     featured: parseBoolean(formData.get('featured')),
     published: parseBoolean(formData.get('published')),

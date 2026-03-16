@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import ImageUploadField from '@/components/admin/media/ImageUploadField';
 
 type PortfolioFormValues = {
   title: string;
@@ -9,6 +10,7 @@ type PortfolioFormValues = {
   category: string;
   shortDescription: string;
   coverImage: string;
+  coverImageAssetId: string;
   galleryImages: string;
   featured: boolean;
   published: boolean;
@@ -67,7 +69,7 @@ export default function PortfolioForm({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
             <label htmlFor="title" className="text-sm font-medium text-slate-700">
-              Название работы
+              Название
             </label>
             <input
               id="title"
@@ -115,7 +117,7 @@ export default function PortfolioForm({
 
           <div className="space-y-2 sm:col-span-2">
             <label htmlFor="shortDescription" className="text-sm font-medium text-slate-700">
-              Короткое описание
+              Описание
             </label>
             <textarea
               id="shortDescription"
@@ -127,31 +129,17 @@ export default function PortfolioForm({
             />
           </div>
 
-          <div className="space-y-2 sm:col-span-2">
-            <label htmlFor="coverImage" className="text-sm font-medium text-slate-700">
-              Ссылка на обложку
-            </label>
-            <input
-              id="coverImage"
+          <div className="sm:col-span-2">
+            <ImageUploadField
+              label="Изображение"
+              folder="portfolio"
               name="coverImage"
-              type="url"
-              defaultValue={initialValues.coverImage}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-              placeholder="https://..."
+              assetIdName="coverImageAssetId"
+              initialUrl={initialValues.coverImage}
+              initialAssetId={initialValues.coverImageAssetId}
+              hint="Загрузите изображение для карточки работы. Можно заменить в любой момент."
             />
           </div>
-
-          {initialValues.coverImage ? (
-            <div className="sm:col-span-2">
-              <p className="mb-2 text-xs text-slate-500">Текущая обложка</p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={initialValues.coverImage}
-                alt="Обложка работы"
-                className="h-40 w-full rounded-lg border border-slate-200 object-cover sm:w-80"
-              />
-            </div>
-          ) : null}
 
           <div className="space-y-2 sm:col-span-2">
             <label htmlFor="galleryImages" className="text-sm font-medium text-slate-700">
@@ -170,7 +158,7 @@ export default function PortfolioForm({
 
           <div className="space-y-2">
             <label htmlFor="sortOrder" className="text-sm font-medium text-slate-700">
-              Порядок показа
+              Порядок
             </label>
             <input
               id="sortOrder"
@@ -185,7 +173,7 @@ export default function PortfolioForm({
           <div className="flex flex-col justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
             <label className="inline-flex items-center gap-2 text-sm text-slate-700">
               <input type="checkbox" name="published" defaultChecked={initialValues.published} className="h-4 w-4" />
-              Опубликовать на сайте
+              Показывать на сайте
             </label>
             <label className="inline-flex items-center gap-2 text-sm text-slate-700">
               <input type="checkbox" name="featured" defaultChecked={initialValues.featured} className="h-4 w-4" />
