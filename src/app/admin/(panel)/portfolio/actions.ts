@@ -133,6 +133,8 @@ export async function createPortfolioItemAction(_: ActionResult, formData: FormD
     await createPortfolioItem(parsed);
 
     revalidatePath('/admin/portfolio');
+    revalidatePath('/portfolio');
+    revalidatePath('/');
     shouldRedirect = true;
   } catch (error) {
     console.error('[admin][portfolio][create] failed', error);
@@ -170,6 +172,8 @@ export async function updatePortfolioItemAction(
 
     revalidatePath('/admin/portfolio');
     revalidatePath(`/admin/portfolio/${id}`);
+    revalidatePath('/portfolio');
+    revalidatePath('/');
     shouldRedirect = true;
   } catch (error) {
     console.error('[admin][portfolio][update] failed', { id, error });
@@ -193,15 +197,21 @@ export async function updatePortfolioItemAction(
 export async function removePortfolioItemAction(id: string) {
   await deletePortfolioItem(id);
   revalidatePath('/admin/portfolio');
+  revalidatePath('/portfolio');
+  revalidatePath('/');
   redirect('/admin/portfolio?success=deleted');
 }
 
 export async function quickTogglePortfolioPublishAction(id: string, nextPublished: boolean) {
   await updatePortfolioItem(id, { published: nextPublished });
   revalidatePath('/admin/portfolio');
+  revalidatePath('/portfolio');
+  revalidatePath('/');
 }
 
 export async function quickTogglePortfolioFeaturedAction(id: string, nextFeatured: boolean) {
   await updatePortfolioItem(id, { featured: nextFeatured });
   revalidatePath('/admin/portfolio');
+  revalidatePath('/portfolio');
+  revalidatePath('/');
 }

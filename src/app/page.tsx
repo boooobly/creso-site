@@ -3,11 +3,13 @@ import servicesLocal from '@/data/services.json';
 import faqLocal from '@/data/faq.json';
 import { getServices, getFaq } from '@/lib/contentful';
 import { messages } from '@/lib/messages';
+import { getFeaturedPortfolioItems } from '@/lib/public-portfolio';
 
 export default async function Home() {
-  const [sCMS, fCMS] = await Promise.all([
+  const [sCMS, fCMS, featuredPortfolio] = await Promise.all([
     getServices().catch(() => null),
     getFaq().catch(() => null),
+    getFeaturedPortfolioItems(3).catch(() => []),
   ]);
 
   const services = (sCMS ?? servicesLocal) as any[];
@@ -34,6 +36,38 @@ export default async function Home() {
     return `/${service.slug}`;
   };
 
+
+  const featuredPortfolioItems = (featuredPortfolio.length > 0
+    ? featuredPortfolio
+    : [
+        {
+          id: 'som',
+          title: 'Рекламная стела для СОМ',
+          shortDescription:
+            'Многоуровневая рекламная конструкция с яркими рекламными блоками для сети строительных материалов.',
+          image: '/images/home_page/examples_of_work/som.png',
+        },
+        {
+          id: 'nevinnomyssk',
+          title: 'Въездная стела Невинномысск',
+          shortDescription:
+            'Крупная городская конструкция с объемными элементами и чистой современной подачей.',
+          image: '/images/home_page/examples_of_work/nevinnomyssk.png',
+        },
+        {
+          id: 'apple-time',
+          title: 'Световой лайтбокс Apple Time',
+          shortDescription:
+            'Подвесной световой короб для торговой точки с аккуратной подсветкой и читаемой навигацией.',
+          image: '/images/home_page/examples_of_work/apple.png',
+        },
+      ]).map((item) => ({
+    id: item.id,
+    title: item.title,
+    description: item.shortDescription ?? '',
+    imageSrc: item.image,
+  }));
+
   const servicesWithHref = services.map((service) => ({
     id: String(service.id),
     title: String(service.title),
@@ -43,7 +77,12 @@ export default async function Home() {
 
   return (
     <div className="home-page-root">
-      <HomePageContent services={servicesWithHref} faq={faq} messages={messages} />
+      <HomePageContent
+        services={servicesWithHref}
+        faq={faq}
+        messages={messages}
+        featuredPortfolioItems={featuredPortfolioItems}
+      />
     </div>
   );
 }
