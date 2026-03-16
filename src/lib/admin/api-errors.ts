@@ -18,6 +18,13 @@ export function handleAdminApiError(error: unknown) {
     if (error.code === 'P2025') {
       return NextResponse.json({ ok: false, error: 'Запись не найдена.' }, { status: 404 });
     }
+
+    if (error.code === 'P2022') {
+      return NextResponse.json(
+        { ok: false, error: 'Структура базы данных не обновлена. Примените последние миграции Prisma.' },
+        { status: 500 }
+      );
+    }
   }
 
   const message = error instanceof Error ? error.message : 'Unknown server error.';
