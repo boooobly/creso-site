@@ -1,24 +1,21 @@
 import { Prisma } from '@prisma/client';
-import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import {
   BAGUETTE_EXTRAS_DEFAULT_ENTRIES,
   BAGUETTE_EXTRAS_PRICING_CATEGORY,
   getBaguetteExtrasPricingConfig,
+  parseAndValidateBaguettePricingValue,
 } from '@/lib/baget/baguetteExtrasPricing';
 
-const numberValueSchema = z.number().nonnegative();
-const materialSchema = z.object({
-  areaPricePerM2: z.number().nonnegative(),
-  cuttingPricePerM: z.number().nonnegative(),
-});
-const autoSchema = z.object({
-  pvcType: z.enum(['none', 'pvc3', 'pvc4']),
-  addOrabond: z.boolean(),
-  forceCardboard: z.boolean(),
-  stretchingRequired: z.boolean(),
-  removeCardboard: z.boolean(),
-});
+export const BAGUETTE_PRICING_ADMIN_GROUPS = [
+  { id: 'glazing-materials', title: 'Стекло и лицевые материалы', description: 'Стекло, оргстекло, ПЭТ и их резка.', keys: ['materials.glass', 'materials.anti_reflective_glass', 'materials.plexiglass', 'materials.pet1mm'] },
+  { id: 'backing-support', title: 'Основа и поддержка', description: 'Картон, ПВХ, Orabond, базовые правила подложки.', keys: ['materials.cardboard', 'materials.pvc3', 'materials.pvc4', 'materials.orabond', 'auto_additions.default', 'auto_additions.photo', 'auto_additions.rhinestone', 'auto_additions.embroidery', 'auto_additions.beads'] },
+  { id: 'hanging-mounting', title: 'Подвесы и крепёж', description: 'Крокодильчики, тросики и петли.', keys: ['hanging.crocodile_price', 'hanging.crocodile_double_threshold_width_mm', 'hanging.wire_price_per_meter_width', 'hanging.wire_loop_price', 'hanging.wire_loop_default_qty'] },
+  { id: 'passepartout-options', title: 'Паспарту и оформление', description: 'Паспарту и параметры оформления.', keys: ['materials.passepartout'] },
+  { id: 'stretcher-structural', title: 'Подрамник и конструкция', description: 'Тарифы подрамника и ограничения по размерам.', keys: ['stretcher.stretcher_price_per_meter_narrow', 'stretcher.stretcher_price_per_meter_wide', 'stretcher.stretcher_narrow_max_width_mm', 'stretcher.stretcher_narrow_max_height_mm', 'auto_additions.stretched_canvas'] },
+  { id: 'print-related', title: 'Печать для багета', description: 'Тариф печати и минимальная тарифицируемая площадь.', keys: ['print.paper_price_per_m2', 'print.canvas_price_per_m2', 'print.minimum_billable_area_m2'] },
+  { id: 'other-baguette', title: 'Прочие параметры', description: 'Подставка и прочие настройки калькулятора.', keys: ['stand.stand_price', 'stand.stand_max_width_mm', 'stand.stand_max_height_mm'] },
+] as const;
 
 export async function ensureBaguetteExtrasPricingEntries() {
   for (const entry of BAGUETTE_EXTRAS_DEFAULT_ENTRIES) {
@@ -82,20 +79,13 @@ export async function listBaguetteExtrasPricingAdminData() {
     histories,
     fallbackUsedKeys: runtimeConfig.fallbackUsedKeys,
     missingKeys: runtimeConfig.missingKeys,
+    unknownKeys: runtimeConfig.unknownKeys,
+    isComplete: runtimeConfig.isComplete,
+    groupedSections: BAGUETTE_PRICING_ADMIN_GROUPS.map((section) => ({
+      ...section,
+      entries: entriesWithDescription.filter((entry) => (section.keys as readonly string[]).includes(`${entry.subcategory}.${entry.key}`)),
+    })).filter((section) => section.entries.length > 0),
   };
-}
-
-function parseUpdatedValue(type: string, rawValue: string): Prisma.InputJsonValue {
-  if (type === 'number') {
-    return numberValueSchema.parse(Number(rawValue));
-  }
-
-  const parsedJson = JSON.parse(rawValue) as unknown;
-  if (parsedJson && typeof parsedJson === 'object' && 'pvcType' in parsedJson) {
-    return autoSchema.parse(parsedJson);
-  }
-
-  return materialSchema.parse(parsedJson);
 }
 
 export async function updateBaguetteExtrasPricingEntry(entryId: string, rawValue: string, note?: string) {
@@ -108,7 +98,8 @@ export async function updateBaguetteExtrasPricingEntry(entryId: string, rawValue
     throw new Error('Разрешено редактировать только конфигурацию доп. материалов багета.');
   }
 
-  const newValue = parseUpdatedValue(entry.type, rawValue);
+  const compositeKey = `${entry.subcategory}.${entry.key}`;
+  const newValue = parseAndValidateBaguettePricingValue(compositeKey, entry.type, rawValue) as Prisma.InputJsonValue;
 
   return prisma.$transaction(async (tx) => {
     const updated = await tx.pricingEntry.update({

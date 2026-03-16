@@ -1,41 +1,50 @@
-# Baguette pricing admin system (phase 1)
+# Baguette pricing admin system
 
-## Source of truth split
-- **Google Sheets remains source of truth** for baguette catalog/base frame data: availability, SKU/article, title, images, base baguette `price_per_meter`.
-- **Database/admin is now source of truth** for all non-baguette extra pricing/config used by baguette calculator/order flow.
+## 1) Source of truth boundary
+- **Google Sheets only**: baguette catalog/base frame data (`availability`, `article`/SKU, title, images, `price_per_meter`).
+- **Admin DB only**: every other value used by baguette calculation/order flow (materials, print rates, thresholds, hangers, stretcher values, auto-addition rules).
 
-## DB storage
-- Config entries are stored in `PricingEntry` under category `baguette-extra-pricing`.
-- Defaults/backfill are defined in `data/baguette-extras-pricing-defaults.json` and seeded via `prisma/seed.js`.
-- Entry types:
-  - `number` for scalar values,
-  - `json` for structured configs (material pair rates, auto-addition rules).
-- Baguette print pricing is stored in baguette config keys (`print.paper_price_per_m2`, `print.canvas_price_per_m2`, `print.minimum_billable_area_m2`) and no longer resolved from wide-format config.
+## 2) Where baguette pricing lives
+- Data is stored in `PricingEntry` with category `baguette-extra-pricing`.
+- Required key set + safe defaults are defined in `data/baguette-extras-pricing-defaults.json`.
+- Loader/parser/completeness logic is centralized in `src/lib/baget/baguetteExtrasPricing.ts`.
 
-## Runtime resolution flow
-1. `getBaguetteExtrasPricingConfig()` loads active entries from `PricingEntry` (`baguette-extra-pricing`).
-2. Values are parsed/validated by schema (`zod`) in `src/lib/baget/baguetteExtrasPricing.ts`.
-3. Missing/malformed values automatically fall back to known-safe defaults from `data/baguette-extras-pricing-defaults.json`, and a server warning is logged with affected keys/reasons.
-4. `bagetQuote()` receives this config and uses it instead of hardcoded constants.
+## 3) Runtime behavior
+1. `getBaguetteExtrasPricingConfig()` loads active admin keys.
+2. Keys are validated by per-key schemas.
+3. If a key is missing or invalid, fallback default is applied.
+4. Any fallback usage is logged on server (`console.warn`) with key + reason.
+5. `bagetQuote()` uses only:
+   - base baguette frame price from Google Sheets,
+   - non-frame extras from this admin pricing config.
 
-Fallbacks are explicit and centralized to make later hard-fail mode easy.
+## 4) Required keys / completeness check
+- `BAGUETTE_PRICING_REQUIRED_KEYS` defines the required baguette pricing keys.
+- `checkBaguettePricingCompleteness()` returns:
+  - `isComplete`,
+  - `missingRequiredKeys`,
+  - `unknownKeys`.
+- This check is used by admin/runtime to make missing config visible during maintenance.
 
-## Admin editing
-- Admin pricing page includes a dedicated baguette config section with grouped blocks (materials, print, hanging, stretcher, auto rules).
-- Office staff can edit every calculator input key used in this phase.
-- Numeric entries use numeric input; structured entries use JSON textarea.
-- Optional note field is supported on save.
+## 5) Admin UX and safety
+- Baguette pricing is grouped into business sections (materials, backing/support, mounting, passepartout, stretcher, print, other).
+- Edit validation uses key-specific schemas with range limits and friendly error messages.
+- Invalid values are rejected and cannot silently break calculations.
+- Admin page shows:
+  - completeness status,
+  - fallback usage warning,
+  - missing keys warning,
+  - unknown key warning.
 
-## History logging
-- Every update creates a `PricingEntryHistory` row with:
-  - entry reference (`pricingEntryId`),
-  - key identity (`category`, `subcategory`, `key`),
-  - `oldValue`, `newValue`,
-  - `createdAt`, optional `note`.
-- Admin page shows recent change history summary.
-- Admin page also shows fallback/missing key warnings to make incomplete DB state visible.
+## 6) History logging
+- Every edit writes a read-only `PricingEntryHistory` record with old/new value, key identity and optional note.
+- Admin page shows recent changes in a human-readable list (what key changed, when, before/after, note).
 
-## Extension points
-- Add new calculator-config keys by appending to `data/baguette-extras-pricing-defaults.json`.
-- Add parser support in `parseUpdatedValue` and `buildConfig` mappings.
-- When ready, remove fallback behavior by enforcing strict completeness checks in loader.
+## 7) How to extend safely
+When adding a new baguette pricing parameter:
+1. Add key/default metadata to `data/baguette-extras-pricing-defaults.json`.
+2. Add schema mapping in `BAGUETTE_KEY_SCHEMAS`.
+3. Add the key into `buildConfig()` mapping and admin group section.
+4. Verify the key appears in completeness check and admin warnings.
+
+This prevents reintroducing hardcoded constants or hidden secondary sources of truth.
