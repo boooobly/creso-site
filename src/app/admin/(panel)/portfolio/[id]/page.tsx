@@ -39,6 +39,7 @@ export default async function AdminPortfolioEditPage({ params }: AdminPortfolioE
           category: item.category,
           shortDescription: item.shortDescription ?? '',
           coverImage: item.coverImage ?? '',
+          coverImageAssetId: item.coverImageAssetId ?? '',
           galleryImages: Array.isArray(item.galleryImages) ? item.galleryImages.join('\n') : '',
           featured: item.featured,
           published: item.published,
