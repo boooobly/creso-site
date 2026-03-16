@@ -1,442 +1,399 @@
-# Site pricing admin migration audit
+# Site pricing admin migration audit (non-baguette scope)
 
 ## Overview
-This audit maps all pricing logic that still lives outside the admin-managed DB layer.
+This document audits **only pricing systems outside the Baguette flow** and maps what still is not admin-managed.
 
-### Current target state
-- **Already done for baguette**: Google Sheets is used only for baguette catalog/base frame data, while non-catalog baguette pricing is admin-managed (`PricingEntry` + history).
-- **Still pending for the rest of services**: pricing logic for wide format, print, heat-transfer, mugs, plotter and milling is mostly code-configured (constants in TS modules and UI strings), not managed via admin DB.
+### Scope boundary
+- Included: wide format, plotter cutting, heat transfer / apparel, print, business cards, mugs, milling, and cross-service quote paths.
+- Excluded: baguette pricing/admin internals (already advanced and intentionally out of scope for this task).
 
-### Existing admin building blocks
-- Generic key/value pricing storage exists: `PricingEntry` (`category`, `subcategory`, `key`, `value`, `type`, `unit`).
-- Generic price list storage exists: `PriceCategory` + `PriceItem` (flat rows).
-- Baguette-specific enhancement exists: strict per-key parsing, completeness checks, fallback diagnostics and history UI.
-
-These blocks are a good base, but the non-baguette calculators currently do not read from them.
+### Current situation
+Most non-baguette pricing is still defined in code/config modules (`src/lib/pricing-config/*`) and consumed by calculators/APIs/UI. The admin panel has foundational pricing entities, but non-baguette calculators do not use them as runtime source-of-truth yet.
 
 ---
 
-## Pricing sources by service
+## Service-by-service pricing audit
 
-## 1) Baguette (reference baseline: mostly migrated)
-### Current source of truth
-- Catalog/base frame price (`price_per_meter`) remains Google Sheets (+ JSON fallback for resilience).
-- Non-catalog extras/thresholds/rules are loaded from `PricingEntry` (`baguette-extra-pricing`) with fallback/default diagnostics.
+## 1) Wide format printing
+### Where pricing lives now
+- `src/lib/pricing-config/wideFormat.ts`
+- `src/lib/calculations/wideFormatPricing.ts`
+- `src/app/api/quotes/wide-format/route.ts`
+- `src/app/api/wide-format-order/route.ts`
+- `src/components/WideFormatPricingCalculator.tsx`
+- `src/app/(public)/wide-format-printing/page.tsx`
 
-### Main files
-- `src/lib/baget/sheetsCatalog.ts`
-- `src/lib/baget/baguetteExtrasPricing.ts`
-- `src/lib/calculations/bagetQuote.ts`
-- `src/lib/admin/baguette-extras-pricing-service.ts`
-- `src/app/admin/(panel)/pricing/page.tsx`
+### Non-admin-managed pricing values
+- **Structured matrix/table**: `pricesRUBPerM2` by material.
+- **Formula parameters / thresholds**: `maxWidth`, `maxWidthByMaterial`, `bannerJoinSeamWidthThreshold`.
+- **Per-meter / per-piece / percentage extras**:
+  - edge gluing (`edgeGluingPerimeterPrice`),
+  - image welding (`imageWeldingPerimeterPrice`),
+  - grommets (`grommetPrice`, `grommetStepM`),
+  - plotter cut estimate (`plotterCutPerimeterPrice`, `plotterCutMinimumFee`),
+  - positioning marks cut (`positioningMarksCutPercent`).
+- **Minimum charge**: `minimumPrintPriceRUB`.
 
-### Notes for global migration
-- Baguette provides the pattern to reuse for other services: required keys, parser guardrails, fallback visibility, completeness checks, history.
+### Visibility
+- **Calculator-facing**: main formula.
+- **User-facing**: calculator labels and summary rows include hardcoded price hints and minimums.
 
----
+### Source of truth today
+- Primary: `WIDE_FORMAT_PRICING_CONFIG` in code.
+- Secondary display copies: hardcoded UI text in calculator/page.
 
-## 2) Wide format printing
-### Current source of truth
-**Not admin-managed.** Pricing is code-configured in `WIDE_FORMAT_PRICING_CONFIG`.
-
-### Pricing values currently outside admin
-- Material `pricesRUBPerM2` matrix.
-- `minimumPrintPriceRUB` minimum order floor.
-- Extra-service rates:
-  - `edgeGluingPerimeterPrice` (per meter),
-  - `imageWeldingPerimeterPrice` (per meter),
-  - `grommetPrice` + `grommetStepM`,
-  - `plotterCutPerimeterPrice` + `plotterCutMinimumFee`,
-  - `positioningMarksCutPercent` (+%).
-- Formula thresholds/constraints:
-  - `bannerJoinSeamWidthThreshold`,
-  - `maxWidth`, `maxWidthByMaterial`.
-
-### Main files
-- Config + material catalog: `src/lib/pricing-config/wideFormat.ts`.
-- Calculation formula: `src/lib/calculations/wideFormatPricing.ts`.
-- Quote API: `src/app/api/quotes/wide-format/route.ts`.
-- Order API path using same formula: `src/app/api/wide-format-order/route.ts`.
-- User UI with rate text: `src/components/WideFormatPricingCalculator.tsx`.
-- Marketing text with discount claim: `src/app/(public)/wide-format-printing/page.tsx`.
-
-### Complexity
-**Medium-high.**
-- Has matrix + formula + thresholds + UI labels tied to material taxonomy.
-- A good candidate for first non-baguette migration because business impact is high and model shape is clear.
+### Complexity / risk
+- **Medium-high**: matrix + formula + duplicated UI strings.
+- Risk of drift between formula values and displayed labels if migrated partially.
 
 ---
 
-## 3) Print (offset business-card style calculator)
-### Current source of truth
-**Not admin-managed.** Pricing is code-configured in `PRINT_PRICING_CONFIG`; business card calculator also has separate code-config.
+## 2) Plotter cutting
+### Where pricing lives now
+- `src/lib/pricing-config/plotterCutting.ts`
+- `src/lib/calculations/plotterCuttingPricing.ts`
+- `src/lib/engine/index.ts` (exposes quote function/catalog)
+- `src/app/(public)/plotter-cutting/page.tsx`
 
-### Pricing values currently outside admin
-- `minimumQuantity`.
-- `basePer100` by product type.
-- Coefficients: density, side, lamination, size.
-- Business-card tiering logic:
-  - allowed quantities,
-  - quantity -> unit-price step function,
-  - `LAMINATION_MULTIPLIER`.
-
-### Main files
-- Print config: `src/lib/pricing-config/print.ts`.
-- Print formula: `src/lib/calculations/printPricing.ts`.
-- Business-card config/formula: `src/lib/pricing-config/business-cards.ts`.
-- UI/summary/forms:
-  - `src/components/PrintPricingCalculator.tsx`,
-  - `src/components/OrderBusinessCardsForm.tsx`,
-  - `src/app/(public)/print/page.tsx`.
-- API currently trusts client-provided `unitPrice`/`totalPrice` instead of recomputing server-side:
-  - `src/app/api/requests/business-cards/route.ts`.
-
-### Complexity
-**Medium.**
-- Formula is simpler than wide format.
-- Main risk is duplicate pricing logic (generic print + business-card specific) and server trusting client totals.
-
----
-
-## 4) Heat transfer (calculator path)
-### Current source of truth
-**Not admin-managed.** Core rates and discount policy are code-configured.
-
-### Pricing values currently outside admin
-- `discountThreshold`, `discountRate`.
-- Mug price matrix by mug type + print type.
-- T-shirt unit prices (`ownClothes`, `companyClothes`).
-- Film rates:
-  - `unitPricePerMeter`,
-  - `transferPrice`,
-  - `urgentMultiplier`,
-  - `minimumOrderTotal`.
-
-### Main files
-- Config: `src/lib/pricing-config/heatTransfer.ts`.
-- Formula: `src/lib/calculations/heatTransferPricing.ts`.
-- Quote API: `src/app/api/quotes/heat-transfer/route.ts`.
-- UI calculator consuming API: `src/components/HeatTransferCalculator.tsx`.
-
-### Additional risk
-- `src/app/api/heat-transfer/route.ts` accepts client-sent `pricing` payload and forwards it in notifications; this endpoint does not recompute pricing server-side.
-
-### Complexity
-**Medium.**
-- Structured but straightforward; data fits the baguette-like key/value+JSON approach.
-
----
-
-## 5) Heat transfer landing / T-shirt service page (separate from calculator)
-### Current source of truth
-**Not admin-managed.** Pricing chips/cards are hardcoded marketing text.
-
-### Pricing values currently outside admin
-- Fixed display values: `A4 - 250 ₽/сторона`, `Футболки - от 500 ₽`, etc.
-- Pricing FAQ statements and hero fallback text include fixed prices.
-
-### Main files
-- `src/components/heat-transfer/TshirtsLanding.tsx`
-- `src/app/(public)/heat-transfer/page.tsx`
-- `src/components/OrderTshirtsForm.tsx` (transfer option label has fixed `250 ₽/сторона`)
-
-### Complexity
-**Low-medium** for data source migration, but **high consistency risk** if left detached from calculator pricing.
-
----
-
-## 6) Mugs (designer + landing)
-### Current source of truth
-**Not admin-managed.** Core mug calculator pricing lives in component constants.
-
-### Pricing values currently outside admin
-- `MUG_UNIT_PRICE = 450`.
-- Volume discount policy:
-  - step quantity `12`,
-  - step rate `2.5%`,
-  - max discount `20%`.
-- Hardcoded price displays in service page (`450 ₽`) and discount text.
-
-### Main files
-- Designer with formula/constants: `src/components/mug-designer/MugDesigner2D.tsx`.
-- Marketing/service text: `src/app/(public)/services/mugs/page.tsx`.
-- Auxiliary info label: `src/components/mug-designer/MugDesignInfoToggle.tsx`.
-
-### Complexity
-**Medium.**
-- Formula is simple but embedded in UI component; requires extraction to server/shared module.
-
----
-
-## 7) Plotter cutting
-### Current source of truth
-**Split / inconsistent.**
-- Calculator formula module exists in code config, but public plotter page uses hardcoded rows and manual lead flow.
-
-### Pricing values currently outside admin
-- Config formula constants:
-  - base per meter,
+### Non-admin-managed pricing values
+- **Per-meter / per-m² / fixed fee / multiplier / minimum** in config:
+  - base cut per meter,
   - weeding per meter,
   - mounting film per m²,
   - transfer fixed fee,
   - urgent multiplier,
   - minimum order total.
-- Public page hardcoded marketing pricing rows (`от 30 ₽ / м.п.`, `+15 ₽ / м.п.`, etc.).
+- **User-facing static rows** on page (`от 30 ₽/м.п.`, `+15 ₽/м.п.`, etc.) are hardcoded separately.
 
-### Main files
-- Code config: `src/lib/pricing-config/plotterCutting.ts`.
-- Formula: `src/lib/calculations/plotterCuttingPricing.ts`.
-- Public page hardcoded rows: `src/app/(public)/plotter-cutting/page.tsx`.
-- Engine exposes plotter calculator but no dedicated quote API or active UI integration path: `src/lib/engine/index.ts`.
+### Visibility
+- **Both**: formula-facing module exists, but public page pricing is also static and manual-request oriented.
 
-### Complexity
-**Medium-high** due to current split and potential dead/unused paths.
+### Source of truth today
+- Split:
+  - formula constants in `PLOTTER_CUTTING_PRICING_CONFIG`,
+  - independent hardcoded public pricing rows on plotter page.
 
----
-
-## 8) Milling
-### Current source of truth
-**Not admin-managed.** Price table and additional-service surcharges are static TS data.
-
-### Pricing values currently outside admin
-- Material/thickness price matrix (`MILLING_MATERIAL_GROUPS`).
-- Additional services and surcharges (`MILLING_ADDITIONAL_SERVICE_GROUPS`), including urgency percentages/minimums and fixed fees.
-- Page-level hardcoded pricing statements (minimum order and “from” price chips).
-
-### Main files
-- Config tables: `src/lib/pricing-config/milling.ts`.
-- Public page + static chips: `src/app/(public)/milling/page.tsx`.
-- Order form validates materials/thickness against static options: `src/components/OrderMillingForm.tsx`, `src/app/api/requests/milling/route.ts`.
-
-### Complexity
-**Medium.**
-- Data is table-driven (good for admin migration) and mostly not formula-heavy.
+### Complexity / risk
+- **Medium-high** due to split/duplication.
+- Need product decision first: true calculator flow vs managed reference tariffs for request-only flow.
 
 ---
 
-## 9) Generic admin pricing model usage gap
-### Observation
-- Generic admin pricing entities (`PriceCategory`, `PriceItem`) are managed in `/admin/pricing`.
-- But main calculators do not consume these tables for runtime pricing.
-- Seed includes legacy/placeholder pricing records not connected to active calculator flows.
+## 3) Heat transfer calculator (mug/t-shirt/film)
+### Where pricing lives now
+- `src/lib/pricing-config/heatTransfer.ts`
+- `src/lib/calculations/heatTransferPricing.ts`
+- `src/app/api/quotes/heat-transfer/route.ts`
+- `src/components/HeatTransferCalculator.tsx`
 
-### Main files
-- Models: `prisma/schema.prisma`.
-- Services: `src/lib/admin/price-catalog-service.ts`, `src/lib/admin/pricing-service.ts`.
-- Validation: `src/lib/admin/validation.ts`.
-- Seed placeholders: `prisma/seed.js`.
+### Non-admin-managed pricing values
+- **Structured matrix**: mug prices by mug type and print type.
+- **Fixed unit prices**: t-shirt own/company clothes.
+- **Discount policy**: threshold + rate.
+- **Film pricing**: per meter, transfer fixed fee, urgent multiplier, minimum order total.
 
-### Complexity
-**Architectural**: migration must pick one runtime model (service-key config + structured JSON for formula services), rather than only flat list items.
+### Visibility
+- **Calculator-facing** via quote API.
+- **User-facing** through calculator totals and summary labels.
 
----
+### Source of truth today
+- Primary: `HEAT_TRANSFER_PRICING_CONFIG` in code.
 
-## File-by-file findings (concise index)
-
-- `src/lib/pricing-config/wideFormat.ts`: full wide-format matrix, extras, minimums, thresholds are code constants.
-- `src/lib/calculations/wideFormatPricing.ts`: formula depends directly on those constants.
-- `src/components/WideFormatPricingCalculator.tsx`: UI strings duplicate price semantics (`+50 ₽/м`, `от 250 ₽`, +30%).
-- `src/app/api/wide-format-order/route.ts`: uses formula + embeds hardcoded fallback wording for estimated cut minimum text.
-
-- `src/lib/pricing-config/plotterCutting.ts`: full plotter rate constants.
-- `src/lib/calculations/plotterCuttingPricing.ts`: formula exists but not clearly wired to public plotter page.
-- `src/app/(public)/plotter-cutting/page.tsx`: independent hardcoded price rows and manual lead flow.
-
-- `src/lib/pricing-config/heatTransfer.ts`: heat-transfer/mug/tshirt/film rates + discount policy.
-- `src/lib/calculations/heatTransferPricing.ts`: formula engine tied to that config.
-- `src/components/HeatTransferCalculator.tsx`: quote UI uses API + sends computed totals in lead payload.
-- `src/app/api/heat-transfer/route.ts`: accepts client pricing payload without server recomputation.
-
-- `src/components/heat-transfer/TshirtsLanding.tsx`, `src/app/(public)/heat-transfer/page.tsx`, `src/components/OrderTshirtsForm.tsx`: hardcoded user-facing price text.
-
-- `src/lib/pricing-config/business-cards.ts`: quantity tiers and lamination multiplier in code.
-- `src/components/PrintPricingCalculator.tsx`: business-card pricing table and totals from code.
-- `src/components/OrderBusinessCardsForm.tsx`: submits `unitPrice`/`totalPrice` derived client-side.
-- `src/app/api/requests/business-cards/route.ts`: validates but does not recompute total server-side.
-
-- `src/lib/pricing-config/print.ts`, `src/lib/calculations/printPricing.ts`, `src/app/api/quotes/print/route.ts`: generic print coefficients entirely code-configured.
-
-- `src/components/mug-designer/MugDesigner2D.tsx` + `src/app/(public)/services/mugs/page.tsx`: mug base price and discount staircase are hardcoded in UI + marketing.
-
-- `src/lib/pricing-config/milling.ts` + `src/app/(public)/milling/page.tsx`: milling matrix and surcharge tables static in code.
+### Complexity / risk
+- **Medium**: config is well-structured and easy to map to admin keys.
+- Additional integrity risk: notification route accepts client pricing payload (see “Cross-service API integrity risks”).
 
 ---
 
-## Current source of truth map
+## 4) Heat transfer landing / apparel page static pricing content
+### Where pricing lives now
+- `src/components/heat-transfer/TshirtsLanding.tsx`
+- `src/app/(public)/heat-transfer/page.tsx`
+- `src/components/OrderTshirtsForm.tsx`
 
-- **Admin-managed today**
-  - Baguette non-catalog extras/config (`PricingEntry`, category `baguette-extra-pricing`).
+### Non-admin-managed pricing values
+- **Hardcoded user-facing amounts** in chips/cards/fallback text/options:
+  - `A4 - 250 ₽/сторона`,
+  - `Футболки - от 500 ₽`,
+  - related FAQ/hero phrasing.
 
-- **Intentionally non-admin (for now)**
-  - Baguette catalog/base frame price in Google Sheets.
+### Visibility
+- **User-facing** primarily marketing + form hints.
 
-- **Still code-managed (migration backlog)**
-  - Wide format, plotter, print, business cards, heat transfer, mugs, milling.
-  - Multiple public pages also carry hardcoded marketing price text that can drift from calculators.
+### Source of truth today
+- Static literals in component/page code.
+- Can diverge from calculator config if not synchronized.
 
----
-
-## Migration complexity and risk assessment
-
-### Isolated / easier first
-1. **Heat transfer config tables** (single config object + one calculator API).
-2. **Print/business cards coefficients and tiers** (compact formulas).
-3. **Mugs base + discount staircase** (small formula extraction from component).
-
-### Medium complexity
-4. **Milling matrix + additional service tables** (table-driven but broad content footprint).
-
-### Higher complexity
-5. **Wide format** (material matrix + multiple extras + threshold logic + order integration + UI duplicates).
-6. **Plotter** (split state between formula module and static page; requires product decision first).
-
-### Cross-cutting risks
-- Duplicate sources of truth (formula constants + UI/marketing strings).
-- Server endpoints that trust client-sent totals (`/api/heat-transfer`, `/api/requests/business-cards`).
-- Material/option enums hardcoded in multiple layers (types, zod schemas, UI option arrays).
-- Existing `PriceCategory/PriceItem` model is too flat for formula-heavy services unless combined with structured `PricingEntry` configs.
+### Complexity / risk
+- **Low-medium** technical complexity.
+- **High consistency risk** if not tied to runtime-config values.
 
 ---
 
-## Recommended migration order (practical)
+## 5) Print calculator (generic print module)
+### Where pricing lives now
+- `src/lib/pricing-config/print.ts`
+- `src/lib/calculations/printPricing.ts`
+- `src/app/api/quotes/print/route.ts`
 
-## Phase 0 (stabilization, tiny PR)
-- Freeze and document pricing boundaries + decide canonical runtime model:
-  - Use **`PricingEntry` service-key configs** for formula services,
-  - Keep `PriceCategory/PriceItem` for simple public static price lists.
-- Add one internal inventory helper that lists unresolved hardcoded pricing strings per service page (non-blocking tooling).
+### Non-admin-managed pricing values
+- **Minimum**: `minimumQuantity`.
+- **Base rates**: `basePer100` by product type.
+- **Coefficients**:
+  - density,
+  - single/double side,
+  - lamination,
+  - size.
 
-## Phase 1 (high value, manageable risk)
-- **Wide format runtime config migration**
-  - Move `WIDE_FORMAT_PRICING_CONFIG` numeric values to admin keys.
-  - Keep material IDs/options stable, but source rates and extras from DB.
-  - Add completeness check + fallback warnings (same pattern as baguette).
-- PR boundary: backend loader + calculator + admin section + no redesign.
+### Visibility
+- **Calculator-facing** via formula/API.
 
-## Phase 2
-- **Heat transfer runtime migration**
-  - Move heat-transfer config object to admin keys.
-  - Recompute totals server-side in `/api/heat-transfer` before notifications.
-- PR boundary: config + calculator + endpoint hardening + admin section.
+### Source of truth today
+- `PRINT_PRICING_CONFIG` in code.
 
-## Phase 3
-- **Print + business cards migration**
-  - Consolidate `print.ts` + `business-cards.ts` into one service config namespace.
-  - Recompute business-card totals server-side in request API.
-- PR boundary: shared config keys + calculator adjustments + request endpoint hardening.
-
-## Phase 4
-- **Mugs pricing migration**
-  - Extract mug formula constants from `MugDesigner2D` into shared server/client config loaded from admin.
-  - Replace hardcoded mug page prices with admin-fed display values.
-
-## Phase 5
-- **Milling pricing table migration**
-  - Move material/thickness matrix + additional surcharge rows to structured admin entries.
-  - Replace hardcoded chips (“минимальный заказ”, “от ...”) with admin content/keys.
-
-## Phase 6
-- **Plotter strategy and migration**
-  - First choose target UX:
-    - either full calculator using existing formula module,
-    - or request-only flow with managed reference tariffs.
-  - Then migrate selected pricing source to admin keys and remove duplicate static rows.
-
-## Phase 7 (consistency cleanup)
-- Sweep all public pages for hardcoded price text; tie them to the same admin keys used by calculators.
-- Add small “pricing consistency” regression tests for key formulas and min/threshold behavior.
+### Complexity / risk
+- **Medium**: straightforward migration to typed keyset.
 
 ---
 
-## Admin model readiness and likely gaps
+## 6) Business cards (public print page + request flow)
+### Where pricing lives now
+- `src/lib/pricing-config/business-cards.ts`
+- `src/components/PrintPricingCalculator.tsx`
+- `src/components/OrderBusinessCardsForm.tsx`
+- `src/app/(public)/print/page.tsx`
+- `src/app/api/requests/business-cards/route.ts`
 
-## What already works well
-- `PricingEntry` supports structured JSON and scalar values.
-- History table already exists and works for baguette edits.
-- Admin page already has a pattern for grouped service-specific editing blocks.
+### Non-admin-managed pricing values
+- **Quantity tier model**:
+  - allowed quantities,
+  - stepwise per-piece pricing (`getUnitPrice`),
+  - lamination multiplier.
+- **User-facing table and totals** rendered from those code values.
 
-## Gaps for remaining services
-1. **Service scoping conventions**
-   - Need explicit category naming convention per service (`wide-format`, `heat-transfer`, `print`, etc.) and required key registries.
-2. **Per-service completeness checks**
-   - Baguette has this; other services need same helper pattern.
-3. **Server-side source-of-truth enforcement**
-   - Some request APIs still trust client totals; should always recompute from server config.
-4. **Formula-oriented admin UX**
-   - Flat `PriceItem` rows are insufficient alone for matrices/coefficients.
-   - Continue using `PricingEntry` + typed parser maps for formula services.
-5. **Content-price sync**
-   - Marketing pages with price text should consume admin values or explicitly mark as “по запросу”.
+### Visibility
+- **Both**: visible on page and used in form summary.
 
----
+### Source of truth today
+- Code module `business-cards.ts`.
+- API validates numeric totals from client payload but does not recompute canonical total server-side.
 
-## Suggested PR boundaries (implementation plan)
-
-1. **PR-1: Wide format config loader + admin section**
-   - Add required keys + parser + completeness helper + diagnostics.
-   - Wire `calculateWideFormatPricing` to loader.
-
-2. **PR-2: Wide format UI and text sync**
-   - Replace hardcoded wide-format surcharge labels/threshold displays with loaded values.
-
-3. **PR-3: Heat transfer config migration + endpoint recompute**
-   - Move config to admin keys; recompute in `/api/heat-transfer`.
-
-4. **PR-4: Print/business cards config migration + endpoint recompute**
-   - Migrate both modules; validate and recompute totals server-side in business-card request route.
-
-5. **PR-5: Mugs pricing extraction from component**
-   - Move mug formula constants to admin config and use in designer + mugs page.
-
-6. **PR-6: Milling table migration**
-   - Move matrix + additional services to admin-managed structured entries.
-
-7. **PR-7: Plotter unification**
-   - Choose calculator/request strategy; remove duplicate pricing rows and wire to one admin source.
-
-8. **PR-8: Final consistency pass**
-   - Replace residual hardcoded price claims in public pages and add lightweight regression tests.
+### Complexity / risk
+- **Medium** technical migration.
+- **High integrity risk** until server recomputation is added.
 
 ---
 
-## Service checklist
+## 7) Mugs service + designer pricing
+### Where pricing lives now
+- `src/components/mug-designer/MugDesigner2D.tsx`
+- `src/app/(public)/services/mugs/page.tsx`
+- `src/components/mug-designer/MugDesignInfoToggle.tsx`
+
+### Non-admin-managed pricing values
+- **Component-embedded constants**:
+  - base unit price (`MUG_UNIT_PRICE`),
+  - discount step quantity,
+  - discount step rate,
+  - max discount.
+- **Static user-facing text** on mugs page (`450 ₽`, discount statement).
+
+### Visibility
+- **Both** calculator-like designer totals + page content.
+
+### Source of truth today
+- Split between component constants and hardcoded page text.
+
+### Complexity / risk
+- **Medium**: requires extraction from client component to shared config loader + sync page copy.
+
+---
+
+## 8) Milling (price tables and surcharges)
+### Where pricing lives now
+- `src/lib/pricing-config/milling.ts`
+- `src/app/(public)/milling/page.tsx`
+- `src/components/OrderMillingForm.tsx`
+- `src/app/api/requests/milling/route.ts`
+
+### Non-admin-managed pricing values
+- **Structured matrix/table**: materials + thickness price rows.
+- **Surcharge/additional-services table**: urgency percentages/minimums, setup fees, logistics/storage, etc.
+- **Static page hints**: minimum order and “from” values in hero/work-condition chips.
+
+### Visibility
+- **Both**: user-facing tables/chips; form/API use material/thickness option sets.
+
+### Source of truth today
+- Static TS tables and strings.
+
+### Complexity / risk
+- **Medium**: table-like data fits admin well; risk is partial migration leaving static chips stale.
+
+---
+
+## File-by-file findings (outside baguette)
+
+- `src/lib/pricing-config/wideFormat.ts`: all wide-format numeric pricing + limits + material matrix.
+- `src/lib/calculations/wideFormatPricing.ts`: wide-format formula depends fully on code config.
+- `src/components/WideFormatPricingCalculator.tsx`: user-visible price labels include hardcoded numeric semantics.
+- `src/app/api/wide-format-order/route.ts`: uses calculator output and contains fixed estimate wording tied to current constants.
+
+- `src/lib/pricing-config/plotterCutting.ts`: all plotter rates/minimums/multipliers.
+- `src/lib/calculations/plotterCuttingPricing.ts`: calculator formula exists but not unified with plotter page display source.
+- `src/app/(public)/plotter-cutting/page.tsx`: separate hardcoded pricing rows and manual lead flow.
+
+- `src/lib/pricing-config/heatTransfer.ts`: mug/t-shirt/film rates + discount policy.
+- `src/lib/calculations/heatTransferPricing.ts`: heat-transfer formula layer.
+- `src/components/HeatTransferCalculator.tsx`: live quote consumer + sends totals in lead payload.
+- `src/components/heat-transfer/TshirtsLanding.tsx`: static pricing cards/chips/FAQ text.
+- `src/components/OrderTshirtsForm.tsx`: transfer option label with hardcoded price mention.
+
+- `src/lib/pricing-config/print.ts`: print coefficients/minimum/base values.
+- `src/lib/calculations/printPricing.ts`: formula implementation.
+- `src/lib/pricing-config/business-cards.ts`: business-card tier logic and multipliers.
+- `src/components/PrintPricingCalculator.tsx`: pricing table + total output from code.
+- `src/app/api/requests/business-cards/route.ts`: trusts client totals (validated, not recomputed).
+
+- `src/components/mug-designer/MugDesigner2D.tsx`: mug price + discount staircase embedded in client component.
+- `src/app/(public)/services/mugs/page.tsx`: static price and discount copy.
+
+- `src/lib/pricing-config/milling.ts`: milling material/thickness table + additional service pricing/surcharges.
+- `src/app/(public)/milling/page.tsx`: static minimum/from-price copy in chips.
+
+---
+
+## Current source of truth by non-baguette service
+
+- **Wide format**: code (`WIDE_FORMAT_PRICING_CONFIG`) + duplicated UI display text.
+- **Plotter cutting**: split between code config and hardcoded plotter-page rows.
+- **Heat transfer calculator**: code config (`HEAT_TRANSFER_PRICING_CONFIG`).
+- **Heat transfer landing copy**: hardcoded component/page strings.
+- **Print calculator**: code config (`PRINT_PRICING_CONFIG`).
+- **Business cards**: code config (`business-cards.ts`) + client-calculated totals sent to API.
+- **Mugs**: client component constants + static page text.
+- **Milling**: static config tables + page-level static pricing chips.
+
+---
+
+## Migration complexity assessment
+
+## Low-medium complexity (good early wins)
+- Heat transfer landing/static copy synchronization.
+- Print coefficients + generic print quote config migration.
+- Business-card tier config migration (if server recomputation is added in same PR).
+
+## Medium complexity
+- Heat-transfer runtime config migration (structured object).
+- Mugs pricing extraction from UI component.
+- Milling table migration (large but table-driven).
+
+## Medium-high complexity
+- Wide format migration (matrix + constraints + extras + duplicated UI labels).
+- Plotter migration (currently split source and partially disconnected calculator flow).
+
+## Admin model fit (for non-baguette)
+- `PricingEntry` (JSON/scalar) is sufficient for formula-heavy services if each service defines:
+  - required keys,
+  - typed parsing,
+  - completeness checks,
+  - fallback diagnostics.
+- `PriceCategory/PriceItem` remains useful for simple display tables but is insufficient alone for formula matrices and multipliers.
+
+## Key migration risks
+- Duplicate source-of-truth during partial rollout.
+- UI hardcoded price text diverging from calculator results.
+- API integrity gaps where server does not recompute totals from trusted config.
+- Enum/schema duplication across types, zod payloads, and option lists.
+
+---
+
+## Recommended migration order
+
+1. **Wide format runtime config migration** (highest business value, active calculator/order usage).
+2. **Heat transfer runtime config migration + server recomputation in lead route**.
+3. **Print + business cards migration together** (shared domain, remove client-trusted totals).
+4. **Mugs pricing extraction to admin-backed config** (designer + page copy sync).
+5. **Milling table/surcharge migration** (table-heavy but contained).
+6. **Plotter unification/migration** after product decision on calculator vs request-only mode.
+7. **Final cross-page copy sync pass** to remove residual hardcoded price literals.
+
+---
+
+## Suggested PR breakdown
+
+## PR-1: Wide format config foundation
+- Add admin keys for all wide-format formula numbers and matrix values.
+- Add typed loader + completeness check + fallback diagnostics.
+- Switch `calculateWideFormatPricing` to admin-loaded config.
+
+## PR-2: Wide format UI text sync
+- Replace hardcoded surcharge/minimum labels in UI with loaded values.
+- Keep visual behavior unchanged.
+
+## PR-3: Heat transfer runtime + API integrity
+- Move heat-transfer rates/discounts to admin keys.
+- In `/api/heat-transfer`, recompute totals server-side from trusted config before send.
+
+## PR-4: Print + business cards
+- Move print coefficients and business-card tier/multiplier to admin keys.
+- Recompute business-card total/unit on server in request route.
+
+## PR-5: Mugs pricing
+- Extract mug pricing constants from `MugDesigner2D` to shared config loader.
+- Replace static mugs page price/discount copy with admin-fed values.
+
+## PR-6: Milling tables
+- Move material-thickness matrix + additional services to admin-managed structured entries.
+- Replace milling page static minimum/from-price chips with managed values.
+
+## PR-7: Plotter finalization
+- Decide UX mode; wire one source-of-truth.
+- Remove duplicate hardcoded plotter pricing rows.
+
+## PR-8: Global consistency cleanup
+- Sweep remaining user-facing hardcoded price literals.
+- Add lightweight regression tests for formula invariants (minimums, thresholds, multipliers).
+
+---
+
+## Final implementation checklist by service
 
 ## Wide format
-- [ ] Add admin keys for all `WIDE_FORMAT_PRICING_CONFIG` numeric values.
-- [ ] Add required-keys completeness checker + fallback diagnostics.
-- [ ] Move wide-format UI surcharge/minimum labels to admin-fed values.
-- [ ] Remove duplicated constants from UI strings.
+- [ ] Migrate matrix + extras + minimum + thresholds to admin keys.
+- [ ] Add required-keys completeness checker.
+- [ ] Replace UI hardcoded surcharge/minimum text.
 
 ## Plotter cutting
-- [ ] Decide final UX path (calculator vs request-only).
-- [ ] Migrate chosen pricing source to admin.
-- [ ] Eliminate duplicate static pricing rows once admin-backed.
+- [ ] Pick target UX (calculator vs request-only).
+- [ ] Consolidate to one admin-backed source.
+- [ ] Remove duplicate static pricing rows.
 
-## Heat transfer
-- [ ] Move `HEAT_TRANSFER_PRICING_CONFIG` to admin keys.
-- [ ] Add server-side recompute in `/api/heat-transfer`.
-- [ ] Align landing page hardcoded prices with admin values.
+## Heat transfer / apparel
+- [ ] Migrate heat-transfer config object to admin keys.
+- [ ] Recompute totals server-side in `/api/heat-transfer`.
+- [ ] Sync landing/form hardcoded price text with managed values.
 
 ## Print
-- [ ] Move `PRINT_PRICING_CONFIG` to admin keys.
-- [ ] Add required-key checks and formula tests against admin-loaded config.
+- [ ] Migrate `PRINT_PRICING_CONFIG` to admin keys.
+- [ ] Keep formula behavior parity with tests.
 
 ## Business cards
-- [ ] Move quantity tiers + lamination multiplier to admin.
-- [ ] Recompute `unitPrice`/`totalPrice` server-side in business-card request API.
-- [ ] Remove client-trusted price fields from critical decision paths.
+- [ ] Migrate quantity tiers + lamination multiplier to admin keys.
+- [ ] Recompute `unitPrice` and `totalPrice` server-side in request API.
+- [ ] Stop trusting client totals as source-of-truth.
 
 ## Mugs
-- [ ] Move mug base price/discount staircase to admin keys.
-- [ ] Reuse same pricing source in designer and mugs landing page.
-- [ ] Remove hardcoded “450 ₽” and discount text literals.
+- [ ] Move base price and discount staircase to admin keys.
+- [ ] Reuse same source for designer and page copy.
+- [ ] Remove hardcoded `450 ₽` literals.
 
 ## Milling
-- [ ] Move material/thickness table to admin-managed structured entries.
-- [ ] Move additional service surcharges to admin.
-- [ ] Replace page-level hardcoded “минимальный заказ”/“от ...” strings with admin values.
+- [ ] Migrate material/thickness price table to admin structured entries.
+- [ ] Migrate additional-service surcharge table.
+- [ ] Replace static minimum/from-price chips with managed values.
 
-## Cross-cutting
-- [ ] Define service key naming convention and required key registries.
-- [ ] Add a small internal check that reports missing required keys by service.
-- [ ] Ensure every pricing-affecting API recalculates totals server-side from admin config.
+## Cross-service
+- [ ] Standardize service key namespaces in `PricingEntry`.
+- [ ] Add per-service required-key registries and completeness checks.
+- [ ] Ensure every pricing-affecting API computes totals from server-side trusted config.
