@@ -360,7 +360,7 @@ Most non-baguette pricing is still defined in code/config modules (`src/lib/pric
 ## Final implementation checklist by service
 
 ## Wide format
-- [ ] Migrate matrix + extras + minimum + thresholds to admin keys.
+- [x] Migrate matrix + extras + minimum + thresholds to admin keys (see `docs/wide-format-pricing-migration.md`).
 - [ ] Add required-keys completeness checker.
 - [ ] Replace UI hardcoded surcharge/minimum text.
 

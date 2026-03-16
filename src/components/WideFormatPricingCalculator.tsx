@@ -19,7 +19,8 @@ import {
   isBannerMaterial,
   isFilmMaterial,
   getWideFormatMaterialMaxWidth,
-  WIDE_FORMAT_PRICING_CONFIG,
+  WIDE_FORMAT_PUBLIC_PRICING_FALLBACK,
+  type WideFormatPublicPricingConfig,
 } from '@/lib/pricing-config/wideFormat';
 import {
   BAGET_TRANSFER_SOURCE_QUERY_KEY,
@@ -71,7 +72,7 @@ const SCROLL_OFFSET_PX = 90;
 
 const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, (maxWidth?: number) => string> = {
   invalid_width: () => 'Введите корректную ширину.',
-  max_width_exceeded: (maxWidth) => `Размер не помещается в ширину рулона ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м. Одна из сторон макета должна быть не больше ${maxWidth ?? WIDE_FORMAT_PRICING_CONFIG.maxWidth} м.`,
+  max_width_exceeded: (maxWidth) => `Размер не помещается в ширину рулона ${maxWidth ?? WIDE_FORMAT_PUBLIC_PRICING_FALLBACK.maxWidth} м. Одна из сторон макета должна быть не больше ${maxWidth ?? WIDE_FORMAT_PUBLIC_PRICING_FALLBACK.maxWidth} м.`,
 };
 
 const EMPTY_QUOTE: WideFormatQuote = {
@@ -108,7 +109,11 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-export default function WideFormatPricingCalculator() {
+type WideFormatPricingCalculatorProps = {
+  pricingConfig: WideFormatPublicPricingConfig;
+};
+
+export default function WideFormatPricingCalculator({ pricingConfig }: WideFormatPricingCalculatorProps) {
   const router = useRouter();
 
   const [material, setMaterial] = useState<WideFormatMaterialType>('banner_240_gloss_3_2m');
@@ -133,14 +138,14 @@ export default function WideFormatPricingCalculator() {
   const [pricePulse, setPricePulse] = useState(false);
 
   const isCanvasMaterial = material.includes('canvas');
-  const maxWidthForCurrentMaterial = getWideFormatMaterialMaxWidth(material);
+  const maxWidthForCurrentMaterial = getWideFormatMaterialMaxWidth(material, pricingConfig);
 
   const isBanner = isBannerMaterial(material);
   const isFilm = isFilmMaterial(material);
   const isExtrasAllowed = isExtrasAllowedForWideFormat(material);
   const availableVariants = WIDE_FORMAT_VARIANTS_BY_CATEGORY[category];
   const parsedWidth = Number(width);
-  const canShowWelding = Number.isFinite(parsedWidth) && parsedWidth > WIDE_FORMAT_PRICING_CONFIG.bannerJoinSeamWidthThreshold;
+  const canShowWelding = Number.isFinite(parsedWidth) && parsedWidth > pricingConfig.bannerJoinSeamWidthThreshold;
 
   const handleCategoryChange = (nextCategory: WideFormatCategory) => {
     setCategory(nextCategory);
@@ -458,10 +463,10 @@ export default function WideFormatPricingCalculator() {
           <div className="space-y-2 pt-1">
             <p className="text-sm font-medium">Дополнительные услуги</p>
             {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
-            {isBanner && <CheckboxRow label={`Люверсы (${WIDE_FORMAT_PRICING_CONFIG.grommetPrice} ₽/шт${quote.grommetsCount > 0 ? `, ~${quote.grommetsCount} шт` : ""})`} checked={grommets} onChange={setGrommets} />}
+            {isBanner && <CheckboxRow label={`Люверсы (${pricingConfig.grommetPrice} ₽/шт${quote.grommetsCount > 0 ? `, ~${quote.grommetsCount} шт` : ""})`} checked={grommets} onChange={setGrommets} />}
             {isBanner && canShowWelding && (
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                При ширине больше {WIDE_FORMAT_PRICING_CONFIG.bannerJoinSeamWidthThreshold} м автоматически добавляется одна проклейка стыка полотен.
+                При ширине больше {pricingConfig.bannerJoinSeamWidthThreshold} м автоматически добавляется одна проклейка стыка полотен.
               </p>
             )}
             {isFilm && <CheckboxRow label="Резка по меткам (от 250 ₽, точно после утверждения макета)" checked={plotterCutByRegistrationMarks} onChange={setPlotterCutByRegistrationMarks} />}
@@ -535,12 +540,12 @@ export default function WideFormatPricingCalculator() {
           {quote.minimumPrintPriceApplied && (
             <SummaryRow
               label="Минимальная стоимость печати"
-              value={`${WIDE_FORMAT_PRICING_CONFIG.minimumPrintPriceRUB.toLocaleString('ru-RU')} ₽`}
+              value={`${pricingConfig.minimumPrintPriceRUB.toLocaleString('ru-RU')} ₽`}
             />
           )}
           {quote.edgeGluingCost > 0 && <SummaryRow label="— Проклейка края" value={`${quote.edgeGluingCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.imageWeldingCost > 0 && <SummaryRow label={`— Проклейка стыка полотен${quote.requiresJoinSeam ? ' (авто)' : ''}`} value={`${quote.imageWeldingCost.toLocaleString('ru-RU')} ₽`} />}
-          {plotterCutByRegistrationMarks && <SummaryRow label="— Резка по меткам" value={`от ${WIDE_FORMAT_PRICING_CONFIG.plotterCutMinimumFee.toLocaleString('ru-RU')} ₽ (оценочно, рассчитает менеджер)`} />}
+          {plotterCutByRegistrationMarks && <SummaryRow label="— Резка по меткам" value={`от ${pricingConfig.plotterCutMinimumFee.toLocaleString('ru-RU')} ₽ (оценочно, рассчитает менеджер)`} />}
           {quote.grommetsCost > 0 && <SummaryRow label={`— Люверсы (${quote.grommetsCount} шт)`} value={`${quote.grommetsCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.positioningMarksCutCost > 0 && <SummaryRow label="— Метки позиционирования" value={`${quote.positioningMarksCutCost.toLocaleString('ru-RU')} ₽`} />}
           {isFilm && (

@@ -4,9 +4,13 @@ import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 import OrderWideFormatForm from '@/components/OrderWideFormatForm';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
+import { getWideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
 
 export default async function WideFormatPrintingPage() {
-  const contentMap = await getPageContentMap('wide_format');
+  const [contentMap, pricing] = await Promise.all([
+    getPageContentMap('wide_format'),
+    getWideFormatPricingConfig(),
+  ]);
 
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Широкоформатная печать до 3.2 м');
   const heroDescription = getPageContentValue(
@@ -69,7 +73,7 @@ export default async function WideFormatPrintingPage() {
 
       <Section className="pt-4 pb-12 md:pt-6">
         <div className="space-y-10">
-          <WideFormatPricingCalculator />
+          <WideFormatPricingCalculator pricingConfig={pricing.config} />
 
           <div className="card flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between md:p-8">
             <div>
