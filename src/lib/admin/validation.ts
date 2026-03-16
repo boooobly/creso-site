@@ -100,6 +100,7 @@ export const mediaAssetSchema = z.object({
   url: z.string().trim().url('Укажите корректную ссылку на файл.'),
   fileName: optionalTrimmedString,
   altText: optionalTrimmedString,
+  description: optionalTrimmedString,
   mimeType: optionalTrimmedString,
   sizeBytes: z.coerce.number().int().min(0).optional(),
   isActive: z.boolean().default(true),
