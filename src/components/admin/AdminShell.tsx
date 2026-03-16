@@ -57,8 +57,8 @@ export default function AdminShell({ children }: AdminShellProps) {
   const pageMeta = resolvePageMeta(pathname);
 
   return (
-    <div className="mx-auto -mt-8 w-screen max-w-none bg-slate-100">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col lg:flex-row">
+    <div className="min-h-screen w-full bg-slate-100">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1600px] flex-col lg:flex-row">
         <AdminSidebar />
 
         <div className="flex min-w-0 flex-1 flex-col">

@@ -36,6 +36,13 @@ type HomePageContentProps = {
   services: Array<{ id: string; title: string; description: string; href: string }>;
   faq: any[];
   messages: SiteMessages;
+  featuredPortfolioItems: Array<{ id: string; title: string; description: string; imageSrc: string }>;
+  heroTitle: string;
+  heroDescription: string;
+  heroPrimaryButtonText: string;
+  heroSecondaryButtonText: string;
+  portfolioBlockTitle: string;
+  portfolioBlockDescription: string;
 };
 
 const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
@@ -85,28 +92,8 @@ const serviceImageById: Record<string, string> = {
   polygraphy: '/images/services/cards.png',
 };
 
-const featuredWorkExamples = [
-  {
-    id: 'som',
-    title: 'Рекламная стела для СОМ',
-    description: 'Многоуровневая рекламная конструкция с яркими рекламными блоками для сети строительных материалов.',
-    imageSrc: '/images/home_page/examples_of_work/som.png',
-  },
-  {
-    id: 'nevinnomyssk',
-    title: 'Въездная стела Невинномысск',
-    description: 'Крупная городская конструкция с объемными элементами и чистой современной подачей.',
-    imageSrc: '/images/home_page/examples_of_work/nevinnomyssk.png',
-  },
-  {
-    id: 'apple-time',
-    title: 'Световой лайтбокс Apple Time',
-    description: 'Подвесной световой короб для торговой точки с аккуратной подсветкой и читаемой навигацией.',
-    imageSrc: '/images/home_page/examples_of_work/apple.png',
-  },
-];
 
-export default function HomePageContent({ services, faq, messages }: HomePageContentProps) {
+export default function HomePageContent({ services, faq, messages, featuredPortfolioItems, heroTitle, heroDescription, heroPrimaryButtonText, heroSecondaryButtonText, portfolioBlockTitle, portfolioBlockDescription }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -118,19 +105,19 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
               <p className="t-eyebrow inline-flex rounded-full border border-[#efb9b9] bg-[#fff7f7] px-4 py-1.5 text-[var(--brand-red)]">
                 ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
               </p>
-              <AnimatedBlurHeadline className="t-h1 max-w-[16ch]" text="Производство рекламы под ключ" breakAfterWord={1} />
-              <p className="t-body text-muted-foreground max-w-[40rem]">Вывески, печать, конструкции и монтаж. От идеи до установки.</p>
+              <AnimatedBlurHeadline className="t-h1 max-w-[16ch]" text={heroTitle} breakAfterWord={1} />
+              <p className="t-body text-muted-foreground max-w-[40rem]">{heroDescription}</p>
             </div>
 
             <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end">
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
                 <Link className="btn-primary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
-                  Рассчитать стоимость
+                  {heroPrimaryButtonText}
                 </Link>
               </motion.div>
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
                 <Link className="btn-secondary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/portfolio" aria-label="Перейти в портфолио">
-                  Смотреть портфолио
+                  {heroSecondaryButtonText}
                 </Link>
               </motion.div>
             </div>
@@ -211,13 +198,13 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-8">
           <div className="space-y-2">
             <p className="t-eyebrow">ПОРТФОЛИО</p>
-            <h2 className="t-h2">Примеры работ</h2>
-            <p className="t-body text-muted-foreground max-w-2xl">Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.</p>
+            <h2 className="t-h2">{portfolioBlockTitle}</h2>
+            <p className="t-body text-muted-foreground max-w-2xl">{portfolioBlockDescription}</p>
           </div>
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>
         <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {featuredWorkExamples.map((item) => (
+          {featuredPortfolioItems.map((item) => (
             <motion.div key={item.id} variants={fadeUp(18)} transition={{ duration: 0.2 }} className="h-full">
               <FeatureCard title={item.title} description={item.description} imageSrc={item.imageSrc} />
             </motion.div>

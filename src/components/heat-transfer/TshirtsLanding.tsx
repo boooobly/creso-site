@@ -203,7 +203,19 @@ function ExampleMockup({ title, description, imageSrc }: { title: string; descri
 }
 
 
-export default function TshirtsLanding() {
+type TshirtsLandingProps = {
+  heroTitle?: string;
+  heroDescription?: string;
+  heroPrimaryButtonText?: string;
+  heroSecondaryButtonText?: string;
+};
+
+export default function TshirtsLanding({
+  heroTitle = 'Печать на футболках',
+  heroDescription = 'Полноцвет A4 — 250 ₽ за 1 сторону. Работаем на ваших или наших футболках.',
+  heroPrimaryButtonText = 'Оставить заявку',
+  heroSecondaryButtonText = 'Смотреть примеры',
+}: TshirtsLandingProps) {
   const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.12 });
 
   return (
@@ -216,8 +228,8 @@ export default function TshirtsLanding() {
             className={`rounded-3xl border border-neutral-200 bg-white/95 p-7 shadow-xl backdrop-blur transition-all duration-700 dark:border-neutral-800 dark:bg-neutral-900/90 md:p-10 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
           >
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600">Студийный уровень печати</p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">Печать на футболках</h1>
-            <p className="mt-4 max-w-3xl text-sm text-neutral-600 dark:text-neutral-300 md:text-lg">Полноцвет A4 — 250 ₽ за 1 сторону. Работаем на ваших или наших футболках.</p>
+            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
+            <p className="mt-4 max-w-3xl text-sm text-neutral-600 dark:text-neutral-300 md:text-lg">{heroDescription}</p>
             <p className="mt-2 flex items-start gap-2 text-sm text-neutral-500 dark:text-neutral-300">
               <Timer className="mt-0.5 size-4 shrink-0 text-red-500" aria-hidden="true" />
               Итоговую стоимость и сроки подтверждает менеджер после проверки макета.
@@ -236,12 +248,8 @@ export default function TshirtsLanding() {
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link href="#tshirts-order" className="inline-flex items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none">
-                Оставить заявку
-              </Link>
-              <Link href="#examples" className="text-sm font-semibold text-neutral-700 underline-offset-4 transition hover:text-red-600 hover:underline dark:text-neutral-200 dark:hover:text-red-300">
-                Смотреть примеры
-              </Link>
+              <Link href="#tshirts-order" className="inline-flex items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none">{heroPrimaryButtonText}</Link>
+              <Link href="#examples" className="text-sm font-semibold text-neutral-700 underline-offset-4 transition hover:text-red-600 hover:underline dark:text-neutral-200 dark:hover:text-red-300">{heroSecondaryButtonText}</Link>
             </div>
           </div>
         </div>
