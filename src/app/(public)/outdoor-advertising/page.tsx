@@ -10,6 +10,7 @@ import ProductionTrustBlock from '@/components/ProductionTrustBlock';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import { messages } from '@/lib/messages';
+import { getSiteImage } from '@/lib/site-images';
 
 const services: Array<{ title: string; image: string; featured?: boolean }> = [
   { title: 'Световые короба', image: '/images/outdoor_examples/lightbox.png', featured: true },
@@ -144,7 +145,10 @@ const portfolioProjects = [
 ] as const;
 
 export default async function OutdoorAdvertisingPage() {
-  const contentMap = await getPageContentMap('outdoor');
+  const [contentMap, heroImage] = await Promise.all([
+    getPageContentMap('outdoor'),
+    getSiteImage('outdoor.hero.main'),
+  ]);
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Наружная реклама под ключ в Ставропольском крае');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.');
   const heroPrimaryButtonText = getPageContentValue(contentMap, 'hero', 'primaryButtonText', 'Получить бесплатный расчет');
@@ -152,6 +156,9 @@ export default async function OutdoorAdvertisingPage() {
   const ctaTitle = getPageContentValue(contentMap, 'cta', 'title', 'Нужна срочная установка?');
   const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Изготавливаем и монтируем конструкции в сжатые сроки.');
   const ctaButtonText = getPageContentValue(contentMap, 'cta', 'buttonText', 'Получить расчет');
+
+  const heroImageSrc = heroImage?.url ?? '/images/outdoor_advertising/manufacturing.png';
+  const heroImageAlt = heroImage?.altText || 'Производство наружной рекламы';
   return (
     <div className="pb-24 md:pb-0">
       <OutdoorFloatingCtas />
@@ -190,8 +197,8 @@ export default async function OutdoorAdvertisingPage() {
 
           <div className="relative min-h-[350px] overflow-hidden rounded-xl border border-neutral-200/80 bg-neutral-100 shadow-md dark:border-neutral-700 dark:bg-neutral-900 md:min-h-[440px]">
             <Image
-              src="/images/outdoor_advertising/manufacturing.png"
-              alt="Производство наружной рекламы"
+              src={heroImageSrc}
+              alt={heroImageAlt}
               fill
               className="object-cover"
               priority

@@ -17,3 +17,21 @@ export function getPageContentValue(
 ) {
   return map.get(`${sectionKey}.${fieldKey}`)?.trim() || defaultValue;
 }
+
+export function getFaqItemsFromContentMap(
+  map: Map<string, string>,
+  sectionKey: string,
+  maxItems: number
+) {
+  const items: Array<{ q: string; a: string }> = [];
+
+  for (let i = 1; i <= maxItems; i += 1) {
+    const q = map.get(`${sectionKey}.question${i}`)?.trim() ?? '';
+    const a = map.get(`${sectionKey}.answer${i}`)?.trim() ?? '';
+
+    if (!q || !a) continue;
+    items.push({ q, a });
+  }
+
+  return items;
+}

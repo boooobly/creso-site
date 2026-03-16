@@ -4,6 +4,7 @@ import RevealOnScroll from '@/components/RevealOnScroll';
 import Section from '@/components/layout/Section';
 import { ClipboardCheck, Cog, Factory, FileText, Frame, Lightbulb, PanelsTopLeft, PencilRuler, Printer, Ruler, ShieldCheck, Sparkles, Type, Wrench } from 'lucide-react';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
+import { getSiteImage } from '@/lib/site-images';
 
 const capabilityBadges = ['Фрезерный станок 2×4 м', 'Печать до 3.2 м', 'Плоттерная резка', 'Багетная мастерская'] as const;
 
@@ -115,13 +116,19 @@ const trustPoints = [
 ] as const;
 
 export default async function ProductionPage() {
-  const contentMap = await getPageContentMap('production');
+  const [contentMap, heroImage] = await Promise.all([
+    getPageContentMap('production'),
+    getSiteImage('production.hero.main'),
+  ]);
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Собственное производство рекламы');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Производим вывески, конструкции и печатную продукцию на собственном оборудовании с контролем качества на каждом этапе.');
   const heroPrimaryButtonText = getPageContentValue(contentMap, 'hero', 'primaryButtonText', 'Обсудить проект');
   const heroSecondaryButtonText = getPageContentValue(contentMap, 'hero', 'secondaryButtonText', 'Смотреть оборудование');
   const ctaTitle = getPageContentValue(contentMap, 'cta', 'title', 'Готовы обсудить задачу?');
   const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Расскажите о проекте — подберём материалы, сроки и предложим решение под ваш бюджет.');
+
+  const heroImageSrc = heroImage?.url ?? '/images/production/hero.png';
+  const heroImageAlt = heroImage?.altText || 'Собственное производство рекламы';
   const heroCtaBaseClass =
     'inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold leading-none transition-all duration-200';
 
@@ -168,7 +175,7 @@ export default async function ProductionPage() {
 
           <div className="relative overflow-hidden rounded-[1.8rem] border border-neutral-200/90 bg-neutral-100 p-1.5 shadow-[0_20px_44px_rgba(17,24,39,0.12)]">
             <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
-              <Image src="/images/production/hero.png" alt="Собственное производство рекламы" fill className="object-cover" priority />
+              <Image src={heroImageSrc} alt={heroImageAlt} fill className="object-cover" priority />
             </div>
             <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/90 bg-white/95 px-4 py-3 backdrop-blur-lg shadow-[0_12px_30px_rgba(17,24,39,0.16)] md:bottom-5 md:left-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600">Собственный цех</p>

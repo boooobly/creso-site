@@ -4,18 +4,23 @@ import faqLocal from '@/data/faq.json';
 import { getServices, getFaq } from '@/lib/contentful';
 import { messages } from '@/lib/messages';
 import { getFeaturedPortfolioItems } from '@/lib/public-portfolio';
-import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
+import { getFaqItemsFromContentMap, getPageContentMap, getPageContentValue } from '@/lib/page-content';
+import { getSiteImage } from '@/lib/site-images';
 
 export default async function Home() {
-  const [sCMS, fCMS, featuredPortfolio, contentMap] = await Promise.all([
+  const [sCMS, fCMS, featuredPortfolio, contentMap, homeHeroImage] = await Promise.all([
     getServices().catch(() => null),
     getFaq().catch(() => null),
     getFeaturedPortfolioItems(3).catch(() => []),
     getPageContentMap('home'),
+    getSiteImage('home.hero.main'),
   ]);
 
   const services = (sCMS ?? servicesLocal) as any[];
   const faq = (fCMS ?? faqLocal) as any[];
+
+  const adminFaqItems = getFaqItemsFromContentMap(contentMap, 'faq', 4);
+  const faqItems = adminFaqItems.length > 0 ? adminFaqItems : faq;
 
   const resolveServiceHref = (service: any) => {
     const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
@@ -88,6 +93,9 @@ export default async function Home() {
     'Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.'
   );
 
+  const homeHeroImageSrc = homeHeroImage?.url ?? '/images/home_page/hero.png';
+  const homeHeroImageAlt = homeHeroImage?.altText || 'Производственная студия Credomir';
+
   const servicesWithHref = services.map((service) => ({
     id: String(service.id),
     title: String(service.title),
@@ -99,7 +107,7 @@ export default async function Home() {
     <div className="home-page-root">
       <HomePageContent
         services={servicesWithHref}
-        faq={faq}
+        faq={faqItems}
         messages={messages}
         featuredPortfolioItems={featuredPortfolioItems}
         heroTitle={homeHeroTitle}
@@ -108,6 +116,8 @@ export default async function Home() {
         heroSecondaryButtonText={homeHeroSecondaryButtonText}
         portfolioBlockTitle={portfolioBlockTitle}
         portfolioBlockDescription={portfolioBlockDescription}
+        heroImageSrc={homeHeroImageSrc}
+        heroImageAlt={homeHeroImageAlt}
       />
     </div>
   );

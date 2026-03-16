@@ -28,9 +28,9 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h1 className="text-xl font-semibold text-slate-900">Контент сайта</h1>
+        <h1 className="text-xl font-semibold text-slate-900">Контент страниц</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Удобное редактирование текста для сотрудников офиса: заголовки, описания, кнопки и CTA-блоки по страницам.
+          Редактируйте тексты по страницам и блокам: заголовки, описания, кнопки, FAQ и CTA.
         </p>
 
         {successMessage ? (
@@ -43,8 +43,8 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
       </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Страница для редактирования</h2>
-        <p className="mt-1 text-sm text-slate-600">Выберите страницу и отредактируйте только понятные текстовые поля.</p>
+        <h2 className="text-lg font-semibold text-slate-900">Выбор страницы</h2>
+        <p className="mt-1 text-sm text-slate-600">Выберите страницу, которую хотите обновить.</p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           {PAGE_CONTENT_DEFINITIONS.map((page) => (
