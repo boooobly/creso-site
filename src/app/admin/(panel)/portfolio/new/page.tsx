@@ -20,6 +20,7 @@ export default function AdminPortfolioCreatePage() {
           category: '',
           shortDescription: '',
           coverImage: '',
+          coverImageAssetId: '',
           galleryImages: '',
           featured: false,
           published: false,
