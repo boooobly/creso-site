@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
+import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { prisma } from '@/lib/db/prisma';
 import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
 import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
@@ -140,10 +141,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Выбранный багет не найден.' }, { status: 400 });
     }
 
+    const extrasPricing = await getBaguetteExtrasPricingConfig();
     const quote = bagetQuote({
       ...parsed.data.baget,
       selectedBaget,
-    });
+    }, extrasPricing.config);
 
     if (quote.total <= 0) {
       return NextResponse.json({ ok: false, error: 'Не удалось рассчитать стоимость заказа.' }, { status: 400 });

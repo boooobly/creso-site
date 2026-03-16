@@ -3,6 +3,7 @@ import { isWideFormatCanvasBagetTransfer } from '@/lib/baget/transfer';
 import type { BagetTransferSource } from '@/lib/baget/printRequirement';
 import { loadBagetCatalog } from '@/lib/baget/sheetsCatalog';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
+import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 
 type BagetPageProps = {
   searchParams?: {
@@ -13,7 +14,11 @@ type BagetPageProps = {
 };
 
 export default async function BagetPage({ searchParams }: BagetPageProps) {
-  const [{ items, source }, contentMap] = await Promise.all([loadBagetCatalog(), getPageContentMap('baget')]);
+  const [{ items, source }, contentMap, pricingConfigData] = await Promise.all([
+    loadBagetCatalog(),
+    getPageContentMap('baget'),
+    getBaguetteExtrasPricingConfig(),
+  ]);
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Конфигуратор багета');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Подберите профиль, оцените превью и получите точный расчёт стоимости.');
   const shouldUseStretchedCanvasPreset = isWideFormatCanvasBagetTransfer(searchParams?.transferSource);
@@ -31,6 +36,7 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
           initialHeight={searchParams?.height}
           initialWorkType={shouldUseStretchedCanvasPreset ? 'stretchedCanvas' : undefined}
           initialTransferSource={initialTransferSource}
+          pricingConfig={pricingConfigData.config}
         />
       </main>
     </div>

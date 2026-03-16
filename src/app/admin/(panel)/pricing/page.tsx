@@ -1,10 +1,12 @@
 import { listPriceCatalog } from '@/lib/admin/price-catalog-service';
+import { listBaguetteExtrasPricingAdminData } from '@/lib/admin/baguette-extras-pricing-service';
 import ConfirmSubmitButton from '@/components/admin/pricing/ConfirmSubmitButton';
 import {
   createPriceCategoryAction,
   createPriceItemAction,
   deletePriceCategoryAction,
   deletePriceItemAction,
+  updateBaguetteExtrasPricingEntryAction,
   updatePriceCategoryAction,
   updatePriceItemAction,
 } from './actions';
@@ -16,6 +18,7 @@ const successMessages: Record<string, string> = {
   'item-created': 'Позиция успешно добавлена.',
   'item-updated': 'Позиция успешно обновлена.',
   'item-deleted': 'Позиция удалена.',
+  'baguette-config-updated': 'Конфигурация доп. материалов багета обновлена.',
 };
 
 type AdminPricingPageProps = {
@@ -26,7 +29,10 @@ type AdminPricingPageProps = {
 };
 
 export default async function AdminPricingPage({ searchParams }: AdminPricingPageProps) {
-  const categories = await listPriceCatalog();
+  const [categories, baguetteConfigData] = await Promise.all([
+    listPriceCatalog(),
+    listBaguetteExtrasPricingAdminData(),
+  ]);
   const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
 
   const baguetteCategories = categories.filter((category) => category.kind === 'baguette_extras');
@@ -44,7 +50,7 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
           <p className="text-sm font-semibold text-amber-900">Важно: багет и Google Sheets</p>
           <p className="mt-1 text-sm text-amber-800">
             Цены на сам багет и карточки багета редактируются в Google Sheets. Здесь редактируются только
-            дополнительные материалы: стекло, ПВХ, паспарту, картон, подвесы, задники и другие доп. опции.
+            дополнительные материалы: стекло, ПВХ, паспарту, печать, картон, подвесы, задники и другие доп. опции.
           </p>
         </div>
 
@@ -56,6 +62,13 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
           <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{searchParams.error}</p>
         ) : null}
       </section>
+
+      <BaguetteExtrasConfigSection
+        entries={baguetteConfigData.entries}
+        histories={baguetteConfigData.histories}
+        fallbackUsedKeys={baguetteConfigData.fallbackUsedKeys}
+        missingKeys={baguetteConfigData.missingKeys}
+      />
 
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-lg font-semibold text-slate-900">Добавить категорию</h2>
@@ -344,6 +357,127 @@ function CategoryCard({ category }: { category: Category }) {
             </button>
           </div>
         </form>
+      </div>
+    </section>
+  );
+}
+
+function BaguetteExtrasConfigSection({
+  entries,
+  histories,
+  fallbackUsedKeys,
+  missingKeys,
+}: {
+  entries: Array<{
+    id: string;
+    label: string;
+    key: string;
+    subcategory: string;
+    type: string;
+    unit: string | null;
+    value: unknown;
+    description: string;
+  }>;
+  histories: Array<{
+    id: string;
+    key: string;
+    subcategory: string;
+    oldValue: unknown;
+    newValue: unknown;
+    createdAt: Date;
+    note: string | null;
+  }>;
+  fallbackUsedKeys: Array<{ key: string; reason: string }>;
+  missingKeys: string[];
+}) {
+  const subgroupLabels: Record<string, string> = {
+    materials: 'Материалы и доп. элементы',
+    print: 'Печать в багетном калькуляторе',
+    hanging: 'Подвесы и тросики',
+    stand: 'Подставка',
+    stretcher: 'Подрамник',
+    auto_additions: 'Автодобавления по типу работ',
+  };
+
+  const groupedEntries = entries.reduce<Record<string, typeof entries>>((acc, entry) => {
+    const subgroup = entry.subcategory;
+    if (!acc[subgroup]) acc[subgroup] = [];
+    acc[subgroup].push(entry);
+    return acc;
+  }, {});
+
+  return (
+    <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <h2 className="text-lg font-semibold text-slate-900">Конфигурация расчёта багета (источник цены)</h2>
+      <p className="text-sm text-slate-600">Редактируются только не-багетные значения калькулятора: материалы, печать, подвесы, подрамник, пороги и автодобавления.</p>
+
+      {fallbackUsedKeys.length > 0 ? (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          Используются fallback-значения для ключей: {fallbackUsedKeys.map((item) => `${item.key} (${item.reason})`).join(', ')}
+        </div>
+      ) : null}
+
+      {missingKeys.length > 0 ? (
+        <div className="rounded-lg border border-orange-300 bg-orange-50 px-3 py-2 text-sm text-orange-900">
+          В БД отсутствуют активные ключи: {missingKeys.join(', ')}
+        </div>
+      ) : null}
+
+      <div className="space-y-4">
+        {Object.entries(groupedEntries).map(([subgroup, subgroupEntries]) => (
+          <div key={subgroup} className="space-y-3">
+            <h3 className="text-sm font-semibold text-slate-800">{subgroupLabels[subgroup] ?? subgroup}</h3>
+            {subgroupEntries.map((entry) => {
+              const action = updateBaguetteExtrasPricingEntryAction.bind(null, entry.id);
+              const formattedValue = entry.type === 'number'
+                ? String(entry.value)
+                : JSON.stringify(entry.value, null, 2);
+
+              return (
+                <form key={entry.id} action={action} className="grid gap-3 rounded-lg border border-slate-200 p-4 md:grid-cols-6">
+                  <div className="space-y-1 md:col-span-2">
+                    <p className="text-sm font-medium text-slate-900">{entry.label}</p>
+                    <p className="text-xs text-slate-500">{entry.subcategory}.{entry.key}</p>
+                    {entry.description ? <p className="text-xs text-slate-500">{entry.description}</p> : null}
+                  </div>
+
+                  <div className="space-y-1 md:col-span-2">
+                    <label className="text-xs font-medium text-slate-600">Значение ({entry.type}{entry.unit ? `, ${entry.unit}` : ''})</label>
+                    {entry.type === 'number' ? (
+                      <input name="value" type="number" min={0} step="0.01" defaultValue={formattedValue} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    ) : (
+                      <textarea name="value" rows={4} defaultValue={formattedValue} className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-xs" />
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-600">Комментарий (опционально)</label>
+                    <input name="note" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Причина изменения" />
+                  </div>
+
+                  <div className="md:col-span-1 flex items-end justify-end">
+                    <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
+                      Сохранить
+                    </button>
+                  </div>
+                </form>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-slate-800">Последние изменения</h3>
+        {histories.length === 0 ? <p className="text-sm text-slate-500">Изменений пока нет.</p> : null}
+        {histories.slice(0, 20).map((history) => (
+          <div key={history.id} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+            <p className="font-medium">{history.subcategory}.{history.key} · {history.createdAt.toLocaleString('ru-RU')}</p>
+            <p>Было: <code>{JSON.stringify(history.oldValue)}</code></p>
+            <p>Стало: <code>{JSON.stringify(history.newValue)}</code></p>
+            {history.note ? <p>Комментарий: {history.note}</p> : null}
+          </div>
+        ))}
       </div>
     </section>
   );

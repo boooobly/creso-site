@@ -10,6 +10,7 @@ import {
   useState,
 } from 'react';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
+import type { BaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
 import { normalizeBagetTextureUrl } from '@/lib/baget/normalizeBagetTextureUrl';
@@ -103,6 +104,7 @@ type BagetConfiguratorProps = {
   initialHeight?: string;
   initialWorkType?: MaterialsState['workType'];
   initialTransferSource?: BagetTransferSource;
+  pricingConfig: BaguetteExtrasPricingConfig;
 };
 
 function normalizeInitialDimension(value: string | undefined, fallback: string): string {
@@ -119,6 +121,7 @@ export default function BagetConfigurator({
   initialHeight,
   initialWorkType,
   initialTransferSource,
+  pricingConfig,
 }: BagetConfiguratorProps) {
   const [widthInput, setWidthInput] = useState(() => normalizeInitialDimension(initialWidth, '500'));
   const [heightInput, setHeightInput] = useState(() => normalizeInitialDimension(initialHeight, '700'));
@@ -250,7 +253,7 @@ export default function BagetConfigurator({
         requiresPrint: printRequirement.requiresPrint,
         printMaterial: printRequirement.printMaterial,
         transferSource: printRequirement.transferSource,
-      }),
+      }, pricingConfig),
     [
       heightMm,
       materials.backPanel,
@@ -267,6 +270,7 @@ export default function BagetConfigurator({
       printRequirement.requiresPrint,
       printRequirement.transferSource,
       selectedBagetForQuote,
+      pricingConfig,
       widthMm,
     ],
   );

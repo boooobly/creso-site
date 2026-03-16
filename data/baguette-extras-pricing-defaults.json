@@ -1,0 +1,395 @@
+[
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "hanging",
+    "key": "crocodile_price",
+    "label": "Крокодильчик: цена за 1 шт",
+    "description": "Стоимость одного крепежа-крокодильчика.",
+    "type": "number",
+    "unit": "₽/шт",
+    "sortOrder": 10,
+    "value": 20
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "hanging",
+    "key": "crocodile_double_threshold_width_mm",
+    "label": "Крокодильчик: порог ширины для 2 шт",
+    "description": "Если ширина работы больше порога, добавляется 2 крокодильчика вместо 1.",
+    "type": "number",
+    "unit": "мм",
+    "sortOrder": 20,
+    "value": 600
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "hanging",
+    "key": "wire_price_per_meter_width",
+    "label": "Тросик: цена за метр по ширине",
+    "description": "Тариф за тросик, рассчитывается по ширине изделия.",
+    "type": "number",
+    "unit": "₽/м",
+    "sortOrder": 30,
+    "value": 30
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "hanging",
+    "key": "wire_loop_price",
+    "label": "Петля для тросика: цена за 1 шт",
+    "description": "Стоимость одной петли для тросика.",
+    "type": "number",
+    "unit": "₽/шт",
+    "sortOrder": 40,
+    "value": 15
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "hanging",
+    "key": "wire_loop_default_qty",
+    "label": "Тросик: количество петель по умолчанию",
+    "description": "Базовое количество петель для варианта подвеса с тросиком.",
+    "type": "number",
+    "unit": "шт",
+    "sortOrder": 50,
+    "value": 2
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "stand",
+    "key": "stand_price",
+    "label": "Ножка-подставка: цена",
+    "description": "Фиксированная цена за подставку.",
+    "type": "number",
+    "unit": "₽/шт",
+    "sortOrder": 60,
+    "value": 120
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "stand",
+    "key": "stand_max_width_mm",
+    "label": "Ножка-подставка: макс. ширина",
+    "description": "Подставка доступна, если ширина изделия не превышает этот порог.",
+    "type": "number",
+    "unit": "мм",
+    "sortOrder": 70,
+    "value": 300
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "stand",
+    "key": "stand_max_height_mm",
+    "label": "Ножка-подставка: макс. высота",
+    "description": "Подставка доступна, если высота изделия не превышает этот порог.",
+    "type": "number",
+    "unit": "мм",
+    "sortOrder": 80,
+    "value": 300
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "stretcher",
+    "key": "stretcher_price_per_meter_narrow",
+    "label": "Подрамник узкий (2 см): цена за метр",
+    "description": "Цена за погонный метр узкого подрамника.",
+    "type": "number",
+    "unit": "₽/м",
+    "sortOrder": 90,
+    "value": 200
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "stretcher",
+    "key": "stretcher_price_per_meter_wide",
+    "label": "Подрамник широкий (4 см): цена за метр",
+    "description": "Цена за погонный метр широкого подрамника.",
+    "type": "number",
+    "unit": "₽/м",
+    "sortOrder": 100,
+    "value": 300
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "stretcher",
+    "key": "stretcher_narrow_max_width_mm",
+    "label": "Подрамник узкий: макс. ширина",
+    "description": "Если ширина больше порога, узкий подрамник запрещается.",
+    "type": "number",
+    "unit": "мм",
+    "sortOrder": 110,
+    "value": 500
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "stretcher",
+    "key": "stretcher_narrow_max_height_mm",
+    "label": "Подрамник узкий: макс. высота",
+    "description": "Если высота больше порога, узкий подрамник запрещается.",
+    "type": "number",
+    "unit": "мм",
+    "sortOrder": 120,
+    "value": 500
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "print",
+    "key": "paper_price_per_m2",
+    "label": "Печать для багета: бумага, цена за м²",
+    "description": "Цена печати на бумаге в багетном калькуляторе.",
+    "type": "number",
+    "unit": "₽/м²",
+    "sortOrder": 121,
+    "value": 500
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "print",
+    "key": "canvas_price_per_m2",
+    "label": "Печать для багета: холст, цена за м²",
+    "description": "Цена печати на холсте в багетном калькуляторе.",
+    "type": "number",
+    "unit": "₽/м²",
+    "sortOrder": 122,
+    "value": 1500
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "print",
+    "key": "minimum_billable_area_m2",
+    "label": "Печать для багета: минимальная тарифицируемая площадь",
+    "description": "Минимальная площадь, которая тарифицируется при печати в багетном калькуляторе.",
+    "type": "number",
+    "unit": "м²",
+    "sortOrder": 123,
+    "value": 1
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "glass",
+    "label": "Стекло",
+    "description": "Цена стекла за м² и резка за метр.",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 130,
+    "value": {
+      "areaPricePerM2": 3705,
+      "cuttingPricePerM": 30
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "anti_reflective_glass",
+    "label": "Антибликовое стекло",
+    "description": "Цена антибликового стекла за м² и резка за метр.",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 140,
+    "value": {
+      "areaPricePerM2": 6000,
+      "cuttingPricePerM": 30
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "plexiglass",
+    "label": "Оргстекло",
+    "description": "Цена оргстекла за м² и резка за метр.",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 150,
+    "value": {
+      "areaPricePerM2": 2575,
+      "cuttingPricePerM": 30
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "pet1mm",
+    "label": "ПЭТ 1 мм",
+    "description": "Цена ПЭТ за м² и резка за метр.",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 160,
+    "value": {
+      "areaPricePerM2": 1200,
+      "cuttingPricePerM": 30
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "passepartout",
+    "label": "Паспарту",
+    "description": "Цена паспарту за м² и резка за метр.",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 170,
+    "value": {
+      "areaPricePerM2": 2325,
+      "cuttingPricePerM": 30
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "cardboard",
+    "label": "Картон",
+    "description": "Цена картона за м² и резка за метр.",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 180,
+    "value": {
+      "areaPricePerM2": 465,
+      "cuttingPricePerM": 30
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "pvc3",
+    "label": "ПВХ 3 мм",
+    "description": "Цена ПВХ 3 мм за м² и резка за метр.",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 190,
+    "value": {
+      "areaPricePerM2": 1855,
+      "cuttingPricePerM": 30
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "pvc4",
+    "label": "ПВХ 4 мм",
+    "description": "Цена ПВХ 4 мм за м² и резка за метр.",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 200,
+    "value": {
+      "areaPricePerM2": 2455,
+      "cuttingPricePerM": 35
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "materials",
+    "key": "orabond",
+    "label": "Orabond",
+    "description": "Цена Orabond за м².",
+    "type": "json",
+    "unit": "структура",
+    "sortOrder": 210,
+    "value": {
+      "areaPricePerM2": 1200,
+      "cuttingPricePerM": 0
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "auto_additions",
+    "key": "rhinestone",
+    "label": "Автодобавления: стразы",
+    "description": "Правила автоматических добавлений для типа работы «Стразы».",
+    "type": "json",
+    "unit": "правила",
+    "sortOrder": 220,
+    "value": {
+      "pvcType": "pvc3",
+      "addOrabond": true,
+      "forceCardboard": false,
+      "stretchingRequired": false,
+      "removeCardboard": false
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "auto_additions",
+    "key": "embroidery",
+    "label": "Автодобавления: вышивка",
+    "description": "Правила автоматических добавлений для типа работы «Вышивка».",
+    "type": "json",
+    "unit": "правила",
+    "sortOrder": 230,
+    "value": {
+      "pvcType": "pvc4",
+      "addOrabond": false,
+      "forceCardboard": true,
+      "stretchingRequired": true,
+      "removeCardboard": false
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "auto_additions",
+    "key": "beads",
+    "label": "Автодобавления: бисер",
+    "description": "Правила автоматических добавлений для типа работы «Бисер».",
+    "type": "json",
+    "unit": "правила",
+    "sortOrder": 240,
+    "value": {
+      "pvcType": "pvc4",
+      "addOrabond": false,
+      "forceCardboard": true,
+      "stretchingRequired": true,
+      "removeCardboard": false
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "auto_additions",
+    "key": "photo",
+    "label": "Автодобавления: фото",
+    "description": "Правила автоматических добавлений для типа работы «Фото».",
+    "type": "json",
+    "unit": "правила",
+    "sortOrder": 250,
+    "value": {
+      "pvcType": "none",
+      "addOrabond": true,
+      "forceCardboard": true,
+      "stretchingRequired": false,
+      "removeCardboard": false
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "auto_additions",
+    "key": "stretched_canvas",
+    "label": "Автодобавления: натяжка на подрамник",
+    "description": "Правила автоматических добавлений для типа работы «Натяжка на подрамник».",
+    "type": "json",
+    "unit": "правила",
+    "sortOrder": 260,
+    "value": {
+      "pvcType": "none",
+      "addOrabond": false,
+      "forceCardboard": false,
+      "stretchingRequired": true,
+      "removeCardboard": true
+    }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "auto_additions",
+    "key": "default",
+    "label": "Автодобавления: по умолчанию",
+    "description": "Правила автоматических добавлений для прочих типов работ.",
+    "type": "json",
+    "unit": "правила",
+    "sortOrder": 270,
+    "value": {
+      "pvcType": "none",
+      "addOrabond": false,
+      "forceCardboard": false,
+      "stretchingRequired": false,
+      "removeCardboard": false
+    }
+  }
+]
