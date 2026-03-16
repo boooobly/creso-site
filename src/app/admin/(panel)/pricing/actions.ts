@@ -13,6 +13,7 @@ import {
   updatePriceItem,
 } from '@/lib/admin/price-catalog-service';
 import { updateBaguetteExtrasPricingEntry } from '@/lib/admin/baguette-extras-pricing-service';
+import { updateWideFormatPricingEntry } from '@/lib/wide-format/wideFormatPricing';
 
 function parseBoolean(value: FormDataEntryValue | null) {
   return value === 'on' || value === 'true' || value === '1';
@@ -160,6 +161,20 @@ export async function updateBaguetteExtrasPricingEntryAction(entryId: string, fo
     if (error instanceof SyntaxError) {
       redirect('/admin/pricing?error=%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5+JSON+%D0%B7%D0%B0%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%BE+%D1%81+%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%BE%D0%B9.');
     }
+    redirectWithError(error);
+  }
+}
+
+
+export async function updateWideFormatPricingEntryAction(entryId: string, formData: FormData) {
+  try {
+    const rawValue = String(formData.get('value') ?? '').trim();
+    const note = String(formData.get('note') ?? '').trim();
+    await updateWideFormatPricingEntry(entryId, rawValue, note || undefined);
+
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=wide-format-config-updated');
+  } catch (error) {
     redirectWithError(error);
   }
 }

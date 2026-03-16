@@ -5,6 +5,7 @@ import { calculateWideFormatPricing } from '@/lib/calculations/wideFormatPricing
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentWithCaption';
 import { getWideFormatMaterialLabel, WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/pricing-config/wideFormat';
+import { getWideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
 
 import { logger } from '@/lib/logger';
 import { FIVE_MB_IN_BYTES, validateUploadedFile } from '@/lib/file-validation';
@@ -149,6 +150,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Проверьте размеры и количество.' }, { status: 400 });
     }
 
+    const pricing = await getWideFormatPricingConfig();
+
     const calculated = calculateWideFormatPricing({
       material: materialIdRaw,
       bannerDensity: 300,
@@ -160,7 +163,7 @@ export async function POST(request: NextRequest) {
       grommets,
       plotterCutByRegistrationMarks,
       cutByPositioningMarks,
-    });
+    }, pricing.config);
 
     const materialLabel = getWideFormatMaterialLabel(materialIdRaw);
 
@@ -200,7 +203,7 @@ export async function POST(request: NextRequest) {
       'Доп. услуги:',
       extrasText,
       `Резка по меткам: ${plotterCutByRegistrationMarks ? 'да' : 'нет'}`,
-      `Оценочно (минимум): ${formatRub(calculated.plotterCutEstimatedCost || 250)}`,
+      `Оценочно (минимум): ${formatRub(calculated.plotterCutEstimatedCost || pricing.config.plotterCutMinimumFee)}`,
       'Финальная стоимость резки по меткам — после проверки и утверждения макета менеджером.',
       '',
       'Стоимость:',
