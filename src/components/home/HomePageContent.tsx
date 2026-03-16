@@ -36,6 +36,7 @@ type HomePageContentProps = {
   services: Array<{ id: string; title: string; description: string; href: string }>;
   faq: any[];
   messages: SiteMessages;
+  featuredPortfolioItems: Array<{ id: string; title: string; description: string; imageSrc: string }>;
 };
 
 const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
@@ -85,28 +86,8 @@ const serviceImageById: Record<string, string> = {
   polygraphy: '/images/services/cards.png',
 };
 
-const featuredWorkExamples = [
-  {
-    id: 'som',
-    title: 'Рекламная стела для СОМ',
-    description: 'Многоуровневая рекламная конструкция с яркими рекламными блоками для сети строительных материалов.',
-    imageSrc: '/images/home_page/examples_of_work/som.png',
-  },
-  {
-    id: 'nevinnomyssk',
-    title: 'Въездная стела Невинномысск',
-    description: 'Крупная городская конструкция с объемными элементами и чистой современной подачей.',
-    imageSrc: '/images/home_page/examples_of_work/nevinnomyssk.png',
-  },
-  {
-    id: 'apple-time',
-    title: 'Световой лайтбокс Apple Time',
-    description: 'Подвесной световой короб для торговой точки с аккуратной подсветкой и читаемой навигацией.',
-    imageSrc: '/images/home_page/examples_of_work/apple.png',
-  },
-];
 
-export default function HomePageContent({ services, faq, messages }: HomePageContentProps) {
+export default function HomePageContent({ services, faq, messages, featuredPortfolioItems }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -217,7 +198,7 @@ export default function HomePageContent({ services, faq, messages }: HomePageCon
           <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
         </div>
         <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {featuredWorkExamples.map((item) => (
+          {featuredPortfolioItems.map((item) => (
             <motion.div key={item.id} variants={fadeUp(18)} transition={{ duration: 0.2 }} className="h-full">
               <FeatureCard title={item.title} description={item.description} imageSrc={item.imageSrc} />
             </motion.div>
