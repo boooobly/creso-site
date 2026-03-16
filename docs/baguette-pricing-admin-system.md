@@ -10,17 +10,18 @@
 - Entry types:
   - `number` for scalar values,
   - `json` for structured configs (material pair rates, auto-addition rules).
+- Baguette print pricing is stored in baguette config keys (`print.paper_price_per_m2`, `print.canvas_price_per_m2`, `print.minimum_billable_area_m2`) and no longer resolved from wide-format config.
 
 ## Runtime resolution flow
 1. `getBaguetteExtrasPricingConfig()` loads active entries from `PricingEntry` (`baguette-extra-pricing`).
 2. Values are parsed/validated by schema (`zod`) in `src/lib/baget/baguetteExtrasPricing.ts`.
-3. Missing/malformed values automatically fall back to known-safe defaults from `data/baguette-extras-pricing-defaults.json`.
+3. Missing/malformed values automatically fall back to known-safe defaults from `data/baguette-extras-pricing-defaults.json`, and a server warning is logged with affected keys/reasons.
 4. `bagetQuote()` receives this config and uses it instead of hardcoded constants.
 
 Fallbacks are explicit and centralized to make later hard-fail mode easy.
 
 ## Admin editing
-- Admin pricing page includes a dedicated baguette extras config section.
+- Admin pricing page includes a dedicated baguette config section with grouped blocks (materials, print, hanging, stretcher, auto rules).
 - Office staff can edit every calculator input key used in this phase.
 - Numeric entries use numeric input; structured entries use JSON textarea.
 - Optional note field is supported on save.
@@ -32,6 +33,7 @@ Fallbacks are explicit and centralized to make later hard-fail mode easy.
   - `oldValue`, `newValue`,
   - `createdAt`, optional `note`.
 - Admin page shows recent change history summary.
+- Admin page also shows fallback/missing key warnings to make incomplete DB state visible.
 
 ## Extension points
 - Add new calculator-config keys by appending to `data/baguette-extras-pricing-defaults.json`.

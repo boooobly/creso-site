@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import {
   BAGUETTE_EXTRAS_DEFAULT_ENTRIES,
   BAGUETTE_EXTRAS_PRICING_CATEGORY,
+  getBaguetteExtrasPricingConfig,
 } from '@/lib/baget/baguetteExtrasPricing';
 
 const numberValueSchema = z.number().nonnegative();
@@ -53,7 +54,7 @@ export async function ensureBaguetteExtrasPricingEntries() {
 export async function listBaguetteExtrasPricingAdminData() {
   await ensureBaguetteExtrasPricingEntries();
 
-  const [entries, histories] = await Promise.all([
+  const [entries, histories, runtimeConfig] = await Promise.all([
     prisma.pricingEntry.findMany({
       where: { category: BAGUETTE_EXTRAS_PRICING_CATEGORY },
       orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }],
@@ -63,9 +64,25 @@ export async function listBaguetteExtrasPricingAdminData() {
       orderBy: { createdAt: 'desc' },
       take: 50,
     }),
+    getBaguetteExtrasPricingConfig(),
   ]);
 
-  return { entries, histories };
+  const descriptionByCompositeKey = BAGUETTE_EXTRAS_DEFAULT_ENTRIES.reduce<Record<string, string>>((acc, entry) => {
+    acc[`${entry.subcategory}.${entry.key}`] = entry.description ?? '';
+    return acc;
+  }, {});
+
+  const entriesWithDescription = entries.map((entry) => ({
+    ...entry,
+    description: descriptionByCompositeKey[`${entry.subcategory}.${entry.key}`] ?? '',
+  }));
+
+  return {
+    entries: entriesWithDescription,
+    histories,
+    fallbackUsedKeys: runtimeConfig.fallbackUsedKeys,
+    missingKeys: runtimeConfig.missingKeys,
+  };
 }
 
 function parseUpdatedValue(type: string, rawValue: string): Prisma.InputJsonValue {

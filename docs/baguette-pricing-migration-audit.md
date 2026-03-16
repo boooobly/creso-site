@@ -32,4 +32,4 @@ This audit covers only non-baguette-extra values in `src/lib/calculations/bagetQ
 
 ## Not migrated by design
 - Baguette profile catalog and base baguette frame pricing (`price_per_meter`, availability, images, SKU/article/title) remain sourced from Google Sheets.
-- Wide-format print pricing lookup (`getBagetPrintPricePerM2`) remains unchanged and out of scope for this step.
+- Wide-format print pricing dependency was a remaining gap and is migrated in the final pass (`docs/baguette-pricing-final-gap-check.md`).

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { bagetQuote } from './bagetQuote';
+import { getBaguetteExtrasDefaultConfig } from '@/lib/baget/baguetteExtrasPricing';
 
 const selectedBaget = {
   id: 'b-1',
@@ -204,6 +205,32 @@ describe('bagetQuote', () => {
     expect(result.meta?.printCost).toBe(1500);
   });
 
+
+
+  it('uses baguette admin print pricing config instead of wide-format pricing module', () => {
+    const config = getBaguetteExtrasDefaultConfig();
+    config.print.canvasPricePerM2 = 2222;
+    config.print.minimumBillableAreaM2 = 0.25;
+
+    const result = bagetQuote({
+      width: 500,
+      height: 500,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+      requiresPrint: true,
+      printMaterial: 'canvas',
+      transferSource: 'manual',
+    }, config);
+
+    expect(result.meta?.printCost).toBe(555.5);
+  });
   it('allows stretched canvas without baget in no-frame mode and keeps stretcher cost', () => {
     const result = bagetQuote({
       width: 1200,

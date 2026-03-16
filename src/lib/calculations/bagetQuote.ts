@@ -6,10 +6,11 @@ import type {
   StretcherType,
   WorkType,
 } from '@/components/baget/BagetFilters';
-import { getBagetPrintPricePerM2, type BagetPrintMaterial } from '@/lib/pricing-config/wideFormat';
+import type { BagetPrintMaterial } from '@/lib/baget/printRequirement';
 import {
   getBaguetteExtrasDefaultConfig,
   resolveAutoAdditionsFromConfig,
+  getBaguettePrintPricePerM2,
   type AutoAdditionRule,
   type BaguetteExtrasPricingConfig,
 } from '@/lib/baget/baguetteExtrasPricing';
@@ -162,7 +163,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     ? stretcherMeters * extrasConfig.stretcher.pricesPerMeter[effectiveStretcherType]
     : 0;
   const printCost = requiresPrint && printMaterial
-    ? Math.max(printAreaM2, 1) * getBagetPrintPricePerM2(printMaterial)
+    ? Math.max(printAreaM2, extrasConfig.print.minimumBillableAreaM2) * getBaguettePrintPricePerM2(printMaterial, extrasConfig)
     : 0;
 
   const rawItems: QuoteLineItem[] = [
