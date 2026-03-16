@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getPublicSiteSettings } from '@/lib/site-settings';
 
 const navItems = [
   { label: 'Багет', href: '/baget' },
@@ -11,7 +12,23 @@ const navItems = [
   { label: 'Политика конфиденциальности', href: '/privacy' },
 ];
 
-export default function SiteFooter() {
+function toExternalLink(value: string, type: 'telegram' | 'whatsapp') {
+  const trimmed = value.trim();
+  if (!trimmed) return '#';
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+
+  if (type === 'telegram') {
+    return trimmed.startsWith('@') ? `https://t.me/${trimmed.slice(1)}` : `https://t.me/${trimmed}`;
+  }
+
+  const digits = trimmed.replace(/\D/g, '');
+  return digits ? `https://wa.me/${digits}` : '#';
+}
+
+export default async function SiteFooter() {
+  const settings = await getPublicSiteSettings();
+  const telegramHref = toExternalLink(settings.telegram, 'telegram');
+
   return (
     <footer className="mt-16 border-t border-neutral-200 bg-neutral-100 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-300">
       <div className="container py-12 md:py-14">
@@ -21,18 +38,28 @@ export default function SiteFooter() {
               <Image src="/images/logo-light.png" alt="CredoMir logo" width={180} height={64} className="block h-12 w-auto dark:hidden" />
               <Image src="/images/logo-dark.png" alt="CredoMir logo" width={180} height={64} className="hidden h-12 w-auto dark:block" />
             </Link>
-            <p>Невинномысск, ул. Калинина, 106</p>
-            <p>Telegram: @Credomir</p>
-            <p>MAX phone: +7 988 731 74 04</p>
+            <p>{settings.address}</p>
+            <p>
+              Telegram:{' '}
+              <a className="underline" href={telegramHref} target="_blank" rel="noreferrer">
+                {settings.telegram}
+              </a>
+            </p>
+            <p>WhatsApp: {settings.whatsapp}</p>
+            <p>Телефон: {settings.phone}</p>
+            <p>Email: {settings.email}</p>
           </div>
 
           <div className="space-y-2.5 text-sm">
-            <h3 className="text-base font-semibold">Реквизиты</h3>
-            <p>ИП Кошелева Валентина Валерьевна</p>
-            <p>ИНН 263106597812</p>
-            <p>ОГРНИП 322265100113550</p>
-            <p>Email: credomir26@mail.ru</p>
-            <p>Телефон: +7 988 731 74 04</p>
+            <h3 className="text-base font-semibold">О компании</h3>
+            <p>{settings.companyName}</p>
+            <p>{settings.companyShortInfo}</p>
+            <p>Режим работы: {settings.workingHours}</p>
+            {settings.vkLink ? (
+              <p>
+                VK: <a className="underline" href={settings.vkLink} target="_blank" rel="noreferrer">Ссылка</a>
+              </p>
+            ) : null}
           </div>
 
           <div className="space-y-2.5 text-sm">
@@ -48,7 +75,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="mt-10 border-t border-neutral-200 pt-5 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
-          © 2026 CredoMir. Все права защищены.
+          {settings.footerText}
         </div>
       </div>
     </footer>

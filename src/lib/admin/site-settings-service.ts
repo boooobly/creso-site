@@ -37,3 +37,39 @@ export async function updateSiteSetting(id: string, payload: unknown) {
 export async function deleteSiteSetting(id: string) {
   return prisma.siteSetting.delete({ where: { id } });
 }
+
+export async function listSiteSettingsByKeys(keys: string[]) {
+  const items = await prisma.siteSetting.findMany({
+    where: { key: { in: keys } },
+    orderBy: { key: 'asc' }
+  });
+
+  return new Map(items.map((item) => [item.key, item]));
+}
+
+export async function upsertSiteSettings(
+  entries: Array<{ key: string; label: string; group: string; description?: string; value: string }>
+) {
+  await prisma.$transaction(
+    entries.map((entry) =>
+      prisma.siteSetting.upsert({
+        where: { key: entry.key },
+        update: {
+          value: entry.value,
+          label: entry.label,
+          group: entry.group,
+          description: entry.description,
+          type: 'string'
+        },
+        create: {
+          key: entry.key,
+          value: entry.value,
+          label: entry.label,
+          group: entry.group,
+          description: entry.description,
+          type: 'string'
+        }
+      })
+    )
+  );
+}
