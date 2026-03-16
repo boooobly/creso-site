@@ -124,7 +124,7 @@ function mapActionError(error: unknown): ActionResult {
 
 export async function createPortfolioItemAction(_: ActionResult, formData: FormData): Promise<ActionResult> {
   let createdAssetId: string | null = null;
-  let redirectTo: string | null = null;
+  let shouldRedirect = false;
 
   try {
     const payload = formDataToPayload(formData);
@@ -134,7 +134,7 @@ export async function createPortfolioItemAction(_: ActionResult, formData: FormD
     await createPortfolioItem(parsed);
 
     revalidatePath('/admin/portfolio');
-    redirectTo = '/admin/portfolio?success=created';
+    shouldRedirect = true;
   } catch (error) {
     console.error('[admin][portfolio][create] failed', error);
 
@@ -147,8 +147,8 @@ export async function createPortfolioItemAction(_: ActionResult, formData: FormD
     return mapActionError(error);
   }
 
-  if (redirectTo) {
-    redirect(redirectTo);
+  if (shouldRedirect) {
+    redirect('/admin/portfolio?success=created');
   }
 
   return {};
@@ -160,7 +160,7 @@ export async function updatePortfolioItemAction(
   formData: FormData
 ): Promise<ActionResult> {
   let createdAssetId: string | null = null;
-  let redirectTo: string | null = null;
+  let shouldRedirect = false;
 
   try {
     const payload = formDataToPayload(formData);
@@ -171,7 +171,7 @@ export async function updatePortfolioItemAction(
 
     revalidatePath('/admin/portfolio');
     revalidatePath(`/admin/portfolio/${id}`);
-    redirectTo = '/admin/portfolio?success=updated';
+    shouldRedirect = true;
   } catch (error) {
     console.error('[admin][portfolio][update] failed', { id, error });
 
@@ -184,8 +184,8 @@ export async function updatePortfolioItemAction(
     return mapActionError(error);
   }
 
-  if (redirectTo) {
-    redirect(redirectTo);
+  if (shouldRedirect) {
+    redirect('/admin/portfolio?success=updated');
   }
 
   return {};
