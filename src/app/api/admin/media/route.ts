@@ -21,7 +21,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
-    return handleAdminApiError(error) ?? NextResponse.json({ ok: false }, { status: 500 });
+    console.error('[api][admin][media][list] failed', error);
+    return handleAdminApiError(error) ?? NextResponse.json({ ok: false, error: 'Не удалось загрузить изображения.' }, { status: 500 });
   }
 }
 
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
     const item = await createMediaAsset(payload);
     return NextResponse.json({ ok: true, item }, { status: 201 });
   } catch (error) {
-    return handleAdminApiError(error) ?? NextResponse.json({ ok: false }, { status: 500 });
+    console.error('[api][admin][media][create] failed', error);
+    return handleAdminApiError(error) ?? NextResponse.json({ ok: false, error: 'Не удалось создать запись изображения в базе данных.' }, { status: 500 });
   }
 }

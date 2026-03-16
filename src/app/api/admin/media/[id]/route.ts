@@ -14,7 +14,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     const item = await updateMediaAsset(params.id, payload);
     return NextResponse.json({ ok: true, item });
   } catch (error) {
-    return handleAdminApiError(error) ?? NextResponse.json({ ok: false }, { status: 500 });
+    console.error('[api][admin][media][update] failed', { id: params.id, error });
+    return handleAdminApiError(error) ?? NextResponse.json({ ok: false, error: 'Не удалось обновить запись изображения.' }, { status: 500 });
   }
 }
 
@@ -26,6 +27,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     await deleteMediaAsset(params.id);
     return NextResponse.json({ ok: true });
   } catch (error) {
+    console.error('[api][admin][media][delete] failed', { id: params.id, error });
     const fallback = error instanceof Error ? error.message : 'Не удалось удалить изображение.';
     return handleAdminApiError(error) ?? NextResponse.json({ ok: false, error: fallback }, { status: 400 });
   }

@@ -53,7 +53,7 @@ export default function ImageUploadField({
 
     if (!uploadResponse.ok || !uploadJson.ok) {
       setUploadState('error');
-      setErrorMessage('error' in uploadJson ? (uploadJson.error ?? 'Не удалось загрузить файл.') : 'Не удалось загрузить файл.');
+      setErrorMessage('error' in uploadJson ? (uploadJson.error ?? 'Не удалось загрузить файл в хранилище.') : 'Не удалось загрузить файл в хранилище.');
       return;
     }
 
@@ -80,8 +80,13 @@ export default function ImageUploadField({
 
     if (!createAssetResponse.ok || !assetJson.ok) {
       setUploadState('error');
-      setErrorMessage('error' in assetJson ? (assetJson.error ?? 'Файл загружен, но не удалось создать запись изображения.') : 'Файл загружен, но не удалось создать запись изображения.');
+      setErrorMessage(
+        'error' in assetJson
+          ? (assetJson.error ?? 'Изображение загружено в хранилище, но запись в базе не создана. Сохранение работы попробует создать её автоматически.')
+          : 'Изображение загружено в хранилище, но запись в базе не создана. Сохранение работы попробует создать её автоматически.'
+      );
       setImageUrl(uploadJson.url);
+      setAssetId('');
       return;
     }
 
