@@ -4,7 +4,7 @@ import faqLocal from '@/data/faq.json';
 import { getServices, getFaq } from '@/lib/contentful';
 import { messages } from '@/lib/messages';
 import { getFeaturedPortfolioItems } from '@/lib/public-portfolio';
-import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
+import { getFaqItemsFromContentMap, getPageContentMap, getPageContentValue } from '@/lib/page-content';
 
 export default async function Home() {
   const [sCMS, fCMS, featuredPortfolio, contentMap] = await Promise.all([
@@ -16,6 +16,9 @@ export default async function Home() {
 
   const services = (sCMS ?? servicesLocal) as any[];
   const faq = (fCMS ?? faqLocal) as any[];
+
+  const adminFaqItems = getFaqItemsFromContentMap(contentMap, 'faq', 4);
+  const faqItems = adminFaqItems.length > 0 ? adminFaqItems : faq;
 
   const resolveServiceHref = (service: any) => {
     const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
@@ -99,7 +102,7 @@ export default async function Home() {
     <div className="home-page-root">
       <HomePageContent
         services={servicesWithHref}
-        faq={faq}
+        faq={faqItems}
         messages={messages}
         featuredPortfolioItems={featuredPortfolioItems}
         heroTitle={homeHeroTitle}
