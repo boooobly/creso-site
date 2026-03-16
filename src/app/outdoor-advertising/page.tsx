@@ -7,6 +7,7 @@ import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import OutdoorFloatingCtas from '@/components/OutdoorFloatingCtas';
 import ProductionTrustBlock from '@/components/ProductionTrustBlock';
+import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import { messages } from '@/lib/messages';
 
@@ -142,7 +143,15 @@ const portfolioProjects = [
   },
 ] as const;
 
-export default function OutdoorAdvertisingPage() {
+export default async function OutdoorAdvertisingPage() {
+  const contentMap = await getPageContentMap('outdoor');
+  const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Наружная реклама под ключ в Ставропольском крае');
+  const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.');
+  const heroPrimaryButtonText = getPageContentValue(contentMap, 'hero', 'primaryButtonText', 'Получить бесплатный расчет');
+  const heroSecondaryButtonText = getPageContentValue(contentMap, 'hero', 'secondaryButtonText', 'Смотреть примеры работ');
+  const ctaTitle = getPageContentValue(contentMap, 'cta', 'title', 'Нужна срочная установка?');
+  const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Изготавливаем и монтируем конструкции в сжатые сроки.');
+  const ctaButtonText = getPageContentValue(contentMap, 'cta', 'buttonText', 'Получить расчет');
   return (
     <div className="pb-24 md:pb-0">
       <OutdoorFloatingCtas />
@@ -151,10 +160,8 @@ export default function OutdoorAdvertisingPage() {
         <div className="card grid gap-8 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
           <div className="flex h-full flex-col gap-6 md:gap-7">
             <div className="space-y-4">
-              <h1 className="text-4xl font-bold leading-tight md:text-5xl">Наружная реклама под ключ в Ставропольском крае</h1>
-              <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">
-                Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.
-              </p>
+              <h1 className="text-4xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
+              <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">{heroDescription}</p>
             </div>
 
             <div className="flex flex-wrap gap-2.5">
@@ -173,15 +180,11 @@ export default function OutdoorAdvertisingPage() {
               <Link
                 href="#outdoor-form-section"
                 className="btn-primary no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
-              >
-                Получить бесплатный расчет
-              </Link>
+              >{heroPrimaryButtonText}</Link>
               <Link
                 href="#outdoor-portfolio"
                 className="btn-secondary no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-              >
-                Смотреть примеры работ
-              </Link>
+              >{heroSecondaryButtonText}</Link>
             </div>
           </div>
 
@@ -312,15 +315,13 @@ export default function OutdoorAdvertisingPage() {
       <Section className="pt-0" background="default">
         <div className="grid items-center gap-5 rounded-2xl bg-neutral-900 px-6 py-7 text-white dark:bg-neutral-800 md:grid-cols-[1fr_auto] md:gap-6 md:px-8">
           <div>
-            <h2 className="text-3xl font-bold">Нужна срочная установка?</h2>
-            <p className="mt-2.5 max-w-2xl text-neutral-200">Изготавливаем и монтируем конструкции в сжатые сроки.</p>
+            <h2 className="text-3xl font-bold">{ctaTitle}</h2>
+            <p className="mt-2.5 max-w-2xl text-neutral-200">{ctaDescription}</p>
           </div>
           <Link
             href="#outdoor-form-section"
             className="btn-primary w-full no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl md:w-auto"
-          >
-            Получить расчет
-          </Link>
+          >{ctaButtonText}</Link>
         </div>
       </Section>
 

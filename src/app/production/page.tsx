@@ -3,6 +3,7 @@ import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import Section from '@/components/layout/Section';
 import { ClipboardCheck, Cog, Factory, FileText, Frame, Lightbulb, PanelsTopLeft, PencilRuler, Printer, Ruler, ShieldCheck, Sparkles, Type, Wrench } from 'lucide-react';
+import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 
 const capabilityBadges = ['Фрезерный станок 2×4 м', 'Печать до 3.2 м', 'Плоттерная резка', 'Багетная мастерская'] as const;
 
@@ -113,7 +114,14 @@ const trustPoints = [
   { title: 'Гарантия на изделия', text: 'Сопровождаем проект и после монтажа.', icon: ShieldCheck },
 ] as const;
 
-export default function ProductionPage() {
+export default async function ProductionPage() {
+  const contentMap = await getPageContentMap('production');
+  const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Собственное производство рекламы');
+  const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Производим вывески, конструкции и печатную продукцию на собственном оборудовании с контролем качества на каждом этапе.');
+  const heroPrimaryButtonText = getPageContentValue(contentMap, 'hero', 'primaryButtonText', 'Обсудить проект');
+  const heroSecondaryButtonText = getPageContentValue(contentMap, 'hero', 'secondaryButtonText', 'Смотреть оборудование');
+  const ctaTitle = getPageContentValue(contentMap, 'cta', 'title', 'Готовы обсудить задачу?');
+  const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Расскажите о проекте — подберём материалы, сроки и предложим решение под ваш бюджет.');
   const heroCtaBaseClass =
     'inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold leading-none transition-all duration-200';
 
@@ -126,7 +134,7 @@ export default function ProductionPage() {
               СОБСТВЕННОЕ ПРОИЗВОДСТВО
             </p>
             <div className="space-y-4">
-              <h1 className="max-w-3xl text-3xl font-bold leading-[1.08] md:text-5xl">Собственное производство рекламы</h1>
+              <h1 className="max-w-3xl text-3xl font-bold leading-[1.08] md:text-5xl">{heroTitle}</h1>
               <p className="max-w-[33rem] text-base leading-relaxed text-neutral-700 md:text-[1.05rem] md:leading-relaxed">
                 Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Без посредников, с
                 контролем качества на каждом этапе.
@@ -148,9 +156,7 @@ export default function ProductionPage() {
               <Link
                 href="/contacts"
                 className={`${heroCtaBaseClass} border border-red-600 bg-red-600 text-white shadow-[0_8px_20px_rgba(220,38,38,0.24)] no-underline hover:border-red-700 hover:bg-red-700 hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]`}
-              >
-                Обсудить проект
-              </Link>
+              >{heroPrimaryButtonText}</Link>
               <a
                 href="#production-gallery"
                 className={`${heroCtaBaseClass} border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]`}
@@ -333,7 +339,7 @@ export default function ProductionPage() {
       <Section className="pt-0 pb-0">
         <div className="card flex flex-col gap-6 p-7 md:flex-row md:items-center md:justify-between md:gap-8 md:p-10">
           <div className="max-w-2xl space-y-3.5">
-            <h2 className="text-2xl font-semibold leading-tight md:text-3xl">Готовы обсудить задачу?</h2>
+            <h2 className="text-2xl font-semibold leading-tight md:text-3xl">{ctaTitle}</h2>
             <p className="text-neutral-700 md:text-lg">
               Подскажем по материалам, подготовим расчет и предложим оптимальное решение под ваш проект.
             </p>

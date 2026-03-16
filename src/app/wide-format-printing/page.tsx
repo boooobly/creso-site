@@ -3,8 +3,22 @@ import { Building2, ClipboardCheck, Droplets, FileText } from 'lucide-react';
 import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 import OrderWideFormatForm from '@/components/OrderWideFormatForm';
+import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 
-export default function WideFormatPrintingPage() {
+export default async function WideFormatPrintingPage() {
+  const contentMap = await getPageContentMap('wide_format');
+
+  const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Широкоформатная печать до 3.2 м');
+  const heroDescription = getPageContentValue(
+    contentMap,
+    'hero',
+    'description',
+    'Материалы, интерьерная/уличная печать, варианты постобработки.'
+  );
+  const ctaTitle = getPageContentValue(contentMap, 'cta', 'title', 'Нужна фигурная резка?');
+  const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Перейдите к услуге плоттерной резки.');
+  const ctaButtonText = getPageContentValue(contentMap, 'cta', 'buttonText', 'Перейти к плоттерной резке');
+
   const trustMarkers = [
     '720 dpi, 6 проходов',
     'Ширина рулона до 3.2 м',
@@ -39,8 +53,8 @@ export default function WideFormatPrintingPage() {
     <div>
       <Section className="pt-6 pb-4 md:pt-10 md:pb-6">
         <div className="card p-6 md:p-8">
-          <h1 className="text-3xl font-bold md:text-4xl">Широкоформатная печать до 3.2 м</h1>
-          <p className="mt-3 text-neutral-600">Материалы, интерьерная/уличная печать, варианты постобработки.</p>
+          <h1 className="text-3xl font-bold md:text-4xl">{heroTitle}</h1>
+          <p className="mt-3 text-neutral-600">{heroDescription}</p>
 
           <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-neutral-600">
             {trustMarkers.map((marker) => (
@@ -59,11 +73,11 @@ export default function WideFormatPrintingPage() {
 
           <div className="card flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between md:p-8">
             <div>
-              <h2 className="text-2xl font-semibold">Нужна фигурная резка?</h2>
-              <p className="text-neutral-700">Перейдите к услуге плоттерной резки.</p>
+              <h2 className="text-2xl font-semibold">{ctaTitle}</h2>
+              <p className="text-neutral-700">{ctaDescription}</p>
             </div>
             <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
-              <Link href="/plotter-cutting" className="btn-primary w-full text-center no-underline md:w-auto">Перейти к плоттерной резке</Link>
+              <Link href="/plotter-cutting" className="btn-primary w-full text-center no-underline md:w-auto">{ctaButtonText}</Link>
             </div>
           </div>
 

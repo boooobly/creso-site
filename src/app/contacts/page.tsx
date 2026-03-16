@@ -4,6 +4,7 @@ import { Calculator, Clock3, FileCheck2, Mail, MessageCircle, MessageSquare, Pac
 import ContactsLeadCapture from '@/components/ContactsLeadCapture';
 import MapSection from '@/components/MapSection';
 import { BRAND } from '@/lib/constants';
+import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { messages } from '@/lib/messages';
 
 
@@ -65,11 +66,16 @@ const processSteps = [
   },
 ] as const;
 
-export default function ContactsPage() {
+export default async function ContactsPage() {
+  const contentMap = await getPageContentMap('contacts');
+  const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Контакты');
+  const ctaTitle = getPageContentValue(contentMap, 'cta', 'title', 'Нужна консультация?');
+  const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Ответим в течение 15 минут в рабочее время.');
+  const ctaButtonText = getPageContentValue(contentMap, 'cta', 'buttonText', 'Перезвоните мне');
   return (
     <div className="space-y-10">
       <section className="space-y-4">
-        <h1 className="text-2xl font-bold">Контакты</h1>
+        <h1 className="text-2xl font-bold">{heroTitle}</h1>
         <p className="text-neutral-700 dark:text-neutral-300">Адрес: {BRAND.address}</p>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {quickContacts.map((item) => {
@@ -156,9 +162,9 @@ export default function ContactsPage() {
       </section>
 
       <section className="space-y-3 rounded-2xl bg-[var(--brand-red)]/10 p-6 text-center">
-        <h2 className="text-2xl font-bold">Нужна консультация?</h2>
-        <p className="text-neutral-700 dark:text-neutral-300">Ответим в течение 15 минут в рабочее время.</p>
-        <Link href="/contacts#contact-form" className="btn-primary inline-flex no-underline">Перезвоните мне</Link>
+        <h2 className="text-2xl font-bold">{ctaTitle}</h2>
+        <p className="text-neutral-700 dark:text-neutral-300">{ctaDescription}</p>
+        <Link href="/contacts#contact-form" className="btn-primary inline-flex no-underline">{ctaButtonText}</Link>
       </section>
     </div>
   );
