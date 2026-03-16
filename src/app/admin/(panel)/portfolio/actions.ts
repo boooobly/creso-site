@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 import {
@@ -95,6 +96,12 @@ async function ensureCoverImageAsset(payload: PortfolioPayload) {
   };
 }
 
+function rethrowIfRedirectError(error: unknown): void {
+  if (isRedirectError(error)) {
+    throw error;
+  }
+}
+
 function mapActionError(error: unknown): ActionResult {
   if (error instanceof ZodError) {
     return { error: error.issues[0]?.message ?? 'Проверьте корректность заполнения формы.' };
@@ -134,6 +141,7 @@ export async function createPortfolioItemAction(_: ActionResult, formData: FormD
     revalidatePath('/admin/portfolio');
     redirect('/admin/portfolio?success=created');
   } catch (error) {
+    rethrowIfRedirectError(error);
     console.error('[admin][portfolio][create] failed', error);
 
     if (createdAssetId) {
@@ -164,6 +172,7 @@ export async function updatePortfolioItemAction(
     revalidatePath(`/admin/portfolio/${id}`);
     redirect('/admin/portfolio?success=updated');
   } catch (error) {
+    rethrowIfRedirectError(error);
     console.error('[admin][portfolio][update] failed', { id, error });
 
     if (createdAssetId) {
