@@ -96,12 +96,6 @@ async function ensureCoverImageAsset(payload: PortfolioPayload) {
   };
 }
 
-function rethrowIfRedirectError(error: unknown): void {
-  if (isRedirectError(error)) {
-    throw error;
-  }
-}
-
 function mapActionError(error: unknown): ActionResult {
   if (error instanceof ZodError) {
     return { error: error.issues[0]?.message ?? 'Проверьте корректность заполнения формы.' };
@@ -130,6 +124,7 @@ function mapActionError(error: unknown): ActionResult {
 
 export async function createPortfolioItemAction(_: ActionResult, formData: FormData): Promise<ActionResult> {
   let createdAssetId: string | null = null;
+  let redirectTo: string | null = null;
 
   try {
     const payload = formDataToPayload(formData);
@@ -139,9 +134,8 @@ export async function createPortfolioItemAction(_: ActionResult, formData: FormD
     await createPortfolioItem(parsed);
 
     revalidatePath('/admin/portfolio');
-    redirect('/admin/portfolio?success=created');
+    redirectTo = '/admin/portfolio?success=created';
   } catch (error) {
-    rethrowIfRedirectError(error);
     console.error('[admin][portfolio][create] failed', error);
 
     if (createdAssetId) {
@@ -152,6 +146,12 @@ export async function createPortfolioItemAction(_: ActionResult, formData: FormD
 
     return mapActionError(error);
   }
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+
+  return {};
 }
 
 export async function updatePortfolioItemAction(
@@ -160,6 +160,7 @@ export async function updatePortfolioItemAction(
   formData: FormData
 ): Promise<ActionResult> {
   let createdAssetId: string | null = null;
+  let redirectTo: string | null = null;
 
   try {
     const payload = formDataToPayload(formData);
@@ -170,9 +171,8 @@ export async function updatePortfolioItemAction(
 
     revalidatePath('/admin/portfolio');
     revalidatePath(`/admin/portfolio/${id}`);
-    redirect('/admin/portfolio?success=updated');
+    redirectTo = '/admin/portfolio?success=updated';
   } catch (error) {
-    rethrowIfRedirectError(error);
     console.error('[admin][portfolio][update] failed', { id, error });
 
     if (createdAssetId) {
@@ -183,6 +183,12 @@ export async function updatePortfolioItemAction(
 
     return mapActionError(error);
   }
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+
+  return {};
 }
 
 export async function removePortfolioItemAction(id: string) {
