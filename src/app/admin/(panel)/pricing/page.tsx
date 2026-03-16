@@ -9,6 +9,7 @@ import {
   updateBaguetteExtrasPricingEntryAction,
   updatePriceCategoryAction,
   updatePriceItemAction,
+  updateBaguetteExtrasPricingEntryAction,
 } from './actions';
 
 const successMessages: Record<string, string> = {
@@ -134,6 +135,8 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
           </div>
         </form>
       </section>
+
+      <BaguetteExtrasConfigSection entries={baguetteConfigData.entries} histories={baguetteConfigData.histories} />
 
       {categories.length === 0 ? (
         <section className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
