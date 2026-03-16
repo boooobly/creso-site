@@ -102,21 +102,38 @@ model PageContent {
 }
 
 model PricingEntry {
-  id          String   @id @default(cuid())
+  id          String                @id @default(cuid())
   category    String
-  subcategory String   @default("")
+  subcategory String                @default("")
   key         String
   label       String
   value       Json
   unit        String?
-  type        String   @default("number")
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  type        String                @default("number")
+  sortOrder   Int                   @default(0)
+  isActive    Boolean               @default(true)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  histories   PricingEntryHistory[]
 
   @@unique([category, subcategory, key])
   @@index([category, isActive, sortOrder])
+}
+
+model PricingEntryHistory {
+  id             String       @id @default(cuid())
+  pricingEntryId String
+  pricingEntry   PricingEntry @relation(fields: [pricingEntryId], references: [id], onDelete: Cascade)
+  category       String
+  subcategory    String
+  key            String
+  oldValue       Json
+  newValue       Json
+  note           String?
+  createdAt      DateTime     @default(now())
+
+  @@index([pricingEntryId, createdAt])
+  @@index([category, createdAt])
 }
 
 
