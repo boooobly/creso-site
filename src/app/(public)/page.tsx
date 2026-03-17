@@ -5,15 +5,18 @@ import { getServices, getFaq } from '@/lib/contentful';
 import { messages } from '@/lib/messages';
 import { getFeaturedPortfolioItems } from '@/lib/public-portfolio';
 import { getFaqItemsFromContentMap, getPageContentList, getPageContentMap, getPageContentValue } from '@/lib/page-content';
-import { getSiteImage } from '@/lib/site-images';
+import { getSiteImage, getSiteImages } from '@/lib/site-images';
+import { SERVICE_CARD_IMAGE_SLOT_BY_ID } from '@/lib/site-service-image-slots';
 
 export default async function Home() {
-  const [sCMS, fCMS, featuredPortfolio, contentMap, homeHeroImage] = await Promise.all([
+  const [sCMS, fCMS, featuredPortfolio, contentMap, homeHeroImage, homePortfolioImages, serviceCardImages] = await Promise.all([
     getServices().catch(() => null),
     getFaq().catch(() => null),
     getFeaturedPortfolioItems(3).catch(() => []),
     getPageContentMap('home'),
     getSiteImage('home.hero.main'),
+    getSiteImages(['home.portfolio.som', 'home.portfolio.nevinnomyssk', 'home.portfolio.apple']),
+    getSiteImages(Object.values(SERVICE_CARD_IMAGE_SLOT_BY_ID)),
   ]);
 
   const services = (sCMS ?? servicesLocal) as any[];
@@ -51,21 +54,21 @@ export default async function Home() {
           title: 'Рекламная стела для СОМ',
           shortDescription:
             'Многоуровневая рекламная конструкция с яркими рекламными блоками для сети строительных материалов.',
-          image: '/images/home_page/examples_of_work/som.png',
+          image: homePortfolioImages['home.portfolio.som']?.url ?? '/images/home_page/examples_of_work/som.png',
         },
         {
           id: 'nevinnomyssk',
           title: 'Въездная стела Невинномысск',
           shortDescription:
             'Крупная городская конструкция с объемными элементами и чистой современной подачей.',
-          image: '/images/home_page/examples_of_work/nevinnomyssk.png',
+          image: homePortfolioImages['home.portfolio.nevinnomyssk']?.url ?? '/images/home_page/examples_of_work/nevinnomyssk.png',
         },
         {
           id: 'apple-time',
           title: 'Световой лайтбокс Apple Time',
           shortDescription:
             'Подвесной световой короб для торговой точки с аккуратной подсветкой и читаемой навигацией.',
-          image: '/images/home_page/examples_of_work/apple.png',
+          image: homePortfolioImages['home.portfolio.apple']?.url ?? '/images/home_page/examples_of_work/apple.png',
         },
       ]).map((item) => ({
     id: item.id,
@@ -169,12 +172,18 @@ export default async function Home() {
   const homeHeroImageSrc = homeHeroImage?.url ?? '/images/home_page/hero.png';
   const homeHeroImageAlt = homeHeroImage?.altText || 'Производственная студия Credomir';
 
-  const servicesWithHref = services.map((service) => ({
-    id: String(service.id),
-    title: String(service.title),
-    description: String(service.description ?? ''),
-    href: resolveServiceHref(service),
-  }));
+  const servicesWithHref = services.map((service) => {
+    const serviceId = String(service.id);
+    const imageSlotKey = SERVICE_CARD_IMAGE_SLOT_BY_ID[serviceId];
+
+    return {
+      id: serviceId,
+      title: String(service.title),
+      description: String(service.description ?? ''),
+      href: resolveServiceHref(service),
+      imageSrc: imageSlotKey ? (serviceCardImages[imageSlotKey]?.url ?? undefined) : undefined,
+    };
+  });
 
   return (
     <div className="home-page-root">

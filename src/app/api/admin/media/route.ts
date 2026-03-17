@@ -6,6 +6,15 @@ import { revalidateAfterMediaChange } from '@/lib/admin/media-revalidation';
 
 export const runtime = 'nodejs';
 
+
+function parsePositiveInt(value: string | null, fallback: number) {
+  if (!value) return fallback;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
+  return parsed;
+}
+
+
 export async function GET(request: NextRequest) {
   try {
     const unauthorized = await requireAdminApiAuth(request);
@@ -13,11 +22,15 @@ export async function GET(request: NextRequest) {
 
     const query = request.nextUrl.searchParams;
     const scope = query.get('scope');
+    const search = query.get('search')?.trim() ?? '';
+    const page = parsePositiveInt(query.get('page'), 1);
+    const pageSize = Math.min(parsePositiveInt(query.get('pageSize'), 20), 100);
+
     const result = await listMediaAssets({
-      page: query.get('page') ?? undefined,
-      pageSize: query.get('pageSize') ?? undefined,
+      page,
+      pageSize,
       scope: scope === 'site' || scope === 'portfolio' ? scope : undefined,
-      search: query.get('search') ?? undefined
+      search: search.length > 0 ? search : undefined,
     });
 
     return NextResponse.json({ ok: true, ...result });

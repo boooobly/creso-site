@@ -33,7 +33,7 @@ const heroChipVariants = {
 };
 
 type HomePageContentProps = {
-  services: Array<{ id: string; title: string; description: string; href: string }>;
+  services: Array<{ id: string; title: string; description: string; href: string; imageSrc?: string }>;
   faq: any[];
   messages: SiteMessages;
   featuredPortfolioItems: Array<{ id: string; title: string; description: string; imageSrc: string }>;
@@ -204,7 +204,7 @@ export default function HomePageContent({
         <motion.div className="grid items-stretch gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {services.map((s) => (
             <motion.div key={s.id} variants={fadeUp(16)} className="h-full">
-              <ServiceCard title={s.title} desc={s.description} href={s.href} imageSrc={serviceImageById[s.id]} />
+              <ServiceCard title={s.title} desc={s.description} href={s.href} imageSrc={s.imageSrc ?? serviceImageById[s.id]} />
             </motion.div>
           ))}
         </motion.div>

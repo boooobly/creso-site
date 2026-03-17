@@ -2,7 +2,8 @@ import { getServices } from '@/lib/contentful';
 import servicesLocal from '@/data/services.json';
 import Section from '@/components/Section';
 import ServiceCard from '@/components/ServiceCard';
-
+import { getSiteImages } from '@/lib/site-images';
+import { SERVICE_CARD_IMAGE_SLOT_BY_ID } from '@/lib/site-service-image-slots';
 
 const serviceImageById: Record<string, string> = {
   baget: '/images/services/bagget.png',
@@ -17,7 +18,10 @@ const serviceImageById: Record<string, string> = {
 };
 
 export default async function ServicesPage() {
-  const sCMS = await getServices().catch(() => null);
+  const [sCMS, serviceCardImages] = await Promise.all([
+    getServices().catch(() => null),
+    getSiteImages(Object.values(SERVICE_CARD_IMAGE_SLOT_BY_ID)),
+  ]);
   const services = sCMS ?? (servicesLocal as any[]);
 
   const resolveServiceHref = (service: any) => {
@@ -55,9 +59,12 @@ export default async function ServicesPage() {
 
       <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-8 md:py-10">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((s: any) => (
-            <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} imageSrc={serviceImageById[s.id]} />
-          ))}
+          {services.map((s: any) => {
+            const slotKey = SERVICE_CARD_IMAGE_SLOT_BY_ID[String(s.id)];
+            const imageSrc = slotKey ? (serviceCardImages[slotKey]?.url ?? serviceImageById[s.id]) : serviceImageById[s.id];
+
+            return <ServiceCard key={s.id} title={s.title} desc={s.description} href={resolveServiceHref(s)} imageSrc={imageSrc} />;
+          })}
         </div>
       </Section>
     </>
