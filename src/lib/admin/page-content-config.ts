@@ -1,4 +1,18 @@
-export type PageContentFieldType = 'text' | 'textarea';
+export type PageContentFieldType = 'text' | 'textarea' | 'list';
+
+export type PageContentListItemField = {
+  key: string;
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+};
+
+export type PageContentListSchema = {
+  itemName: string;
+  minItems?: number;
+  maxItems?: number;
+  fields: PageContentListItemField[];
+};
 
 export type PageContentFieldDefinition = {
   sectionKey: string;
@@ -7,7 +21,27 @@ export type PageContentFieldDefinition = {
   helper?: string;
   type: PageContentFieldType;
   defaultValue: string;
+  listSchema?: PageContentListSchema;
 };
+
+function listField(params: {
+  sectionKey: string;
+  fieldKey: string;
+  label: string;
+  helper?: string;
+  defaultItems: Array<Record<string, string>>;
+  listSchema: PageContentListSchema;
+}): PageContentFieldDefinition {
+  return {
+    sectionKey: params.sectionKey,
+    fieldKey: params.fieldKey,
+    label: params.label,
+    helper: params.helper,
+    type: 'list',
+    defaultValue: JSON.stringify(params.defaultItems),
+    listSchema: params.listSchema,
+  };
+}
 
 export type PageContentSectionDefinition = {
   key: string;
@@ -23,30 +57,6 @@ export type PageContentPageDefinition = {
   sections: PageContentSectionDefinition[];
 };
 
-function faqFields(sectionKey: string, defaults: Array<{ question: string; answer: string }>) {
-  return defaults.flatMap((item, index) => {
-    const itemNumber = index + 1;
-
-    return [
-      {
-        sectionKey,
-        fieldKey: `question${itemNumber}`,
-        label: `Вопрос ${itemNumber}`,
-        helper: 'Оставьте поле пустым, чтобы скрыть пункт на сайте.',
-        type: 'text' as const,
-        defaultValue: item.question,
-      },
-      {
-        sectionKey,
-        fieldKey: `answer${itemNumber}`,
-        label: `Ответ ${itemNumber}`,
-        type: 'textarea' as const,
-        defaultValue: item.answer,
-      },
-    ];
-  });
-}
-
 export const PAGE_CONTENT_DEFINITIONS: PageContentPageDefinition[] = [
   {
     key: 'home',
@@ -58,10 +68,59 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentPageDefinition[] = [
         title: 'Первый экран',
         description: 'Главный заголовок и кнопки на первом экране.',
         fields: [
+          { sectionKey: 'hero', fieldKey: 'eyebrow', label: 'Короткая подпись над заголовком', type: 'text', defaultValue: 'ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR' },
           { sectionKey: 'hero', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Производство рекламы под ключ' },
           { sectionKey: 'hero', fieldKey: 'description', label: 'Описание', type: 'textarea', defaultValue: 'Вывески, печать, конструкции и монтаж. От идеи до установки.' },
           { sectionKey: 'hero', fieldKey: 'primaryButtonText', label: 'Текст кнопки', helper: 'Основная кнопка', type: 'text', defaultValue: 'Рассчитать стоимость' },
           { sectionKey: 'hero', fieldKey: 'secondaryButtonText', label: 'Текст кнопки', helper: 'Вторая кнопка', type: 'text', defaultValue: 'Смотреть портфолио' },
+          listField({
+            sectionKey: 'hero',
+            fieldKey: 'trustBadges',
+            label: 'Бейджи доверия под кнопками',
+            helper: 'Короткие факты в первом экране (до 6 пунктов).',
+            defaultItems: [
+              { label: 'Собственное производство' },
+              { label: 'Монтажная бригада' },
+              { label: 'Работаем по договору' },
+              { label: 'Гарантия 5 лет' },
+            ],
+            listSchema: {
+              itemName: 'Бейдж',
+              minItems: 1,
+              maxItems: 6,
+              fields: [{ key: 'label', label: 'Текст бейджа', required: true }],
+            },
+          }),
+        ],
+      },
+      {
+        key: 'trust_section',
+        title: 'Почему нам доверяют',
+        description: 'Заголовки и карточки преимуществ на главной странице.',
+        fields: [
+          { sectionKey: 'trust_section', fieldKey: 'eyebrow', label: 'Короткая подпись раздела', type: 'text', defaultValue: 'ПОЧЕМУ НАМ ДОВЕРЯЮТ' },
+          { sectionKey: 'trust_section', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'С нами проще работать' },
+          listField({
+            sectionKey: 'trust_section',
+            fieldKey: 'featureCards',
+            label: 'Карточки преимуществ',
+            helper: 'Карточки показываются в том же порядке, что и в списке.',
+            defaultItems: [
+              { title: 'Берём задачу под ключ', description: 'От замера и макета до производства и монтажа.' },
+              { title: 'Подбираем решение под бюджет', description: 'Предлагаем оптимальный вариант под вашу задачу.' },
+              { title: 'Держим сроки', description: 'Сразу говорим реальные сроки без лишних обещаний.' },
+              { title: 'Всегда можно уточнить детали', description: 'Помогаем по материалам, размерам и конструкции.' },
+            ],
+            listSchema: {
+              itemName: 'Карточка преимущества',
+              minItems: 1,
+              maxItems: 8,
+              fields: [
+                { key: 'title', label: 'Заголовок', required: true },
+                { key: 'description', label: 'Описание', required: true },
+              ],
+            },
+          }),
         ],
       },
       {
@@ -70,18 +129,95 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentPageDefinition[] = [
         fields: [
           { sectionKey: 'portfolio_preview', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Примеры работ' },
           { sectionKey: 'portfolio_preview', fieldKey: 'description', label: 'Описание', type: 'textarea', defaultValue: 'Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.' },
+          { sectionKey: 'portfolio_preview', fieldKey: 'linkLabel', label: 'Текст ссылки', type: 'text', defaultValue: 'Смотреть всё портфолио' },
+        ],
+      },
+      {
+        key: 'process',
+        title: 'Раздел «Процесс»',
+        fields: [
+          { sectionKey: 'process', fieldKey: 'eyebrow', label: 'Короткая подпись раздела', type: 'text', defaultValue: 'ПРОЦЕСС' },
+          { sectionKey: 'process', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Как мы запускаем ваш проект' },
+          { sectionKey: 'process', fieldKey: 'description', label: 'Описание', type: 'textarea', defaultValue: 'Понятные этапы, реальные сроки и контроль качества на каждом шаге.' },
+          listField({
+            sectionKey: 'process',
+            fieldKey: 'steps',
+            label: 'Шаги процесса',
+            helper: 'От 2 до 6 шагов. Показываются в указанном порядке.',
+            defaultItems: [
+              { title: 'Бриф и расчёт', description: 'Уточняем задачу, сроки и бюджет. Подбираем формат, материалы и решение.' },
+              { title: 'Макет и согласование', description: 'Готовим визуализацию, уточняем детали и согласовываем финальный вариант.' },
+              { title: 'Производство', description: 'Запускаем проект на собственных мощностях и контролируем качество на каждом этапе.' },
+              { title: 'Монтаж и передача', description: 'Организуем доставку, установку или передачу готового тиража.' },
+            ],
+            listSchema: {
+              itemName: 'Шаг',
+              minItems: 2,
+              maxItems: 6,
+              fields: [
+                { key: 'title', label: 'Название шага', required: true },
+                { key: 'description', label: 'Описание шага', required: true },
+              ],
+            },
+          }),
         ],
       },
       {
         key: 'faq',
         title: 'FAQ',
         description: 'Вопросы и ответы на главной странице.',
-        fields: faqFields('faq', [
-          { question: 'Как быстро вы делаете расчёт?', answer: 'Обычно считаем стоимость в день обращения после уточнения задачи.' },
-          { question: 'Можно ли работать по договору?', answer: 'Да, при необходимости заключаем договор и фиксируем сроки.' },
-          { question: 'Вы занимаетесь монтажом?', answer: 'Да, делаем монтаж собственной бригадой в Ставропольском крае и рядом.' },
-          { question: 'Помогаете с подбором материалов?', answer: 'Да, подбираем материалы под бюджет и условия эксплуатации.' },
-        ]),
+        fields: [
+          { sectionKey: 'faq', fieldKey: 'eyebrow', label: 'Короткая подпись раздела', type: 'text', defaultValue: 'FAQ' },
+          { sectionKey: 'faq', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Частые вопросы' },
+          { sectionKey: 'faq', fieldKey: 'description', label: 'Описание', type: 'textarea', defaultValue: 'Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.' },
+          { sectionKey: 'faq', fieldKey: 'linkLabel', label: 'Текст ссылки', type: 'text', defaultValue: 'Задать свой вопрос' },
+          listField({
+            sectionKey: 'faq',
+            fieldKey: 'items',
+            label: 'Список вопросов и ответов',
+            helper: 'Первые 4 пункта выводятся на главной странице.',
+            defaultItems: [
+              { question: 'Как быстро вы делаете расчёт?', answer: 'Обычно считаем стоимость в день обращения после уточнения задачи.' },
+              { question: 'Можно ли работать по договору?', answer: 'Да, при необходимости заключаем договор и фиксируем сроки.' },
+              { question: 'Вы занимаетесь монтажом?', answer: 'Да, делаем монтаж собственной бригадой в Ставропольском крае и рядом.' },
+              { question: 'Помогаете с подбором материалов?', answer: 'Да, подбираем материалы под бюджет и условия эксплуатации.' },
+            ],
+            listSchema: {
+              itemName: 'Вопрос',
+              minItems: 1,
+              maxItems: 12,
+              fields: [
+                { key: 'question', label: 'Вопрос', required: true },
+                { key: 'answer', label: 'Ответ', required: true },
+              ],
+            },
+          }),
+        ],
+      },
+      {
+        key: 'lead',
+        title: 'Финальный CTA-блок с формой',
+        fields: [
+          { sectionKey: 'lead', fieldKey: 'eyebrow', label: 'Короткая подпись раздела', type: 'text', defaultValue: 'ЗАЯВКА' },
+          { sectionKey: 'lead', fieldKey: 'description', label: 'Короткое описание', type: 'textarea', defaultValue: 'Опишите задачу — предложим формат, сроки и стоимость.' },
+          listField({
+            sectionKey: 'lead',
+            fieldKey: 'points',
+            label: 'Пункты преимуществ рядом с формой',
+            helper: 'Список коротких пунктов слева от формы.',
+            defaultItems: [
+              { label: 'Расчёт стоимости и сроков в день обращения' },
+              { label: 'Подбор материалов под бюджет и задачу' },
+              { label: 'Один менеджер на всём цикле проекта' },
+            ],
+            listSchema: {
+              itemName: 'Пункт',
+              minItems: 1,
+              maxItems: 8,
+              fields: [{ key: 'label', label: 'Текст пункта', required: true }],
+            },
+          }),
+        ],
       },
     ],
   },

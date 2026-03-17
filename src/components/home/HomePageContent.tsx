@@ -37,50 +37,35 @@ type HomePageContentProps = {
   faq: any[];
   messages: SiteMessages;
   featuredPortfolioItems: Array<{ id: string; title: string; description: string; imageSrc: string }>;
+  heroEyebrow: string;
   heroTitle: string;
   heroDescription: string;
   heroPrimaryButtonText: string;
   heroSecondaryButtonText: string;
+  heroTrustBadges: Array<{ label: string }>;
+  trustSectionEyebrow: string;
+  trustSectionTitle: string;
+  trustFeatureCards: Array<{ title: string; description: string }>;
   portfolioBlockTitle: string;
   portfolioBlockDescription: string;
+  portfolioLinkLabel: string;
+  processEyebrow: string;
+  processTitle: string;
+  processDescription: string;
+  processSteps: Array<{ title: string; description: string }>;
+  faqEyebrow: string;
+  faqTitle: string;
+  faqDescription: string;
+  faqLinkLabel: string;
+  leadEyebrow: string;
+  leadDescription: string;
+  leadPoints: Array<{ label: string }>;
   heroImageSrc: string;
   heroImageAlt: string;
 };
 
-const trustBadges = ['Собственное производство', 'Монтажная бригада', 'Работаем по договору', 'Гарантия 5 лет'];
-
-const trustHighlights = [
-  { title: 'Берём задачу под ключ', description: 'От замера и макета до производства и монтажа.', icon: KeyRound },
-  { title: 'Подбираем решение под бюджет', description: 'Предлагаем оптимальный вариант под вашу задачу.', icon: Wallet },
-  { title: 'Держим сроки', description: 'Сразу говорим реальные сроки без лишних обещаний.', icon: Clock3 },
-  { title: 'Всегда можно уточнить детали', description: 'Помогаем по материалам, размерам и конструкции.', icon: Search },
-];
-
-const processSteps = [
-  {
-    title: 'Бриф и расчёт',
-    description: 'Уточняем задачу, сроки и бюджет. Подбираем формат, материалы и решение.',
-    icon: ClipboardList,
-  },
-  {
-    title: 'Макет и согласование',
-    description: 'Готовим визуализацию, уточняем детали и согласовываем финальный вариант.',
-    icon: PencilRuler,
-  },
-  {
-    title: 'Производство',
-    description: 'Запускаем проект на собственных мощностях и контролируем качество на каждом этапе.',
-    icon: Cog,
-  },
-  {
-    title: 'Монтаж и передача',
-    description: 'Организуем доставку, установку или передачу готового тиража.',
-    icon: Truck,
-  },
-];
-
-const leadPoints = ['Расчёт стоимости и сроков в день обращения', 'Подбор материалов под бюджет и задачу', 'Один менеджер на всём цикле проекта'];
-
+const trustIcons = [KeyRound, Wallet, Clock3, Search];
+const processIcons = [ClipboardList, PencilRuler, Cog, Truck];
 
 const serviceImageById: Record<string, string> = {
   baget: '/images/services/bagget.png',
@@ -94,8 +79,37 @@ const serviceImageById: Record<string, string> = {
   polygraphy: '/images/services/cards.png',
 };
 
-
-export default function HomePageContent({ services, faq, messages, featuredPortfolioItems, heroTitle, heroDescription, heroPrimaryButtonText, heroSecondaryButtonText, portfolioBlockTitle, portfolioBlockDescription, heroImageSrc, heroImageAlt }: HomePageContentProps) {
+export default function HomePageContent({
+  services,
+  faq,
+  messages,
+  featuredPortfolioItems,
+  heroEyebrow,
+  heroTitle,
+  heroDescription,
+  heroPrimaryButtonText,
+  heroSecondaryButtonText,
+  heroTrustBadges,
+  trustSectionEyebrow,
+  trustSectionTitle,
+  trustFeatureCards,
+  portfolioBlockTitle,
+  portfolioBlockDescription,
+  portfolioLinkLabel,
+  processEyebrow,
+  processTitle,
+  processDescription,
+  processSteps,
+  faqEyebrow,
+  faqTitle,
+  faqDescription,
+  faqLinkLabel,
+  leadEyebrow,
+  leadDescription,
+  leadPoints,
+  heroImageSrc,
+  heroImageAlt,
+}: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -105,7 +119,7 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
             <div className="space-y-5">
               <p className="t-eyebrow inline-flex rounded-full border border-[#efb9b9] bg-[#fff7f7] px-4 py-1.5 text-[var(--brand-red)]">
-                ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR
+                {heroEyebrow}
               </p>
               <AnimatedBlurHeadline className="t-h1 max-w-[16ch]" text={heroTitle} breakAfterWord={1} />
               <p className="t-body text-muted-foreground max-w-[40rem]">{heroDescription}</p>
@@ -117,7 +131,7 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
                   {heroPrimaryButtonText}
                 </Link>
               </motion.div>
-              <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
+              <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
                 <Link className="btn-secondary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/portfolio" aria-label="Перейти в портфолио">
                   {heroSecondaryButtonText}
                 </Link>
@@ -125,8 +139,8 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
             </div>
 
             <motion.ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4" initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-              {trustBadges.map((badge, index) => (
-                <BadgeChip key={badge} label={badge} index={index} variants={heroChipVariants} />
+              {heroTrustBadges.map((badge, index) => (
+                <BadgeChip key={`${badge.label}-${index}`} label={badge.label} index={index} variants={heroChipVariants} />
               ))}
             </motion.ul>
           </motion.div>
@@ -157,16 +171,16 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
 
       <Section className="border-y border-neutral-200/70 py-12 md:py-14" background="muted" fullBleed>
         <div className="mb-6 space-y-2 md:mb-7">
-          <p className="t-eyebrow">ПОЧЕМУ НАМ ДОВЕРЯЮТ</p>
-          <h2 className="t-h2">С нами проще работать</h2>
+          <p className="t-eyebrow">{trustSectionEyebrow}</p>
+          <h2 className="t-h2">{trustSectionTitle}</h2>
         </div>
         <motion.ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
-          {trustHighlights.map((item) => {
-            const Icon = item.icon;
+          {trustFeatureCards.map((item, index) => {
+            const Icon = trustIcons[index % trustIcons.length];
 
             return (
               <motion.li
-                key={item.title}
+                key={`${item.title}-${index}`}
                 variants={fadeUp(14)}
                 className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
               >
@@ -203,7 +217,7 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
             <h2 className="t-h2">{portfolioBlockTitle}</h2>
             <p className="t-body text-muted-foreground max-w-2xl">{portfolioBlockDescription}</p>
           </div>
-          <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Смотреть всё портфолио</Link>
+          <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{portfolioLinkLabel}</Link>
         </div>
         <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {featuredPortfolioItems.map((item) => (
@@ -216,17 +230,17 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
 
       <Section className="py-12 md:py-16">
         <div className="mb-5 space-y-2 md:mb-8">
-          <p className="t-eyebrow">ПРОЦЕСС</p>
-          <h2 className="t-h2">Как мы запускаем ваш проект</h2>
-          <p className="t-body text-muted-foreground max-w-2xl">Понятные этапы, реальные сроки и контроль качества на каждом шаге.</p>
+          <p className="t-eyebrow">{processEyebrow}</p>
+          <h2 className="t-h2">{processTitle}</h2>
+          <p className="t-body text-muted-foreground max-w-2xl">{processDescription}</p>
         </div>
         <motion.ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {processSteps.map((step, index) => {
-            const Icon = step.icon;
+            const Icon = processIcons[index % processIcons.length];
 
             return (
               <motion.li
-                key={step.title}
+                key={`${step.title}-${index}`}
                 variants={fadeUp(16)}
                 className="relative h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
               >
@@ -245,11 +259,11 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
       <Section background="muted" className="border-y border-neutral-200/60 py-12 md:py-16" fullBleed>
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-8">
           <div className="space-y-2">
-            <p className="t-eyebrow">FAQ</p>
-            <h2 className="t-h2">Частые вопросы</h2>
-            <p className="t-body text-muted-foreground max-w-2xl">Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.</p>
+            <p className="t-eyebrow">{faqEyebrow}</p>
+            <h2 className="t-h2">{faqTitle}</h2>
+            <p className="t-body text-muted-foreground max-w-2xl">{faqDescription}</p>
           </div>
-          <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">Задать свой вопрос</Link>
+          <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{faqLinkLabel}</Link>
         </div>
         <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="rounded-2xl border border-neutral-200/70 bg-white/80 p-4 sm:p-5 md:p-6">
           <FAQ items={faq.slice(0, 4)} />
@@ -268,15 +282,15 @@ export default function HomePageContent({ services, faq, messages, featuredPortf
           />
           <div className="relative z-10 space-y-4 lg:max-w-[30rem]">
             <div className="space-y-3">
-              <p className="t-eyebrow">ЗАЯВКА</p>
+              <p className="t-eyebrow">{leadEyebrow}</p>
               <h2 className="t-h2 font-extrabold">{messages.lead.title}</h2>
-              <p className="t-body text-muted-foreground max-w-md">Опишите задачу — предложим формат, сроки и стоимость.</p>
+              <p className="t-body text-muted-foreground max-w-md">{leadDescription}</p>
             </div>
             <ul className="space-y-2">
-              {leadPoints.map((point) => (
-                <li key={point} className="flex items-start gap-2.5 text-sm text-neutral-700">
+              {leadPoints.map((point, index) => (
+                <li key={`${point.label}-${index}`} className="flex items-start gap-2.5 text-sm text-neutral-700">
                   <CheckCircle2 className="mt-0.5 size-4 text-[var(--brand-red)]" />
-                  <span>{point}</span>
+                  <span>{point.label}</span>
                 </li>
               ))}
             </ul>
