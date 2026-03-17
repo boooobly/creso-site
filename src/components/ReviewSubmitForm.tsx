@@ -31,7 +31,8 @@ export default function ReviewSubmitForm({ onSubmitted }: ReviewSubmitFormProps)
     event.preventDefault();
     setSubmitState({ type: 'idle' });
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const text = String(formData.get('text') || '').trim();
 
     if (URL_PATTERN.test(text)) {
@@ -52,37 +53,41 @@ export default function ReviewSubmitForm({ onSubmitted }: ReviewSubmitFormProps)
 
     setIsSubmitting(true);
 
+    let response: Response;
     try {
-      const response = await fetch('/api/reviews', {
+      response = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
-      if (!response.ok) {
-        const body = (await response.json().catch(() => null)) as { error?: string } | null;
-        setSubmitState({
-          type: 'error',
-          message: body?.error || 'Не удалось отправить отзыв. Попробуйте позже.',
-        });
-        return;
-      }
-
-      event.currentTarget.reset();
-      setRating(5);
-      setSubmitState({
-        type: 'success',
-        message: 'Спасибо! Ваш отзыв появится после модерации.',
-      });
-      onSubmitted?.();
     } catch {
       setSubmitState({
         type: 'error',
         message: 'Ошибка сети. Попробуйте позже.',
       });
-    } finally {
       setIsSubmitting(false);
+      return;
     }
+
+    const body = (await response.json().catch(() => null)) as { error?: string } | null;
+
+    if (!response.ok) {
+      setSubmitState({
+        type: 'error',
+        message: body?.error || 'Не удалось отправить отзыв. Попробуйте позже.',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    form.reset();
+    setRating(5);
+    setSubmitState({
+      type: 'success',
+      message: 'Спасибо! Ваш отзыв сохранён и появится после модерации.',
+    });
+    onSubmitted?.();
+    setIsSubmitting(false);
   }
 
   return (
