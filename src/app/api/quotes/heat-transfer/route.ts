@@ -4,6 +4,7 @@ import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getHeatTransferQuote, type HeatTransferPricingInput } from '@/lib/engine';
 
 import { logger } from '@/lib/logger';
+import { getHeatTransferPricingConfig } from '@/lib/heat-transfer/heatTransferPricing';
 const heatTransferQuoteSchema = z.object({
   productType: z.enum(['mug', 'tshirt', 'film']),
   mugType: z.enum(['white330', 'chameleon']),
@@ -26,7 +27,8 @@ export async function POST(req: Request) {
     }
 
     const input: HeatTransferPricingInput = parsed.data;
-    const quote = getHeatTransferQuote(input);
+    const pricing = await getHeatTransferPricingConfig();
+    const quote = getHeatTransferQuote(input, pricing.config);
 
     logQuoteGeneration({
       calculatorType: 'heat-transfer',

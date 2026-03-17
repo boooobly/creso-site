@@ -15,6 +15,7 @@ import {
 import { updateBaguetteExtrasPricingEntry } from '@/lib/admin/baguette-extras-pricing-service';
 import { updateWideFormatPricingEntry } from '@/lib/wide-format/wideFormatPricing';
 import { updatePlotterCuttingPricingEntry } from '@/lib/plotter-cutting/plotterCuttingPricing';
+import { updateHeatTransferPricingEntry } from '@/lib/heat-transfer/heatTransferPricing';
 
 function parseBoolean(value: FormDataEntryValue | null) {
   return value === 'on' || value === 'true' || value === '1';
@@ -189,6 +190,20 @@ export async function updatePlotterCuttingPricingEntryAction(entryId: string, fo
 
     revalidatePath('/admin/pricing');
     redirect('/admin/pricing?success=plotter-cutting-config-updated');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
+
+
+export async function updateHeatTransferPricingEntryAction(entryId: string, formData: FormData) {
+  try {
+    const rawValue = String(formData.get('value') ?? '').trim();
+    const note = String(formData.get('note') ?? '').trim();
+    await updateHeatTransferPricingEntry(entryId, rawValue, note || undefined);
+
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=heat-transfer-config-updated');
   } catch (error) {
     redirectWithError(error);
   }
