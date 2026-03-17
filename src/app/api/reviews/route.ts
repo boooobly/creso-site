@@ -20,17 +20,11 @@ const createReviewSchema = z.object({
   website: z.string().optional(),
 });
 
-const emptyReviewsResponse = {
-  items: [],
-  totalApproved: 0,
-  averageRating: null,
-  nextCursor: null,
-} satisfies {
-  items: Array<{ id: string; name: string | null; isAnonymous: boolean; rating: number; text: string; createdAt: string }>;
-  totalApproved: number;
-  averageRating: number | null;
-  nextCursor: string | null;
-};
+
+const listReviewsQuerySchema = z.object({
+  cursor: z.string().trim().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(12),
+});
 
 function getClientIp(request: NextRequest): string | null {
   const forwardedFor = request.headers.get('x-forwarded-for');
@@ -43,8 +37,65 @@ function getClientIp(request: NextRequest): string | null {
   return realIp || null;
 }
 
-export async function GET() {
-  return NextResponse.json(emptyReviewsResponse, { status: 200 });
+export async function GET(request: NextRequest) {
+  try {
+    const parsedQuery = listReviewsQuerySchema.safeParse({
+      cursor: request.nextUrl.searchParams.get('cursor') ?? undefined,
+      limit: request.nextUrl.searchParams.get('limit') ?? undefined,
+    });
+
+    if (!parsedQuery.success) {
+      return NextResponse.json({ ok: false, error: 'Некорректные параметры запроса.' }, { status: 400 });
+    }
+
+    const { cursor, limit } = parsedQuery.data;
+
+    const [reviews, totalApproved, ratingStats] = await prisma.$transaction([
+      prisma.review.findMany({
+        where: { status: 'approved' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        cursor: cursor ? { id: cursor } : undefined,
+        skip: cursor ? 1 : 0,
+        take: limit + 1,
+        select: {
+          id: true,
+          name: true,
+          isAnonymous: true,
+          rating: true,
+          text: true,
+          createdAt: true,
+        },
+      }),
+      prisma.review.count({ where: { status: 'approved' } }),
+      prisma.review.aggregate({
+        where: { status: 'approved' },
+        _avg: { rating: true },
+      }),
+    ]);
+
+    const hasMore = reviews.length > limit;
+    const pageItems = hasMore ? reviews.slice(0, limit) : reviews;
+
+    return NextResponse.json(
+      {
+        items: pageItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+          isAnonymous: item.isAnonymous,
+          rating: item.rating,
+          text: item.text,
+          createdAt: item.createdAt.toISOString(),
+        })),
+        totalApproved,
+        averageRating: ratingStats._avg.rating,
+        nextCursor: hasMore ? pageItems[pageItems.length - 1]?.id ?? null : null,
+      },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error('[api/reviews] GET failed', error);
+    return NextResponse.json({ ok: false, error: 'Внутренняя ошибка сервера.' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
