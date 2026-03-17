@@ -4,37 +4,37 @@ import { AdminPageSection } from '@/components/admin/AdminPageSection';
 const sections = [
   {
     href: '/admin/content',
-    title: 'Page Content',
+    title: 'Контент страниц',
     description: 'Заголовки, подзаголовки, тексты кнопок и блоков на страницах сайта.'
   },
   {
     href: '/admin/pricing',
-    title: 'Prices',
+    title: 'Цены',
     description: 'Общие цены услуг и дополнительные материалы для багета (стекло, ПВХ, паспарту и т.д.).'
   },
   {
     href: '/admin/portfolio',
-    title: 'Portfolio',
+    title: 'Портфолио',
     description: 'Примеры работ: добавление, редактирование, публикация и порядок показа.'
   },
   {
     href: '/admin/site-images',
-    title: 'Site Images',
+    title: 'Изображения сайта',
     description: 'Загрузка и хранение изображений для страниц, баннеров и портфолио.'
   },
   {
     href: '/admin/reviews',
-    title: 'Reviews',
+    title: 'Отзывы',
     description: 'Проверка и публикация клиентских отзывов.'
   },
   {
     href: '/admin/orders',
-    title: 'Orders',
+    title: 'Заявки',
     description: 'Список заявок, статусы обработки и контроль оплат по каждому заказу.'
   },
   {
     href: '/admin/settings',
-    title: 'Settings',
+    title: 'Настройки',
     description: 'Контакты, адрес, рабочие часы, SEO-параметры по умолчанию и общие настройки.'
   }
 ];
