@@ -4,30 +4,34 @@ import RevealOnScroll from '@/components/RevealOnScroll';
 import Section from '@/components/layout/Section';
 import { ClipboardCheck, Cog, Factory, FileText, Frame, Lightbulb, PanelsTopLeft, PencilRuler, Printer, Ruler, ShieldCheck, Sparkles, Type, Wrench } from 'lucide-react';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
-import { getSiteImage } from '@/lib/site-images';
+import { getSiteImage, getSiteImages } from '@/lib/site-images';
 
 const capabilityBadges = ['Фрезерный станок 2×4 м', 'Печать до 3.2 м', 'Плоттерная резка', 'Багетная мастерская'] as const;
 
 const equipment = [
   {
+    slotKey: 'production.equipment.milling',
     title: 'Фрезерный станок',
     text: 'Рабочее поле 2×4 м. Обработка ПВХ, композита и пластика.',
     tag: 'Поле 2×4 м',
     image: '/images/production/milling.png',
   },
   {
+    slotKey: 'production.equipment.printer',
     title: 'Широкоформатный принтер',
     text: 'Экосольвентная печать для баннеров, пленки и холста.',
     tag: 'Печать до 3.2 м',
     image: '/images/production/printer.png',
   },
   {
+    slotKey: 'production.equipment.plotter',
     title: 'Плоттерная резка',
     text: 'Контурная резка пленок, аппликаций и наклеек.',
     tag: 'Точная резка',
     image: '/images/production/plotter.png',
   },
   {
+    slotKey: 'production.equipment.baget',
     title: 'Багетная мастерская',
     text: 'Изготовление рам и оформление работ под заказ.',
     tag: 'Оформление и сборка',
@@ -116,9 +120,10 @@ const trustPoints = [
 ] as const;
 
 export default async function ProductionPage() {
-  const [contentMap, heroImage] = await Promise.all([
+  const [contentMap, heroImage, equipmentImages] = await Promise.all([
     getPageContentMap('production'),
     getSiteImage('production.hero.main'),
+    getSiteImages(equipment.map((item) => item.slotKey)),
   ]);
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Собственное производство рекламы');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Производим вывески, конструкции и печатную продукцию на собственном оборудовании с контролем качества на каждом этапе.');
@@ -189,12 +194,15 @@ export default async function ProductionPage() {
         <div className="space-y-5">
           <h2 className="text-2xl font-semibold md:text-3xl">Наше оборудование</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {equipment.map((item) => (
+            {equipment.map((item) => {
+              const itemImage = equipmentImages[item.slotKey]?.url ?? item.image;
+
+              return (
               <RevealOnScroll key={item.title}>
                 <article className="group relative isolate min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-md">
                   <div className="absolute -inset-px overflow-hidden rounded-[inherit]">
                     <div className="relative h-full w-full rounded-[inherit]">
-                      <Image src={item.image} alt={item.title} fill className="rounded-[inherit] object-cover" />
+                      <Image src={itemImage} alt={item.title} fill className="rounded-[inherit] object-cover" />
                     </div>
                   </div>
                   <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
@@ -208,7 +216,8 @@ export default async function ProductionPage() {
                   </div>
                 </article>
               </RevealOnScroll>
-            ))}
+              );
+            })}
           </div>
         </div>
       </Section>

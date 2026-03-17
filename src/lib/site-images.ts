@@ -46,3 +46,11 @@ export async function getSiteImage(slotKey: string) {
   const map = await getSiteImagesMap();
   return map.get(slotKey) ?? null;
 }
+
+export async function getSiteImages(slotKeys: string[]) {
+  const map = await getSiteImagesMap();
+  return slotKeys.reduce<Record<string, SiteImageRecord | null>>((acc, key) => {
+    acc[key] = map.get(key) ?? null;
+    return acc;
+  }, {});
+}

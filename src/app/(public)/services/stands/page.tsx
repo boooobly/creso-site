@@ -6,6 +6,7 @@ import Section from '@/components/Section';
 import StandPreviewCard from '@/components/services/StandPreviewCard';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import { messages } from '@/lib/messages';
+import { getSiteImage } from '@/lib/site-images';
 
 const heroChips = ['Собственное производство', 'Карманы и сменные блоки', 'Изготовление по размерам', 'Доставка и монтаж'] as const;
 
@@ -58,7 +59,11 @@ const revealDelayClasses = [
 
 const getRevealDelayClass = (index: number) => revealDelayClasses[index] ?? revealDelayClasses[revealDelayClasses.length - 1];
 
-export default function StandsServicePage() {
+export default async function StandsServicePage() {
+  const heroImage = await getSiteImage('stands.hero.main');
+  const heroImageSrc = heroImage?.url ?? '/images/stands/hero.png';
+  const heroImageAlt = heroImage?.altText || 'Изготовление информационных стендов';
+
   return (
     <div>
       <Section className="pb-8 pt-8 md:pb-10 md:pt-10" background="default" id="stands-hero">
@@ -93,8 +98,8 @@ export default function StandsServicePage() {
             <div className="rounded-3xl border border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100/90 to-white p-5 md:p-6">
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-white/80">
                 <Image
-                  src="/images/stands/hero.png"
-                  alt="Изготовление стендов"
+                  src={heroImageSrc}
+                  alt={heroImageAlt}
                   fill
                   className="object-cover"
                   sizes="(min-width: 1024px) 45vw, 100vw"

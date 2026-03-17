@@ -4,8 +4,12 @@ import { ZodError } from 'zod';
 
 export function handleAdminApiError(error: unknown) {
   if (error instanceof ZodError) {
+    const firstIssue = error.issues[0];
+    const issuePath = firstIssue?.path?.length ? ` (${firstIssue.path.join('.')})` : '';
+    const issueMessage = firstIssue?.message ? ` ${firstIssue.message}${issuePath}` : '';
+
     return NextResponse.json(
-      { ok: false, error: 'Проверьте корректность данных формы.', issues: error.issues },
+      { ok: false, error: `Проверьте корректность данных формы.${issueMessage}`.trim(), issues: error.issues },
       { status: 400 }
     );
   }

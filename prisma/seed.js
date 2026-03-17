@@ -69,16 +69,30 @@ const baguetteExtrasPricingEntries = require('../data/baguette-extras-pricing-de
 const wideFormatPricingEntries = require('../data/wide-format-pricing-defaults.json');
 const printPricingEntries = require('../data/print-pricing-defaults.json');
 
+
+const defaultSiteImageAssets = [
+  { title: 'Главная — главный экран', scope: 'site', fileName: 'home.hero.main', url: '/images/home_page/hero.png', altText: 'Производственная студия Credomir', mimeType: 'image/png', isActive: true, sortOrder: 10 },
+  { title: 'Главная — портфолио СОМ', scope: 'site', fileName: 'home.portfolio.som', url: '/images/home_page/examples_of_work/som.png', altText: 'Рекламная стела для СОМ', mimeType: 'image/png', isActive: true, sortOrder: 20 },
+  { title: 'Главная — портфолио Невинномысск', scope: 'site', fileName: 'home.portfolio.nevinnomyssk', url: '/images/home_page/examples_of_work/nevinnomyssk.png', altText: 'Въездная стела Невинномысск', mimeType: 'image/png', isActive: true, sortOrder: 30 },
+  { title: 'Главная — портфолио Apple Time', scope: 'site', fileName: 'home.portfolio.apple', url: '/images/home_page/examples_of_work/apple.png', altText: 'Световой лайтбокс Apple Time', mimeType: 'image/png', isActive: true, sortOrder: 40 },
+  { title: 'Наружная реклама — главный экран', scope: 'site', fileName: 'outdoor.hero.main', url: '/images/outdoor_advertising/manufacturing.png', altText: 'Производство наружной рекламы', mimeType: 'image/png', isActive: true, sortOrder: 50 },
+  { title: 'Производство — главный экран', scope: 'site', fileName: 'production.hero.main', url: '/images/production/hero.png', altText: 'Собственное производство рекламы', mimeType: 'image/png', isActive: true, sortOrder: 60 },
+  { title: 'Стенды — главный экран', scope: 'site', fileName: 'stands.hero.main', url: '/images/stands/hero.png', altText: 'Изготовление информационных стендов', mimeType: 'image/png', isActive: true, sortOrder: 70 },
+  { title: 'Кружки — главный экран', scope: 'site', fileName: 'mugs.hero.main', url: '/images/mug/mug-hero.jpg', altText: 'Печать на кружках — пример готовой работы', mimeType: 'image/jpeg', isActive: true, sortOrder: 80 }
+];
+
 const defaultMediaAssets = [
   {
     title: 'Временный баннер-заполнитель',
     kind: 'image',
+    scope: 'site',
     url: 'https://via.placeholder.com/1200x630?text=Site+Image',
     altText: 'Временное изображение для админки',
     mimeType: 'image/png',
     isActive: true,
     sortOrder: 10
-  }
+  },
+  ...defaultSiteImageAssets.map((item) => ({ kind: 'image', ...item }))
 ];
 
 async function main() {
@@ -251,7 +265,13 @@ async function main() {
   }
 
   for (const asset of defaultMediaAssets) {
-    const existing = await prisma.mediaAsset.findFirst({ where: { url: asset.url } });
+    const existing = await prisma.mediaAsset.findFirst({
+      where: asset.fileName
+        ? {
+            OR: [{ fileName: asset.fileName }, { url: asset.url }],
+          }
+        : { url: asset.url },
+    });
 
     if (existing) {
       await prisma.mediaAsset.update({
@@ -259,10 +279,13 @@ async function main() {
         data: {
           title: asset.title,
           kind: asset.kind,
+          scope: asset.scope,
+          url: asset.url,
+          fileName: asset.fileName,
           altText: asset.altText,
           mimeType: asset.mimeType,
           isActive: asset.isActive,
-          sortOrder: asset.sortOrder
+          sortOrder: asset.sortOrder,
         }
       });
       continue;

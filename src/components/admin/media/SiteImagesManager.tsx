@@ -82,11 +82,12 @@ export default function SiteImagesManager() {
     setLoading(true);
     setError(null);
 
-    const response = await fetch('/api/admin/media?scope=site&page=1&pageSize=200', { cache: 'no-store' });
-    const json = (await response.json()) as { ok: boolean; items?: MediaAsset[]; error?: string };
+    const response = await fetch('/api/admin/media?scope=site&page=1&pageSize=100', { cache: 'no-store' });
+    const json = (await response.json()) as { ok: boolean; items?: MediaAsset[]; error?: string; issues?: Array<{ message?: string; path?: Array<string | number> }> };
 
     if (!response.ok || !json.ok) {
-      setError(json.error ?? 'Не получилось загрузить изображения. Обновите страницу и попробуйте снова.');
+      const details = json.issues?.[0]?.message;
+      setError(details ? `Не получилось загрузить изображения: ${details}` : json.error ?? 'Не получилось загрузить изображения. Обновите страницу и попробуйте снова.');
       setLoading(false);
       return;
     }

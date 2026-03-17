@@ -2,6 +2,7 @@ import Section from '@/components/Section';
 import Image from 'next/image';
 import MugPrintAreaCalibrator from '@/components/mug-designer/MugPrintAreaCalibrator';
 import OrderMugsForm from '@/components/OrderMugsForm';
+import { getSiteImage } from '@/lib/site-images';
 
 const faqItems = [
   {
@@ -18,7 +19,10 @@ const faqItems = [
   },
 ];
 
-export default function MugsServicePage() {
+export default async function MugsServicePage() {
+  const heroImage = await getSiteImage('mugs.hero.main');
+  const heroImageSrc = heroImage?.url ?? '/images/mug/mug-hero.jpg';
+  const heroImageAlt = heroImage?.altText || 'Печать на кружках — пример готовой работы';
   const heroBenefits = ['3–5 рабочих дней', '2 макета включены', 'Скидка до 20%', 'Проверка перед печатью'];
 
   return (
@@ -53,8 +57,8 @@ export default function MugsServicePage() {
                 <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-xl">
                   <div className="relative aspect-[4/3] w-full">
                     <Image
-                      src="/images/mug/mug-hero.jpg"
-                      alt="Печать на кружках — пример готовой работы"
+                      src={heroImageSrc}
+                      alt={heroImageAlt}
                       fill
                       sizes="(min-width: 1024px) 520px, 90vw"
                       className="object-cover object-[55%_50%]"
