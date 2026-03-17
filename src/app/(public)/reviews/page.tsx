@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
-import ReviewsClient from '@/components/ReviewsClient';
+import ReviewsClient, { type PublicReviewItem } from '@/components/ReviewsClient';
+import { prisma } from '@/lib/db/prisma';
+
+export const dynamic = 'force-dynamic';
 
 type TrustItem = {
   icon: string;
@@ -34,14 +37,50 @@ const trustPoints: TrustItem[] = [
 const yandexReviewsUrl = 'https://yandex.com/maps/org/credomir/162252059264/reviews/?ll=41.959534%2C44.623058&z=17';
 const yandexEmbedUrl = 'https://yandex.com/map-widget/v1/?ll=41.959534%2C44.623058&mode=search&oid=162252059264&z=17';
 
-export default function ReviewsPage() {
+async function loadApprovedReviews(): Promise<PublicReviewItem[]> {
+  try {
+    const items = await prisma.review.findMany({
+      where: { status: 'approved' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      select: {
+        id: true,
+        name: true,
+        isAnonymous: true,
+        rating: true,
+        text: true,
+        createdAt: true,
+      },
+    });
+
+    return items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      isAnonymous: item.isAnonymous,
+      rating: item.rating,
+      text: item.text,
+      createdAt: item.createdAt.toISOString(),
+    }));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : '';
+    if (message.startsWith('[env]')) {
+      return [];
+    }
+
+    console.error('[reviews/page] failed to load approved reviews', error);
+    return [];
+  }
+}
+
+export default async function ReviewsPage() {
+  const reviews = await loadApprovedReviews();
+
   return (
     <div className="space-y-12 md:space-y-16">
       <section className="space-y-4 text-center">
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Отзывы реальных клиентов</h1>
       </section>
 
-      <ReviewsClient />
+      <ReviewsClient reviews={reviews} />
 
       <section className="card rounded-2xl p-6 md:p-8">
         <RevealOnScroll>
