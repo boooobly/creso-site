@@ -28,6 +28,11 @@ const sections = [
     description: 'Проверка и публикация клиентских отзывов.'
   },
   {
+    href: '/admin/orders',
+    title: 'Orders',
+    description: 'Список заявок, статусы обработки и контроль оплат по каждому заказу.'
+  },
+  {
     href: '/admin/settings',
     title: 'Settings',
     description: 'Контакты, адрес, рабочие часы, SEO-параметры по умолчанию и общие настройки.'
