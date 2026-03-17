@@ -33,6 +33,8 @@ import { PLOTTER_COMPLEXITY_OPTIONS, PLOTTER_MATERIAL_OPTIONS } from '@/lib/pric
 import { PRINT_QUANTITY_PRESETS, PRINT_SIZE_OPTIONS } from '@/lib/pricing-config/print';
 import { WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/pricing-config/wideFormat';
 import { WIDE_FORMAT_PRICING_FALLBACK_CONFIG, type WideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
+import { PLOTTER_CUTTING_PRICING_FALLBACK_CONFIG } from '@/lib/plotter-cutting/plotterCuttingPricing';
+import { HEAT_TRANSFER_PRICING_FALLBACK_CONFIG } from '@/lib/heat-transfer/heatTransferPricing';
 
 export type {
   BagetInputValidation,
@@ -62,12 +64,12 @@ export function getWideFormatQuote(input: WideFormatPricingInput, pricingConfig:
   return calculateWideFormatPricing(input, pricingConfig);
 }
 
-export function getHeatTransferQuote(input: HeatTransferPricingInput) {
-  return calculateHeatTransferPricing(input);
+export function getHeatTransferQuote(input: HeatTransferPricingInput, pricingConfig = HEAT_TRANSFER_PRICING_FALLBACK_CONFIG) {
+  return calculateHeatTransferPricing(input, pricingConfig);
 }
 
-export function getPlotterCuttingQuote(input: PlotterCuttingPricingInput) {
-  return calculatePlotterCuttingPricing(input);
+export function getPlotterCuttingQuote(input: PlotterCuttingPricingInput, pricingConfig = PLOTTER_CUTTING_PRICING_FALLBACK_CONFIG) {
+  return calculatePlotterCuttingPricing(input, pricingConfig);
 }
 
 export function getBagetValidation(widthInput: string, heightInput: string): BagetInputValidation {

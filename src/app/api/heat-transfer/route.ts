@@ -3,6 +3,8 @@ import nodemailer from 'nodemailer';
 
 import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
+import { calculateHeatTransferPricing } from '@/lib/calculations/heatTransferPricing';
+import { getHeatTransferPricingConfig } from '@/lib/heat-transfer/heatTransferPricing';
 export const runtime = 'nodejs';
 
 type HeatTransferPayload = {
@@ -133,6 +135,24 @@ export async function POST(req: NextRequest) {
     }
 
     payload.contact.phone = phone;
+
+    const pricing = await getHeatTransferPricingConfig();
+    const recalculated = calculateHeatTransferPricing({
+      productType: payload.productType,
+      mugType: payload.configuration.mugType,
+      mugPrintType: payload.configuration.mugPrintType,
+      mugQuantity: Number(payload.configuration.mugQuantity ?? 0),
+      tshirtQuantity: Number(payload.configuration.tshirtQuantity ?? 0),
+      useOwnClothes: Boolean(payload.configuration.useOwnClothes),
+      filmLengthInput: String(payload.configuration.filmLength ?? ''),
+      filmUrgent: Boolean(payload.configuration.filmUrgent),
+      filmTransfer: Boolean(payload.configuration.filmTransfer),
+    }, pricing.config);
+
+    payload.pricing.quantity = recalculated.quantity;
+    payload.pricing.subtotal = Math.round(recalculated.subtotal);
+    payload.pricing.discount = Math.round(recalculated.discount);
+    payload.pricing.total = Math.round(recalculated.total);
 
     const [emailSent, telegramSent] = await Promise.all([
       sendEmail(payload).catch(() => false),

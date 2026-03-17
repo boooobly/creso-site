@@ -8,12 +8,13 @@ import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 
 const heroBadges = ['Макс. ширина 600 мм', 'Резка по меткам', 'Срочные заказы'];
 
-const pricingRows = [
+const defaultPricingRows = [
   { label: 'Базовая резка', value: 'от 30 ₽ / м.п.' },
   { label: 'Выборка', value: '+15 ₽ / м.п.' },
   { label: 'Монтажная плёнка', value: '+100 ₽ / м²' },
+  { label: 'Перенос на деталь', value: '+300 ₽' },
   { label: 'Срочность', value: '+30%' },
-  { label: 'Печать + резка по меткам', value: '+20% к стоимости печати' },
+  { label: 'Минимальная стоимость заказа', value: 'от 400 ₽' },
 ];
 
 const priceFactors = [
@@ -41,6 +42,7 @@ const revealBase =
 
 export default function PlotterCuttingPage() {
   const [isRequirementsOpen, setIsRequirementsOpen] = useState(false);
+  const [pricingRows, setPricingRows] = useState(defaultPricingRows);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.1 });
@@ -67,6 +69,39 @@ export default function PlotterCuttingPage() {
   const nameError = touched.name && !name.trim() ? 'Введите имя.' : '';
   const phoneError = touched.phone && !phoneValid ? 'Введите телефон в формате +7 (999) 999-99-99.' : '';
 
+
+
+  useEffect(() => {
+    let ignore = false;
+
+    fetch('/api/pricing/plotter-cutting')
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (ignore || !data?.ok || !data?.config) return;
+        const config = data.config as {
+          baseCutPricePerMeter: number;
+          weedingPricePerMeter: number;
+          mountingFilmPricePerSquareMeter: number;
+          transferPrice: number;
+          urgentMultiplier: number;
+          minimumOrderTotal: number;
+        };
+
+        setPricingRows([
+          { label: 'Базовая резка', value: `от ${config.baseCutPricePerMeter} ₽ / м.п.` },
+          { label: 'Выборка', value: `+${config.weedingPricePerMeter} ₽ / м.п.` },
+          { label: 'Монтажная плёнка', value: `+${config.mountingFilmPricePerSquareMeter} ₽ / м²` },
+          { label: 'Перенос на деталь', value: `+${config.transferPrice} ₽` },
+          { label: 'Срочность', value: `+${Math.round((config.urgentMultiplier - 1) * 100)}%` },
+          { label: 'Минимальная стоимость заказа', value: `от ${config.minimumOrderTotal} ₽` },
+        ]);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
   useEffect(() => {
     if (!isRequirementsOpen) return;
 
