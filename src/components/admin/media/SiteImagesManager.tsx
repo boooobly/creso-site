@@ -1,4 +1,5 @@
 'use client';
+import { AdminAlert } from '@/components/admin/ui';
 
 import { useEffect, useMemo, useState } from 'react';
 import { SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
@@ -313,8 +314,8 @@ export default function SiteImagesManager() {
           <li>Замена изображения не затрагивает другие разделы админки.</li>
         </ul>
 
-        {message ? <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p> : null}
-        {error ? <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+        {message ? <AdminAlert tone="success" className="mt-4">{message}</AdminAlert> : null}
+        {error ? <AdminAlert tone="error" className="mt-4">{error}</AdminAlert> : null}
       </section>
 
       {!loading && groupedSlots.length > 1 ? (

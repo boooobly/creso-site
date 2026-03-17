@@ -2,15 +2,17 @@
 
 import type { MouseEvent } from 'react';
 import { useFormStatus } from 'react-dom';
+import { AdminButton } from '@/components/admin/ui';
 
 type ReviewActionButtonProps = {
   label: string;
   pendingLabel: string;
-  className: string;
+  variant?: 'primary' | 'secondary' | 'danger';
+  className?: string;
   confirmText?: string;
 };
 
-export default function ReviewActionButton({ label, pendingLabel, className, confirmText }: ReviewActionButtonProps) {
+export default function ReviewActionButton({ label, pendingLabel, variant = 'secondary', className, confirmText }: ReviewActionButtonProps) {
   const { pending } = useFormStatus();
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -22,8 +24,8 @@ export default function ReviewActionButton({ label, pendingLabel, className, con
   };
 
   return (
-    <button type="submit" disabled={pending} className={className} onClick={handleClick}>
+    <AdminButton type="submit" variant={variant} disabled={pending} className={className} onClick={handleClick}>
       {pending ? pendingLabel : label}
-    </button>
+    </AdminButton>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { AdminAlert, AdminButton } from '@/components/admin/ui';
 import ImageUploadField from '@/components/admin/media/ImageUploadField';
 
 type PortfolioFormValues = {
@@ -29,13 +30,9 @@ function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
 
   return (
-    <button
-      type="submit"
-      className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-      disabled={pending}
-    >
+    <AdminButton type="submit" variant="primary" className="px-4 py-2.5" disabled={pending}>
       {pending ? 'Сохраняем...' : label}
-    </button>
+    </AdminButton>
   );
 }
 
@@ -183,7 +180,7 @@ export default function PortfolioForm({
         </div>
 
         {state.error ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>
+          <AdminAlert tone="error">{state.error}</AdminAlert>
         ) : null}
 
         <div className="flex items-center justify-end">
