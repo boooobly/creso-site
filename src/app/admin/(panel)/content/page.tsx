@@ -108,10 +108,11 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
                   const defaultValue = existingMap.get(`${field.sectionKey}.${field.fieldKey}`) ?? field.defaultValue;
 
                   if (field.type === 'list' && field.listSchema) {
-                    const existingItems = parseListValue(defaultValue, field.listSchema);
-                    const preparedItems = existingItems.length > 0 ? existingItems : parseListValue(field.defaultValue, field.listSchema);
-                    const minItems = field.listSchema.minItems ?? 1;
-                    const maxItems = field.listSchema.maxItems ?? Math.max(preparedItems.length, minItems);
+                    const listSchema = field.listSchema;
+                    const existingItems = parseListValue(defaultValue, listSchema);
+                    const preparedItems = existingItems.length > 0 ? existingItems : parseListValue(field.defaultValue, listSchema);
+                    const minItems = listSchema.minItems ?? 1;
+                    const maxItems = listSchema.maxItems ?? Math.max(preparedItems.length, minItems);
                     const itemCount = Math.max(minItems, preparedItems.length, 1);
                     const rows = Array.from({ length: maxItems }).map((_, index) => preparedItems[index] ?? {});
 
@@ -126,10 +127,10 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
                           {rows.map((item, rowIndex) => (
                             <div key={`${inputName}-${rowIndex}`} className="rounded-lg border border-slate-200 bg-white p-3">
                               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                {field.listSchema?.itemName} {rowIndex + 1}
+                                {listSchema.itemName} {rowIndex + 1}
                               </p>
                               <div className="grid gap-3 md:grid-cols-2">
-                                {field.listSchema.fields.map((listField) => {
+                                {listSchema.fields.map((listField) => {
                                   const listInputName = `${inputName}__${rowIndex}__${listField.key}`;
                                   const isDescriptionField = /description|answer/i.test(listField.key);
 
