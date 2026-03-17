@@ -4,7 +4,7 @@ import { createPortfolioItemAction } from '../actions';
 
 export default function AdminPortfolioCreatePage() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Link href="/admin/portfolio" className="inline-flex text-sm text-slate-600 transition hover:text-slate-900">
         ← Назад к списку работ
       </Link>

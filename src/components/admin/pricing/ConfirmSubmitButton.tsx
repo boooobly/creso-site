@@ -1,22 +1,24 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
+import { AdminButton } from '@/components/admin/ui';
 
 type ConfirmSubmitButtonProps = {
   action: () => Promise<void>;
   confirmText: string;
   idleLabel: string;
   pendingLabel: string;
+  variant?: 'primary' | 'secondary' | 'danger';
   className?: string;
 };
 
-function InnerButton({ idleLabel, pendingLabel, className }: Omit<ConfirmSubmitButtonProps, 'action' | 'confirmText'>) {
+function InnerButton({ idleLabel, pendingLabel, variant, className }: Omit<ConfirmSubmitButtonProps, 'action' | 'confirmText'>) {
   const { pending } = useFormStatus();
 
   return (
-    <button type="submit" disabled={pending} className={className}>
+    <AdminButton type="submit" variant={variant} disabled={pending} className={className}>
       {pending ? pendingLabel : idleLabel}
-    </button>
+    </AdminButton>
   );
 }
 
@@ -25,6 +27,7 @@ export default function ConfirmSubmitButton({
   confirmText,
   idleLabel,
   pendingLabel,
+  variant = 'secondary',
   className,
 }: ConfirmSubmitButtonProps) {
   return (
@@ -36,7 +39,7 @@ export default function ConfirmSubmitButton({
         }
       }}
     >
-      <InnerButton idleLabel={idleLabel} pendingLabel={pendingLabel} className={className} />
+      <InnerButton idleLabel={idleLabel} pendingLabel={pendingLabel} variant={variant} className={className} />
     </form>
   );
 }

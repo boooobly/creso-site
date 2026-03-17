@@ -1,3 +1,4 @@
+import { AdminAlert } from '@/components/admin/ui';
 import { listPriceCatalog } from '@/lib/admin/price-catalog-service';
 import { listBaguetteExtrasPricingAdminData } from '@/lib/admin/baguette-extras-pricing-service';
 import { listWideFormatPricingAdminData } from '@/lib/wide-format/wideFormatPricing';
@@ -20,17 +21,17 @@ import {
 } from './actions';
 
 const successMessages: Record<string, string> = {
-  'category-created': 'Категория успешно создана.',
-  'category-updated': 'Категория успешно обновлена.',
-  'category-deleted': 'Категория удалена.',
-  'item-created': 'Позиция успешно добавлена.',
-  'item-updated': 'Позиция успешно обновлена.',
-  'item-deleted': 'Позиция удалена.',
-  'baguette-config-updated': 'Конфигурация доп. материалов багета обновлена.',
-  'wide-format-config-updated': 'Конфигурация широкоформатной печати обновлена.',
-  'plotter-cutting-config-updated': 'Конфигурация плоттерной резки обновлена.',
-  'heat-transfer-config-updated': 'Конфигурация термопереноса обновлена.',
-  'print-config-updated': 'Конфигурация общей печати обновлена.',
+  'category-created': 'Готово: категория добавлена.',
+  'category-updated': 'Готово: категория обновлена.',
+  'category-deleted': 'Готово: категория удалена.',
+  'item-created': 'Готово: позиция добавлена.',
+  'item-updated': 'Готово: позиция обновлена.',
+  'item-deleted': 'Готово: позиция удалена.',
+  'baguette-config-updated': 'Готово: настройки доп. материалов багета обновлены.',
+  'wide-format-config-updated': 'Готово: настройки широкоформатной печати обновлены.',
+  'plotter-cutting-config-updated': 'Готово: настройки плоттерной резки обновлены.',
+  'heat-transfer-config-updated': 'Готово: настройки термопереноса обновлены.',
+  'print-config-updated': 'Готово: настройки общей печати обновлены.',
 };
 
 type AdminPricingPageProps = {
@@ -71,11 +72,11 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
         </div>
 
         {successMessage ? (
-          <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMessage}</p>
+          <AdminAlert tone="success" className="mt-4">{successMessage}</AdminAlert>
         ) : null}
 
         {searchParams?.error ? (
-          <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{searchParams.error}</p>
+          <AdminAlert tone="error" className="mt-4">{searchParams.error}</AdminAlert>
         ) : null}
 
         <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
@@ -316,7 +317,7 @@ function CategoryCard({ category }: { category: Category }) {
         confirmText="Удалить категорию? Если в ней есть позиции, удаление будет запрещено."
         idleLabel="Удалить"
         pendingLabel="Удаляем..."
-        className="rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+        variant="danger"
       />
 
       <div className="space-y-3">
@@ -392,7 +393,7 @@ function CategoryCard({ category }: { category: Category }) {
                 confirmText="Удалить эту позицию? Действие нельзя отменить."
                 idleLabel="Удалить"
                 pendingLabel="Удаляем..."
-                className="rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+                variant="danger"
               />
             </div>
           );

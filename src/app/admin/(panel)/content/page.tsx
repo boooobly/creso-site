@@ -1,3 +1,4 @@
+import { AdminAlert } from '@/components/admin/ui';
 import { savePageContentAction } from './actions';
 import { PAGE_CONTENT_DEFINITIONS, type PageContentListSchema } from '@/lib/admin/page-content-config';
 import { listPageContentByPageKey, toPageContentStringMap } from '@/lib/admin/page-content-service';
@@ -12,7 +13,7 @@ type AdminContentPageProps = {
 };
 
 const successMessages: Record<string, string> = {
-  saved: 'Готово! Изменения сохранены и уже применяются на сайте.'
+  saved: 'Готово: изменения сохранены и уже видны на сайте.'
 };
 
 function parseListValue(rawValue: string | undefined, schema: PageContentListSchema) {
@@ -82,7 +83,7 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
   const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
 
   return (
-    <div className="space-y-5 pb-8 lg:space-y-6">
+    <div className="space-y-6 pb-8">
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h1 className="text-xl font-semibold text-slate-900">Редактор текстов сайта</h1>
         <p className="mt-2 text-sm text-slate-600">
@@ -90,15 +91,11 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
         </p>
 
         {successMessage ? (
-          <p role="status" className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            {successMessage}
-          </p>
+          <AdminAlert tone="success" role="status" className="mt-4">{successMessage}</AdminAlert>
         ) : null}
 
         {searchParams?.error ? (
-          <p role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            Не удалось сохранить: {searchParams.error}
-          </p>
+          <AdminAlert tone="error" role="alert" className="mt-4">Не удалось сохранить: {searchParams.error}</AdminAlert>
         ) : null}
       </section>
 

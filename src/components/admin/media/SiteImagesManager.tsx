@@ -1,4 +1,5 @@
 'use client';
+import { AdminAlert, AdminEmptyState } from '@/components/admin/ui';
 
 import { useEffect, useMemo, useState } from 'react';
 import { SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
@@ -313,8 +314,8 @@ export default function SiteImagesManager() {
           <li>Замена изображения не затрагивает другие разделы админки.</li>
         </ul>
 
-        {message ? <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p> : null}
-        {error ? <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+        {message ? <AdminAlert tone="success" className="mt-4">{message}</AdminAlert> : null}
+        {error ? <AdminAlert tone="error" className="mt-4">{error}</AdminAlert> : null}
       </section>
 
       {!loading && groupedSlots.length > 1 ? (
@@ -330,10 +331,13 @@ export default function SiteImagesManager() {
         </nav>
       ) : null}
 
-      {loading ? <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Загружаем карточки...</section> : null}
+      {loading ? <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Загружаем изображения…</section> : null}
 
       {!loading && SITE_IMAGE_SLOTS.length === 0 ? (
-        <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Пока нет настроенных блоков с изображениями.</section>
+        <AdminEmptyState
+          title="Пока нет настроенных блоков с изображениями"
+          description="Добавьте слоты в конфигурацию, чтобы управлять изображениями из админки."
+        />
       ) : null}
 
       {!loading
@@ -524,7 +528,7 @@ export default function SiteImagesManager() {
 
           <div className="space-y-3">
             {extraItems.length === 0 ? (
-              <p className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">Пока нет дополнительных карточек.</p>
+              <AdminEmptyState title="Пока нет дополнительных карточек" description="Добавьте первую карточку справа: укажите название, загрузите изображение и сохраните." />
             ) : (
               extraItems.map((item) => (
                 <article key={item.id} className="rounded-lg border border-slate-200 p-3">

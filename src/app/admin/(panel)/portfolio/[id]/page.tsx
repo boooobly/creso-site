@@ -20,7 +20,7 @@ export default async function AdminPortfolioEditPage({ params }: AdminPortfolioE
   const deleteAction = removePortfolioItemAction.bind(null, item.id);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link href="/admin/portfolio" className="inline-flex text-sm text-slate-600 transition hover:text-slate-900">
           ← Назад к списку работ

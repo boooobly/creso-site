@@ -1,3 +1,4 @@
+import { AdminAlert } from '@/components/admin/ui';
 import { saveSiteSettingsAction } from './actions';
 import SubmitSettingsButton from './SubmitSettingsButton';
 import { SITE_SETTINGS_SECTIONS, type SiteSettingFieldDefinition } from '@/lib/admin/site-settings-config';
@@ -11,7 +12,7 @@ type AdminSettingsPageProps = {
 };
 
 const successMessages: Record<string, string> = {
-  saved: 'Готово! Настройки сохранены. Обновлённые данные уже применяются на сайте.',
+  saved: 'Готово: настройки сохранены и уже применяются на сайте.',
 };
 
 function renderFieldInput(field: SiteSettingFieldDefinition, value: string) {
@@ -51,7 +52,7 @@ export default async function AdminSettingsPage({ searchParams }: AdminSettingsP
   const requiredFields = SITE_SETTINGS_SECTIONS.flatMap((section) => section.fields).filter((field) => field.required).length;
 
   return (
-    <div className="space-y-4 pb-8 lg:space-y-5">
+    <div className="space-y-6 pb-8">
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h1 className="text-xl font-semibold text-slate-900">Настройки компании и сайта</h1>
         <p className="mt-2 text-sm text-slate-600">
@@ -65,15 +66,11 @@ export default async function AdminSettingsPage({ searchParams }: AdminSettingsP
         </div>
 
         {successMessage ? (
-          <p role="status" className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            {successMessage}
-          </p>
+          <AdminAlert tone="success" role="status" className="mt-4">{successMessage}</AdminAlert>
         ) : null}
 
         {searchParams?.error ? (
-          <p role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            Не удалось сохранить. Проверьте поле и попробуйте снова: {searchParams.error}
-          </p>
+          <AdminAlert tone="error" role="alert" className="mt-4">Не удалось сохранить изменения. Проверьте поле и попробуйте ещё раз: {searchParams.error}</AdminAlert>
         ) : null}
       </section>
 
