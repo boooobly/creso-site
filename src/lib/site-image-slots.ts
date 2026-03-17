@@ -7,6 +7,9 @@ export type SiteImageSlotDefinition = {
   route: string;
   fallbackUrl: string;
   fallbackAlt: string;
+  groupKey: string;
+  groupLabel: string;
+  groupDescription: string;
 };
 
 export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
@@ -14,31 +17,40 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     key: 'home.hero.main',
     label: 'Главная — главный экран',
     pageTitle: 'Главная',
-    sectionLabel: 'Главный экран',
-    usageLabel: 'Фоновое изображение первого экрана',
+    sectionLabel: 'Первый экран',
+    usageLabel: 'Фоновое изображение на первом экране главной страницы',
     route: '/',
     fallbackUrl: '/images/home_page/hero.png',
     fallbackAlt: 'Производственная студия Credomir',
+    groupKey: 'home',
+    groupLabel: 'Главная страница',
+    groupDescription: 'Картинки для ключевых блоков главной страницы.',
   },
   {
     key: 'outdoor.hero.main',
     label: 'Наружная реклама — главный экран',
     pageTitle: 'Наружная реклама',
-    sectionLabel: 'Главный экран',
-    usageLabel: 'Изображение секции для первого экрана',
+    sectionLabel: 'Первый экран',
+    usageLabel: 'Ключевая иллюстрация страницы услуги «Наружная реклама»',
     route: '/outdoor-advertising',
     fallbackUrl: '/images/outdoor_advertising/manufacturing.png',
     fallbackAlt: 'Производство наружной рекламы',
+    groupKey: 'services',
+    groupLabel: 'Страницы услуг',
+    groupDescription: 'Иллюстрации для страниц услуг и направлений.',
   },
   {
     key: 'production.hero.main',
     label: 'Производство — главный экран',
     pageTitle: 'Производство',
-    sectionLabel: 'Главный экран',
-    usageLabel: 'Главная иллюстрация производственного блока',
+    sectionLabel: 'Первый экран',
+    usageLabel: 'Ключевая иллюстрация страницы услуги «Производство»',
     route: '/production',
     fallbackUrl: '/images/production/hero.png',
     fallbackAlt: 'Собственное производство рекламы',
+    groupKey: 'services',
+    groupLabel: 'Страницы услуг',
+    groupDescription: 'Иллюстрации для страниц услуг и направлений.',
   },
 ];
 
