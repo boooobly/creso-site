@@ -39,7 +39,7 @@ function validateField(label: string, inputName: string, value: string, required
   }
 
   if (['vkLink', 'seoOgImage', 'whatsapp'].includes(inputName) && !isLikelyUrl(value)) {
-    throw new Error(`Поле «${label}» должно начинаться с http:// или https://`);
+    throw new Error(`Проверьте поле «${label}»: ссылка должна начинаться с http:// или https://.`);
   }
 
   if (inputName === 'telegram' && value && !value.startsWith('http') && !isTelegramUsername(value)) {
@@ -75,7 +75,7 @@ export async function saveSiteSettingsAction(formData: FormData) {
 
     redirect(`/admin/settings?success=${SETTINGS_SUCCESS}`);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Не удалось сохранить настройки. Попробуйте ещё раз.';
+    const message = error instanceof Error ? error.message : 'Не удалось сохранить настройки. Попробуйте ещё раз через несколько секунд.';
     redirect(`/admin/settings?error=${encodeURIComponent(message)}`);
   }
 }
