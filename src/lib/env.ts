@@ -12,6 +12,15 @@ const optionalUrl = z.preprocess((value) => {
   return trimmed === '' ? undefined : trimmed;
 }, z.string().url('PUBLIC_BASE_URL must be a valid URL.').optional());
 
+const optionalDatabaseUrl = z.preprocess((value) => {
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+}, z.string().url('Database URL must be a valid URL.').refine(
+  (value) => value.startsWith('postgres://') || value.startsWith('postgresql://'),
+  'Database URL must start with postgres:// or postgresql://.',
+).optional());
+
 const sendCustomerEmailsSchema = z.preprocess((value) => {
   if (value === undefined || value === null || value === '') return false;
   if (typeof value === 'boolean') return value;
@@ -42,7 +51,8 @@ const publicEnvSchema = z.object({
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   ENABLE_DATABASE: enableDatabaseSchema,
-  DATABASE_URL: optionalTrimmedString,
+  DATABASE_URL: optionalDatabaseUrl,
+  DATABASE_URL_UNPOOLED: optionalDatabaseUrl,
   PUBLIC_BASE_URL: optionalUrl,
   SEND_CUSTOMER_EMAILS: sendCustomerEmailsSchema,
   ADMIN_TOKEN: z.string().trim().min(1, 'ADMIN_TOKEN is required.'),
@@ -77,6 +87,14 @@ const serverEnvSchema = z.object({
       code: z.ZodIssueCode.custom,
       path: ['DATABASE_URL'],
       message: 'DATABASE_URL is required when ENABLE_DATABASE=true.',
+    });
+  }
+
+  if (value.NODE_ENV === 'production' && value.ENABLE_DATABASE && !value.DATABASE_URL_UNPOOLED) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['DATABASE_URL_UNPOOLED'],
+      message: 'DATABASE_URL_UNPOOLED is required in production when ENABLE_DATABASE=true for Prisma migrations.',
     });
   }
 
@@ -163,5 +181,10 @@ export function requireDatabaseEnv(): void {
   const databaseUrl = process.env.DATABASE_URL?.trim();
   if (!databaseUrl) {
     throw new Error('[env] DATABASE_URL is required when ENABLE_DATABASE=true.');
+  }
+
+  const isPostgresProtocol = databaseUrl.startsWith('postgres://') || databaseUrl.startsWith('postgresql://');
+  if (!isPostgresProtocol) {
+    throw new Error('[env] DATABASE_URL must start with postgres:// or postgresql://.');
   }
 }

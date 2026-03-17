@@ -13,7 +13,8 @@
     "prisma:studio": "prisma studio",
     "postinstall": "prisma generate",
     "prisma:seed": "prisma db seed",
-    "prebuild": "prisma generate"
+    "prebuild": "prisma generate",
+    "vercel-build": "node scripts/vercel-build.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
