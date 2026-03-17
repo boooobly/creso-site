@@ -35,6 +35,7 @@ import { WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/pricing-config/wideFormat';
 import { WIDE_FORMAT_PRICING_FALLBACK_CONFIG, type WideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
 import { PLOTTER_CUTTING_PRICING_FALLBACK_CONFIG } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { HEAT_TRANSFER_PRICING_FALLBACK_CONFIG } from '@/lib/heat-transfer/heatTransferPricing';
+import type { PrintPricingConfig } from '@/lib/print/printPricing';
 
 export type {
   BagetInputValidation,
@@ -56,8 +57,8 @@ export type {
   TshirtSize,
 };
 
-export function getPrintQuote(input: PrintPricingInput) {
-  return calculatePrintPricing(input);
+export function getPrintQuote(input: PrintPricingInput, pricingConfig?: PrintPricingConfig) {
+  return calculatePrintPricing(input, pricingConfig);
 }
 
 export function getWideFormatQuote(input: WideFormatPricingInput, pricingConfig: WideFormatPricingConfig = WIDE_FORMAT_PRICING_FALLBACK_CONFIG) {

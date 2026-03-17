@@ -1,5 +1,6 @@
-import { PRINT_PRICING_CONFIG } from '@/lib/pricing-config/print';
 import { resolveQuantity } from './shared';
+import type { PrintPricingConfig } from '@/lib/print/printPricing';
+import { PRINT_PRICING_FALLBACK_CONFIG } from '@/lib/print/printPricing';
 import type { PrintDensity, PrintProductType, PrintType } from './types';
 
 export type PrintPricingInput = {
@@ -19,11 +20,11 @@ export type PrintPricingResult = {
   unitPrice: number;
 };
 
-export function calculatePrintPricing(input: PrintPricingInput): PrintPricingResult {
+export function calculatePrintPricing(input: PrintPricingInput, pricingConfig: PrintPricingConfig = PRINT_PRICING_FALLBACK_CONFIG): PrintPricingResult {
   const resolved = resolveQuantity({
     presetQuantity: input.presetQuantity,
     customQuantityInput: input.customQuantityInput,
-    minimumQuantity: PRINT_PRICING_CONFIG.minimumQuantity,
+    minimumQuantity: pricingConfig.minimumQuantity,
   });
 
   if (!resolved.isValid) {
@@ -35,11 +36,11 @@ export function calculatePrintPricing(input: PrintPricingInput): PrintPricingRes
     };
   }
 
-  const base = PRINT_PRICING_CONFIG.basePer100[input.productType];
-  const densityCoefficient = PRINT_PRICING_CONFIG.densityCoefficient[input.density];
-  const sideCoefficient = PRINT_PRICING_CONFIG.sideCoefficient[input.printType];
-  const laminationCoefficient = PRINT_PRICING_CONFIG.laminationCoefficient[String(input.lamination) as 'true' | 'false'];
-  const sizeCoefficient = PRINT_PRICING_CONFIG.sizeCoefficient[input.productType][input.size] ?? 1;
+  const base = pricingConfig.basePer100[input.productType];
+  const densityCoefficient = pricingConfig.densityCoefficient[input.density];
+  const sideCoefficient = pricingConfig.sideCoefficient[input.printType];
+  const laminationCoefficient = pricingConfig.laminationCoefficient[String(input.lamination) as 'true' | 'false'];
+  const sizeCoefficient = pricingConfig.sizeCoefficient[input.productType][input.size] ?? 1;
 
   const rawTotal = (resolved.quantity / 100) * base * densityCoefficient * sideCoefficient * laminationCoefficient * sizeCoefficient;
   const totalPrice = Math.round(rawTotal);
