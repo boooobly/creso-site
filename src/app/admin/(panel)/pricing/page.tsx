@@ -21,17 +21,17 @@ import {
 } from './actions';
 
 const successMessages: Record<string, string> = {
-  'category-created': 'Категория успешно создана.',
-  'category-updated': 'Категория успешно обновлена.',
-  'category-deleted': 'Категория удалена.',
-  'item-created': 'Позиция успешно добавлена.',
-  'item-updated': 'Позиция успешно обновлена.',
-  'item-deleted': 'Позиция удалена.',
-  'baguette-config-updated': 'Конфигурация доп. материалов багета обновлена.',
-  'wide-format-config-updated': 'Конфигурация широкоформатной печати обновлена.',
-  'plotter-cutting-config-updated': 'Конфигурация плоттерной резки обновлена.',
-  'heat-transfer-config-updated': 'Конфигурация термопереноса обновлена.',
-  'print-config-updated': 'Конфигурация общей печати обновлена.',
+  'category-created': 'Готово: категория добавлена.',
+  'category-updated': 'Готово: категория обновлена.',
+  'category-deleted': 'Готово: категория удалена.',
+  'item-created': 'Готово: позиция добавлена.',
+  'item-updated': 'Готово: позиция обновлена.',
+  'item-deleted': 'Готово: позиция удалена.',
+  'baguette-config-updated': 'Готово: настройки доп. материалов багета обновлены.',
+  'wide-format-config-updated': 'Готово: настройки широкоформатной печати обновлены.',
+  'plotter-cutting-config-updated': 'Готово: настройки плоттерной резки обновлены.',
+  'heat-transfer-config-updated': 'Готово: настройки термопереноса обновлены.',
+  'print-config-updated': 'Готово: настройки общей печати обновлены.',
 };
 
 type AdminPricingPageProps = {

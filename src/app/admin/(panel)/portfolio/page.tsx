@@ -18,9 +18,9 @@ type AdminPortfolioPageProps = {
 };
 
 const successMap = {
-  created: 'Работа успешно добавлена.',
-  updated: 'Изменения сохранены.',
-  deleted: 'Работа удалена.'
+  created: 'Готово: работа добавлена.',
+  updated: 'Готово: изменения сохранены.',
+  deleted: 'Готово: работа удалена.'
 } as const;
 
 export default async function AdminPortfolioPage({ searchParams }: AdminPortfolioPageProps) {
@@ -124,17 +124,11 @@ export default async function AdminPortfolioPage({ searchParams }: AdminPortfoli
           </div>
 
           <div className="md:col-span-4 flex flex-wrap gap-2">
-            <button
-              type="submit"
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-            >
+            <AdminButton type="submit" variant="primary" className="px-4">
               Применить фильтры
-            </button>
-            <Link
-              href="/admin/portfolio"
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-            >
-              Сбросить
+            </AdminButton>
+            <Link href="/admin/portfolio">
+              <AdminButton variant="secondary" className="px-4">Сбросить</AdminButton>
             </Link>
           </div>
         </form>

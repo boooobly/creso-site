@@ -13,7 +13,7 @@ type AdminContentPageProps = {
 };
 
 const successMessages: Record<string, string> = {
-  saved: 'Готово! Изменения сохранены и уже применяются на сайте.'
+  saved: 'Готово: изменения сохранены и уже видны на сайте.'
 };
 
 function parseListValue(rawValue: string | undefined, schema: PageContentListSchema) {
@@ -83,7 +83,7 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
   const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
 
   return (
-    <div className="space-y-5 pb-8 lg:space-y-6">
+    <div className="space-y-6 pb-8">
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h1 className="text-xl font-semibold text-slate-900">Редактор текстов сайта</h1>
         <p className="mt-2 text-sm text-slate-600">

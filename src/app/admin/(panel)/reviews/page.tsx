@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Prisma } from '@prisma/client';
 import { AdminPageSection } from '@/components/admin/AdminPageSection';
-import { AdminAlert } from '@/components/admin/ui';
+import { AdminAlert, AdminButton, AdminEmptyState } from '@/components/admin/ui';
 import ReviewActionButton from '@/components/admin/reviews/ReviewActionButton';
 import { prisma } from '@/lib/db/prisma';
 import { deleteReviewAction, setReviewStatusAction } from './actions';
@@ -18,8 +18,8 @@ type FilterKey = (typeof FILTERS)[number]['key'];
 const successMessages: Record<string, string> = {
   published: 'Готово: отзыв теперь виден на сайте.',
   hidden: 'Готово: отзыв скрыт с сайта.',
-  deleted: 'Отзыв удалён.',
-  'returned-to-queue': 'Отзыв снова в очереди на проверку.'
+  deleted: 'Готово: отзыв удалён.',
+  'returned-to-queue': 'Готово: отзыв снова в очереди на проверку.'
 };
 
 type AdminReviewsPageProps = {
@@ -170,14 +170,14 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
               />
             </label>
 
-            <div className="flex items-end gap-2">
-              <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700">
+            <div className="flex items-end gap-2 max-sm:flex-col max-sm:items-stretch">
+              <AdminButton type="submit" variant="primary" className="px-4">
                 Показать
-              </button>
+              </AdminButton>
               <input type="hidden" name="filter" value={filter} />
               {hasFilters ? (
-                <Link href="/admin/reviews" className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
-                  Сбросить всё
+                <Link href="/admin/reviews">
+                  <AdminButton variant="secondary" className="px-4">Сбросить всё</AdminButton>
                 </Link>
               ) : null}
             </div>
@@ -205,9 +205,11 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
         </div>
 
         {reviews.length === 0 ? (
-          <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
-            <p className="text-sm font-medium text-slate-900">Ничего не найдено</p>
-            <p className="mt-1 text-sm text-slate-500">Попробуйте другой фильтр или нажмите «Сбросить всё», чтобы вернуться к общей ленте.</p>
+          <div className="mt-4">
+            <AdminEmptyState
+              title="Ничего не найдено"
+              description="Попробуйте другой фильтр или нажмите «Сбросить всё», чтобы вернуться к общей ленте."
+            />
           </div>
         ) : (
           <div className="mt-4 space-y-3">

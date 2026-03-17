@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Prisma } from '@prisma/client';
 import { AdminPageSection } from '@/components/admin/AdminPageSection';
-import { AdminEmptyState } from '@/components/admin/ui';
+import { AdminButton, AdminEmptyState } from '@/components/admin/ui';
 import { prisma } from '@/lib/db/prisma';
 import {
   formatAdminDateTime,
@@ -125,13 +125,13 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
             </select>
           </label>
 
-          <div className="flex items-end gap-2">
-            <button className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700" type="submit">
+          <div className="flex items-end gap-2 max-sm:flex-col max-sm:items-stretch">
+            <AdminButton type="submit" variant="primary" className="px-4">
               Применить
-            </button>
+            </AdminButton>
             {hasFilters ? (
-              <Link href="/admin/orders" className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
-                Очистить
+              <Link href="/admin/orders">
+                <AdminButton variant="secondary" className="px-4">Очистить</AdminButton>
               </Link>
             ) : null}
           </div>

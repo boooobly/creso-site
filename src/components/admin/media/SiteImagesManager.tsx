@@ -1,5 +1,5 @@
 'use client';
-import { AdminAlert } from '@/components/admin/ui';
+import { AdminAlert, AdminEmptyState } from '@/components/admin/ui';
 
 import { useEffect, useMemo, useState } from 'react';
 import { SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
@@ -331,10 +331,13 @@ export default function SiteImagesManager() {
         </nav>
       ) : null}
 
-      {loading ? <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Загружаем карточки...</section> : null}
+      {loading ? <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Загружаем изображения…</section> : null}
 
       {!loading && SITE_IMAGE_SLOTS.length === 0 ? (
-        <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Пока нет настроенных блоков с изображениями.</section>
+        <AdminEmptyState
+          title="Пока нет настроенных блоков с изображениями"
+          description="Добавьте слоты в конфигурацию, чтобы управлять изображениями из админки."
+        />
       ) : null}
 
       {!loading
@@ -525,7 +528,7 @@ export default function SiteImagesManager() {
 
           <div className="space-y-3">
             {extraItems.length === 0 ? (
-              <p className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">Пока нет дополнительных карточек.</p>
+              <AdminEmptyState title="Пока нет дополнительных карточек" description="Добавьте первую карточку справа: укажите название, загрузите изображение и сохраните." />
             ) : (
               extraItems.map((item) => (
                 <article key={item.id} className="rounded-lg border border-slate-200 p-3">
