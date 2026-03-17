@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getPrintQuote, type PrintPricingInput } from '@/lib/engine';
+import { getPrintPricingConfig } from '@/lib/print/printPricing';
 
 import { logger } from '@/lib/logger';
 const printQuoteSchema = z.object({
@@ -24,7 +25,8 @@ export async function POST(req: Request) {
     }
 
     const input: PrintPricingInput = parsed.data;
-    const quote = getPrintQuote(input);
+    const pricing = await getPrintPricingConfig();
+    const quote = getPrintQuote(input, pricing.config);
 
     logQuoteGeneration({
       calculatorType: 'print',

@@ -1,0 +1,16 @@
+[
+  {"category":"print-pricing","subcategory":"global","key":"minimum_quantity","label":"Минимальный тираж","description":"Минимально допустимый тираж для расчёта офсетной печати.","type":"number","unit":"шт","sortOrder":10,"value":100},
+  {"category":"print-pricing","subcategory":"base_per_100","key":"cards","label":"База за 100 шт — визитки","description":"Базовая стоимость 100 визиток до применения коэффициентов.","type":"number","unit":"₽/100 шт","sortOrder":20,"value":500},
+  {"category":"print-pricing","subcategory":"base_per_100","key":"flyers","label":"База за 100 шт — флаеры","description":"Базовая стоимость 100 флаеров до применения коэффициентов.","type":"number","unit":"₽/100 шт","sortOrder":30,"value":650},
+  {"category":"print-pricing","subcategory":"density_coefficient","key":"300","label":"Коэффициент плотности 300 gsm","description":"Множитель цены для плотности бумаги 300 gsm.","type":"number","unit":"коэфф.","sortOrder":40,"value":1},
+  {"category":"print-pricing","subcategory":"density_coefficient","key":"350","label":"Коэффициент плотности 350 gsm","description":"Множитель цены для плотности бумаги 350 gsm.","type":"number","unit":"коэфф.","sortOrder":50,"value":1.2},
+  {"category":"print-pricing","subcategory":"density_coefficient","key":"400","label":"Коэффициент плотности 400 gsm","description":"Множитель цены для плотности бумаги 400 gsm.","type":"number","unit":"коэфф.","sortOrder":60,"value":1.4},
+  {"category":"print-pricing","subcategory":"side_coefficient","key":"single","label":"Коэффициент односторонней печати","description":"Множитель стоимости для односторонней печати.","type":"number","unit":"коэфф.","sortOrder":70,"value":1},
+  {"category":"print-pricing","subcategory":"side_coefficient","key":"double","label":"Коэффициент двусторонней печати","description":"Множитель стоимости для двусторонней печати.","type":"number","unit":"коэфф.","sortOrder":80,"value":1.5},
+  {"category":"print-pricing","subcategory":"lamination_coefficient","key":"false","label":"Коэффициент без ламинации","description":"Множитель стоимости если ламинация не выбрана.","type":"number","unit":"коэфф.","sortOrder":90,"value":1},
+  {"category":"print-pricing","subcategory":"lamination_coefficient","key":"true","label":"Коэффициент с ламинацией","description":"Множитель стоимости при включенной ламинации.","type":"number","unit":"коэфф.","sortOrder":100,"value":1.2},
+  {"category":"print-pricing","subcategory":"size_coefficient","key":"cards_90x50","label":"Коэффициент размера визитки 90x50","description":"Множитель для визиток формата 90x50.","type":"number","unit":"коэфф.","sortOrder":110,"value":1},
+  {"category":"print-pricing","subcategory":"size_coefficient","key":"cards_85x55","label":"Коэффициент размера визитки 85x55","description":"Множитель для визиток формата 85x55.","type":"number","unit":"коэфф.","sortOrder":120,"value":1},
+  {"category":"print-pricing","subcategory":"size_coefficient","key":"flyers_A6","label":"Коэффициент размера флаера A6","description":"Множитель для флаеров формата A6.","type":"number","unit":"коэфф.","sortOrder":130,"value":1},
+  {"category":"print-pricing","subcategory":"size_coefficient","key":"flyers_A5","label":"Коэффициент размера флаера A5","description":"Множитель для флаеров формата A5.","type":"number","unit":"коэфф.","sortOrder":140,"value":1}
+]

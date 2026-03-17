@@ -16,6 +16,7 @@ import { updateBaguetteExtrasPricingEntry } from '@/lib/admin/baguette-extras-pr
 import { updateWideFormatPricingEntry } from '@/lib/wide-format/wideFormatPricing';
 import { updatePlotterCuttingPricingEntry } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { updateHeatTransferPricingEntry } from '@/lib/heat-transfer/heatTransferPricing';
+import { updatePrintPricingEntry } from '@/lib/print/printPricing';
 
 function parseBoolean(value: FormDataEntryValue | null) {
   return value === 'on' || value === 'true' || value === '1';
@@ -204,6 +205,20 @@ export async function updateHeatTransferPricingEntryAction(entryId: string, form
 
     revalidatePath('/admin/pricing');
     redirect('/admin/pricing?success=heat-transfer-config-updated');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
+
+
+export async function updatePrintPricingEntryAction(entryId: string, formData: FormData) {
+  try {
+    const rawValue = String(formData.get('value') ?? '').trim();
+    const note = String(formData.get('note') ?? '').trim();
+    await updatePrintPricingEntry(entryId, rawValue, note || undefined);
+
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=print-config-updated');
   } catch (error) {
     redirectWithError(error);
   }

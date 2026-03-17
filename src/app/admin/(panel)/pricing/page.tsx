@@ -3,6 +3,7 @@ import { listBaguetteExtrasPricingAdminData } from '@/lib/admin/baguette-extras-
 import { listWideFormatPricingAdminData } from '@/lib/wide-format/wideFormatPricing';
 import { listPlotterCuttingPricingAdminData } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { listHeatTransferPricingAdminData } from '@/lib/heat-transfer/heatTransferPricing';
+import { listPrintPricingAdminData } from '@/lib/print/printPricing';
 import ConfirmSubmitButton from '@/components/admin/pricing/ConfirmSubmitButton';
 import {
   createPriceCategoryAction,
@@ -15,6 +16,7 @@ import {
   updateWideFormatPricingEntryAction,
   updatePlotterCuttingPricingEntryAction,
   updateHeatTransferPricingEntryAction,
+  updatePrintPricingEntryAction,
 } from './actions';
 
 const successMessages: Record<string, string> = {
@@ -28,6 +30,7 @@ const successMessages: Record<string, string> = {
   'wide-format-config-updated': 'Конфигурация широкоформатной печати обновлена.',
   'plotter-cutting-config-updated': 'Конфигурация плоттерной резки обновлена.',
   'heat-transfer-config-updated': 'Конфигурация термопереноса обновлена.',
+  'print-config-updated': 'Конфигурация общей печати обновлена.',
 };
 
 type AdminPricingPageProps = {
@@ -38,12 +41,13 @@ type AdminPricingPageProps = {
 };
 
 export default async function AdminPricingPage({ searchParams }: AdminPricingPageProps) {
-  const [categories, baguetteConfigData, wideFormatConfigData, plotterCuttingConfigData, heatTransferConfigData] = await Promise.all([
+  const [categories, baguetteConfigData, wideFormatConfigData, plotterCuttingConfigData, heatTransferConfigData, printConfigData] = await Promise.all([
     listPriceCatalog(),
     listBaguetteExtrasPricingAdminData(),
     listWideFormatPricingAdminData(),
     listPlotterCuttingPricingAdminData(),
     listHeatTransferPricingAdminData(),
+    listPrintPricingAdminData(),
   ]);
   const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
 
@@ -113,6 +117,15 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
         groupedSections={heatTransferConfigData.groupedSections}
       />
 
+
+      <PrintConfigSection
+        histories={printConfigData.histories}
+        fallbackUsedKeys={printConfigData.fallbackUsedKeys}
+        missingKeys={printConfigData.missingKeys}
+        unknownKeys={printConfigData.unknownKeys}
+        isComplete={printConfigData.isComplete}
+        groupedSections={printConfigData.groupedSections}
+      />
 
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-lg font-semibold text-slate-900">Добавить категорию</h2>
@@ -852,6 +865,119 @@ function WideFormatConfigSection({
             <div className="mt-3 grid gap-3">
               {section.entries.map((entry) => {
                 const action = updateWideFormatPricingEntryAction.bind(null, entry.id);
+                return (
+                  <form key={entry.id} action={action} className="grid gap-2 rounded-md border border-slate-200 p-3 md:grid-cols-[2fr_1fr_1fr_auto]">
+                    <div>
+                      <p className="text-sm font-medium text-slate-900">{entry.label}</p>
+                      <p className="text-xs text-slate-600">{entry.description}</p>
+                      <p className="text-xs text-slate-500">Ключ: {entry.subcategory}.{entry.key}</p>
+                    </div>
+                    <input name="value" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <input name="note" placeholder="Комментарий (необязательно)" className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
+                      Сохранить {entry.unit ? `(${entry.unit})` : ''}
+                    </button>
+                  </form>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6">
+        <h3 className="text-sm font-semibold text-slate-900">История изменений</h3>
+        {histories.length === 0 ? <p className="text-sm text-slate-500">Изменений пока нет.</p> : null}
+        {histories.slice(0, 20).map((history) => (
+          <div key={history.id} className="mt-2 rounded-lg border border-slate-200 p-3 text-xs text-slate-700">
+            <p className="font-medium">{history.subcategory}.{history.key}</p>
+            <p>Было: {JSON.stringify(history.oldValue)}</p>
+            <p>Стало: {JSON.stringify(history.newValue)}</p>
+            <p>Когда: {new Date(history.createdAt).toLocaleString('ru-RU')}</p>
+            {history.note ? <p>Комментарий: {history.note}</p> : null}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PrintConfigSection({
+  histories,
+  fallbackUsedKeys,
+  missingKeys,
+  unknownKeys,
+  isComplete,
+  groupedSections,
+}: {
+  histories: Array<{
+    id: string;
+    subcategory: string;
+    key: string;
+    oldValue: unknown;
+    newValue: unknown;
+    note: string | null;
+    createdAt: Date;
+  }>;
+  fallbackUsedKeys: Array<{ key: string; reason: string }>;
+  missingKeys: string[];
+  unknownKeys: string[];
+  isComplete: boolean;
+  groupedSections: Array<{
+    id: string;
+    title: string;
+    description: string;
+    entries: Array<{
+      id: string;
+      category: string;
+      subcategory: string;
+      key: string;
+      label: string;
+      description?: string;
+      value: unknown;
+      unit: string | null;
+      type: string;
+      sortOrder: number;
+      isActive: boolean;
+    }>;
+  }>;
+}) {
+  const fallbackSummary = fallbackUsedKeys.map((item) => `${item.key} (${item.reason === 'missing' ? 'нет активного ключа' : 'значение некорректно'})`).join(', ');
+
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <h2 className="text-lg font-semibold text-slate-900">Общая печать — параметры калькулятора</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        Здесь редактируются базовые ставки и коэффициенты для расчёта визиток/флаеров в модуле общей печати.
+      </p>
+
+      <div className="mt-3 space-y-2">
+        <p className={`text-sm ${isComplete ? 'text-emerald-700' : 'text-amber-700'}`}>
+          {isComplete ? 'Обязательные ключи заполнены.' : `Не хватает ключей: ${missingKeys.join(', ')}`}
+        </p>
+
+        {fallbackUsedKeys.length > 0 ? (
+          <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            Используются резервные значения для ключей: {fallbackSummary}
+          </p>
+        ) : null}
+
+        {unknownKeys.length > 0 ? (
+          <p className="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+            В БД есть нестандартные ключи (не из обязательного списка): {unknownKeys.join(', ')}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="mt-5 space-y-5">
+        {groupedSections.map((section) => (
+          <div key={section.id} className="rounded-lg border border-slate-200 p-4">
+            <h3 className="text-sm font-semibold text-slate-900">{section.title}</h3>
+            <p className="mt-1 text-xs text-slate-600">{section.description}</p>
+
+            <div className="mt-3 grid gap-3">
+              {section.entries.map((entry) => {
+                const action = updatePrintPricingEntryAction.bind(null, entry.id);
                 return (
                   <form key={entry.id} action={action} className="grid gap-2 rounded-md border border-slate-200 p-3 md:grid-cols-[2fr_1fr_1fr_auto]">
                     <div>
