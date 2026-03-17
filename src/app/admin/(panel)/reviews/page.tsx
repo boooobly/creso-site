@@ -6,19 +6,19 @@ import { prisma } from '@/lib/db/prisma';
 import { deleteReviewAction, setReviewStatusAction } from './actions';
 
 const FILTERS = [
-  { key: 'all', label: 'Все отзывы' },
-  { key: 'pending', label: 'Нужно проверить' },
-  { key: 'approved', label: 'Опубликовано' },
-  { key: 'rejected', label: 'Скрыто / отклонено' }
+  { key: 'all', label: 'Все', hint: 'вся история' },
+  { key: 'pending', label: 'Нужно проверить', hint: 'приоритет' },
+  { key: 'approved', label: 'Опубликованные', hint: 'видны на сайте' },
+  { key: 'rejected', label: 'Скрытые', hint: 'не показываются' }
 ] as const;
 
 type FilterKey = (typeof FILTERS)[number]['key'];
 
 const successMessages: Record<string, string> = {
-  published: 'Отзыв опубликован и уже виден на сайте.',
-  hidden: 'Отзыв скрыт с сайта.',
+  published: 'Готово: отзыв теперь виден на сайте.',
+  hidden: 'Готово: отзыв скрыт с сайта.',
   deleted: 'Отзыв удалён.',
-  'returned-to-queue': 'Отзыв возвращён в очередь на проверку.'
+  'returned-to-queue': 'Отзыв снова в очереди на проверку.'
 };
 
 type AdminReviewsPageProps = {
@@ -38,13 +38,21 @@ function getFilter(raw?: string): FilterKey {
 function getStatusLabel(status: string) {
   if (status === 'approved') return 'Опубликован';
   if (status === 'rejected') return 'Скрыт';
-  return 'Новый';
+  return 'Ждёт проверки';
 }
 
 function getStatusBadgeClass(status: string) {
-  if (status === 'approved') return 'bg-emerald-100 text-emerald-700';
-  if (status === 'rejected') return 'bg-slate-200 text-slate-700';
-  return 'bg-amber-100 text-amber-700';
+  if (status === 'approved') return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+  if (status === 'rejected') return 'bg-slate-100 text-slate-700 border border-slate-200';
+  return 'bg-amber-50 text-amber-700 border border-amber-200';
+}
+
+function getCardClass(status: string) {
+  if (status === 'pending') {
+    return 'border-amber-200 bg-amber-50/30 ring-1 ring-amber-100';
+  }
+
+  return 'border-slate-200 bg-white';
 }
 
 function renderStars(rating: number) {
@@ -67,6 +75,11 @@ function formatDate(value: Date) {
     hour: '2-digit',
     minute: '2-digit'
   }).format(value);
+}
+
+function getTextPreview(text: string, limit = 260) {
+  if (text.length <= limit) return text;
+  return `${text.slice(0, limit).trim()}…`;
 }
 
 export default async function AdminReviewsPage({ searchParams }: AdminReviewsPageProps) {
@@ -122,40 +135,51 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
   return (
     <div className="space-y-6">
       <AdminPageSection
-        title="Модерация отзывов"
-        description="Проверьте новые отзывы, быстро опубликуйте подходящие и скройте те, которые не должны показываться на сайте."
+        title="Отзывы клиентов"
+        description="Сначала проверьте новые отзывы. Остальные можно найти через фильтры ниже."
       >
+        {pendingCount > 0 ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            Сейчас ждут проверки: <span className="font-semibold">{pendingCount}</span>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            Очередь чистая — новых отзывов на проверку нет.
+          </div>
+        )}
+
         {successMessage ? (
-          <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMessage}</p>
+          <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMessage}</p>
         ) : null}
 
         {searchParams?.error ? (
           <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{searchParams.error}</p>
         ) : null}
 
-        <form method="GET" className="mt-4 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 md:grid-cols-[1fr_auto_auto]">
-          <label className="space-y-1">
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Поиск по отзывам</span>
-            <input
-              type="search"
-              name="q"
-              defaultValue={query}
-              placeholder="Имя клиента или текст отзыва"
-              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
-            />
-          </label>
+        <form method="GET" className="mt-4 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[1fr_auto]">
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <label className="space-y-1">
+              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Быстрый поиск</span>
+              <input
+                type="search"
+                name="q"
+                defaultValue={query}
+                placeholder="Имя клиента или фраза из отзыва"
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
+              />
+            </label>
 
-          <input type="hidden" name="filter" value={filter} />
-
-          <div className="flex items-end gap-2">
-            <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700">
-              Найти
-            </button>
-            {hasFilters ? (
-              <Link href="/admin/reviews" className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
-                Сбросить
-              </Link>
-            ) : null}
+            <div className="flex items-end gap-2">
+              <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700">
+                Показать
+              </button>
+              <input type="hidden" name="filter" value={filter} />
+              {hasFilters ? (
+                <Link href="/admin/reviews" className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
+                  Сбросить всё
+                </Link>
+              ) : null}
+            </div>
           </div>
         </form>
 
@@ -164,57 +188,69 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
             <Link
               key={item.key}
               href={buildFilterHref(item.key, query)}
-              className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+              className={`rounded-lg border px-3 py-2 text-sm transition ${
                 filter === item.key
                   ? 'border-slate-900 bg-slate-900 text-white'
                   : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
               }`}
             >
-              {item.label} · {counts[item.key]}
+              <span className="font-semibold">{item.label}</span>
+              <span className={`ml-1.5 text-xs ${filter === item.key ? 'text-slate-200' : 'text-slate-500'}`}>{item.hint}</span>
+              <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${filter === item.key ? 'bg-slate-700 text-white' : 'bg-slate-100 text-slate-700'}`}>
+                {counts[item.key]}
+              </span>
             </Link>
           ))}
         </div>
 
-        <p className="mt-4 text-sm text-slate-600">
-          Найдено: <span className="font-semibold text-slate-900">{reviews.length}</span>
-        </p>
-
         {reviews.length === 0 ? (
           <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
-            <p className="text-sm font-medium text-slate-900">Отзывов по текущему фильтру пока нет</p>
-            <p className="mt-1 text-sm text-slate-500">Попробуйте сменить фильтр или очистить поиск, чтобы увидеть другие отзывы.</p>
+            <p className="text-sm font-medium text-slate-900">Ничего не найдено</p>
+            <p className="mt-1 text-sm text-slate-500">Попробуйте другой фильтр или нажмите «Сбросить всё», чтобы вернуться к общей ленте.</p>
           </div>
         ) : (
           <div className="mt-4 space-y-3">
             {reviews.map((review) => {
-              const authorLabel = review.isAnonymous ? 'Анонимный клиент' : review.name?.trim() || 'Без имени';
+              const authorLabel = review.isAnonymous ? 'Анонимный клиент' : review.name?.trim() || 'Клиент без имени';
               const isVisibleOnSite = review.status === 'approved';
+              const isLongText = review.text.length > 260;
 
               return (
-                <article key={review.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <article key={review.id} className={`rounded-xl border p-4 shadow-sm ${getCardClass(review.status)}`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
+                    <div className="space-y-1">
                       <p className="text-base font-semibold text-slate-900">{authorLabel}</p>
-                      <p className="mt-0.5 text-xs text-slate-500">Добавлен: {formatDate(review.createdAt)}</p>
+                      <p className="text-xs text-slate-500">{formatDate(review.createdAt)}</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 text-xs">
                       <span className={`inline-flex rounded-full px-2.5 py-1 font-medium ${getStatusBadgeClass(review.status)}`}>
                         {getStatusLabel(review.status)}
                       </span>
-                      <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-700">
+                      <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 font-medium text-slate-700">
                         На сайте: {isVisibleOnSite ? 'Да' : 'Нет'}
                       </span>
                     </div>
                   </div>
 
-                  <p className="mt-3 text-sm font-medium text-amber-600" aria-label={`Оценка ${review.rating} из 5`}>
-                    {renderStars(review.rating)}
-                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                    <p className="font-medium text-amber-600" aria-label={`Оценка ${review.rating} из 5`}>
+                      {renderStars(review.rating)}
+                    </p>
+                    {review.status === 'pending' ? <p className="text-xs font-medium text-amber-700">Нужно решение: опубликовать или скрыть</p> : null}
+                  </div>
 
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{review.text}</p>
+                  <div className="mt-3 rounded-lg bg-white/80 p-3">
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{getTextPreview(review.text)}</p>
+                    {isLongText ? (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-xs font-medium text-slate-600 hover:text-slate-900">Показать полный текст</summary>
+                        <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{review.text}</p>
+                      </details>
+                    ) : null}
+                  </div>
 
-                  <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+                  <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-200/70 pt-3">
                     {review.status !== 'approved' ? (
                       <form action={setReviewStatusAction}>
                         <input type="hidden" name="reviewId" value={review.id} />
@@ -232,7 +268,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                         <input type="hidden" name="nextStatus" value="rejected" />
                         <input type="hidden" name="redirectSearchParams" value={redirectSearchParams.toString()} />
                         <ReviewActionButton
-                          label="Скрыть с сайта"
+                          label="Скрыть"
                           pendingLabel="Скрываем..."
                           className="rounded-md bg-slate-700 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
                         />
@@ -246,7 +282,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                         <input type="hidden" name="redirectSearchParams" value={redirectSearchParams.toString()} />
                         <ReviewActionButton
                           label="Отклонить"
-                          pendingLabel="Обновляем..."
+                          pendingLabel="Сохраняем..."
                           className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                         />
                       </form>
@@ -258,8 +294,8 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                         <input type="hidden" name="nextStatus" value="pending" />
                         <input type="hidden" name="redirectSearchParams" value={redirectSearchParams.toString()} />
                         <ReviewActionButton
-                          label="Вернуть на проверку"
-                          pendingLabel="Обновляем..."
+                          label="Вернуть в новые"
+                          pendingLabel="Сохраняем..."
                           className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                         />
                       </form>
@@ -271,7 +307,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                       <ReviewActionButton
                         label="Удалить"
                         pendingLabel="Удаляем..."
-                        confirmText="Удалить этот отзыв без возможности восстановления?"
+                        confirmText="Вы точно хотите удалить отзыв? Восстановить его не получится."
                         className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
                       />
                     </form>
