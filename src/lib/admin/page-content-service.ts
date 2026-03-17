@@ -42,7 +42,7 @@ export function toPageContentStringMap(items: Array<{ sectionKey: string; fieldK
 
   for (const item of items) {
     const key = `${item.sectionKey}.${item.fieldKey}`;
-    const value = typeof item.value === 'string' ? item.value : '';
+    const value = typeof item.value === 'string' ? item.value : JSON.stringify(item.value);
     map.set(key, value);
   }
 
@@ -56,6 +56,7 @@ export async function upsertPageContentFields(
     fieldKey: string;
     label: string;
     value: string;
+    type: string;
     sortOrder: number;
   }>
 ) {
@@ -74,7 +75,7 @@ export async function upsertPageContentFields(
           sectionKey: entry.sectionKey,
           fieldKey: entry.fieldKey,
           value: entry.value,
-          type: 'string',
+          type: entry.type,
           label: entry.label,
           sortOrder: entry.sortOrder
         },
@@ -82,7 +83,7 @@ export async function upsertPageContentFields(
           value: entry.value,
           label: entry.label,
           sortOrder: entry.sortOrder,
-          type: 'string'
+          type: entry.type
         }
       })
     )

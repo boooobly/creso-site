@@ -4,7 +4,7 @@ import faqLocal from '@/data/faq.json';
 import { getServices, getFaq } from '@/lib/contentful';
 import { messages } from '@/lib/messages';
 import { getFeaturedPortfolioItems } from '@/lib/public-portfolio';
-import { getFaqItemsFromContentMap, getPageContentMap, getPageContentValue } from '@/lib/page-content';
+import { getFaqItemsFromContentMap, getPageContentList, getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getSiteImage } from '@/lib/site-images';
 
 export default async function Home() {
@@ -43,7 +43,6 @@ export default async function Home() {
     return `/${service.slug}`;
   };
 
-
   const featuredPortfolioItems = (featuredPortfolio.length > 0
     ? featuredPortfolio
     : [
@@ -75,7 +74,7 @@ export default async function Home() {
     imageSrc: item.image,
   }));
 
-
+  const homeHeroEyebrow = getPageContentValue(contentMap, 'hero', 'eyebrow', 'ПРОИЗВОДСТВЕННАЯ СТУДИЯ CREDOMIR');
   const homeHeroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Производство рекламы под ключ');
   const homeHeroDescription = getPageContentValue(
     contentMap,
@@ -85,12 +84,86 @@ export default async function Home() {
   );
   const homeHeroPrimaryButtonText = getPageContentValue(contentMap, 'hero', 'primaryButtonText', 'Рассчитать стоимость');
   const homeHeroSecondaryButtonText = getPageContentValue(contentMap, 'hero', 'secondaryButtonText', 'Смотреть портфолио');
+  const homeHeroBadges = getPageContentList(
+    contentMap,
+    'hero',
+    'trustBadges',
+    [
+      { label: 'Собственное производство' },
+      { label: 'Монтажная бригада' },
+      { label: 'Работаем по договору' },
+      { label: 'Гарантия 5 лет' },
+    ],
+    ['label']
+  );
+
+  const trustSectionEyebrow = getPageContentValue(contentMap, 'trust_section', 'eyebrow', 'ПОЧЕМУ НАМ ДОВЕРЯЮТ');
+  const trustSectionTitle = getPageContentValue(contentMap, 'trust_section', 'title', 'С нами проще работать');
+  const trustFeatureCards = getPageContentList(
+    contentMap,
+    'trust_section',
+    'featureCards',
+    [
+      { title: 'Берём задачу под ключ', description: 'От замера и макета до производства и монтажа.' },
+      { title: 'Подбираем решение под бюджет', description: 'Предлагаем оптимальный вариант под вашу задачу.' },
+      { title: 'Держим сроки', description: 'Сразу говорим реальные сроки без лишних обещаний.' },
+      { title: 'Всегда можно уточнить детали', description: 'Помогаем по материалам, размерам и конструкции.' },
+    ],
+    ['title', 'description']
+  );
+
   const portfolioBlockTitle = getPageContentValue(contentMap, 'portfolio_preview', 'title', 'Примеры работ');
   const portfolioBlockDescription = getPageContentValue(
     contentMap,
     'portfolio_preview',
     'description',
     'Примеры работ, где сочетаются дизайн, точная реализация и соблюдение сроков.'
+  );
+  const portfolioLinkLabel = getPageContentValue(contentMap, 'portfolio_preview', 'linkLabel', 'Смотреть всё портфолио');
+
+  const processEyebrow = getPageContentValue(contentMap, 'process', 'eyebrow', 'ПРОЦЕСС');
+  const processTitle = getPageContentValue(contentMap, 'process', 'title', 'Как мы запускаем ваш проект');
+  const processDescription = getPageContentValue(
+    contentMap,
+    'process',
+    'description',
+    'Понятные этапы, реальные сроки и контроль качества на каждом шаге.'
+  );
+  const processSteps = getPageContentList(
+    contentMap,
+    'process',
+    'steps',
+    [
+      { title: 'Бриф и расчёт', description: 'Уточняем задачу, сроки и бюджет. Подбираем формат, материалы и решение.' },
+      { title: 'Макет и согласование', description: 'Готовим визуализацию, уточняем детали и согласовываем финальный вариант.' },
+      { title: 'Производство', description: 'Запускаем проект на собственных мощностях и контролируем качество на каждом этапе.' },
+      { title: 'Монтаж и передача', description: 'Организуем доставку, установку или передачу готового тиража.' },
+    ],
+    ['title', 'description']
+  );
+
+  const faqEyebrow = getPageContentValue(contentMap, 'faq', 'eyebrow', 'FAQ');
+  const faqTitle = getPageContentValue(contentMap, 'faq', 'title', 'Частые вопросы');
+  const faqDescription = getPageContentValue(
+    contentMap,
+    'faq',
+    'description',
+    'Коротко ответили на вопросы, которые чаще всего возникают перед запуском проекта.'
+  );
+  const faqLinkLabel = getPageContentValue(contentMap, 'faq', 'linkLabel', 'Задать свой вопрос');
+
+  const leadEyebrow = getPageContentValue(contentMap, 'lead', 'eyebrow', 'ЗАЯВКА');
+  const leadDescription = getPageContentValue(contentMap, 'lead', 'description', 'Опишите задачу — предложим формат, сроки и стоимость.');
+  const leadPoints = getPageContentList(
+    contentMap,
+    'lead',
+    'points',
+    [
+      { label: 'Расчёт стоимости и сроков в день обращения' },
+      { label: 'Подбор материалов под бюджет и задачу' },
+      { label: 'Один менеджер на всём цикле проекта' },
+    ],
+    ['label']
   );
 
   const homeHeroImageSrc = homeHeroImage?.url ?? '/images/home_page/hero.png';
@@ -110,12 +183,29 @@ export default async function Home() {
         faq={faqItems}
         messages={messages}
         featuredPortfolioItems={featuredPortfolioItems}
+        heroEyebrow={homeHeroEyebrow}
         heroTitle={homeHeroTitle}
         heroDescription={homeHeroDescription}
         heroPrimaryButtonText={homeHeroPrimaryButtonText}
         heroSecondaryButtonText={homeHeroSecondaryButtonText}
+        heroTrustBadges={homeHeroBadges}
+        trustSectionEyebrow={trustSectionEyebrow}
+        trustSectionTitle={trustSectionTitle}
+        trustFeatureCards={trustFeatureCards}
         portfolioBlockTitle={portfolioBlockTitle}
         portfolioBlockDescription={portfolioBlockDescription}
+        portfolioLinkLabel={portfolioLinkLabel}
+        processEyebrow={processEyebrow}
+        processTitle={processTitle}
+        processDescription={processDescription}
+        processSteps={processSteps}
+        faqEyebrow={faqEyebrow}
+        faqTitle={faqTitle}
+        faqDescription={faqDescription}
+        faqLinkLabel={faqLinkLabel}
+        leadEyebrow={leadEyebrow}
+        leadDescription={leadDescription}
+        leadPoints={leadPoints}
         heroImageSrc={homeHeroImageSrc}
         heroImageAlt={homeHeroImageAlt}
       />

@@ -1,5 +1,5 @@
 import { savePageContentAction } from './actions';
-import { PAGE_CONTENT_DEFINITIONS } from '@/lib/admin/page-content-config';
+import { PAGE_CONTENT_DEFINITIONS, type PageContentListSchema } from '@/lib/admin/page-content-config';
 import { listPageContentByPageKey, toPageContentStringMap } from '@/lib/admin/page-content-service';
 
 type AdminContentPageProps = {
@@ -13,6 +13,31 @@ type AdminContentPageProps = {
 const successMessages: Record<string, string> = {
   saved: 'Изменения сохранены. Текст на сайте обновится автоматически.'
 };
+
+function parseListValue(rawValue: string | undefined, schema: PageContentListSchema) {
+  if (!rawValue) return [] as Array<Record<string, string>>;
+
+  try {
+    const parsed = JSON.parse(rawValue);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .filter((item) => item && typeof item === 'object')
+      .map((item) => {
+        const record = item as Record<string, unknown>;
+        const next: Record<string, string> = {};
+
+        for (const field of schema.fields) {
+          const value = record[field.key];
+          next[field.key] = typeof value === 'string' ? value : '';
+        }
+
+        return next;
+      });
+  } catch {
+    return [];
+  }
+}
 
 export default async function AdminContentPage({ searchParams }: AdminContentPageProps) {
   const currentPageKey =
@@ -81,6 +106,71 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
                 {section.fields.map((field) => {
                   const inputName = `${field.sectionKey}__${field.fieldKey}`;
                   const defaultValue = existingMap.get(`${field.sectionKey}.${field.fieldKey}`) ?? field.defaultValue;
+
+                  if (field.type === 'list' && field.listSchema) {
+                    const listSchema = field.listSchema;
+                    const existingItems = parseListValue(defaultValue, listSchema);
+                    const preparedItems = existingItems.length > 0 ? existingItems : parseListValue(field.defaultValue, listSchema);
+                    const minItems = listSchema.minItems ?? 1;
+                    const maxItems = listSchema.maxItems ?? Math.max(preparedItems.length, minItems);
+                    const itemCount = Math.max(minItems, preparedItems.length, 1);
+                    const rows = Array.from({ length: maxItems }).map((_, index) => preparedItems[index] ?? {});
+
+                    return (
+                      <div key={inputName} className="space-y-3 md:col-span-2">
+                        <div>
+                          <p className="text-sm font-medium text-slate-700">{field.label}</p>
+                          {field.helper ? <p className="text-xs text-slate-500">{field.helper}</p> : null}
+                        </div>
+                        <input type="hidden" name={`${inputName}__count`} value={rows.length} />
+                        <div className="space-y-3">
+                          {rows.map((item, rowIndex) => (
+                            <div key={`${inputName}-${rowIndex}`} className="rounded-lg border border-slate-200 bg-white p-3">
+                              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                {listSchema.itemName} {rowIndex + 1}
+                              </p>
+                              <div className="grid gap-3 md:grid-cols-2">
+                                {listSchema.fields.map((listField) => {
+                                  const listInputName = `${inputName}__${rowIndex}__${listField.key}`;
+                                  const isDescriptionField = /description|answer/i.test(listField.key);
+
+                                  return (
+                                    <div key={listInputName} className={isDescriptionField ? 'space-y-1 md:col-span-2' : 'space-y-1'}>
+                                      <label htmlFor={listInputName} className="text-xs font-medium text-slate-700">
+                                        {listField.label}
+                                      </label>
+                                      {isDescriptionField ? (
+                                        <textarea
+                                          id={listInputName}
+                                          name={listInputName}
+                                          rows={3}
+                                          defaultValue={item[listField.key] ?? ''}
+                                          placeholder={listField.placeholder}
+                                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                                        />
+                                      ) : (
+                                        <input
+                                          id={listInputName}
+                                          name={listInputName}
+                                          defaultValue={item[listField.key] ?? ''}
+                                          placeholder={listField.placeholder}
+                                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                                        />
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          Заполненные пункты сохраняются. Пустые карточки пропускаются автоматически.
+                          {maxItems > itemCount ? ` Максимум: ${maxItems}.` : null}
+                        </p>
+                      </div>
+                    );
+                  }
 
                   return (
                     <div key={inputName} className={field.type === 'textarea' ? 'space-y-1 md:col-span-2' : 'space-y-1'}>
