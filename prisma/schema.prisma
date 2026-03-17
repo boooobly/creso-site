@@ -20,6 +20,7 @@ model Order {
   phone           String?
   email           String?
   comment         String?
+  managerNote     String?
   total           Int
   prepayRequired  Boolean  @default(false)
   prepayAmount    Int?
