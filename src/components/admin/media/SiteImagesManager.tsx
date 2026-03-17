@@ -54,7 +54,7 @@ export default function SiteImagesManager() {
   }, [items]);
 
   const groupedSlots = useMemo(() => {
-    const groups = new Map<string, { label: string; slots: (typeof SITE_IMAGE_SLOTS)[number][] }>();
+    const groups = new Map<string, { label: string; description: string; slots: (typeof SITE_IMAGE_SLOTS)[number][] }>();
 
     for (const slot of SITE_IMAGE_SLOTS) {
       const existingGroup = groups.get(slot.groupKey);
@@ -63,7 +63,11 @@ export default function SiteImagesManager() {
         continue;
       }
 
-      groups.set(slot.groupKey, { label: slot.groupLabel, slots: [slot] });
+      groups.set(slot.groupKey, {
+        label: slot.groupLabel,
+        description: slot.groupDescription,
+        slots: [slot],
+      });
     }
 
     return Array.from(groups.entries()).map(([key, value]) => ({ key, ...value }));
@@ -82,7 +86,7 @@ export default function SiteImagesManager() {
     const json = (await response.json()) as { ok: boolean; items?: MediaAsset[]; error?: string };
 
     if (!response.ok || !json.ok) {
-      setError(json.error ?? 'Не удалось загрузить изображения. Попробуйте обновить страницу.');
+      setError(json.error ?? 'Не получилось загрузить изображения. Обновите страницу и попробуйте снова.');
       setLoading(false);
       return;
     }
@@ -122,12 +126,12 @@ export default function SiteImagesManager() {
 
   function validateFile(file: File) {
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      setError('Поддерживаются JPG, PNG, WEBP, AVIF и SVG. Выберите другой файл.');
+      setError('Можно загружать JPG, PNG, WEBP, AVIF и SVG. Выберите другой файл.');
       return false;
     }
 
     if (file.size > MAX_UPLOAD_BYTES) {
-      setError('Размер файла не должен превышать 10 МБ.');
+      setError('Файл слишком большой. Выберите изображение до 10 МБ.');
       return false;
     }
 
@@ -149,7 +153,7 @@ export default function SiteImagesManager() {
 
     if (!response.ok || !json.ok || !json.url) {
       setUploadingKey(null);
-      setError(json.error ?? 'Ошибка загрузки файла.');
+      setError(json.error ?? 'Не получилось загрузить изображение. Попробуйте ещё раз.');
       return;
     }
 
@@ -159,7 +163,7 @@ export default function SiteImagesManager() {
       setSlotDraftValue(key, { imageUrl: json.url });
     }
 
-    setMessage('Файл загружен. Проверьте предпросмотр и нажмите «Сохранить изменения».');
+    setMessage('Новое изображение выбрано. Проверьте карточку и нажмите «Сохранить на сайте».');
     setUploadingKey(null);
   }
 
@@ -169,7 +173,7 @@ export default function SiteImagesManager() {
     const existing = slotItemsMap.get(slotKey);
 
     if (!slot || !draft || !draft.imageUrl.trim()) {
-      setError('Сначала загрузите изображение для этого блока.');
+      setError('Сначала выберите изображение для этого блока.');
       return;
     }
 
@@ -199,11 +203,11 @@ export default function SiteImagesManager() {
 
     if (!response.ok || !json.ok) {
       setSavingKey(null);
-      setError(json.error ?? 'Не удалось сохранить изображение.');
+      setError(json.error ?? 'Не получилось сохранить изменения.');
       return;
     }
 
-    setMessage('Изображение сохранено. На сайте обновление появится автоматически.');
+    setMessage('Готово: изображение обновлено на сайте.');
     await loadItems();
     setSavingKey(null);
   }
@@ -214,7 +218,7 @@ export default function SiteImagesManager() {
 
     if (!slot || !existing) return;
 
-    if (!window.confirm(`Удалить изображение «${slot.sectionLabel}» на странице «${slot.pageTitle}»? Будет возвращена стандартная картинка.`)) {
+    if (!window.confirm(`Вернуть стандартное изображение для блока «${slot.sectionLabel}» на странице «${slot.pageTitle}»?`)) {
       return;
     }
 
@@ -222,17 +226,17 @@ export default function SiteImagesManager() {
     const json = (await response.json()) as { ok: boolean; error?: string };
 
     if (!response.ok || !json.ok) {
-      setError(json.error ?? 'Не удалось удалить изображение.');
+      setError(json.error ?? 'Не получилось вернуть стандартное изображение.');
       return;
     }
 
-    setMessage('Изображение удалено. Для блока снова используется стандартная картинка.');
+    setMessage('Для этого блока снова используется стандартное изображение.');
     await loadItems();
   }
 
   async function saveExtraImage() {
     if (!extraForm.title.trim() || !extraForm.imageUrl.trim()) {
-      setError('Укажите название и загрузите изображение.');
+      setError('Укажите название и выберите изображение.');
       return;
     }
 
@@ -261,11 +265,11 @@ export default function SiteImagesManager() {
 
     if (!response.ok || !json.ok) {
       setSavingKey(null);
-      setError(json.error ?? 'Не удалось сохранить изображение.');
+      setError(json.error ?? 'Не получилось сохранить карточку изображения.');
       return;
     }
 
-    setMessage(editingExtraId ? 'Карточка дополнительного изображения обновлена.' : 'Дополнительное изображение добавлено.');
+    setMessage(editingExtraId ? 'Карточка изображения обновлена.' : 'Карточка изображения добавлена.');
     setExtraForm(emptyExtraForm);
     setEditingExtraId(null);
     await loadItems();
@@ -283,54 +287,61 @@ export default function SiteImagesManager() {
   }
 
   async function deleteExtra(item: MediaAsset) {
-    if (!window.confirm(`Удалить дополнительное изображение «${item.title}»?`)) return;
+    if (!window.confirm(`Удалить карточку «${item.title}»?`)) return;
 
     const response = await fetch(`/api/admin/media/${item.id}`, { method: 'DELETE' });
     const json = (await response.json()) as { ok: boolean; error?: string };
 
     if (!response.ok || !json.ok) {
-      setError(json.error ?? 'Не удалось удалить изображение.');
+      setError(json.error ?? 'Не получилось удалить карточку.');
       return;
     }
 
-    setMessage('Дополнительное изображение удалено.');
+    setMessage('Карточка удалена.');
     await loadItems();
   }
 
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Изображения сайта</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Раздел для сотрудников: здесь можно безопасно заменить ключевые картинки сайта и сразу увидеть результат в предпросмотре.
-        </p>
+        <h2 className="text-lg font-semibold text-slate-900">Картинки сайта</h2>
+        <p className="mt-1 text-sm text-slate-600">Просто выберите нужный блок, замените картинку и нажмите «Сохранить на сайте».</p>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-slate-600">
-          <li>Поддерживаются форматы JPG, PNG, WEBP, AVIF, SVG.</li>
-          <li>Рекомендуемый размер файла: до 10 МБ.</li>
-          <li>После загрузки не забудьте нажать «Сохранить изменения» в карточке.</li>
+          <li>Форматы: JPG, PNG, WEBP, AVIF, SVG.</li>
+          <li>Размер файла: до 10 МБ.</li>
+          <li>Замена изображения не затрагивает другие разделы админки.</li>
         </ul>
 
         {message ? <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p> : null}
         {error ? <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
       </section>
 
-      {loading ? (
-        <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Загружаем изображения и статусы...</section>
+      {!loading && groupedSlots.length > 1 ? (
+        <nav className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Быстрый переход</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {groupedSlots.map((group) => (
+              <a key={group.key} href={`#group-${group.key}`} className="rounded-full border border-slate-300 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100">
+                {group.label}
+              </a>
+            ))}
+          </div>
+        </nav>
       ) : null}
 
+      {loading ? <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Загружаем карточки...</section> : null}
+
       {!loading && SITE_IMAGE_SLOTS.length === 0 ? (
-        <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">
-          Пока нет настроенных изображений для сайта.
-        </section>
+        <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-6">Пока нет настроенных блоков с изображениями.</section>
       ) : null}
 
       {!loading
         ? groupedSlots.map((group) => (
-            <section key={group.key} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <section id={`group-${group.key}`} key={group.key} className="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <h3 className="text-base font-semibold text-slate-900">{group.label}</h3>
-              <p className="mt-1 text-sm text-slate-600">Выберите карточку, чтобы заменить изображение и описание для конкретного блока сайта.</p>
+              <p className="mt-1 text-sm text-slate-600">{group.description}</p>
 
-              <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              <div className="mt-5 grid gap-4 xl:grid-cols-2">
                 {group.slots.map((slot) => {
                   const draft = slotDrafts[slot.key] ?? { imageUrl: '', altText: slot.fallbackAlt, note: '' };
                   const existing = slotItemsMap.get(slot.key);
@@ -340,50 +351,50 @@ export default function SiteImagesManager() {
 
                   return (
                     <article key={slot.key} className="rounded-xl border border-slate-200 p-4">
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{slot.pageTitle}</p>
-                          <h4 className="mt-1 text-sm font-semibold text-slate-900">{slot.sectionLabel}</h4>
+                          <h4 className="text-sm font-semibold text-slate-900">{slot.sectionLabel}</h4>
+                          <p className="mt-1 text-xs text-slate-600">Страница: {slot.pageTitle}</p>
+                          <p className="text-xs text-slate-500">Где на сайте: {slot.route}</p>
                         </div>
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                             existing ? 'border border-emerald-200 bg-emerald-50 text-emerald-700' : 'border border-amber-200 bg-amber-50 text-amber-700'
                           }`}
                         >
-                          {existing ? 'Установлено' : 'Стандартная картинка'}
+                          {existing ? 'Сейчас установлено' : 'Сейчас стандартная картинка'}
                         </span>
                       </div>
 
                       <p className="mt-2 text-xs text-slate-600">{slot.usageLabel}</p>
-                      <p className="mt-1 text-xs text-slate-500">Где отображается: {slot.route}</p>
 
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={previewUrl} alt={draft.altText || slot.fallbackAlt} className="mt-3 h-40 w-full rounded-lg border border-slate-200 object-cover" />
+                      <img src={previewUrl} alt={draft.altText || slot.fallbackAlt} className="mt-3 h-48 w-full rounded-lg border border-slate-200 object-cover" />
 
                       <div className="mt-3 space-y-2">
-                        <label className="text-xs font-medium text-slate-700">Alt текст (описание для SEO и доступности)</label>
+                        <label className="text-xs font-medium text-slate-700">Подпись для картинки (alt)</label>
                         <input
                           value={draft.altText}
                           onChange={(event) => setSlotDraftValue(slot.key, { altText: event.target.value })}
                           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                          placeholder="Кратко опишите, что на картинке"
+                          placeholder="Кратко опишите изображение"
                         />
                       </div>
 
                       <div className="mt-3 space-y-2">
-                        <label className="text-xs font-medium text-slate-700">Комментарий для команды (где используется)</label>
+                        <label className="text-xs font-medium text-slate-700">Подсказка для команды</label>
                         <textarea
                           rows={2}
                           value={draft.note}
                           onChange={(event) => setSlotDraftValue(slot.key, { note: event.target.value })}
                           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                          placeholder="Например: Главная → первый экран"
+                          placeholder="Например: Первый экран страницы"
                         />
                       </div>
 
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <label className="inline-flex cursor-pointer rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-700 hover:bg-slate-100">
-                          {isUploading ? 'Загрузка...' : existing ? 'Заменить изображение' : 'Загрузить изображение'}
+                        <label className="inline-flex cursor-pointer rounded-lg bg-slate-900 px-3 py-2 text-xs font-medium text-white hover:bg-slate-700">
+                          {isUploading ? 'Загрузка...' : 'Заменить изображение'}
                           <input
                             type="file"
                             accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
@@ -401,9 +412,9 @@ export default function SiteImagesManager() {
                           type="button"
                           onClick={() => void saveSlot(slot.key)}
                           disabled={isSaving || isUploading || !draft.imageUrl}
-                          className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-medium text-white disabled:opacity-50"
+                          className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-800 hover:bg-slate-100 disabled:opacity-50"
                         >
-                          {isSaving ? 'Сохранение...' : 'Сохранить изменения'}
+                          {isSaving ? 'Сохранение...' : 'Сохранить на сайте'}
                         </button>
 
                         {existing ? (
@@ -412,7 +423,7 @@ export default function SiteImagesManager() {
                             onClick={() => void deleteSlotImage(slot.key)}
                             className="rounded-lg border border-red-200 px-3 py-2 text-xs text-red-600"
                           >
-                            Удалить и вернуть стандарт
+                            Вернуть стандарт
                           </button>
                         ) : null}
                       </div>
@@ -425,12 +436,12 @@ export default function SiteImagesManager() {
         : null}
 
       <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h3 className="text-base font-semibold text-slate-900">Дополнительные изображения</h3>
-        <p className="mt-1 text-sm text-slate-600">Изображения для блоков, которые не привязаны к фиксированному месту. Можно хранить и переиспользовать.</p>
+        <h3 className="text-base font-semibold text-slate-900">Дополнительные картинки</h3>
+        <p className="mt-1 text-sm text-slate-600">Подходит для изображений, которые используются в разных местах сайта.</p>
 
-        <div className="mt-4 grid gap-6 lg:grid-cols-2">
+        <div className="mt-4 grid gap-6 xl:grid-cols-2">
           <div className="space-y-3 rounded-lg border border-slate-200 p-4">
-            <p className="text-sm font-semibold text-slate-900">{editingExtraId ? 'Редактирование карточки' : 'Добавить новую карточку'}</p>
+            <p className="text-sm font-semibold text-slate-900">{editingExtraId ? 'Редактировать карточку' : 'Новая карточка'}</p>
 
             <label className="space-y-1 text-sm text-slate-700">
               <span className="font-medium">Название</span>
@@ -438,17 +449,17 @@ export default function SiteImagesManager() {
                 value={extraForm.title}
                 onChange={(event) => setExtraForm((prev) => ({ ...prev, title: event.target.value }))}
                 className="w-full rounded-lg border border-slate-200 px-3 py-2"
-                placeholder="Например: Иконка для блока контактов"
+                placeholder="Например: Картинка для контактов"
               />
             </label>
 
             <label className="space-y-1 text-sm text-slate-700">
-              <span className="font-medium">Alt текст</span>
+              <span className="font-medium">Подпись для картинки (alt)</span>
               <input
                 value={extraForm.altText}
                 onChange={(event) => setExtraForm((prev) => ({ ...prev, altText: event.target.value }))}
                 className="w-full rounded-lg border border-slate-200 px-3 py-2"
-                placeholder="Краткое описание изображения"
+                placeholder="Короткое описание"
               />
             </label>
 
@@ -459,20 +470,20 @@ export default function SiteImagesManager() {
                 value={extraForm.note}
                 onChange={(event) => setExtraForm((prev) => ({ ...prev, note: event.target.value }))}
                 className="w-full rounded-lg border border-slate-200 px-3 py-2"
-                placeholder="Например: Страница услуг → карточка №2"
+                placeholder="Например: Блок услуг"
               />
             </label>
 
             {extraForm.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={extraForm.imageUrl} alt={extraForm.altText || 'Предпросмотр'} className="h-36 w-full rounded-lg border border-slate-200 object-cover" />
+              <img src={extraForm.imageUrl} alt={extraForm.altText || 'Предпросмотр'} className="h-40 w-full rounded-lg border border-slate-200 object-cover" />
             ) : (
-              <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-sm text-slate-500">Изображение пока не выбрано.</p>
+              <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-sm text-slate-500">Картинка пока не выбрана.</p>
             )}
 
             <div className="flex flex-wrap gap-2">
-              <label className="inline-flex cursor-pointer rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
-                {uploadingKey === 'extra' ? 'Загрузка...' : extraForm.imageUrl ? 'Заменить изображение' : 'Загрузить изображение'}
+              <label className="inline-flex cursor-pointer rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                {uploadingKey === 'extra' ? 'Загрузка...' : 'Заменить изображение'}
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
@@ -490,7 +501,7 @@ export default function SiteImagesManager() {
                 type="button"
                 onClick={() => void saveExtraImage()}
                 disabled={savingKey === 'extra' || uploadingKey === 'extra'}
-                className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100 disabled:opacity-50"
               >
                 {savingKey === 'extra' ? 'Сохранение...' : 'Сохранить'}
               </button>
@@ -512,19 +523,18 @@ export default function SiteImagesManager() {
 
           <div className="space-y-3">
             {extraItems.length === 0 ? (
-              <p className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">Пока нет дополнительных изображений. Добавьте первую карточку слева.</p>
+              <p className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">Пока нет дополнительных карточек.</p>
             ) : (
               extraItems.map((item) => (
                 <article key={item.id} className="rounded-lg border border-slate-200 p-3">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.url} alt={item.altText ?? item.title} className="h-28 w-full rounded-lg object-cover" />
                   <h4 className="mt-2 text-sm font-semibold text-slate-900">{item.title}</h4>
-                  <p className="mt-1 text-xs text-slate-500">Статус: сохранено в разделе «Дополнительные изображения»</p>
-                  {item.description ? <p className="mt-1 text-xs text-slate-600">Где используется: {item.description}</p> : null}
+                  {item.description ? <p className="mt-1 text-xs text-slate-600">Где используется: {item.description}</p> : <p className="mt-1 text-xs text-slate-500">Место использования пока не указано.</p>}
 
                   <div className="mt-2 flex gap-2">
                     <button type="button" onClick={() => startEditExtra(item)} className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-700">
-                      Редактировать
+                      Изменить
                     </button>
                     <button type="button" onClick={() => void deleteExtra(item)} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs text-red-600">
                       Удалить

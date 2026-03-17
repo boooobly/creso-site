@@ -9,6 +9,7 @@ export type SiteImageSlotDefinition = {
   fallbackAlt: string;
   groupKey: string;
   groupLabel: string;
+  groupDescription: string;
 };
 
 export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
@@ -23,6 +24,7 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     fallbackAlt: 'Производственная студия Credomir',
     groupKey: 'home',
     groupLabel: 'Главная страница',
+    groupDescription: 'Картинки для ключевых блоков главной страницы.',
   },
   {
     key: 'outdoor.hero.main',
@@ -35,6 +37,7 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     fallbackAlt: 'Производство наружной рекламы',
     groupKey: 'services',
     groupLabel: 'Страницы услуг',
+    groupDescription: 'Иллюстрации для страниц услуг и направлений.',
   },
   {
     key: 'production.hero.main',
@@ -47,6 +50,7 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     fallbackAlt: 'Собственное производство рекламы',
     groupKey: 'services',
     groupLabel: 'Страницы услуг',
+    groupDescription: 'Иллюстрации для страниц услуг и направлений.',
   },
 ];
 
