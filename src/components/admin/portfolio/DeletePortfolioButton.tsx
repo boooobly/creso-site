@@ -1,6 +1,7 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
+import { AdminButton } from '@/components/admin/ui';
 
 type DeletePortfolioButtonProps = {
   action: () => Promise<void>;
@@ -10,13 +11,9 @@ function Button() {
   const { pending } = useFormStatus();
 
   return (
-    <button
-      type="submit"
-      className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-      disabled={pending}
-    >
+    <AdminButton type="submit" variant="danger" className="px-4 py-2.5" disabled={pending}>
       {pending ? 'Удаляем...' : 'Удалить работу'}
-    </button>
+    </AdminButton>
   );
 }
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Prisma } from '@prisma/client';
 import { AdminPageSection } from '@/components/admin/AdminPageSection';
+import { AdminAlert } from '@/components/admin/ui';
 import ReviewActionButton from '@/components/admin/reviews/ReviewActionButton';
 import { prisma } from '@/lib/db/prisma';
 import { deleteReviewAction, setReviewStatusAction } from './actions';
@@ -149,11 +150,11 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
         )}
 
         {successMessage ? (
-          <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMessage}</p>
+          <AdminAlert tone="success" className="mt-3">{successMessage}</AdminAlert>
         ) : null}
 
         {searchParams?.error ? (
-          <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{searchParams.error}</p>
+          <AdminAlert tone="error" className="mt-3">{searchParams.error}</AdminAlert>
         ) : null}
 
         <form method="GET" className="mt-4 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[1fr_auto]">
@@ -259,7 +260,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                         <ReviewActionButton
                           label="Опубликовать"
                           pendingLabel="Публикуем..."
-                          className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-emerald-500"
+                          variant="primary"
                         />
                       </form>
                     ) : (
@@ -270,7 +271,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                         <ReviewActionButton
                           label="Скрыть"
                           pendingLabel="Скрываем..."
-                          className="rounded-md bg-slate-700 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
+                          variant="secondary"
                         />
                       </form>
                     )}
@@ -283,7 +284,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                         <ReviewActionButton
                           label="Отклонить"
                           pendingLabel="Сохраняем..."
-                          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                          variant="secondary"
                         />
                       </form>
                     ) : null}
@@ -296,7 +297,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                         <ReviewActionButton
                           label="Вернуть в новые"
                           pendingLabel="Сохраняем..."
-                          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                          variant="secondary"
                         />
                       </form>
                     ) : null}
@@ -308,7 +309,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
                         label="Удалить"
                         pendingLabel="Удаляем..."
                         confirmText="Вы точно хотите удалить отзыв? Восстановить его не получится."
-                        className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
+                        variant="danger"
                       />
                     </form>
                   </div>

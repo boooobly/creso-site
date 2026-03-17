@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Prisma } from '@prisma/client';
 import { AdminPageSection } from '@/components/admin/AdminPageSection';
+import { AdminEmptyState } from '@/components/admin/ui';
 import { prisma } from '@/lib/db/prisma';
 import {
   formatAdminDateTime,
@@ -145,9 +146,11 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
 
         <div className="mt-4 overflow-x-auto rounded-lg border border-slate-200">
           {orders.length === 0 ? (
-            <div className="space-y-2 p-8 text-center">
-              <p className="text-sm font-medium text-slate-900">По текущим условиям заказы не найдены</p>
-              <p className="text-sm text-slate-500">Измените параметры поиска или сбросьте фильтры, чтобы увидеть все заявки.</p>
+            <div className="p-6">
+              <AdminEmptyState
+                title="По текущим условиям заказы не найдены"
+                description="Измените параметры поиска или сбросьте фильтры, чтобы увидеть все заявки."
+              />
             </div>
           ) : (
             <table className="min-w-full divide-y divide-slate-200 text-sm">

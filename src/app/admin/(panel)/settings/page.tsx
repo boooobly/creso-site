@@ -1,3 +1,4 @@
+import { AdminAlert } from '@/components/admin/ui';
 import { saveSiteSettingsAction } from './actions';
 import SubmitSettingsButton from './SubmitSettingsButton';
 import { SITE_SETTINGS_SECTIONS, type SiteSettingFieldDefinition } from '@/lib/admin/site-settings-config';
@@ -65,15 +66,11 @@ export default async function AdminSettingsPage({ searchParams }: AdminSettingsP
         </div>
 
         {successMessage ? (
-          <p role="status" className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            {successMessage}
-          </p>
+          <AdminAlert tone="success" role="status" className="mt-4">{successMessage}</AdminAlert>
         ) : null}
 
         {searchParams?.error ? (
-          <p role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            Не удалось сохранить. Проверьте поле и попробуйте снова: {searchParams.error}
-          </p>
+          <AdminAlert tone="error" role="alert" className="mt-4">Не удалось сохранить. Проверьте поле и попробуйте снова: {searchParams.error}</AdminAlert>
         ) : null}
       </section>
 
