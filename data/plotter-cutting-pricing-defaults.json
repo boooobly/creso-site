@@ -1,0 +1,8 @@
+[
+  {"category":"plotter-cutting-pricing","subcategory":"global","key":"base_cut_price_per_meter","label":"Базовая резка","description":"Стоимость резки за погонный метр до применения коэффициента сложности.","type":"number","unit":"₽/м.п.","sortOrder":10,"value":30},
+  {"category":"plotter-cutting-pricing","subcategory":"global","key":"weeding_price_per_meter","label":"Выборка","description":"Стоимость выборки за погонный метр.","type":"number","unit":"₽/м.п.","sortOrder":20,"value":15},
+  {"category":"plotter-cutting-pricing","subcategory":"global","key":"mounting_film_price_per_square_meter","label":"Монтажная плёнка","description":"Стоимость монтажной плёнки за квадратный метр.","type":"number","unit":"₽/м²","sortOrder":30,"value":100},
+  {"category":"plotter-cutting-pricing","subcategory":"global","key":"transfer_price","label":"Перенос на деталь","description":"Фиксированная стоимость услуги переноса на деталь.","type":"number","unit":"₽","sortOrder":40,"value":300},
+  {"category":"plotter-cutting-pricing","subcategory":"global","key":"urgent_multiplier","label":"Коэффициент срочности","description":"Множитель к сумме заказа при включенной срочности.","type":"number","unit":"множитель","sortOrder":50,"value":1.3},
+  {"category":"plotter-cutting-pricing","subcategory":"global","key":"minimum_order_total","label":"Минимальная стоимость заказа","description":"Минимальный чек по плоттерной резке.","type":"number","unit":"₽","sortOrder":60,"value":400}
+]
