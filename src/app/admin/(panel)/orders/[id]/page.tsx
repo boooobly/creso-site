@@ -3,14 +3,19 @@ import { notFound } from 'next/navigation';
 import { AdminPageSection } from '@/components/admin/AdminPageSection';
 import { prisma } from '@/lib/db/prisma';
 import {
+  formatAdminBoolean,
   formatAdminDateTime,
   formatJsonForAdmin,
   formatMoneyRub,
+  formatNullableText,
+  getOrderStatusBadgeClass,
   getOrderStatusLabel,
+  getPaymentStatusBadgeClass,
   getPaymentStatusLabel,
   ORDER_STATUSES,
   PAYMENT_STATUSES
 } from '@/lib/admin/orders';
+import SubmitOrderUpdateButton from '../SubmitOrderUpdateButton';
 import { updateOrderAdminAction } from '../actions';
 
 type OrderDetailPageProps = {
@@ -23,6 +28,14 @@ type OrderDetailPageProps = {
   };
 };
 
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <p className="text-sm text-slate-700">
+      <span className="text-slate-500">{label}:</span> {value}
+    </p>
+  );
+}
+
 export default async function AdminOrderDetailPage({ params, searchParams }: OrderDetailPageProps) {
   const order = await prisma.order.findUnique({ where: { id: params.id } });
 
@@ -34,115 +47,137 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Ord
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Link href="/admin/orders" className="inline-flex text-sm text-slate-600 transition hover:text-slate-900">← Назад к заказам</Link>
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${getOrderStatusBadgeClass(order.status)}`}>
+            {getOrderStatusLabel(order.status)}
+          </span>
+          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${getPaymentStatusBadgeClass(order.paymentStatus)}`}>
+            {getPaymentStatusLabel(order.paymentStatus)}
+          </span>
+        </div>
       </div>
 
-      {success ? <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">Данные заказа сохранены.</p> : null}
-      {error ? <p className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">Проверьте статус заказа и статус оплаты.</p> : null}
+      {success ? (
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          Изменения сохранены. Статусы и заметка обновлены.
+        </p>
+      ) : null}
+      {error ? (
+        <p className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+          Не удалось сохранить изменения. Проверьте выбранные статусы и повторите попытку.
+        </p>
+      ) : null}
 
       <AdminPageSection
         title={`Заказ #${order.number}`}
-        description="Карточка заказа с источником, оплатой, JSON-данными расчета и внутренними заметками."
+        description="Ключевая коммерческая информация находится в верхних карточках."
       >
-        <div className="grid gap-6 lg:grid-cols-2">
-          <article className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">Основное</h3>
-            <p><span className="text-slate-500">ID:</span> {order.id}</p>
-            <p><span className="text-slate-500">Номер:</span> {order.number}</p>
-            <p><span className="text-slate-500">Источник:</span> {order.source}</p>
-            <p><span className="text-slate-500">Статус заказа:</span> {getOrderStatusLabel(order.status)}</p>
-            <p><span className="text-slate-500">Клиент:</span> {order.customerName || '—'}</p>
-            <p><span className="text-slate-500">Телефон:</span> {order.phone || '—'}</p>
-            <p><span className="text-slate-500">Email:</span> {order.email || '—'}</p>
-            <p><span className="text-slate-500">Комментарий клиента:</span> {order.comment || '—'}</p>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <article className="rounded-lg border border-slate-200 bg-slate-50 p-4 lg:col-span-1">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">Сумма заказа</h3>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{formatMoneyRub(order.total)}</p>
+            <p className="mt-1 text-sm text-slate-600">Предоплата: {order.prepayRequired ? formatMoneyRub(order.prepayAmount) : 'не требуется'}</p>
+            <p className="text-sm text-slate-600">Оплачено: {order.paidAmount ? formatMoneyRub(order.paidAmount) : '—'}</p>
           </article>
 
-          <article className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">Оплата и суммы</h3>
-            <p><span className="text-slate-500">Итого:</span> {formatMoneyRub(order.total)}</p>
-            <p><span className="text-slate-500">Предоплата обязательна:</span> {order.prepayRequired ? 'Да' : 'Нет'}</p>
-            <p><span className="text-slate-500">Сумма предоплаты:</span> {order.prepayRequired ? formatMoneyRub(order.prepayAmount) : '—'}</p>
-            <p><span className="text-slate-500">Статус оплаты:</span> {getPaymentStatusLabel(order.paymentStatus)}</p>
-            <p><span className="text-slate-500">Платежный провайдер:</span> {order.paymentProvider || '—'}</p>
-            <p><span className="text-slate-500">Референс платежа:</span> {order.paymentRef || '—'}</p>
-            <p><span className="text-slate-500">Оплачено:</span> {order.paidAmount ? formatMoneyRub(order.paidAmount) : '—'}</p>
-            <p><span className="text-slate-500">Дата оплаты:</span> {formatAdminDateTime(order.paidAt)}</p>
+          <article className="rounded-lg border border-slate-200 bg-slate-50 p-4 lg:col-span-1">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">Клиент</h3>
+            <div className="mt-2 space-y-1">
+              <InfoRow label="Имя" value={formatNullableText(order.customerName)} />
+              <InfoRow label="Телефон" value={formatNullableText(order.phone)} />
+              <InfoRow label="Email" value={formatNullableText(order.email)} />
+              <InfoRow label="Комментарий" value={formatNullableText(order.comment)} />
+            </div>
           </article>
-        </div>
 
-        <div className="mt-5 rounded-lg border border-slate-200 bg-white p-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">Служебные отметки</h3>
-          <p className="mt-2 text-sm text-slate-700"><span className="text-slate-500">Создан:</span> {formatAdminDateTime(order.createdAt)}</p>
-          <p className="text-sm text-slate-700"><span className="text-slate-500">Обновлен:</span> {formatAdminDateTime(order.updatedAt)}</p>
+          <article className="rounded-lg border border-slate-200 bg-slate-50 p-4 lg:col-span-1">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">Заказ</h3>
+            <div className="mt-2 space-y-1">
+              <InfoRow label="ID" value={order.id} />
+              <InfoRow label="Номер" value={order.number} />
+              <InfoRow label="Источник" value={formatNullableText(order.source)} />
+              <InfoRow label="Предоплата обязательна" value={formatAdminBoolean(order.prepayRequired)} />
+              <InfoRow label="Создан" value={formatAdminDateTime(order.createdAt)} />
+              <InfoRow label="Обновлен" value={formatAdminDateTime(order.updatedAt)} />
+            </div>
+          </article>
         </div>
       </AdminPageSection>
 
-      <AdminPageSection
-        title="Действия менеджера"
-        description="Обновите статусы и внутреннюю заметку."
-      >
-        <form action={submitAction} className="grid gap-4 lg:grid-cols-2">
-          <label className="space-y-1 text-sm text-slate-700">
-            <span className="font-medium">Статус заказа</span>
-            <select
-              name="status"
-              defaultValue={order.status}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
-            >
-              {ORDER_STATUSES.map((status) => (
-                <option key={status} value={status}>{getOrderStatusLabel(status)}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1 text-sm text-slate-700">
-            <span className="font-medium">Статус оплаты</span>
-            <select
-              name="paymentStatus"
-              defaultValue={order.paymentStatus}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
-            >
-              {PAYMENT_STATUSES.map((status) => (
-                <option key={status} value={status}>{getPaymentStatusLabel(status)}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1 text-sm text-slate-700 lg:col-span-2">
-            <span className="font-medium">Внутренняя заметка</span>
-            <textarea
-              name="managerNote"
-              defaultValue={order.managerNote ?? ''}
-              rows={6}
-              placeholder="Заметка видна только менеджерам"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
-            />
-          </label>
-
-          <div className="lg:col-span-2">
-            <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700">
-              Сохранить изменения
-            </button>
+      <div className="grid gap-6 xl:grid-cols-3">
+        <AdminPageSection title="Оплата" description="Технические детали платежа по заказу.">
+          <div className="space-y-1">
+            <InfoRow label="Статус" value={getPaymentStatusLabel(order.paymentStatus)} />
+            <InfoRow label="Провайдер" value={formatNullableText(order.paymentProvider)} />
+            <InfoRow label="Референс" value={formatNullableText(order.paymentRef)} />
+            <InfoRow label="Сумма оплаты" value={order.paidAmount ? formatMoneyRub(order.paidAmount) : '—'} />
+            <InfoRow label="Дата оплаты" value={formatAdminDateTime(order.paidAt)} />
           </div>
-        </form>
+        </AdminPageSection>
+
+        <AdminPageSection title="Действия менеджера" description="Безопасное обновление статусов и внутренней заметки.">
+          <form action={submitAction} className="grid gap-4">
+            <label className="space-y-1 text-sm text-slate-700">
+              <span className="font-medium">Статус заказа</span>
+              <select
+                name="status"
+                defaultValue={order.status}
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
+              >
+                {ORDER_STATUSES.map((status) => (
+                  <option key={status} value={status}>{getOrderStatusLabel(status)}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-1 text-sm text-slate-700">
+              <span className="font-medium">Статус оплаты</span>
+              <select
+                name="paymentStatus"
+                defaultValue={order.paymentStatus}
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
+              >
+                {PAYMENT_STATUSES.map((status) => (
+                  <option key={status} value={status}>{getPaymentStatusLabel(status)}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-1 text-sm text-slate-700">
+              <span className="font-medium">Внутренняя заметка</span>
+              <textarea
+                name="managerNote"
+                defaultValue={order.managerNote ?? ''}
+                rows={6}
+                placeholder="Например: клиент попросил уточнить сроки отгрузки"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
+              />
+            </label>
+
+            <div>
+              <SubmitOrderUpdateButton />
+              <p className="mt-2 text-xs text-slate-500">Кнопка блокируется на время сохранения, чтобы избежать случайного повторного отправления.</p>
+            </div>
+          </form>
+        </AdminPageSection>
+
+        <AdminPageSection title="Служебные поля" description="Системная информация о заявке.">
+          <div className="space-y-1">
+            <InfoRow label="Статус заказа" value={getOrderStatusLabel(order.status)} />
+            <InfoRow label="Статус оплаты" value={getPaymentStatusLabel(order.paymentStatus)} />
+            <InfoRow label="Менеджерская заметка" value={formatNullableText(order.managerNote)} />
+          </div>
+        </AdminPageSection>
+      </div>
+
+      <AdminPageSection title="payloadJson" description="Входные данные заявки в читаемом формате.">
+        <pre className="overflow-x-auto rounded-md border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-700">{formatJsonForAdmin(order.payloadJson)}</pre>
       </AdminPageSection>
 
-      <AdminPageSection
-        title="JSON данные"
-        description="Полезно для диагностики входных данных и расчета цены."
-      >
-        <div className="space-y-4">
-          <article className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <h3 className="text-sm font-semibold text-slate-900">payloadJson</h3>
-            <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded-md bg-white p-3 text-xs text-slate-700">{formatJsonForAdmin(order.payloadJson)}</pre>
-          </article>
-
-          <article className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <h3 className="text-sm font-semibold text-slate-900">quoteJson</h3>
-            <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded-md bg-white p-3 text-xs text-slate-700">{formatJsonForAdmin(order.quoteJson)}</pre>
-          </article>
-        </div>
+      <AdminPageSection title="quoteJson" description="Расчет стоимости и служебные параметры.">
+        <pre className="overflow-x-auto rounded-md border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-700">{formatJsonForAdmin(order.quoteJson)}</pre>
       </AdminPageSection>
     </div>
   );
