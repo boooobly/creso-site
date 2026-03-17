@@ -364,6 +364,197 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentPageDefinition[] = [
       },
     ],
   },
+
+  {
+    key: 'services',
+    title: 'Услуги',
+    route: '/services',
+    sections: [
+      {
+        key: 'hero',
+        title: 'Первый экран',
+        fields: [
+          { sectionKey: 'hero', fieldKey: 'eyebrow', label: 'Короткая подпись', type: 'text', defaultValue: 'УСЛУГИ' },
+          { sectionKey: 'hero', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Список услуг' },
+          {
+            sectionKey: 'hero',
+            fieldKey: 'description',
+            label: 'Описание',
+            type: 'textarea',
+            defaultValue: 'Выполняем проекты по наружной рекламе, печати и производству под ключ: от расчёта и дизайна до монтажа и сдачи.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'print',
+    title: 'Визитки и флаеры',
+    route: '/print',
+    sections: [
+      {
+        key: 'hero',
+        title: 'Вступительный блок',
+        fields: [
+          { sectionKey: 'hero', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Офсетные визитки' },
+          {
+            sectionKey: 'hero',
+            fieldKey: 'description',
+            label: 'Описание',
+            type: 'textarea',
+            defaultValue: 'Фиксированные параметры печати: 90x50 мм, мелованный картон 300 gsm. Выберите тираж и опции, затем отправьте заявку менеджеру.',
+          },
+          listField({
+            sectionKey: 'hero',
+            fieldKey: 'featureChips',
+            label: 'Короткие бейджи под описанием',
+            helper: 'До 6 коротких пунктов о параметрах услуги.',
+            defaultItems: [
+              { label: 'Офсетная печать' },
+              { label: '300 gsm мелованный картон' },
+              { label: 'Кратно 1000' },
+              { label: '7–10 рабочих дней' },
+            ],
+            listSchema: {
+              itemName: 'Бейдж',
+              minItems: 1,
+              maxItems: 6,
+              fields: [{ key: 'label', label: 'Текст бейджа', required: true }],
+            },
+          }),
+        ],
+      },
+    ],
+  },
+  {
+    key: 'milling',
+    title: 'Фрезеровка',
+    route: '/milling',
+    sections: [
+      {
+        key: 'hero',
+        title: 'Первый экран',
+        fields: [
+          { sectionKey: 'hero', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Фрезеровка листовых материалов' },
+          {
+            sectionKey: 'hero',
+            fieldKey: 'description',
+            label: 'Описание',
+            type: 'textarea',
+            defaultValue: 'Выполним раскрой и фигурную резку на ЧПУ. Работаем по вашим макетам и помогаем подготовить файл.',
+          },
+        ],
+      },
+      {
+        key: 'form',
+        title: 'Блок заявки',
+        fields: [
+          { sectionKey: 'form', fieldKey: 'title', label: 'Заголовок формы', type: 'text', defaultValue: 'Оставьте заявку на фрезеровку' },
+          { sectionKey: 'form', fieldKey: 'description', label: 'Описание формы', type: 'textarea', defaultValue: 'Прикрепите макет и укажите задачу — менеджер свяжется с вами для уточнения деталей.' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'plotter_cutting',
+    title: 'Плоттерная резка',
+    route: '/plotter-cutting',
+    sections: [
+      {
+        key: 'hero',
+        title: 'Первый экран',
+        fields: [
+          { sectionKey: 'hero', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Плоттерная резка самоклеящейся пленки и оракала' },
+          { sectionKey: 'hero', fieldKey: 'description', label: 'Описание', type: 'textarea', defaultValue: 'Режем плёнку по контуру, готовим наклейки и элементы для витрин, автомобилей и навигации.' },
+        ],
+      },
+      {
+        key: 'form',
+        title: 'Блок заявки',
+        fields: [
+          { sectionKey: 'form', fieldKey: 'title', label: 'Заголовок формы', type: 'text', defaultValue: 'Заявка на плоттерную резку' },
+          { sectionKey: 'form', fieldKey: 'successMessage', label: 'Сообщение после отправки', type: 'text', defaultValue: 'Заявка отправлена. Менеджер свяжется с вами в ближайшее время.' },
+        ],
+      },
+      {
+        key: 'requirements',
+        title: 'Требования к макету',
+        fields: [
+          { sectionKey: 'requirements', fieldKey: 'title', label: 'Заголовок блока', type: 'text', defaultValue: 'Требования к макету' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'reviews_page',
+    title: 'Страница отзывов',
+    route: '/reviews',
+    sections: [
+      {
+        key: 'hero',
+        title: 'Первый экран',
+        fields: [
+          { sectionKey: 'hero', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Отзывы реальных клиентов' },
+          { sectionKey: 'hero', fieldKey: 'description', label: 'Описание', type: 'textarea', defaultValue: 'Собрали отзывы клиентов, с которыми уже работали по печати, вывескам и монтажу.' },
+        ],
+      },
+      {
+        key: 'yandex',
+        title: 'Блок Яндекс Карт',
+        fields: [
+          { sectionKey: 'yandex', fieldKey: 'title', label: 'Заголовок блока', type: 'text', defaultValue: 'Отзывы на Яндекс Картах' },
+          { sectionKey: 'yandex', fieldKey: 'buttonText', label: 'Текст кнопки', type: 'text', defaultValue: 'Открыть все отзывы' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'service_mugs',
+    title: 'Печать на кружках',
+    route: '/services/mugs',
+    sections: [
+      {
+        key: 'hero',
+        title: 'Первый экран',
+        fields: [
+          { sectionKey: 'hero', fieldKey: 'eyebrow', label: 'Короткая подпись', type: 'text', defaultValue: 'Услуги / Сувенирная продукция' },
+          { sectionKey: 'hero', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Печать на кружках' },
+          { sectionKey: 'hero', fieldKey: 'description', label: 'Описание', type: 'textarea', defaultValue: 'Печатаем логотипы, подарочные дизайны и корпоративные серии. Поможем выбрать кружки и подготовить макет.' },
+        ],
+      },
+      {
+        key: 'faq',
+        title: 'FAQ',
+        fields: [
+          { sectionKey: 'faq', fieldKey: 'title', label: 'Заголовок FAQ', type: 'text', defaultValue: 'Частые вопросы' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'service_stands',
+    title: 'Изготовление стендов',
+    route: '/services/stands',
+    sections: [
+      {
+        key: 'hero',
+        title: 'Первый экран',
+        fields: [
+          { sectionKey: 'hero', fieldKey: 'eyebrow', label: 'Короткая подпись', type: 'text', defaultValue: 'Услуги / Информационные конструкции' },
+          { sectionKey: 'hero', fieldKey: 'title', label: 'Заголовок', type: 'text', defaultValue: 'Изготовление информационных стендов' },
+          { sectionKey: 'hero', fieldKey: 'description', label: 'Описание', type: 'textarea', defaultValue: 'Производим стенды для офисов, учреждений и уличных площадок. Подбираем формат и комплектацию под задачу.' },
+        ],
+      },
+      {
+        key: 'cta',
+        title: 'Финальный CTA-блок',
+        fields: [
+          { sectionKey: 'cta', fieldKey: 'title', label: 'Заголовок CTA', type: 'text', defaultValue: 'Нужен стенд под вашу задачу?' },
+          { sectionKey: 'cta', fieldKey: 'description', label: 'Описание CTA', type: 'textarea', defaultValue: 'Опишите формат, место установки и сроки. Подскажем вариант и рассчитаем стоимость.' },
+        ],
+      },
+    ],
+  },
 ];
 
 export function getPageContentDefinition(pageKey: string) {
