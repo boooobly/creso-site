@@ -9,7 +9,16 @@ export const PLOTTER_COMPLEXITY_OPTIONS = [
   { value: 1.6, label: 'Сложная (1.6)' },
 ] as const;
 
-export const PLOTTER_CUTTING_PRICING_CONFIG = {
+export type PlotterCuttingPricingConfig = {
+  baseCutPricePerMeter: number;
+  weedingPricePerMeter: number;
+  mountingFilmPricePerSquareMeter: number;
+  transferPrice: number;
+  urgentMultiplier: number;
+  minimumOrderTotal: number;
+};
+
+export const PLOTTER_CUTTING_PRICING_CONFIG: PlotterCuttingPricingConfig = {
   baseCutPricePerMeter: 30,
   weedingPricePerMeter: 15,
   mountingFilmPricePerSquareMeter: 100,

@@ -3,6 +3,8 @@ import nodemailer from 'nodemailer';
 
 import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
+import { calculatePlotterCuttingPricing } from '@/lib/calculations/plotterCuttingPricing';
+import { getPlotterCuttingPricingConfig } from '@/lib/plotter-cutting/plotterCuttingPricing';
 export const runtime = 'nodejs';
 
 type PlotterPayload = {
@@ -137,6 +139,27 @@ export async function POST(req: NextRequest) {
     }
 
     payload.contact.phone = phone;
+
+    const complexity = Number(payload.calculator.complexity ?? 1);
+    if (!Number.isFinite(complexity) || complexity <= 0) {
+      return NextResponse.json({ ok: false, error: 'Некорректный коэффициент сложности.' }, { status: 400 });
+    }
+
+    const pricing = await getPlotterCuttingPricingConfig();
+    const recalculated = calculatePlotterCuttingPricing({
+      cutLengthInput: String(payload.calculator.cutLength ?? ''),
+      areaInput: String(payload.calculator.area ?? ''),
+      complexity,
+      weeding: Boolean(payload.calculator.extras?.weeding),
+      mountingFilm: Boolean(payload.calculator.extras?.mountingFilm),
+      transfer: Boolean(payload.calculator.extras?.transfer),
+      urgent: Boolean(payload.calculator.extras?.urgent),
+    }, pricing.config);
+
+    payload.calculator.baseCost = recalculated.baseCost;
+    payload.calculator.extrasCost = recalculated.extrasCost;
+    payload.calculator.minimumApplied = recalculated.minimumApplied;
+    payload.calculator.total = recalculated.totalCost;
 
     const [emailSent, telegramSent] = await Promise.all([
       sendEmail(payload).catch(() => false),

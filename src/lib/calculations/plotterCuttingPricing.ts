@@ -1,4 +1,4 @@
-import { PLOTTER_CUTTING_PRICING_CONFIG } from '@/lib/pricing-config/plotterCutting';
+import { PLOTTER_CUTTING_PRICING_CONFIG, type PlotterCuttingPricingConfig } from '@/lib/pricing-config/plotterCutting';
 import { parseNumericInput } from './shared';
 
 export type PlotterCuttingPricingInput = {
@@ -27,26 +27,29 @@ export type PlotterCuttingCalculationResult = {
   totalCost: number;
 };
 
-export function calculatePlotterCuttingPricing(input: PlotterCuttingPricingInput): PlotterCuttingCalculationResult {
+export function calculatePlotterCuttingPricing(
+  input: PlotterCuttingPricingInput,
+  pricingConfig: PlotterCuttingPricingConfig = PLOTTER_CUTTING_PRICING_CONFIG,
+): PlotterCuttingCalculationResult {
   const cutLength = parseNumericInput(input.cutLengthInput);
   const area = parseNumericInput(input.areaInput);
 
   const valuesValid = Number.isFinite(cutLength) && Number.isFinite(area);
   const positiveValues = cutLength >= 0 && area >= 0;
 
-  const baseCost = valuesValid && positiveValues ? cutLength * PLOTTER_CUTTING_PRICING_CONFIG.baseCutPricePerMeter * input.complexity : 0;
+  const baseCost = valuesValid && positiveValues ? cutLength * pricingConfig.baseCutPricePerMeter * input.complexity : 0;
   const weedingCost = input.weeding && valuesValid && positiveValues
-    ? cutLength * PLOTTER_CUTTING_PRICING_CONFIG.weedingPricePerMeter
+    ? cutLength * pricingConfig.weedingPricePerMeter
     : 0;
   const mountingFilmCost = input.mountingFilm && valuesValid && positiveValues
-    ? area * PLOTTER_CUTTING_PRICING_CONFIG.mountingFilmPricePerSquareMeter
+    ? area * pricingConfig.mountingFilmPricePerSquareMeter
     : 0;
-  const transferCost = input.transfer ? PLOTTER_CUTTING_PRICING_CONFIG.transferPrice : 0;
+  const transferCost = input.transfer ? pricingConfig.transferPrice : 0;
 
   const extrasCost = weedingCost + mountingFilmCost + transferCost;
   const subtotal = baseCost + extrasCost;
-  const urgentTotal = input.urgent ? subtotal * PLOTTER_CUTTING_PRICING_CONFIG.urgentMultiplier : subtotal;
-  const minimumApplied = urgentTotal > 0 && urgentTotal < PLOTTER_CUTTING_PRICING_CONFIG.minimumOrderTotal;
+  const urgentTotal = input.urgent ? subtotal * pricingConfig.urgentMultiplier : subtotal;
+  const minimumApplied = urgentTotal > 0 && urgentTotal < pricingConfig.minimumOrderTotal;
 
   return {
     cutLength,
@@ -61,6 +64,6 @@ export function calculatePlotterCuttingPricing(input: PlotterCuttingPricingInput
     subtotal,
     urgentTotal,
     minimumApplied,
-    totalCost: minimumApplied ? PLOTTER_CUTTING_PRICING_CONFIG.minimumOrderTotal : urgentTotal,
+    totalCost: minimumApplied ? pricingConfig.minimumOrderTotal : urgentTotal,
   };
 }
