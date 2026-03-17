@@ -77,6 +77,28 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
         {searchParams?.error ? (
           <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{searchParams.error}</p>
         ) : null}
+
+        <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p className="text-sm font-semibold text-slate-900">Быстрая навигация по тарифам</p>
+          <p className="mt-1 text-xs text-slate-600">Каждый блок ниже отвечает за отдельную услугу. Сначала проверьте статус полноты, затем вносите значения.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[
+              ['baguette-extras', 'Багет: доп. материалы'],
+              ['wide-format', 'Широкоформатная печать'],
+              ['plotter-cutting', 'Плоттерная резка'],
+              ['heat-transfer', 'Термоперенос'],
+              ['print', 'Общая печать'],
+            ].map(([id, label]) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        </div>
       </section>
 
       <BaguetteExtrasConfigSection
@@ -420,6 +442,77 @@ function CategoryCard({ category }: { category: Category }) {
   );
 }
 
+
+
+type PricingHistoryItem = {
+  id: string;
+  subcategory: string;
+  key: string;
+  oldValue: unknown;
+  newValue: unknown;
+  note: string | null;
+  createdAt: Date;
+};
+
+function PricingDiagnostics({
+  isComplete,
+  missingKeys,
+  fallbackUsedKeys,
+  unknownKeys,
+}: {
+  isComplete: boolean;
+  missingKeys: string[];
+  fallbackUsedKeys: Array<{ key: string; reason: string }>;
+  unknownKeys: string[];
+}) {
+  const fallbackSummary = fallbackUsedKeys.map((item) => `${item.key} (${item.reason === 'missing' ? 'нет активного ключа' : 'значение некорректно'})`).join(', ');
+
+  return (
+    <div className="space-y-2">
+      <p className={`text-sm ${isComplete ? 'text-emerald-700' : 'text-amber-700'}`}>
+        {isComplete ? 'Обязательные ключи заполнены.' : `Не хватает ключей: ${missingKeys.join(', ')}`}
+      </p>
+
+      {fallbackUsedKeys.length > 0 ? (
+        <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Используются резервные значения для ключей: {fallbackSummary}
+        </p>
+      ) : null}
+
+      {unknownKeys.length > 0 ? (
+        <p className="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+          В БД есть нестандартные ключи (не из обязательного списка): {unknownKeys.join(', ')}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function PricingHistory({ histories }: { histories: PricingHistoryItem[] }) {
+  return (
+    <div className="mt-6 space-y-2">
+      <h3 className="text-sm font-semibold text-slate-900">История изменений</h3>
+      <p className="text-xs text-slate-500">Журнал только для просмотра. Показываются 20 последних изменений.</p>
+      {histories.length === 0 ? <p className="text-sm text-slate-500">Изменений пока нет.</p> : null}
+      {histories.slice(0, 20).map((history) => {
+        const oldValue = JSON.stringify(history.oldValue);
+        const newValue = JSON.stringify(history.newValue);
+        const changed = oldValue !== newValue;
+
+        return (
+          <div key={history.id} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+            <p className="font-medium">{history.subcategory}.{history.key} · {history.createdAt.toLocaleString('ru-RU')}</p>
+            <p>Изменение: {changed ? 'значение обновлено' : 'значение без фактических отличий'}</p>
+            <p>Было: <code>{oldValue}</code></p>
+            <p>Стало: <code>{newValue}</code></p>
+            {history.note ? <p>Комментарий: {history.note}</p> : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function BaguetteExtrasConfigSection({
   histories,
   fallbackUsedKeys,
@@ -460,8 +553,8 @@ function BaguetteExtrasConfigSection({
   const fallbackSummary = fallbackUsedKeys.map((item) => `${item.key} (${item.reason === 'missing' ? 'нет активного ключа' : 'значение некорректно'})`).join(', ');
 
   return (
-    <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <h2 className="text-lg font-semibold text-slate-900">Настройки расчёта багета (кроме каталога из Google Sheets)</h2>
+    <section id="baguette-extras" className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <h2 className="text-lg font-semibold text-slate-900">Багет: доп. материалы и правила расчёта</h2>
       <p className="text-sm text-slate-600">
         Здесь ведутся все доплаты и правила багетного расчёта: стекло, задники, крепёж, подрамник, печать и автодобавления.
       </p>
@@ -605,31 +698,15 @@ function HeatTransferConfigSection({
     }>;
   }>;
 }) {
-  const fallbackSummary = fallbackUsedKeys.map((item) => `${item.key} (${item.reason === 'missing' ? 'нет активного ключа' : 'значение некорректно'})`).join(', ');
-
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section id="heat-transfer" className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <h2 className="text-lg font-semibold text-slate-900">Термоперенос — параметры калькулятора</h2>
       <p className="mt-1 text-sm text-slate-600">
         Настройки для кружек, футболок и термоплёнки: цены, скидка по тиражу, срочность и минимальный чек.
       </p>
 
-      <div className="mt-3 space-y-2">
-        <p className={`text-sm ${isComplete ? 'text-emerald-700' : 'text-amber-700'}`}>
-          {isComplete ? 'Обязательные ключи заполнены.' : `Не хватает ключей: ${missingKeys.join(', ')}`}
-        </p>
-
-        {fallbackUsedKeys.length > 0 ? (
-          <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            Используются резервные значения для ключей: {fallbackSummary}
-          </p>
-        ) : null}
-
-        {unknownKeys.length > 0 ? (
-          <p className="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-            В БД есть нестандартные ключи (не из обязательного списка): {unknownKeys.join(', ')}
-          </p>
-        ) : null}
+      <div className="mt-3">
+        <PricingDiagnostics isComplete={isComplete} missingKeys={missingKeys} fallbackUsedKeys={fallbackUsedKeys} unknownKeys={unknownKeys} />
       </div>
 
       <div className="mt-5 space-y-5">
@@ -647,7 +724,7 @@ function HeatTransferConfigSection({
                       <p className="text-sm font-medium text-slate-900">{entry.label}</p>
                       <p className="text-xs text-slate-500">Ключ: {entry.subcategory}.{entry.key}</p>
                     </div>
-                    <input name="value" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <input name="value" type="number" min={0} step="0.01" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     <input name="note" placeholder="Комментарий (необязательно)" className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
                       Сохранить {entry.unit ? `(${entry.unit})` : ''}
@@ -659,20 +736,7 @@ function HeatTransferConfigSection({
           </div>
         ))}
       </div>
-
-      <div className="mt-6">
-        <h3 className="text-sm font-semibold text-slate-900">История изменений</h3>
-        {histories.length === 0 ? <p className="text-sm text-slate-500">Изменений пока нет.</p> : null}
-        {histories.slice(0, 20).map((history) => (
-          <div key={history.id} className="mt-2 rounded-lg border border-slate-200 p-3 text-xs text-slate-700">
-            <p className="font-medium">{history.subcategory}.{history.key}</p>
-            <p>Было: {JSON.stringify(history.oldValue)}</p>
-            <p>Стало: {JSON.stringify(history.newValue)}</p>
-            <p>Когда: {new Date(history.createdAt).toLocaleString('ru-RU')}</p>
-            {history.note ? <p>Комментарий: {history.note}</p> : null}
-          </div>
-        ))}
-      </div>
+      <PricingHistory histories={histories} />
     </section>
   );
 }
@@ -716,31 +780,15 @@ function PlotterCuttingConfigSection({
     }>;
   }>;
 }) {
-  const fallbackSummary = fallbackUsedKeys.map((item) => `${item.key} (${item.reason === 'missing' ? 'нет активного ключа' : 'значение некорректно'})`).join(', ');
-
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section id="plotter-cutting" className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <h2 className="text-lg font-semibold text-slate-900">Плоттерная резка — параметры калькулятора</h2>
       <p className="mt-1 text-sm text-slate-600">
         Офис может редактировать ставки плоттерной резки: базовую стоимость, выборку, монтажную плёнку, перенос, срочность и минимальный чек.
       </p>
 
-      <div className="mt-3 space-y-2">
-        <p className={`text-sm ${isComplete ? 'text-emerald-700' : 'text-amber-700'}`}>
-          {isComplete ? 'Обязательные ключи заполнены.' : `Не хватает ключей: ${missingKeys.join(', ')}`}
-        </p>
-
-        {fallbackUsedKeys.length > 0 ? (
-          <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            Используются резервные значения для ключей: {fallbackSummary}
-          </p>
-        ) : null}
-
-        {unknownKeys.length > 0 ? (
-          <p className="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-            В БД есть нестандартные ключи (не из обязательного списка): {unknownKeys.join(', ')}
-          </p>
-        ) : null}
+      <div className="mt-3">
+        <PricingDiagnostics isComplete={isComplete} missingKeys={missingKeys} fallbackUsedKeys={fallbackUsedKeys} unknownKeys={unknownKeys} />
       </div>
 
       <div className="mt-5 space-y-5">
@@ -758,7 +806,7 @@ function PlotterCuttingConfigSection({
                       <p className="text-sm font-medium text-slate-900">{entry.label}</p>
                       <p className="text-xs text-slate-500">Ключ: {entry.subcategory}.{entry.key}</p>
                     </div>
-                    <input name="value" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <input name="value" type="number" min={0} step="0.01" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     <input name="note" placeholder="Комментарий (необязательно)" className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
                       Сохранить {entry.unit ? `(${entry.unit})` : ''}
@@ -770,20 +818,7 @@ function PlotterCuttingConfigSection({
           </div>
         ))}
       </div>
-
-      <div className="mt-6">
-        <h3 className="text-sm font-semibold text-slate-900">История изменений</h3>
-        {histories.length === 0 ? <p className="text-sm text-slate-500">Изменений пока нет.</p> : null}
-        {histories.slice(0, 20).map((history) => (
-          <div key={history.id} className="mt-2 rounded-lg border border-slate-200 p-3 text-xs text-slate-700">
-            <p className="font-medium">{history.subcategory}.{history.key}</p>
-            <p>Было: {JSON.stringify(history.oldValue)}</p>
-            <p>Стало: {JSON.stringify(history.newValue)}</p>
-            <p>Когда: {new Date(history.createdAt).toLocaleString('ru-RU')}</p>
-            {history.note ? <p>Комментарий: {history.note}</p> : null}
-          </div>
-        ))}
-      </div>
+      <PricingHistory histories={histories} />
     </section>
   );
 }
@@ -829,31 +864,15 @@ function WideFormatConfigSection({
     }>;
   }>;
 }) {
-  const fallbackSummary = fallbackUsedKeys.map((item) => `${item.key} (${item.reason === 'missing' ? 'нет активного ключа' : 'значение некорректно'})`).join(', ');
-
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section id="wide-format" className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <h2 className="text-lg font-semibold text-slate-900">Широкоформатная печать — параметры калькулятора</h2>
       <p className="mt-1 text-sm text-slate-600">
         Здесь редактируются все формульные значения: минимальный чек, доп. услуги, цены за м² и ограничения ширины рулонов.
       </p>
 
-      <div className="mt-3 space-y-2">
-        <p className={`text-sm ${isComplete ? 'text-emerald-700' : 'text-amber-700'}`}>
-          {isComplete ? 'Обязательные ключи заполнены.' : `Не хватает ключей: ${missingKeys.join(', ')}`}
-        </p>
-
-        {fallbackUsedKeys.length > 0 ? (
-          <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            Используются резервные значения для ключей: {fallbackSummary}
-          </p>
-        ) : null}
-
-        {unknownKeys.length > 0 ? (
-          <p className="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-            В БД есть нестандартные ключи (не из обязательного списка): {unknownKeys.join(', ')}
-          </p>
-        ) : null}
+      <div className="mt-3">
+        <PricingDiagnostics isComplete={isComplete} missingKeys={missingKeys} fallbackUsedKeys={fallbackUsedKeys} unknownKeys={unknownKeys} />
       </div>
 
       <div className="mt-5 space-y-5">
@@ -872,7 +891,7 @@ function WideFormatConfigSection({
                       <p className="text-xs text-slate-600">{entry.description}</p>
                       <p className="text-xs text-slate-500">Ключ: {entry.subcategory}.{entry.key}</p>
                     </div>
-                    <input name="value" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <input name="value" type="number" min={0} step="0.01" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     <input name="note" placeholder="Комментарий (необязательно)" className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
                       Сохранить {entry.unit ? `(${entry.unit})` : ''}
@@ -884,20 +903,7 @@ function WideFormatConfigSection({
           </div>
         ))}
       </div>
-
-      <div className="mt-6">
-        <h3 className="text-sm font-semibold text-slate-900">История изменений</h3>
-        {histories.length === 0 ? <p className="text-sm text-slate-500">Изменений пока нет.</p> : null}
-        {histories.slice(0, 20).map((history) => (
-          <div key={history.id} className="mt-2 rounded-lg border border-slate-200 p-3 text-xs text-slate-700">
-            <p className="font-medium">{history.subcategory}.{history.key}</p>
-            <p>Было: {JSON.stringify(history.oldValue)}</p>
-            <p>Стало: {JSON.stringify(history.newValue)}</p>
-            <p>Когда: {new Date(history.createdAt).toLocaleString('ru-RU')}</p>
-            {history.note ? <p>Комментарий: {history.note}</p> : null}
-          </div>
-        ))}
-      </div>
+      <PricingHistory histories={histories} />
     </section>
   );
 }
@@ -942,31 +948,15 @@ function PrintConfigSection({
     }>;
   }>;
 }) {
-  const fallbackSummary = fallbackUsedKeys.map((item) => `${item.key} (${item.reason === 'missing' ? 'нет активного ключа' : 'значение некорректно'})`).join(', ');
-
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section id="print" className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <h2 className="text-lg font-semibold text-slate-900">Общая печать — параметры калькулятора</h2>
       <p className="mt-1 text-sm text-slate-600">
         Здесь редактируются базовые ставки и коэффициенты для расчёта визиток/флаеров в модуле общей печати.
       </p>
 
-      <div className="mt-3 space-y-2">
-        <p className={`text-sm ${isComplete ? 'text-emerald-700' : 'text-amber-700'}`}>
-          {isComplete ? 'Обязательные ключи заполнены.' : `Не хватает ключей: ${missingKeys.join(', ')}`}
-        </p>
-
-        {fallbackUsedKeys.length > 0 ? (
-          <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            Используются резервные значения для ключей: {fallbackSummary}
-          </p>
-        ) : null}
-
-        {unknownKeys.length > 0 ? (
-          <p className="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-            В БД есть нестандартные ключи (не из обязательного списка): {unknownKeys.join(', ')}
-          </p>
-        ) : null}
+      <div className="mt-3">
+        <PricingDiagnostics isComplete={isComplete} missingKeys={missingKeys} fallbackUsedKeys={fallbackUsedKeys} unknownKeys={unknownKeys} />
       </div>
 
       <div className="mt-5 space-y-5">
@@ -985,7 +975,7 @@ function PrintConfigSection({
                       <p className="text-xs text-slate-600">{entry.description}</p>
                       <p className="text-xs text-slate-500">Ключ: {entry.subcategory}.{entry.key}</p>
                     </div>
-                    <input name="value" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <input name="value" type="number" min={0} step="0.01" defaultValue={String(entry.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     <input name="note" placeholder="Комментарий (необязательно)" className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     <button type="submit" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
                       Сохранить {entry.unit ? `(${entry.unit})` : ''}
@@ -997,20 +987,7 @@ function PrintConfigSection({
           </div>
         ))}
       </div>
-
-      <div className="mt-6">
-        <h3 className="text-sm font-semibold text-slate-900">История изменений</h3>
-        {histories.length === 0 ? <p className="text-sm text-slate-500">Изменений пока нет.</p> : null}
-        {histories.slice(0, 20).map((history) => (
-          <div key={history.id} className="mt-2 rounded-lg border border-slate-200 p-3 text-xs text-slate-700">
-            <p className="font-medium">{history.subcategory}.{history.key}</p>
-            <p>Было: {JSON.stringify(history.oldValue)}</p>
-            <p>Стало: {JSON.stringify(history.newValue)}</p>
-            <p>Когда: {new Date(history.createdAt).toLocaleString('ru-RU')}</p>
-            {history.note ? <p>Комментарий: {history.note}</p> : null}
-          </div>
-        ))}
-      </div>
+      <PricingHistory histories={histories} />
     </section>
   );
 }
