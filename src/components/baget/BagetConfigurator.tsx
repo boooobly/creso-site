@@ -13,13 +13,12 @@ import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import type { BaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
-import { normalizeBagetTextureUrl } from '@/lib/baget/normalizeBagetTextureUrl';
 import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
 import { getInitialBagetPrintRequirement, type BagetPrintRequirement, type BagetTransferSource } from '@/lib/baget/printRequirement';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
-import BagetPreview from './BagetPreview';
+import BagetPreview, { type BagetPreviewProps } from './BagetPreview';
 import InfoTooltip from './InfoTooltip';
 
 const ITEMS_PER_PAGE = 16;
@@ -624,6 +623,28 @@ export default function BagetConfigurator({
     calcMeta.printCost,
   ]);
 
+  const previewProps = useMemo<BagetPreviewProps>(() => ({
+    widthMm,
+    heightMm,
+    selectedBaget: selectedBagetForQuote,
+    imageUrl,
+    stretchedCanvas: isNoFrameStretchedCanvas,
+    passepartoutEnabled: materials.passepartout,
+    passepartoutMm,
+    passepartoutBottomMm,
+    passepartoutColor: materials.passepartoutColor,
+  }), [
+    heightMm,
+    imageUrl,
+    isNoFrameStretchedCanvas,
+    materials.passepartout,
+    materials.passepartoutColor,
+    passepartoutBottomMm,
+    passepartoutMm,
+    selectedBagetForQuote,
+    widthMm,
+  ]);
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[18%_52%_30%] lg:items-start">
       <aside className="space-y-4 lg:sticky lg:top-24">
@@ -746,16 +767,8 @@ export default function BagetConfigurator({
         >
           <div ref={previewRef}>
             <BagetPreview
-              widthMm={widthMm}
-              heightMm={heightMm}
-              selectedBaget={selectedBagetForQuote}
-              imageUrl={imageUrl}
+              {...previewProps}
               highlighted={previewHighlighted}
-              stretchedCanvas={isNoFrameStretchedCanvas}
-              passepartoutEnabled={materials.passepartout}
-              passepartoutMm={passepartoutMm}
-              passepartoutBottomMm={passepartoutBottomMm}
-              passepartoutColor={materials.passepartoutColor}
             />
           </div>
         </button>
@@ -888,15 +901,7 @@ export default function BagetConfigurator({
                 >
                   <BagetPreview
                     className="max-h-[calc(80vh-2rem)]"
-                    widthMm={widthMm}
-                    heightMm={heightMm}
-                    selectedBaget={selectedBagetForQuote}
-                    imageUrl={imageUrl}
-                    stretchedCanvas={isNoFrameStretchedCanvas}
-                    passepartoutEnabled={materials.passepartout}
-                    passepartoutMm={passepartoutMm}
-                    passepartoutBottomMm={passepartoutBottomMm}
-                    passepartoutColor={materials.passepartoutColor}
+                    {...previewProps}
                   />
                 </div>
               </div>
@@ -909,9 +914,9 @@ export default function BagetConfigurator({
           onClose={() => setIsOrderModalOpen(false)}
           orderSummary={orderSummary}
           orderInput={orderInput}
-          previewImageUrl={imageUrl ?? undefined}
           uploadedImageFile={uploadedImageFile}
           totalPriceRub={quote.total}
+          previewProps={previewProps}
           effectiveSize={{
             wMm: Math.round(effectiveWidthMm),
             hMm: Math.round(effectiveHeightMm),

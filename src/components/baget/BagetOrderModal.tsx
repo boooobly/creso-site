@@ -6,6 +6,7 @@ import type { BagetQuoteResult } from '@/lib/calculations/bagetQuote';
 import type { FrameMode } from './BagetFilters';
 import type { BagetPrintMaterial, BagetTransferSource } from '@/lib/baget/printRequirement';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import BagetPreview, { type BagetPreviewProps } from './BagetPreview';
 
 type SizeMm = {
   wMm: number;
@@ -80,11 +81,11 @@ type BagetOrderModalProps = {
     baget: BagetOrderRequestBagetInput;
     fulfillmentType?: 'pickup' | 'selfPickup' | 'delivery';
   } | null;
-  previewImageUrl?: string;
   uploadedImageFile?: File | null;
   totalPriceRub: number;
   effectiveSize: SizeMm;
   outerSize?: SizeMm;
+  previewProps: BagetPreviewProps;
 };
 
 type FormErrors = {
@@ -109,11 +110,11 @@ export default function BagetOrderModal({
   onClose,
   orderSummary,
   orderInput,
-  previewImageUrl,
   uploadedImageFile,
   totalPriceRub,
   effectiveSize,
   outerSize,
+  previewProps,
 }: BagetOrderModalProps) {
   const [serverResult, setServerResult] = useState<OrderResponse | null>(null);
   const [name, setName] = useState('');
@@ -333,17 +334,12 @@ export default function BagetOrderModal({
           ) : (
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <section className="space-y-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/40">
-                {previewImageUrl ? (
-                  <div className="rounded-xl border border-neutral-200 bg-white p-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
-                    <p className="mb-2 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Превью</p>
-                    <img
-                      src={previewImageUrl}
-                      alt="Предпросмотр работы"
-                      className="mx-auto max-h-[200px] w-full rounded-lg border border-neutral-200 object-contain dark:border-neutral-700"
-                    />
-                    <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Финальный вид (пример)</p>
-                  </div>
-                ) : null}
+                <div className="overflow-hidden rounded-xl">
+                  <BagetPreview
+                    {...previewProps}
+                    className="rounded-xl border border-neutral-200 bg-white p-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-900"
+                  />
+                </div>
 
                 <h4 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Состав заказа</h4>
 
