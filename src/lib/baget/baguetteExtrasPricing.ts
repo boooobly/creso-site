@@ -2,6 +2,7 @@ import { z } from 'zod';
 import defaultsJson from '../../../data/baguette-extras-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
+import { loadPricingConfigWithFallback } from '@/lib/pricing/loadPricingConfigWithFallback';
 import type { WorkType } from '@/components/baget/BagetFilters';
 import type { BagetPrintMaterial } from '@/lib/baget/printRequirement';
 
@@ -267,19 +268,21 @@ export function getBaguetteExtrasDefaultConfig(): BaguetteExtrasPricingConfig {
 }
 
 export async function getBaguetteExtrasPricingConfig() {
-  const rows = await prisma.pricingEntry.findMany({
-    where: {
-      category: BAGUETTE_EXTRAS_PRICING_CATEGORY,
-      isActive: true,
-    },
-    select: {
-      subcategory: true,
-      key: true,
-      value: true,
-    },
+  return loadPricingConfigWithFallback({
+    label: 'baguette-pricing',
+    loadRows: () => prisma.pricingEntry.findMany({
+      where: {
+        category: BAGUETTE_EXTRAS_PRICING_CATEGORY,
+        isActive: true,
+      },
+      select: {
+        subcategory: true,
+        key: true,
+        value: true,
+      },
+    }),
+    buildFromRows: getBaguetteExtrasPricingConfigFromRows,
   });
-
-  return getBaguetteExtrasPricingConfigFromRows(rows);
 }
 
 export function getBaguetteExtrasPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {

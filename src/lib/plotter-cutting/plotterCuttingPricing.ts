@@ -4,6 +4,7 @@ import defaultsJson from '../../../data/plotter-cutting-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
+import { loadPricingConfigWithFallback } from '@/lib/pricing/loadPricingConfigWithFallback';
 import type { PlotterCuttingPricingConfig } from '@/lib/pricing-config/plotterCutting';
 
 export const PLOTTER_CUTTING_PRICING_CATEGORY = 'plotter-cutting-pricing';
@@ -112,9 +113,11 @@ async function listActivePlotterCuttingPricingRows() {
 }
 
 export async function getPlotterCuttingPricingConfig() {
-  const rows = await listActivePlotterCuttingPricingRows();
-
-  return getPlotterCuttingPricingConfigFromRows(rows);
+  return loadPricingConfigWithFallback({
+    label: 'plotter-cutting-pricing',
+    loadRows: listActivePlotterCuttingPricingRows,
+    buildFromRows: getPlotterCuttingPricingConfigFromRows,
+  });
 }
 
 export function getPlotterCuttingPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {
