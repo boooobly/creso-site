@@ -58,6 +58,31 @@ export async function sendTelegramPhotoBuffer(params: {
   }
 }
 
+export async function sendTelegramDocumentBuffer(params: {
+  token: string;
+  chatId: string;
+  bytes: Buffer;
+  caption?: string;
+  filename: string;
+  mime?: string;
+}): Promise<void> {
+  const formData = new FormData();
+  formData.set('chat_id', params.chatId);
+  if (params.caption) formData.set('caption', params.caption.slice(0, 1024));
+
+  const documentBlob = new Blob([new Uint8Array(params.bytes)], { type: params.mime || 'application/octet-stream' });
+  formData.set('document', documentBlob, params.filename);
+
+  const response = await fetch(`${TELEGRAM_API_BASE}/bot${params.token}/sendDocument`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const details = await response.text().catch(() => '');
+    throw new Error(`Telegram document send failed: ${response.status} ${details}`);
+  }
+}
 
 export async function sendTelegramPhotoAlbumBuffer(params: {
   token: string;
