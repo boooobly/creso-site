@@ -17,6 +17,7 @@ import { updateWideFormatPricingEntry } from '@/lib/wide-format/wideFormatPricin
 import { updatePlotterCuttingPricingEntry } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { updateHeatTransferPricingEntry } from '@/lib/heat-transfer/heatTransferPricing';
 import { updatePrintPricingEntry } from '@/lib/print/printPricing';
+import { normalizeNumericInput } from '@/lib/admin/pricing-input';
 
 function parseBoolean(value: FormDataEntryValue | null) {
   return value === 'on' || value === 'true' || value === '1';
@@ -38,6 +39,30 @@ function slugify(value: string) {
 function parseSortOrder(value: FormDataEntryValue | null) {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+
+function buildBaguetteRawValue(formData: FormData) {
+  const editorMode = String(formData.get('editorMode') ?? '').trim();
+
+  if (editorMode === 'material-rate') {
+    return JSON.stringify({
+      areaPricePerM2: Number(normalizeNumericInput(String(formData.get('areaPricePerM2') ?? ''))),
+      cuttingPricePerM: Number(normalizeNumericInput(String(formData.get('cuttingPricePerM') ?? ''))),
+    });
+  }
+
+  if (editorMode === 'auto-addition-rule') {
+    return JSON.stringify({
+      pvcType: String(formData.get('pvcType') ?? 'none').trim() || 'none',
+      addOrabond: parseBoolean(formData.get('addOrabond')),
+      forceCardboard: parseBoolean(formData.get('forceCardboard')),
+      stretchingRequired: parseBoolean(formData.get('stretchingRequired')),
+      removeCardboard: parseBoolean(formData.get('removeCardboard')),
+    });
+  }
+
+  return String(formData.get('value') ?? '').trim();
 }
 
 function redirectWithError(error: unknown) {
@@ -154,7 +179,7 @@ export async function deletePriceItemAction(id: string) {
 
 export async function updateBaguetteExtrasPricingEntryAction(entryId: string, formData: FormData) {
   try {
-    const rawValue = String(formData.get('value') ?? '').trim();
+    const rawValue = buildBaguetteRawValue(formData);
     const note = String(formData.get('note') ?? '').trim();
     await updateBaguetteExtrasPricingEntry(entryId, rawValue, note || undefined);
 

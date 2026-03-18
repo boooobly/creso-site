@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import defaultsJson from '../../../data/print-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
+import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import type { PrintDensity, PrintProductType, PrintType } from '@/lib/calculations/types';
 
 export const PRINT_PRICING_CATEGORY = 'print-pricing';
@@ -154,10 +155,11 @@ export async function ensurePrintPricingEntries() {
 
 export function parseAndValidatePrintPricingValue(compositeKey: string, rawValue: string) {
   const schema = PRINT_KEY_SCHEMAS[compositeKey] ?? positiveSchema;
-  const parsed = schema.safeParse(Number(rawValue));
+  const parsedValue = parseNumericInput(rawValue);
+  const parsed = schema.safeParse(parsedValue);
 
   if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? 'Некорректное значение. Проверьте формат и диапазон.');
+    throw new Error(getFriendlyNumericValidationMessage(rawValue, parsed.error.issues[0]));
   }
 
   return parsed.data;
