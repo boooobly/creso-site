@@ -6,7 +6,7 @@ import { buildDriveDirectImageCandidates, extractDriveFileId } from '@/lib/baget
 import { BagetItem } from './BagetCard';
 import { PassepartoutColor } from './BagetFilters';
 
-type BagetPreviewProps = {
+export type BagetPreviewProps = {
   widthMm: number;
   heightMm: number;
   selectedBaget: BagetItem | null;
