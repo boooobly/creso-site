@@ -8,18 +8,36 @@ export type MillingMaterialGroup = {
   }>;
 };
 
+export type MillingMaterialRateDefinition = {
+  key: string;
+  thickness: string;
+  defaultPrice: number;
+  sortOrder: number;
+};
+
+export type MillingMaterialGroupDefinition = {
+  id: string;
+  title: string;
+  description: string;
+  rows: MillingMaterialRateDefinition[];
+};
+
 export const MILLING_PRICE_PDF_PATH = '/prices/milling-price.pdf';
 
-export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
+function formatPricePerMeter(value: number) {
+  return `${value.toLocaleString('ru-RU')} ₽/м.п.`;
+}
+
+export const MILLING_MATERIAL_GROUP_DEFINITIONS: MillingMaterialGroupDefinition[] = [
   {
     id: 'pvc',
     title: 'ПВХ',
     description: 'Фрезеровка ПВХ листов разных толщин.',
     rows: [
-      { thickness: '1–3 мм', price: '30 ₽/м.п.' },
-      { thickness: '4–6 мм', price: '35 ₽/м.п.' },
-      { thickness: '8–10 мм', price: '45 ₽/м.п.' },
-      { thickness: 'свыше 10 мм', price: '60 ₽/м.п.' },
+      { key: 'price_1_3_mm', thickness: '1–3 мм', defaultPrice: 30, sortOrder: 10 },
+      { key: 'price_4_6_mm', thickness: '4–6 мм', defaultPrice: 35, sortOrder: 20 },
+      { key: 'price_8_10_mm', thickness: '8–10 мм', defaultPrice: 45, sortOrder: 30 },
+      { key: 'price_over_10_mm', thickness: 'свыше 10 мм', defaultPrice: 60, sortOrder: 40 },
     ],
   },
   {
@@ -27,13 +45,13 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'Оргстекло (акрил)',
     description: 'Прозрачное и цветное оргстекло.',
     rows: [
-      { thickness: '1–2 мм', price: '30 ₽/м.п.' },
-      { thickness: '3–4 мм', price: '35 ₽/м.п.' },
-      { thickness: '5–6 мм', price: '45 ₽/м.п.' },
-      { thickness: '8 мм', price: '60 ₽/м.п.' },
-      { thickness: '10 мм', price: '80 ₽/м.п.' },
-      { thickness: '15 мм', price: '110 ₽/м.п.' },
-      { thickness: '20 мм', price: '135 ₽/м.п.' },
+      { key: 'price_1_2_mm', thickness: '1–2 мм', defaultPrice: 30, sortOrder: 10 },
+      { key: 'price_3_4_mm', thickness: '3–4 мм', defaultPrice: 35, sortOrder: 20 },
+      { key: 'price_5_6_mm', thickness: '5–6 мм', defaultPrice: 45, sortOrder: 30 },
+      { key: 'price_8_mm', thickness: '8 мм', defaultPrice: 60, sortOrder: 40 },
+      { key: 'price_10_mm', thickness: '10 мм', defaultPrice: 80, sortOrder: 50 },
+      { key: 'price_15_mm', thickness: '15 мм', defaultPrice: 110, sortOrder: 60 },
+      { key: 'price_20_mm', thickness: '20 мм', defaultPrice: 135, sortOrder: 70 },
     ],
   },
   {
@@ -41,8 +59,8 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'Полистирол',
     description: 'Листовой полистирол для рекламы и POS.',
     rows: [
-      { thickness: '1–3 мм', price: '35 ₽/м.п.' },
-      { thickness: '4–6 мм', price: '45 ₽/м.п.' },
+      { key: 'price_1_3_mm', thickness: '1–3 мм', defaultPrice: 35, sortOrder: 10 },
+      { key: 'price_4_6_mm', thickness: '4–6 мм', defaultPrice: 45, sortOrder: 20 },
     ],
   },
   {
@@ -50,11 +68,11 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'Поликарбонат литой',
     description: 'Фрезеровка листового литого поликарбоната.',
     rows: [
-      { thickness: '1–2 мм', price: '60 ₽/м.п.' },
-      { thickness: '3–4 мм', price: '90 ₽/м.п.' },
-      { thickness: '5–6 мм', price: '120 ₽/м.п.' },
-      { thickness: '8 мм', price: '180 ₽/м.п.' },
-      { thickness: '10 мм', price: '210 ₽/м.п.' },
+      { key: 'price_1_2_mm', thickness: '1–2 мм', defaultPrice: 60, sortOrder: 10 },
+      { key: 'price_3_4_mm', thickness: '3–4 мм', defaultPrice: 90, sortOrder: 20 },
+      { key: 'price_5_6_mm', thickness: '5–6 мм', defaultPrice: 120, sortOrder: 30 },
+      { key: 'price_8_mm', thickness: '8 мм', defaultPrice: 180, sortOrder: 40 },
+      { key: 'price_10_mm', thickness: '10 мм', defaultPrice: 210, sortOrder: 50 },
     ],
   },
   {
@@ -62,8 +80,8 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'А-ПЭТ',
     description: 'Прозрачный пластик для упаковки и дисплеев.',
     rows: [
-      { thickness: '0.5–1 мм', price: '45 ₽/м.п.' },
-      { thickness: '1.5–2 мм', price: '50 ₽/м.п.' },
+      { key: 'price_0_5_1_mm', thickness: '0.5–1 мм', defaultPrice: 45, sortOrder: 10 },
+      { key: 'price_1_5_2_mm', thickness: '1.5–2 мм', defaultPrice: 50, sortOrder: 20 },
     ],
   },
   {
@@ -71,9 +89,9 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'АКП',
     description: 'Фрезеровка и раскрой композитных панелей.',
     rows: [
-      { thickness: '3 мм', price: '35 ₽/м.п.' },
-      { thickness: '4 мм', price: '40 ₽/м.п.' },
-      { thickness: '6 мм', price: '50 ₽/м.п.' },
+      { key: 'price_3_mm', thickness: '3 мм', defaultPrice: 35, sortOrder: 10 },
+      { key: 'price_4_mm', thickness: '4 мм', defaultPrice: 40, sortOrder: 20 },
+      { key: 'price_6_mm', thickness: '6 мм', defaultPrice: 50, sortOrder: 30 },
     ],
   },
   {
@@ -81,7 +99,7 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'V-канавка',
     description: 'Дополнительная операция к базовой стоимости реза.',
     rows: [
-      { thickness: 'Доплата', price: '+10 ₽/м.п.' },
+      { key: 'price_markup', thickness: 'Доплата', defaultPrice: 10, sortOrder: 10 },
     ],
   },
   {
@@ -89,9 +107,9 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'Полиамид / Полиэтилен / Полипропилен',
     description: 'Фрезеровка инженерных и конструкционных полимерных листов.',
     rows: [
-      { thickness: 'до 10 мм', price: '80 ₽/м.п.' },
-      { thickness: 'до 20 мм', price: '160 ₽/м.п.' },
-      { thickness: 'до 30 мм', price: '240 ₽/м.п.' },
+      { key: 'price_up_to_10_mm', thickness: 'до 10 мм', defaultPrice: 80, sortOrder: 10 },
+      { key: 'price_up_to_20_mm', thickness: 'до 20 мм', defaultPrice: 160, sortOrder: 20 },
+      { key: 'price_up_to_30_mm', thickness: 'до 30 мм', defaultPrice: 240, sortOrder: 30 },
     ],
   },
   {
@@ -99,9 +117,9 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'XPS пенополистирол (экструдированный)',
     description: 'Резка листов XPS по контуру.',
     rows: [
-      { thickness: '25–30 мм', price: '40 ₽/м.п.' },
-      { thickness: '40 мм', price: '50 ₽/м.п.' },
-      { thickness: '50 мм', price: '60 ₽/м.п.' },
+      { key: 'price_25_30_mm', thickness: '25–30 мм', defaultPrice: 40, sortOrder: 10 },
+      { key: 'price_40_mm', thickness: '40 мм', defaultPrice: 50, sortOrder: 20 },
+      { key: 'price_50_mm', thickness: '50 мм', defaultPrice: 60, sortOrder: 30 },
     ],
   },
   {
@@ -109,10 +127,10 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'ДСП',
     description: 'Фрезеровка древесно-стружечных плит.',
     rows: [
-      { thickness: '8 мм', price: '55 ₽/м.п.' },
-      { thickness: '16 мм', price: '70 ₽/м.п.' },
-      { thickness: '18–20 мм', price: '90 ₽/м.п.' },
-      { thickness: '22 мм', price: '120 ₽/м.п.' },
+      { key: 'price_8_mm', thickness: '8 мм', defaultPrice: 55, sortOrder: 10 },
+      { key: 'price_16_mm', thickness: '16 мм', defaultPrice: 70, sortOrder: 20 },
+      { key: 'price_18_20_mm', thickness: '18–20 мм', defaultPrice: 90, sortOrder: 30 },
+      { key: 'price_22_mm', thickness: '22 мм', defaultPrice: 120, sortOrder: 40 },
     ],
   },
   {
@@ -120,10 +138,10 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'Фанера',
     description: 'Фигурная резка фанеры для декора и рекламы.',
     rows: [
-      { thickness: '3–6 мм', price: '45 ₽/м.п.' },
-      { thickness: '8–12 мм', price: '50 ₽/м.п.' },
-      { thickness: '15–18 мм', price: '70 ₽/м.п.' },
-      { thickness: '20 мм и более', price: '100 ₽/м.п.' },
+      { key: 'price_3_6_mm', thickness: '3–6 мм', defaultPrice: 45, sortOrder: 10 },
+      { key: 'price_8_12_mm', thickness: '8–12 мм', defaultPrice: 50, sortOrder: 20 },
+      { key: 'price_15_18_mm', thickness: '15–18 мм', defaultPrice: 70, sortOrder: 30 },
+      { key: 'price_20_mm_and_more', thickness: '20 мм и более', defaultPrice: 100, sortOrder: 40 },
     ],
   },
   {
@@ -131,23 +149,36 @@ export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = [
     title: 'МДФ',
     description: 'Фрезеровка фасадных и декоративных элементов.',
     rows: [
-      { thickness: '4–6 мм', price: '35 ₽/м.п.' },
-      { thickness: '8–10 мм', price: '50 ₽/м.п.' },
-      { thickness: '12–16 мм', price: '60 ₽/м.п.' },
-      { thickness: '18–22 мм', price: '80 ₽/м.п.' },
-      { thickness: '25 мм и более', price: '100 ₽/м.п.' },
+      { key: 'price_4_6_mm', thickness: '4–6 мм', defaultPrice: 35, sortOrder: 10 },
+      { key: 'price_8_10_mm', thickness: '8–10 мм', defaultPrice: 50, sortOrder: 20 },
+      { key: 'price_12_16_mm', thickness: '12–16 мм', defaultPrice: 60, sortOrder: 30 },
+      { key: 'price_18_22_mm', thickness: '18–22 мм', defaultPrice: 80, sortOrder: 40 },
+      { key: 'price_25_mm_and_more', thickness: '25 мм и более', defaultPrice: 100, sortOrder: 50 },
     ],
   },
 ];
 
+export const MILLING_MATERIAL_GROUPS: MillingMaterialGroup[] = MILLING_MATERIAL_GROUP_DEFINITIONS.map((group) => ({
+  id: group.id,
+  title: group.title,
+  description: group.description,
+  rows: group.rows.map((row) => ({
+    thickness: row.thickness,
+    price: formatPricePerMeter(row.defaultPrice),
+  })),
+}));
+
+export type MillingAdditionalServiceItem = {
+  key: string;
+  label: string;
+  details: string;
+  badges?: string[];
+};
+
 export type MillingAdditionalServiceGroup = {
   id: string;
   title: string;
-  items: Array<{
-    label: string;
-    details: string;
-    badges?: string[];
-  }>;
+  items: MillingAdditionalServiceItem[];
 };
 
 export const MILLING_ADDITIONAL_SERVICE_GROUPS: MillingAdditionalServiceGroup[] = [
@@ -156,11 +187,13 @@ export const MILLING_ADDITIONAL_SERVICE_GROUPS: MillingAdditionalServiceGroup[] 
     title: 'Срочность',
     items: [
       {
+        key: 'same_day',
         label: 'День в день',
         details: '30%, минимум 350 ₽',
         badges: ['+30%', 'минимум 350 ₽'],
       },
       {
+        key: 'while_you_wait',
         label: 'Заказ при вас (от 30 мин)',
         details: '50%, минимум 700 ₽',
         badges: ['+50%', 'минимум 700 ₽'],
@@ -171,14 +204,15 @@ export const MILLING_ADDITIONAL_SERVICE_GROUPS: MillingAdditionalServiceGroup[] 
     id: 'preparation-and-complexity',
     title: 'Подготовка и сложность',
     items: [
-      { label: 'Подготовка макета', details: 'от 300 ₽' },
-      { label: 'Компоновка деталей', details: 'от 300 ₽' },
+      { key: 'layout_preparation', label: 'Подготовка макета', details: 'от 300 ₽' },
+      { key: 'parts_nesting', label: 'Компоновка деталей', details: 'от 300 ₽' },
       {
+        key: 'small_parts_complexity',
         label: 'Фрезеровка малых деталей до 50 мм, множества отверстий, тонких форм',
         details: '50%',
         badges: ['+50%'],
       },
-      { label: 'Полировка торцов прозрачного оргстекла', details: '90 ₽/м.п.' },
+      { key: 'transparent_acrylic_edge_polishing', label: 'Полировка торцов прозрачного оргстекла', details: '90 ₽/м.п.' },
     ],
   },
   {
@@ -186,27 +220,29 @@ export const MILLING_ADDITIONAL_SERVICE_GROUPS: MillingAdditionalServiceGroup[] 
     title: 'Материал заказчика, логистика и хранение',
     items: [
       {
+        key: 'customer_material_piece_markup',
         label: 'Фрезеровка из кусков материала заказчика',
         details: '10% за каждый последующий кусок',
         badges: ['+10%'],
       },
-      { label: 'Погрузка/выгрузка материалов заказчика', details: '100 ₽/лист' },
+      { key: 'customer_material_loading', label: 'Погрузка/выгрузка материалов заказчика', details: '100 ₽/лист' },
       {
+        key: 'storage_after_free_period',
         label: 'Хранение материалов клиента',
         details: 'бесплатно 3 суток до фрезеровки и 3 суток после, далее 150 ₽/сутки',
       },
-      { label: 'Доставка отфрезерованных деталей по городу', details: 'от 500 ₽' },
+      { key: 'city_delivery', label: 'Доставка отфрезерованных деталей по городу', details: 'от 500 ₽' },
     ],
   },
 ];
 
-export const MILLING_MATERIAL_OPTIONS = MILLING_MATERIAL_GROUPS.map((group) => ({
+export const MILLING_MATERIAL_OPTIONS = MILLING_MATERIAL_GROUP_DEFINITIONS.map((group) => ({
   value: group.title,
   label: group.title,
 }));
 
 export const MILLING_THICKNESS_BY_MATERIAL = Object.fromEntries(
-  MILLING_MATERIAL_GROUPS.map((group) => [group.title, group.rows.map((row) => row.thickness)]),
+  MILLING_MATERIAL_GROUP_DEFINITIONS.map((group) => [group.title, group.rows.map((row) => row.thickness)]),
 ) as Record<string, string[]>;
 
 export const MILLING_ALLOWED_EXTENSIONS = ['.pdf', '.cdr', '.ai', '.eps', '.dxf', '.svg'] as const;

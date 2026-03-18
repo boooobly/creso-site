@@ -17,6 +17,7 @@ import { updateWideFormatPricingEntry } from '@/lib/wide-format/wideFormatPricin
 import { updatePlotterCuttingPricingEntry } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { updateHeatTransferPricingEntry } from '@/lib/heat-transfer/heatTransferPricing';
 import { updatePrintPricingEntry } from '@/lib/print/printPricing';
+import { updateMillingPricingEntry } from '@/lib/milling/millingPricing';
 import { normalizeNumericInput } from '@/lib/admin/pricing-input';
 
 function parseBoolean(value: FormDataEntryValue | null) {
@@ -244,6 +245,19 @@ export async function updatePrintPricingEntryAction(entryId: string, formData: F
 
     revalidatePath('/admin/pricing');
     redirect('/admin/pricing?success=print-config-updated');
+  } catch (error) {
+    redirectWithError(error);
+  }
+}
+
+export async function updateMillingPricingEntryAction(entryId: string, formData: FormData) {
+  try {
+    const rawValue = String(formData.get('value') ?? '').trim();
+    const note = String(formData.get('note') ?? '').trim();
+    await updateMillingPricingEntry(entryId, rawValue, note || undefined);
+
+    revalidatePath('/admin/pricing');
+    redirect('/admin/pricing?success=milling-config-updated');
   } catch (error) {
     redirectWithError(error);
   }

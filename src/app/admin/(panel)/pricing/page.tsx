@@ -5,6 +5,7 @@ import { listPriceCatalog } from '@/lib/admin/price-catalog-service';
 import { listHeatTransferPricingAdminData } from '@/lib/heat-transfer/heatTransferPricing';
 import { listPlotterCuttingPricingAdminData } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { listPrintPricingAdminData } from '@/lib/print/printPricing';
+import { listMillingPricingAdminData } from '@/lib/milling/millingPricing';
 import { listWideFormatPricingAdminData } from '@/lib/wide-format/wideFormatPricing';
 import {
   createPriceCategoryAction,
@@ -18,6 +19,7 @@ import {
   updatePriceItemAction,
   updatePrintPricingEntryAction,
   updateWideFormatPricingEntryAction,
+  updateMillingPricingEntryAction,
 } from './actions';
 
 const successMessages: Record<string, string> = {
@@ -32,6 +34,7 @@ const successMessages: Record<string, string> = {
   'plotter-cutting-config-updated': 'Готово: настройки плоттерной резки обновлены.',
   'heat-transfer-config-updated': 'Готово: настройки термопереноса обновлены.',
   'print-config-updated': 'Готово: настройки общей печати обновлены.',
+  'milling-config-updated': 'Готово: настройки фрезеровки листовых материалов обновлены.',
 };
 
 const moduleNav = [
@@ -42,6 +45,7 @@ const moduleNav = [
   { id: 'plotter-cutting', label: 'Плоттерная резка' },
   { id: 'heat-transfer', label: 'Термоперенос' },
   { id: 'print', label: 'Общая печать' },
+  { id: 'milling', label: 'Фрезеровка листовых материалов' },
 ] as const;
 
 type AdminPricingPageProps = {
@@ -167,13 +171,14 @@ function getModuleHealthLabel(isComplete: boolean, missingKeys: string[], fallba
 }
 
 export default async function AdminPricingPage({ searchParams }: AdminPricingPageProps) {
-  const [categories, baguetteConfigData, wideFormatConfigData, plotterCuttingConfigData, heatTransferConfigData, printConfigData] = await Promise.all([
+  const [categories, baguetteConfigData, wideFormatConfigData, plotterCuttingConfigData, heatTransferConfigData, printConfigData, millingConfigData] = await Promise.all([
     listPriceCatalog(),
     listBaguetteExtrasPricingAdminData(),
     listWideFormatPricingAdminData(),
     listPlotterCuttingPricingAdminData(),
     listHeatTransferPricingAdminData(),
     listPrintPricingAdminData(),
+    listMillingPricingAdminData(),
   ]);
 
   const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
@@ -342,6 +347,20 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
         isComplete={printConfigData.isComplete}
         groupedSections={printConfigData.groupedSections}
         updateAction={updatePrintPricingEntryAction}
+      />
+
+      <ConfigModuleSection
+        id="milling"
+        title="Фрезеровка листовых материалов"
+        description="Цены по материалам, минимальный заказ, срочность и сопутствующие услуги для листовой фрезеровки."
+        audienceNote="Блок собран по понятным для офиса группам: отдельно материалы, отдельно срочность, подготовка и логистика."
+        histories={millingConfigData.histories}
+        fallbackUsedKeys={millingConfigData.fallbackUsedKeys}
+        missingKeys={millingConfigData.missingKeys}
+        unknownKeys={millingConfigData.unknownKeys}
+        isComplete={millingConfigData.isComplete}
+        groupedSections={millingConfigData.groupedSections}
+        updateAction={updateMillingPricingEntryAction}
       />
     </div>
   );
