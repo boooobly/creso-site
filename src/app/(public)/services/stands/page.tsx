@@ -6,23 +6,24 @@ import Section from '@/components/Section';
 import StandPreviewCard from '@/components/services/StandPreviewCard';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import { messages } from '@/lib/messages';
-import { getSiteImage } from '@/lib/site-images';
+import { getSiteImages } from '@/lib/site-images';
+import { STANDS_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
 
 const heroChips = ['Собственное производство', 'Карманы и сменные блоки', 'Изготовление по размерам', 'Доставка и монтаж'] as const;
 
 const indoorStands = [
-  { title: 'Стенд «Информация»', description: 'Универсальное решение для объявлений и инструкций.', previewHint: 'Типовая компоновка с карманами А4 и шапкой.', imageSrc: '/images/stands/info.png' },
-  { title: 'Уголок потребителя', description: 'Для торговых точек, салонов и офисов.', previewHint: 'Блоки с документами, реквизитами и правилами.', imageSrc: '/images/stands/consumer_corner.png' },
-  { title: 'Пожарные стенды', description: 'Схемы, регламенты и инструкции по безопасности.', previewHint: 'Схема эвакуации и обязательные памятки.', imageSrc: '/images/stands/fire_safety.png' },
-  { title: 'Охрана труда', description: 'Наглядные материалы для производственных зон.', previewHint: 'Нормативы, инструкции и чек-листы для персонала.', imageSrc: '/images/stands/labor_protection.png' },
-  { title: 'Первая помощь', description: 'Памятки и алгоритмы действий в экстренных случаях.', previewHint: 'Алгоритмы оказания помощи и контактные номера.', imageSrc: '/images/stands/first_aid.png' },
-  { title: 'Гражданская оборона и ЧС', description: 'Информационные блоки для обучения персонала.', previewHint: 'Порядок действий при внештатных ситуациях.', imageSrc: '/images/stands/civil_defense.png' },
+  { title: 'Стенд «Информация»', description: 'Универсальное решение для объявлений и инструкций.', previewHint: 'Типовая компоновка с карманами А4 и шапкой.', imageSrc: '/images/stands/info.png', slotKey: 'stands.indoor.info' },
+  { title: 'Уголок потребителя', description: 'Для торговых точек, салонов и офисов.', previewHint: 'Блоки с документами, реквизитами и правилами.', imageSrc: '/images/stands/consumer_corner.png', slotKey: 'stands.indoor.consumer_corner' },
+  { title: 'Пожарные стенды', description: 'Схемы, регламенты и инструкции по безопасности.', previewHint: 'Схема эвакуации и обязательные памятки.', imageSrc: '/images/stands/fire_safety.png', slotKey: 'stands.indoor.fire_safety' },
+  { title: 'Охрана труда', description: 'Наглядные материалы для производственных зон.', previewHint: 'Нормативы, инструкции и чек-листы для персонала.', imageSrc: '/images/stands/labor_protection.png', slotKey: 'stands.indoor.labor_protection' },
+  { title: 'Первая помощь', description: 'Памятки и алгоритмы действий в экстренных случаях.', previewHint: 'Алгоритмы оказания помощи и контактные номера.', imageSrc: '/images/stands/first_aid.png', slotKey: 'stands.indoor.first_aid' },
+  { title: 'Гражданская оборона и ЧС', description: 'Информационные блоки для обучения персонала.', previewHint: 'Порядок действий при внештатных ситуациях.', imageSrc: '/images/stands/civil_defense.png', slotKey: 'stands.indoor.civil_defense' },
 ] as const;
 
 const outdoorStands = [
-  { title: 'Уличные информационные стенды', description: 'Антивандальные решения с защитой от погоды.', previewHint: 'Усиленная рама и защищённая зона размещения листов.', imageSrc: '/images/stands/street_stand.png' },
-  { title: 'Уличные городские стенды', description: 'Оформление в фирменных требованиях муниципалитетов.', previewHint: 'Формат с бренд-зоной и нормативной структурой.', imageSrc: '/images/stands/city_stand.png' },
-  { title: 'На детские площадки', description: 'Яркие и безопасные конструкции для дворов и парков.', previewHint: 'Визуально читаемый стенд для жителей и родителей.', imageSrc: '/images/stands/playgrounds.png' },
+  { title: 'Уличные информационные стенды', description: 'Антивандальные решения с защитой от погоды.', previewHint: 'Усиленная рама и защищённая зона размещения листов.', imageSrc: '/images/stands/street_stand.png', slotKey: 'stands.outdoor.street_stand' },
+  { title: 'Уличные городские стенды', description: 'Оформление в фирменных требованиях муниципалитетов.', previewHint: 'Формат с бренд-зоной и нормативной структурой.', imageSrc: '/images/stands/city_stand.png', slotKey: 'stands.outdoor.city_stand' },
+  { title: 'На детские площадки', description: 'Яркие и безопасные конструкции для дворов и парков.', previewHint: 'Визуально читаемый стенд для жителей и родителей.', imageSrc: '/images/stands/playgrounds.png', slotKey: 'stands.outdoor.playgrounds' },
 ] as const;
 
 const materials = [
@@ -60,9 +61,9 @@ const revealDelayClasses = [
 const getRevealDelayClass = (index: number) => revealDelayClasses[index] ?? revealDelayClasses[revealDelayClasses.length - 1];
 
 export default async function StandsServicePage() {
-  const heroImage = await getSiteImage('stands.hero.main');
-  const heroImageSrc = heroImage?.url ?? '/images/stands/hero.png';
-  const heroImageAlt = heroImage?.altText || 'Изготовление информационных стендов';
+  const siteImages = await getSiteImages(STANDS_SITE_IMAGE_SLOTS.map((slot) => slot.key));
+  const heroImageSrc = siteImages['stands.hero.main']?.url ?? '/images/stands/hero.png';
+  const heroImageAlt = siteImages['stands.hero.main']?.altText || 'Изготовление информационных стендов';
 
   return (
     <div>
@@ -125,7 +126,7 @@ export default async function StandsServicePage() {
               title={item.title}
               description={item.description}
               previewHint={item.previewHint}
-              imageSrc={item.imageSrc}
+              imageSrc={siteImages[item.slotKey]?.url ?? item.imageSrc}
             />
           ))}
         </div>
@@ -146,7 +147,7 @@ export default async function StandsServicePage() {
               title={item.title}
               description={item.description}
               previewHint={item.previewHint}
-              imageSrc={item.imageSrc}
+              imageSrc={siteImages[item.slotKey]?.url ?? item.imageSrc}
             />
           ))}
         </div>

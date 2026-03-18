@@ -2,7 +2,7 @@ import { cache } from 'react';
 import { prisma } from '@/lib/db/prisma';
 import { SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
 
-type SiteImageRecord = {
+export type SiteImageRecord = {
   key: string;
   url: string;
   altText: string;

@@ -12,7 +12,7 @@ export type SiteImageSlotDefinition = {
   groupDescription: string;
 };
 
-export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
+const HOME_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   {
     key: 'home.hero.main',
     label: 'Главная — главный экран',
@@ -65,6 +65,9 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     groupLabel: 'Главная страница',
     groupDescription: 'Основные изображения главной страницы.',
   },
+];
+
+const SERVICE_CARD_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   {
     key: 'services.card.baget',
     label: 'Услуги — багет',
@@ -182,6 +185,9 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     groupLabel: 'Карточки услуг',
     groupDescription: 'Картинки карточек услуг, используются на главной и странице услуг.',
   },
+];
+
+export const OUTDOOR_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   {
     key: 'outdoor.hero.main',
     label: 'Наружная реклама — главный экран',
@@ -193,8 +199,27 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     fallbackAlt: 'Производство наружной рекламы',
     groupKey: 'outdoor',
     groupLabel: 'Наружная реклама',
-    groupDescription: 'Главные изображения страницы наружной рекламы.',
+    groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.',
   },
+  { key: 'outdoor.services.lightbox', label: 'Наружная реклама — световые короба', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Световые короба»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/lightbox.png', fallbackAlt: 'Световые короба', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.dimensional_letters', label: 'Наружная реклама — объемные буквы', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Объемные буквы»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/dimensional_letters.png', fallbackAlt: 'Объемные буквы', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.backlit_sign', label: 'Наружная реклама — контражурные буквы', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Контражурные буквы»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/backlit_sign.png', fallbackAlt: 'Контражурные буквы', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.roof_sign', label: 'Наружная реклама — крышные установки', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Крышные установки»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/roof_sign.png', fallbackAlt: 'Крышные установки', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.banner', label: 'Наружная реклама — баннеры', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Баннеры»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/banner.png', fallbackAlt: 'Баннеры', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.lightbox_cube', label: 'Наружная реклама — лайтбоксы', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Лайтбоксы»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/lightbox_cube.png', fallbackAlt: 'Лайтбоксы', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.neon', label: 'Наружная реклама — гибкий неон', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Гибкий неон»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/neon.png', fallbackAlt: 'Гибкий неон', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.stela', label: 'Наружная реклама — стелы', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Стелы»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/stela.png', fallbackAlt: 'Стелы', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.address_sign', label: 'Наружная реклама — адресные таблички', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Адресные таблички»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/adress_sign.png', fallbackAlt: 'Адресные таблички', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.services.custom', label: 'Наружная реклама — сложные конструкции', pageTitle: 'Наружная реклама', sectionLabel: 'Что изготавливаем', usageLabel: 'Карточка «Сложные конструкции любой сложности»', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_examples/custom.png', fallbackAlt: 'Сложные конструкции любой сложности', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.portfolio.baton.main', label: 'Наружная реклама — портфолио Baton: общий вид', pageTitle: 'Наружная реклама', sectionLabel: 'Портфолио', usageLabel: 'Первое изображение проекта Baton', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_advertising/outdoor_portfolio/baton.png', fallbackAlt: 'Проект Baton: общий вид рекламной конструкции', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.portfolio.baton.zoom', label: 'Наружная реклама — портфолио Baton: детали', pageTitle: 'Наружная реклама', sectionLabel: 'Портфолио', usageLabel: 'Второе изображение проекта Baton', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_advertising/outdoor_portfolio/baton_zoom.png', fallbackAlt: 'Проект Baton: крупный план деталей вывески', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.portfolio.baton.night', label: 'Наружная реклама — портфолио Baton: ночной вид', pageTitle: 'Наружная реклама', sectionLabel: 'Портфолио', usageLabel: 'Третье изображение проекта Baton', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_advertising/outdoor_portfolio/baton_night.png', fallbackAlt: 'Проект Baton: ночной вид с подсветкой', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.portfolio.cheese.main', label: 'Наружная реклама — портфолио Cheese: общий вид', pageTitle: 'Наружная реклама', sectionLabel: 'Портфолио', usageLabel: 'Первое изображение проекта Cheese', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_advertising/outdoor_portfolio/cheese.png', fallbackAlt: 'Проект Cheese: общий вид рекламной конструкции', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.portfolio.cheese.zoom', label: 'Наружная реклама — портфолио Cheese: детали', pageTitle: 'Наружная реклама', sectionLabel: 'Портфолио', usageLabel: 'Второе изображение проекта Cheese', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_advertising/outdoor_portfolio/cheese_zoom.png', fallbackAlt: 'Проект Cheese: крупный план деталей вывески', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+  { key: 'outdoor.portfolio.cheese.night', label: 'Наружная реклама — портфолио Cheese: ночной вид', pageTitle: 'Наружная реклама', sectionLabel: 'Портфолио', usageLabel: 'Третье изображение проекта Cheese', route: '/outdoor-advertising', fallbackUrl: '/images/outdoor_advertising/outdoor_portfolio/cheese_night.png', fallbackAlt: 'Проект Cheese: ночной вид с подсветкой', groupKey: 'outdoor', groupLabel: 'Наружная реклама', groupDescription: 'Изображения страницы наружной рекламы: первый экран, каталог и портфолио.' },
+];
+
+const PRODUCTION_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   {
     key: 'production.hero.main',
     label: 'Производство — главный экран',
@@ -260,6 +285,9 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     groupLabel: 'Производство',
     groupDescription: 'Главные изображения страницы «Производство».',
   },
+];
+
+export const STANDS_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   {
     key: 'stands.hero.main',
     label: 'Стенды — главный экран',
@@ -269,10 +297,22 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     route: '/services/stands',
     fallbackUrl: '/images/stands/hero.png',
     fallbackAlt: 'Изготовление информационных стендов',
-    groupKey: 'service-pages',
-    groupLabel: 'Другие страницы услуг',
-    groupDescription: 'Ключевые картинки узкоспециализированных страниц услуг.',
+    groupKey: 'stands',
+    groupLabel: 'Стенды',
+    groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.',
   },
+  { key: 'stands.indoor.info', label: 'Стенды — для помещений: Информация', pageTitle: 'Стенды', sectionLabel: 'Стенды для помещений', usageLabel: 'Карточка «Стенд «Информация»»', route: '/services/stands', fallbackUrl: '/images/stands/info.png', fallbackAlt: 'Стенд «Информация»', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+  { key: 'stands.indoor.consumer_corner', label: 'Стенды — для помещений: Уголок потребителя', pageTitle: 'Стенды', sectionLabel: 'Стенды для помещений', usageLabel: 'Карточка «Уголок потребителя»', route: '/services/stands', fallbackUrl: '/images/stands/consumer_corner.png', fallbackAlt: 'Уголок потребителя', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+  { key: 'stands.indoor.fire_safety', label: 'Стенды — для помещений: Пожарная безопасность', pageTitle: 'Стенды', sectionLabel: 'Стенды для помещений', usageLabel: 'Карточка «Пожарные стенды»', route: '/services/stands', fallbackUrl: '/images/stands/fire_safety.png', fallbackAlt: 'Пожарные стенды', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+  { key: 'stands.indoor.labor_protection', label: 'Стенды — для помещений: Охрана труда', pageTitle: 'Стенды', sectionLabel: 'Стенды для помещений', usageLabel: 'Карточка «Охрана труда»', route: '/services/stands', fallbackUrl: '/images/stands/labor_protection.png', fallbackAlt: 'Стенд по охране труда', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+  { key: 'stands.indoor.first_aid', label: 'Стенды — для помещений: Первая помощь', pageTitle: 'Стенды', sectionLabel: 'Стенды для помещений', usageLabel: 'Карточка «Первая помощь»', route: '/services/stands', fallbackUrl: '/images/stands/first_aid.png', fallbackAlt: 'Стенд по первой помощи', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+  { key: 'stands.indoor.civil_defense', label: 'Стенды — для помещений: Гражданская оборона и ЧС', pageTitle: 'Стенды', sectionLabel: 'Стенды для помещений', usageLabel: 'Карточка «Гражданская оборона и ЧС»', route: '/services/stands', fallbackUrl: '/images/stands/civil_defense.png', fallbackAlt: 'Стенд по гражданской обороне и ЧС', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+  { key: 'stands.outdoor.street_stand', label: 'Стенды — уличные: информационный стенд', pageTitle: 'Стенды', sectionLabel: 'Уличные стенды', usageLabel: 'Карточка «Уличные информационные стенды»', route: '/services/stands', fallbackUrl: '/images/stands/street_stand.png', fallbackAlt: 'Уличный информационный стенд', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+  { key: 'stands.outdoor.city_stand', label: 'Стенды — уличные: городской стенд', pageTitle: 'Стенды', sectionLabel: 'Уличные стенды', usageLabel: 'Карточка «Уличные городские стенды»', route: '/services/stands', fallbackUrl: '/images/stands/city_stand.png', fallbackAlt: 'Уличный городской стенд', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+  { key: 'stands.outdoor.playgrounds', label: 'Стенды — уличные: детские площадки', pageTitle: 'Стенды', sectionLabel: 'Уличные стенды', usageLabel: 'Карточка «На детские площадки»', route: '/services/stands', fallbackUrl: '/images/stands/playgrounds.png', fallbackAlt: 'Стенд для детской площадки', groupKey: 'stands', groupLabel: 'Стенды', groupDescription: 'Изображения страницы стендов: главный экран и примеры вариантов.' },
+];
+
+const MUGS_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   {
     key: 'mugs.hero.main',
     label: 'Кружки — главный экран',
@@ -286,6 +326,30 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     groupLabel: 'Другие страницы услуг',
     groupDescription: 'Ключевые картинки узкоспециализированных страниц услуг.',
   },
+];
+
+export const PLOTTER_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
+  { key: 'plotter.examples.labels', label: 'Плоттерная резка — пример: стикерпак', pageTitle: 'Плоттерная резка', sectionLabel: 'Примеры', usageLabel: 'Карточка «Стикерпак для бренда»', route: '/plotter-cutting', fallbackUrl: '/images/plotter/plotter_labels.png', fallbackAlt: 'Стикерпак для бренда', groupKey: 'plotter', groupLabel: 'Плоттерная резка', groupDescription: 'Изображения страницы плоттерной резки: примеры типовых работ.' },
+  { key: 'plotter.examples.window', label: 'Плоттерная резка — пример: витрина', pageTitle: 'Плоттерная резка', sectionLabel: 'Примеры', usageLabel: 'Карточка «Оформление витрины»', route: '/plotter-cutting', fallbackUrl: '/images/plotter/plotter_window.png', fallbackAlt: 'Оформление витрины', groupKey: 'plotter', groupLabel: 'Плоттерная резка', groupDescription: 'Изображения страницы плоттерной резки: примеры типовых работ.' },
+  { key: 'plotter.examples.stickers', label: 'Плоттерная резка — пример: резка по меткам', pageTitle: 'Плоттерная резка', sectionLabel: 'Примеры', usageLabel: 'Карточка «Резка по меткам»', route: '/plotter-cutting', fallbackUrl: '/images/plotter/plotter_stickers.png', fallbackAlt: 'Резка по меткам', groupKey: 'plotter', groupLabel: 'Плоттерная резка', groupDescription: 'Изображения страницы плоттерной резки: примеры типовых работ.' },
+  { key: 'plotter.examples.car', label: 'Плоттерная резка — пример: оклейка машины', pageTitle: 'Плоттерная резка', sectionLabel: 'Примеры', usageLabel: 'Карточка «Оклейка машины»', route: '/plotter-cutting', fallbackUrl: '/images/plotter/plotter_car.png', fallbackAlt: 'Оклейка машины', groupKey: 'plotter', groupLabel: 'Плоттерная резка', groupDescription: 'Изображения страницы плоттерной резки: примеры типовых работ.' },
+];
+
+export const TSHIRTS_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
+  { key: 'tshirts.examples.logo', label: 'Печать на футболках — пример: логотип на груди', pageTitle: 'Печать на футболках', sectionLabel: 'Примеры работ', usageLabel: 'Карточка «Логотип на груди»', route: '/heat-transfer', fallbackUrl: '/images/t-shirt/logo.png', fallbackAlt: 'Логотип на груди', groupKey: 'tshirts', groupLabel: 'Печать на футболках', groupDescription: 'Изображения страницы печати на футболках: реальные примеры работ.' },
+  { key: 'tshirts.examples.team', label: 'Печать на футболках — пример: мерч для команды', pageTitle: 'Печать на футболках', sectionLabel: 'Примеры работ', usageLabel: 'Карточка «Мерч для команды»', route: '/heat-transfer', fallbackUrl: '/images/t-shirt/eurochem.png', fallbackAlt: 'Мерч для команды', groupKey: 'tshirts', groupLabel: 'Печать на футболках', groupDescription: 'Изображения страницы печати на футболках: реальные примеры работ.' },
+  { key: 'tshirts.examples.film', label: 'Печать на футболках — пример: термоплёнка', pageTitle: 'Печать на футболках', sectionLabel: 'Примеры работ', usageLabel: 'Карточка «Надпись термоплёнкой»', route: '/heat-transfer', fallbackUrl: '/images/t-shirt/termoplenka.png', fallbackAlt: 'Надпись термоплёнкой', groupKey: 'tshirts', groupLabel: 'Печать на футболках', groupDescription: 'Изображения страницы печати на футболках: реальные примеры работ.' },
+];
+
+export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
+  ...HOME_IMAGE_SLOTS,
+  ...SERVICE_CARD_IMAGE_SLOTS,
+  ...OUTDOOR_SITE_IMAGE_SLOTS,
+  ...PRODUCTION_IMAGE_SLOTS,
+  ...STANDS_SITE_IMAGE_SLOTS,
+  ...MUGS_SITE_IMAGE_SLOTS,
+  ...PLOTTER_SITE_IMAGE_SLOTS,
+  ...TSHIRTS_SITE_IMAGE_SLOTS,
 ];
 
 export const SITE_IMAGE_SLOT_KEYS = new Set(SITE_IMAGE_SLOTS.map((slot) => slot.key));
