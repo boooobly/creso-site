@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logQuoteGeneration } from '@/lib/quote-logging';
 import { getWideFormatQuote, type WideFormatPricingInput } from '@/lib/engine';
-import { getWideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
+import { getWideFormatPricingConfig, isWideFormatMaterialVisibleInConstructor } from '@/lib/wide-format/wideFormatPricing';
 
 import { logger } from '@/lib/logger';
 const wideFormatQuoteSchema = z.object({
@@ -45,6 +45,11 @@ export async function POST(req: Request) {
 
     const input: WideFormatPricingInput = parsed.data;
     const pricing = await getWideFormatPricingConfig();
+
+    if (!isWideFormatMaterialVisibleInConstructor(input.material, pricing.config)) {
+      return NextResponse.json({ ok: false, error: 'Выбранный материал сейчас недоступен в конструкторе.' }, { status: 400 });
+    }
+
     const quote = getWideFormatQuote(input, pricing.config);
 
     logQuoteGeneration({

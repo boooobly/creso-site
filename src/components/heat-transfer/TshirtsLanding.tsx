@@ -7,6 +7,7 @@ import { CSSProperties, ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
 import FloatingTshirtsCTA from '@/components/heat-transfer/FloatingTshirtsCTA';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
+import type { SiteImageRecord } from '@/lib/site-images';
 
 type FaqItem = { question: string; answer: string };
 
@@ -65,16 +66,19 @@ const galleryCards = [
     title: 'Логотип на груди',
     description: 'Компактное нанесение логотипа на футболки для формы, персонала и промо.',
     imageSrc: '/images/t-shirt/logo.png',
+    slotKey: 'tshirts.examples.logo',
   },
   {
     title: 'Мерч для команды',
     description: 'Единый стиль для сотрудников, команд и мероприятий с аккуратным переносом.',
     imageSrc: '/images/t-shirt/eurochem.png',
+    slotKey: 'tshirts.examples.team',
   },
   {
     title: 'Надпись термоплёнкой',
     description: 'Контрастные надписи и простая графика с чистой и стойкой посадкой на ткани.',
     imageSrc: '/images/t-shirt/termoplenka.png',
+    slotKey: 'tshirts.examples.film',
   },
 ] as const;
 
@@ -208,6 +212,7 @@ type TshirtsLandingProps = {
   heroDescription?: string;
   heroPrimaryButtonText?: string;
   heroSecondaryButtonText?: string;
+  galleryImages?: Record<string, SiteImageRecord | null>;
 };
 
 export default function TshirtsLanding({
@@ -215,6 +220,7 @@ export default function TshirtsLanding({
   heroDescription = 'Полноцвет A4 — 250 ₽ за 1 сторону. Работаем на ваших или наших футболках.',
   heroPrimaryButtonText = 'Оставить заявку',
   heroSecondaryButtonText = 'Смотреть примеры',
+  galleryImages = {},
 }: TshirtsLandingProps) {
   const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.12 });
 
@@ -317,7 +323,11 @@ export default function TshirtsLanding({
                 reveal={reveal}
                 className="premium-card group h-full overflow-hidden"
               >
-                <ExampleMockup title={card.title} description={card.description} imageSrc={card.imageSrc} />
+                <ExampleMockup
+                  title={card.title}
+                  description={card.description}
+                  imageSrc={galleryImages[card.slotKey]?.url ?? card.imageSrc}
+                />
               </AnimatedCard>
             ))}
           </div>

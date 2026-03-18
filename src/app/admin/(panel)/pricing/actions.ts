@@ -197,7 +197,10 @@ export async function updateBaguetteExtrasPricingEntryAction(entryId: string, fo
 
 export async function updateWideFormatPricingEntryAction(entryId: string, formData: FormData) {
   try {
-    const rawValue = String(formData.get('value') ?? '').trim();
+    const entryType = String(formData.get('entryType') ?? 'number').trim();
+    const rawValue = entryType === 'boolean'
+      ? String(parseBoolean(formData.get('valueBoolean')))
+      : String(formData.get('value') ?? '').trim();
     const note = String(formData.get('note') ?? '').trim();
     await updateWideFormatPricingEntry(entryId, rawValue, note || undefined);
 

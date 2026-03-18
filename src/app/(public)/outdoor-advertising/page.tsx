@@ -10,19 +10,20 @@ import ProductionTrustBlock from '@/components/ProductionTrustBlock';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import { messages } from '@/lib/messages';
-import { getSiteImage } from '@/lib/site-images';
+import { getSiteImages } from '@/lib/site-images';
+import { OUTDOOR_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
 
-const services: Array<{ title: string; image: string; featured?: boolean }> = [
-  { title: 'Световые короба', image: '/images/outdoor_examples/lightbox.png', featured: true },
-  { title: 'Объемные буквы', image: '/images/outdoor_examples/dimensional_letters.png' },
-  { title: 'Контражурные буквы', image: '/images/outdoor_examples/backlit_sign.png' },
-  { title: 'Крышные установки', image: '/images/outdoor_examples/roof_sign.png' },
-  { title: 'Баннеры', image: '/images/outdoor_examples/banner.png' },
-  { title: 'Лайтбоксы', image: '/images/outdoor_examples/lightbox_cube.png' },
-  { title: 'Гибкий неон', image: '/images/outdoor_examples/neon.png' },
-  { title: 'Стелы', image: '/images/outdoor_examples/stela.png' },
-  { title: 'Адресные таблички', image: '/images/outdoor_examples/adress_sign.png' },
-  { title: 'Сложные конструкции любой сложности', image: '/images/outdoor_examples/custom.png' },
+const services: Array<{ title: string; image: string; slotKey: string; featured?: boolean }> = [
+  { title: 'Световые короба', image: '/images/outdoor_examples/lightbox.png', slotKey: 'outdoor.services.lightbox', featured: true },
+  { title: 'Объемные буквы', image: '/images/outdoor_examples/dimensional_letters.png', slotKey: 'outdoor.services.dimensional_letters' },
+  { title: 'Контражурные буквы', image: '/images/outdoor_examples/backlit_sign.png', slotKey: 'outdoor.services.backlit_sign' },
+  { title: 'Крышные установки', image: '/images/outdoor_examples/roof_sign.png', slotKey: 'outdoor.services.roof_sign' },
+  { title: 'Баннеры', image: '/images/outdoor_examples/banner.png', slotKey: 'outdoor.services.banner' },
+  { title: 'Лайтбоксы', image: '/images/outdoor_examples/lightbox_cube.png', slotKey: 'outdoor.services.lightbox_cube' },
+  { title: 'Гибкий неон', image: '/images/outdoor_examples/neon.png', slotKey: 'outdoor.services.neon' },
+  { title: 'Стелы', image: '/images/outdoor_examples/stela.png', slotKey: 'outdoor.services.stela' },
+  { title: 'Адресные таблички', image: '/images/outdoor_examples/adress_sign.png', slotKey: 'outdoor.services.address_sign' },
+  { title: 'Сложные конструкции любой сложности', image: '/images/outdoor_examples/custom.png', slotKey: 'outdoor.services.custom' },
 ] as const;
 
 const strengths: Array<{ title: string; description: string; icon: LucideIcon }> = [
@@ -94,6 +95,7 @@ const portfolioProjects = [
     images: [
       {
         src: '/images/outdoor_advertising/outdoor_portfolio/baton.png',
+        slotKey: 'outdoor.portfolio.baton.main',
         alt: 'Проект Baton: общий вид рекламной конструкции',
         title: 'Общий вид',
         category: 'Фасадная вывеска',
@@ -101,6 +103,7 @@ const portfolioProjects = [
       },
       {
         src: '/images/outdoor_advertising/outdoor_portfolio/baton_zoom.png',
+        slotKey: 'outdoor.portfolio.baton.zoom',
         alt: 'Проект Baton: крупный план деталей вывески',
         title: 'Детали',
         category: 'Крупный план',
@@ -108,6 +111,7 @@ const portfolioProjects = [
       },
       {
         src: '/images/outdoor_advertising/outdoor_portfolio/baton_night.png',
+        slotKey: 'outdoor.portfolio.baton.night',
         alt: 'Проект Baton: ночной вид с подсветкой',
         title: 'Ночной вид',
         category: 'Подсветка',
@@ -121,6 +125,7 @@ const portfolioProjects = [
     images: [
       {
         src: '/images/outdoor_advertising/outdoor_portfolio/cheese.png',
+        slotKey: 'outdoor.portfolio.cheese.main',
         alt: 'Проект Cheese: общий вид рекламной конструкции',
         title: 'Общий вид',
         category: 'Фасадная вывеска',
@@ -128,6 +133,7 @@ const portfolioProjects = [
       },
       {
         src: '/images/outdoor_advertising/outdoor_portfolio/cheese_zoom.png',
+        slotKey: 'outdoor.portfolio.cheese.zoom',
         alt: 'Проект Cheese: крупный план деталей вывески',
         title: 'Детали',
         category: 'Крупный план',
@@ -135,6 +141,7 @@ const portfolioProjects = [
       },
       {
         src: '/images/outdoor_advertising/outdoor_portfolio/cheese_night.png',
+        slotKey: 'outdoor.portfolio.cheese.night',
         alt: 'Проект Cheese: ночной вид с подсветкой',
         title: 'Ночной вид',
         category: 'Подсветка',
@@ -145,9 +152,9 @@ const portfolioProjects = [
 ] as const;
 
 export default async function OutdoorAdvertisingPage() {
-  const [contentMap, heroImage] = await Promise.all([
+  const [contentMap, siteImages] = await Promise.all([
     getPageContentMap('outdoor'),
-    getSiteImage('outdoor.hero.main'),
+    getSiteImages(OUTDOOR_SITE_IMAGE_SLOTS.map((slot) => slot.key)),
   ]);
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Наружная реклама под ключ в Ставропольском крае');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.');
@@ -157,8 +164,17 @@ export default async function OutdoorAdvertisingPage() {
   const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Изготавливаем и монтируем конструкции в сжатые сроки.');
   const ctaButtonText = getPageContentValue(contentMap, 'cta', 'buttonText', 'Получить расчет');
 
-  const heroImageSrc = heroImage?.url ?? '/images/outdoor_advertising/manufacturing.png';
-  const heroImageAlt = heroImage?.altText || 'Производство наружной рекламы';
+  const heroImageSrc = siteImages['outdoor.hero.main']?.url ?? '/images/outdoor_advertising/manufacturing.png';
+  const heroImageAlt = siteImages['outdoor.hero.main']?.altText || 'Производство наружной рекламы';
+
+  const resolvedPortfolioProjects = portfolioProjects.map((project) => ({
+    ...project,
+    images: project.images.map((image) => ({
+      ...image,
+      src: siteImages[image.slotKey]?.url ?? image.src,
+      alt: siteImages[image.slotKey]?.altText || image.alt,
+    })),
+  }));
   return (
     <div className="pb-24 md:pb-0">
       <OutdoorFloatingCtas />
@@ -214,7 +230,7 @@ export default async function OutdoorAdvertisingPage() {
             <h2 className="text-2xl font-bold">Портфолио</h2>
             <p className="hidden text-sm text-neutral-600 md:block dark:text-neutral-300">Реализованные проекты по региону</p>
           </div>
-          <OutdoorPortfolioGallery projects={[...portfolioProjects]} />
+          <OutdoorPortfolioGallery projects={resolvedPortfolioProjects} />
         </RevealOnScroll>
       </Section>
 
@@ -228,7 +244,7 @@ export default async function OutdoorAdvertisingPage() {
                 className={`card group relative overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-black/15 ${service.featured ? 'min-h-[240px] md:col-span-2 lg:col-span-3 lg:min-h-[300px]' : 'min-h-[180px]'}`}
               >
                 <Image
-                  src={service.image}
+                  src={siteImages[service.slotKey]?.url ?? service.image}
                   alt={service.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-[1.05]"
