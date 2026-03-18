@@ -28,6 +28,7 @@ import {
   BAGET_TRANSFER_SOURCE_WIDE_FORMAT_CANVAS,
 } from '@/lib/baget/transfer';
 import ImageDropzone from '@/components/ImageDropzone';
+import Button from '@/components/ui/Button';
 import {
   Select,
   SelectContent,
@@ -629,26 +630,4 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <b>{value}</b>
     </p>
   );
-}
-
-function Button({
-  children,
-  variant,
-  className = '',
-  onClick,
-}: {
-  children: React.ReactNode;
-  variant: 'primary';
-  className?: string;
-  onClick?: () => void;
-}) {
-  if (variant === 'primary') {
-    return (
-      <button type="button" onClick={onClick} className={`btn-primary ${className}`.trim()}>
-        {children}
-      </button>
-    );
-  }
-
-  return null;
 }
