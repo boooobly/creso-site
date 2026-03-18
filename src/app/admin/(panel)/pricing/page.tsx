@@ -75,7 +75,7 @@ type ConfigEntry = {
   description?: string;
   value: unknown;
   unit: string | null;
-  type: string;
+  type: 'number' | 'boolean' | string;
   sortOrder: number;
   isActive: boolean;
 };
@@ -152,6 +152,10 @@ function isBaguetteAutoAdditionRule(value: unknown): value is BaguetteAutoAdditi
 }
 
 function getEntryInputHint(entry: ConfigEntry) {
+  if (entry.type === 'boolean') {
+    return 'Переключатель влияет только на показ материала в публичном конструкторе и не удаляет цену из системы.';
+  }
+
   if (entry.type !== 'number') {
     return 'Изменяйте только если понимаете правило расчёта. При необходимости оставьте комментарий для коллег.';
   }
@@ -296,8 +300,8 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
       <ConfigModuleSection
         id="wide-format"
         title="Широкоформатная печать"
-        description="Стоимость печати, дополнительные работы и ограничения по ширине материалов."
-        audienceNote="Используйте этот блок для изменения прайса услуг и производственных ограничений по рулонным материалам."
+        description="Стоимость печати, дополнительные работы, ограничения по ширине и показ материалов в публичном конструкторе."
+        audienceNote="Используйте этот блок для изменения прайса услуг, производственных ограничений и списка материалов, которые видят клиенты."
         histories={wideFormatConfigData.histories}
         fallbackUsedKeys={wideFormatConfigData.fallbackUsedKeys}
         missingKeys={wideFormatConfigData.missingKeys}
@@ -1129,15 +1133,29 @@ function ConfigEntryCard({ entry, action }: { entry: ConfigEntry; action: Config
       </div>
 
       <form action={boundAction} className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_1fr_auto]">
+        <input type="hidden" name="entryType" value={entry.type} />
+
         <div className="space-y-1">
-          <label className="text-sm font-medium text-slate-700">Новое значение {entry.unit ? `(${entry.unit})` : ''}</label>
-          <input name="value" type="number" min={0} step="0.01" defaultValue={String(entry.value)} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" />
+          {entry.type === 'boolean' ? (
+            <>
+              <span className="text-sm font-medium text-slate-700">Показывать в конструкторе</span>
+              <label className="flex min-h-[42px] items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800">
+                <input type="checkbox" name="valueBoolean" value="true" defaultChecked={Boolean(entry.value)} className="h-4 w-4" />
+                <span>Материал доступен клиентам в публичном конструкторе</span>
+              </label>
+            </>
+          ) : (
+            <>
+              <label className="text-sm font-medium text-slate-700">Новое значение {entry.unit ? `(${entry.unit})` : ''}</label>
+              <input name="value" type="number" min={0} step="0.01" defaultValue={String(entry.value)} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" />
+            </>
+          )}
           <p className="text-xs text-slate-500">{getEntryInputHint(entry)}</p>
         </div>
 
         <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700">Комментарий к изменению</label>
-          <input name="note" placeholder="Например: уточнили прайс от поставщика" className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" />
+          <input name="note" placeholder={entry.type === 'boolean' ? 'Например: временно скрыли материал из конструктора' : 'Например: уточнили прайс от поставщика'} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" />
         </div>
 
         <div className="flex items-end">
