@@ -68,6 +68,7 @@ const defaultPriceItems = [
 const baguetteExtrasPricingEntries = require('../data/baguette-extras-pricing-defaults.json');
 const wideFormatPricingEntries = require('../data/wide-format-pricing-defaults.json');
 const printPricingEntries = require('../data/print-pricing-defaults.json');
+const millingPricingEntries = require('../data/milling-pricing-defaults.json');
 
 
 const defaultSiteImageAssets = [
@@ -203,6 +204,37 @@ async function main() {
 
 
   for (const entry of printPricingEntries) {
+    await prisma.pricingEntry.upsert({
+      where: {
+        category_subcategory_key: {
+          category: entry.category,
+          subcategory: entry.subcategory,
+          key: entry.key,
+        },
+      },
+      update: {
+        label: entry.label,
+        type: entry.type,
+        unit: entry.unit,
+        value: entry.value,
+        sortOrder: entry.sortOrder,
+        isActive: true,
+      },
+      create: {
+        category: entry.category,
+        subcategory: entry.subcategory,
+        key: entry.key,
+        label: entry.label,
+        value: entry.value,
+        type: entry.type,
+        unit: entry.unit,
+        sortOrder: entry.sortOrder,
+        isActive: true,
+      },
+    });
+  }
+
+  for (const entry of millingPricingEntries) {
     await prisma.pricingEntry.upsert({
       where: {
         category_subcategory_key: {
