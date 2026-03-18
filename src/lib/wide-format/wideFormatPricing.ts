@@ -4,6 +4,7 @@ import defaultsJson from '../../../data/wide-format-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
+import { loadPricingConfigWithFallback } from '@/lib/pricing/loadPricingConfigWithFallback';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 import {
   WIDE_FORMAT_PRICING_FALLBACK_CONFIG,
@@ -190,21 +191,21 @@ export function getVisibleWideFormatMaterials(
 }
 
 export async function getWideFormatPricingConfig() {
-  await ensureWideFormatPricingEntries();
-
-  const rows = await prisma.pricingEntry.findMany({
-    where: {
-      category: WIDE_FORMAT_PRICING_CATEGORY,
-      isActive: true,
-    },
-    select: {
-      subcategory: true,
-      key: true,
-      value: true,
-    },
+  return loadPricingConfigWithFallback({
+    label: 'wide-format-pricing',
+    loadRows: () => prisma.pricingEntry.findMany({
+      where: {
+        category: WIDE_FORMAT_PRICING_CATEGORY,
+        isActive: true,
+      },
+      select: {
+        subcategory: true,
+        key: true,
+        value: true,
+      },
+    }),
+    buildFromRows: getWideFormatPricingConfigFromRows,
   });
-
-  return getWideFormatPricingConfigFromRows(rows);
 }
 
 export function getWideFormatPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {

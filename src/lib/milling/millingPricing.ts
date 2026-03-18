@@ -4,6 +4,7 @@ import defaultsJson from '../../../data/milling-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
+import { loadPricingConfigWithFallback } from '@/lib/pricing/loadPricingConfigWithFallback';
 import {
   MILLING_ADDITIONAL_SERVICE_GROUPS,
   MILLING_MATERIAL_GROUP_DEFINITIONS,
@@ -160,14 +161,14 @@ export function parseAndValidateMillingPricingValue(compositeKey: string, rawVal
 }
 
 export async function getMillingPricingConfig() {
-  await ensureMillingPricingEntries();
-
-  const rows = await prisma.pricingEntry.findMany({
-    where: { category: MILLING_PRICING_CATEGORY, isActive: true },
-    select: { subcategory: true, key: true, value: true },
+  return loadPricingConfigWithFallback({
+    label: 'milling-pricing',
+    loadRows: () => prisma.pricingEntry.findMany({
+      where: { category: MILLING_PRICING_CATEGORY, isActive: true },
+      select: { subcategory: true, key: true, value: true },
+    }),
+    buildFromRows: getMillingPricingConfigFromRows,
   });
-
-  return getMillingPricingConfigFromRows(rows);
 }
 
 export function getMillingPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {

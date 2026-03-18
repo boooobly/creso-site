@@ -4,6 +4,7 @@ import defaultsJson from '../../../data/print-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
+import { loadPricingConfigWithFallback } from '@/lib/pricing/loadPricingConfigWithFallback';
 import type { PrintDensity, PrintProductType, PrintType } from '@/lib/calculations/types';
 
 export const PRINT_PRICING_CATEGORY = 'print-pricing';
@@ -145,14 +146,14 @@ export function parseAndValidatePrintPricingValue(compositeKey: string, rawValue
 }
 
 export async function getPrintPricingConfig() {
-  await ensurePrintPricingEntries();
-
-  const rows = await prisma.pricingEntry.findMany({
-    where: { category: PRINT_PRICING_CATEGORY, isActive: true },
-    select: { subcategory: true, key: true, value: true },
+  return loadPricingConfigWithFallback({
+    label: 'print-pricing',
+    loadRows: () => prisma.pricingEntry.findMany({
+      where: { category: PRINT_PRICING_CATEGORY, isActive: true },
+      select: { subcategory: true, key: true, value: true },
+    }),
+    buildFromRows: getPrintPricingConfigFromRows,
   });
-
-  return getPrintPricingConfigFromRows(rows);
 }
 
 export function getPrintPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {

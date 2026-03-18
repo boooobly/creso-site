@@ -4,6 +4,7 @@ import defaultsJson from '../../../data/heat-transfer-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
+import { loadPricingConfigWithFallback } from '@/lib/pricing/loadPricingConfigWithFallback';
 import type { HeatTransferPricingConfig } from '@/lib/pricing-config/heatTransfer';
 
 export const HEAT_TRANSFER_PRICING_CATEGORY = 'heat-transfer-pricing';
@@ -128,14 +129,14 @@ export function parseAndValidateHeatTransferPricingValue(compositeKey: string, r
 }
 
 export async function getHeatTransferPricingConfig() {
-  await ensureHeatTransferPricingEntries();
-
-  const rows = await prisma.pricingEntry.findMany({
-    where: { category: HEAT_TRANSFER_PRICING_CATEGORY, isActive: true },
-    select: { subcategory: true, key: true, value: true },
+  return loadPricingConfigWithFallback({
+    label: 'heat-transfer-pricing',
+    loadRows: () => prisma.pricingEntry.findMany({
+      where: { category: HEAT_TRANSFER_PRICING_CATEGORY, isActive: true },
+      select: { subcategory: true, key: true, value: true },
+    }),
+    buildFromRows: getHeatTransferPricingConfigFromRows,
   });
-
-  return getHeatTransferPricingConfigFromRows(rows);
 }
 
 export function getHeatTransferPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {
