@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { calculateWideFormatPricing } from '@/lib/calculations/wideFormatPricing';
 import {
   WIDE_FORMAT_PRICING_FALLBACK_CONFIG,
   getVisibleWideFormatMaterials,
@@ -22,5 +23,27 @@ describe('wideFormatPricing visibility config', () => {
     expect(parsed.config.visibleInConstructorByMaterial.banner_240_gloss_3_2m).toBe(false);
     expect(getVisibleWideFormatMaterials(parsed.config)).not.toContain('banner_240_gloss_3_2m');
     expect(parsed.fallbackUsedKeys.some((item) => item.key === 'visibility_in_constructor.banner_340_matte_3_2m')).toBe(true);
+  });
+
+  it('uses the resolved admin config for quote calculations without extra server fetches', () => {
+    const parsed = getWideFormatPricingConfigFromRows([
+      { subcategory: 'price_per_m2', key: 'banner_240_gloss_3_2m', value: 999 },
+    ]);
+
+    const quote = calculateWideFormatPricing({
+      material: 'banner_240_gloss_3_2m',
+      bannerDensity: 300,
+      widthInput: '1',
+      heightInput: '1',
+      quantityInput: '1',
+      edgeGluing: false,
+      imageWelding: false,
+      grommets: false,
+      plotterCutByRegistrationMarks: false,
+      cutByPositioningMarks: false,
+    }, parsed.config);
+
+    expect(quote.materialPricePerM2).toBe(999);
+    expect(quote.totalCost).toBe(999);
   });
 });

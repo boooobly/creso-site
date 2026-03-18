@@ -31,8 +31,11 @@ import { BAGUETTES } from '@/lib/pricing-config/baget';
 import { HEAT_TRANSFER_QUANTITY_PRESETS } from '@/lib/pricing-config/heatTransfer';
 import { PLOTTER_COMPLEXITY_OPTIONS, PLOTTER_MATERIAL_OPTIONS } from '@/lib/pricing-config/plotterCutting';
 import { PRINT_QUANTITY_PRESETS, PRINT_SIZE_OPTIONS } from '@/lib/pricing-config/print';
-import { WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/pricing-config/wideFormat';
-import { WIDE_FORMAT_PRICING_FALLBACK_CONFIG, type WideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
+import {
+  WIDE_FORMAT_MATERIAL_OPTIONS,
+  WIDE_FORMAT_PRICING_FALLBACK_CONFIG,
+  type WideFormatPricingConfig,
+} from '@/lib/pricing-config/wideFormat';
 import { PLOTTER_CUTTING_PRICING_FALLBACK_CONFIG } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { HEAT_TRANSFER_PRICING_FALLBACK_CONFIG } from '@/lib/heat-transfer/heatTransferPricing';
 import type { PrintPricingConfig } from '@/lib/print/printPricing';
