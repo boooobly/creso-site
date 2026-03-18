@@ -2,6 +2,8 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import defaultsJson from '../../../data/plotter-cutting-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
+import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
+import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
 import type { PlotterCuttingPricingConfig } from '@/lib/pricing-config/plotterCutting';
 
 export const PLOTTER_CUTTING_PRICING_CATEGORY = 'plotter-cutting-pricing';
@@ -82,42 +84,21 @@ function buildConfig(source: ConfigKeyMap) {
 export const PLOTTER_CUTTING_PRICING_FALLBACK_CONFIG: PlotterCuttingPricingConfig = buildConfig(fallbackValues).config;
 
 export async function ensurePlotterCuttingPricingEntries() {
-  for (const entry of PLOTTER_CUTTING_DEFAULT_ENTRIES) {
-    await prisma.pricingEntry.upsert({
-      where: {
-        category_subcategory_key: {
-          category: entry.category,
-          subcategory: entry.subcategory,
-          key: entry.key,
-        },
-      },
-      update: {
-        label: entry.label,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-      },
-      create: {
-        category: entry.category,
-        subcategory: entry.subcategory,
-        key: entry.key,
-        label: entry.label,
-        value: entry.value,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-        isActive: true,
-      },
-    });
-  }
+  await ensurePricingEntries(
+    PLOTTER_CUTTING_DEFAULT_ENTRIES.map((entry) => ({
+      ...entry,
+      value: entry.value as Prisma.InputJsonValue,
+    }))
+  );
 }
 
 export function parseAndValidatePlotterCuttingPricingValue(compositeKey: string, rawValue: string) {
   const schema = PLOTTER_CUTTING_KEY_SCHEMAS[compositeKey] ?? nonNegativeSchema;
-  const parsed = schema.safeParse(Number(rawValue));
+  const parsedValue = parseNumericInput(rawValue);
+  const parsed = schema.safeParse(parsedValue);
 
   if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? 'Некорректное значение. Проверьте формат и диапазон.');
+    throw new Error(getFriendlyNumericValidationMessage(rawValue, parsed.error.issues[0]));
   }
 
   return parsed.data;
@@ -131,6 +112,10 @@ export async function getPlotterCuttingPricingConfig() {
     select: { subcategory: true, key: true, value: true },
   });
 
+  return getPlotterCuttingPricingConfigFromRows(rows);
+}
+
+export function getPlotterCuttingPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {
   const source = mapRowsToValues(rows);
   const loadedKeys = Object.keys(source);
   const { config, fallbackUsedKeys } = buildConfig(source);
@@ -184,7 +169,7 @@ export async function updatePlotterCuttingPricingEntry(entryId: string, rawValue
 export async function listPlotterCuttingPricingAdminData() {
   await ensurePlotterCuttingPricingEntries();
 
-  const [entries, histories, runtimeConfig] = await Promise.all([
+  const [entries, histories] = await Promise.all([
     prisma.pricingEntry.findMany({
       where: { category: PLOTTER_CUTTING_PRICING_CATEGORY },
       orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }],
@@ -192,10 +177,10 @@ export async function listPlotterCuttingPricingAdminData() {
     prisma.pricingEntryHistory.findMany({
       where: { category: PLOTTER_CUTTING_PRICING_CATEGORY },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      take: 20,
     }),
-    getPlotterCuttingPricingConfig(),
   ]);
+  const runtimeConfig = getPlotterCuttingPricingConfigFromRows(entries);
 
   const sections = [
     {

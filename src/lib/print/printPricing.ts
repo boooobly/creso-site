@@ -2,6 +2,8 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import defaultsJson from '../../../data/print-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
+import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
+import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
 import type { PrintDensity, PrintProductType, PrintType } from '@/lib/calculations/types';
 
 export const PRINT_PRICING_CATEGORY = 'print-pricing';
@@ -122,42 +124,21 @@ function buildConfig(source: ConfigKeyMap) {
 export const PRINT_PRICING_FALLBACK_CONFIG: PrintPricingConfig = buildConfig(fallbackValues).config;
 
 export async function ensurePrintPricingEntries() {
-  for (const entry of PRINT_DEFAULT_ENTRIES) {
-    await prisma.pricingEntry.upsert({
-      where: {
-        category_subcategory_key: {
-          category: entry.category,
-          subcategory: entry.subcategory,
-          key: entry.key,
-        },
-      },
-      update: {
-        label: entry.label,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-      },
-      create: {
-        category: entry.category,
-        subcategory: entry.subcategory,
-        key: entry.key,
-        label: entry.label,
-        value: entry.value,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-        isActive: true,
-      },
-    });
-  }
+  await ensurePricingEntries(
+    PRINT_DEFAULT_ENTRIES.map((entry) => ({
+      ...entry,
+      value: entry.value as Prisma.InputJsonValue,
+    }))
+  );
 }
 
 export function parseAndValidatePrintPricingValue(compositeKey: string, rawValue: string) {
   const schema = PRINT_KEY_SCHEMAS[compositeKey] ?? positiveSchema;
-  const parsed = schema.safeParse(Number(rawValue));
+  const parsedValue = parseNumericInput(rawValue);
+  const parsed = schema.safeParse(parsedValue);
 
   if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? 'Некорректное значение. Проверьте формат и диапазон.');
+    throw new Error(getFriendlyNumericValidationMessage(rawValue, parsed.error.issues[0]));
   }
 
   return parsed.data;
@@ -171,6 +152,10 @@ export async function getPrintPricingConfig() {
     select: { subcategory: true, key: true, value: true },
   });
 
+  return getPrintPricingConfigFromRows(rows);
+}
+
+export function getPrintPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {
   const source = mapRowsToValues(rows);
   const loadedKeys = Object.keys(source);
   const { config, fallbackUsedKeys } = buildConfig(source);
@@ -224,7 +209,7 @@ export async function updatePrintPricingEntry(entryId: string, rawValue: string,
 export async function listPrintPricingAdminData() {
   await ensurePrintPricingEntries();
 
-  const [entries, histories, runtimeConfig] = await Promise.all([
+  const [entries, histories] = await Promise.all([
     prisma.pricingEntry.findMany({
       where: { category: PRINT_PRICING_CATEGORY },
       orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }],
@@ -232,10 +217,10 @@ export async function listPrintPricingAdminData() {
     prisma.pricingEntryHistory.findMany({
       where: { category: PRINT_PRICING_CATEGORY },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      take: 20,
     }),
-    getPrintPricingConfig(),
   ]);
+  const runtimeConfig = getPrintPricingConfigFromRows(entries);
 
   const groupedSections = [
     {

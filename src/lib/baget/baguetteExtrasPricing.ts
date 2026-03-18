@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import defaultsJson from '../../../data/baguette-extras-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
+import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import type { WorkType } from '@/components/baget/BagetFilters';
 import type { BagetPrintMaterial } from '@/lib/baget/printRequirement';
 
@@ -144,12 +145,16 @@ export function getBaguettePricingValidationSchema(compositeKey: string): z.ZodT
 }
 
 export function parseAndValidateBaguettePricingValue(compositeKey: string, type: string, rawValue: string) {
-  const parsedInput = type === 'number' ? Number(rawValue) : JSON.parse(rawValue);
+  const parsedInput = type === 'number' ? parseNumericInput(rawValue) : JSON.parse(rawValue);
   const schema = getBaguettePricingValidationSchema(compositeKey);
   const parsed = schema.safeParse(parsedInput);
 
   if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? 'Некорректное значение. Проверьте формат и диапазон.');
+    if (type === 'number') {
+      throw new Error(getFriendlyNumericValidationMessage(rawValue, parsed.error.issues[0]));
+    }
+
+    throw new Error(parsed.error.issues[0]?.message ?? 'Проверьте заполнение правила расчёта.');
   }
 
   return parsed.data as number | MaterialRate | AutoAdditionRule;
@@ -264,6 +269,10 @@ export async function getBaguetteExtrasPricingConfig() {
     },
   });
 
+  return getBaguetteExtrasPricingConfigFromRows(rows);
+}
+
+export function getBaguetteExtrasPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {
   const source = mapRowsToValues(rows);
   const loadedKeys = Object.keys(source);
   const { config, diagnostics } = buildConfig(source);
