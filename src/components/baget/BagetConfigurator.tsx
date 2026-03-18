@@ -160,6 +160,7 @@ export default function BagetConfigurator({
   const [selectedBaget, setSelectedBaget] = useState<CatalogBagetItem | null>(catalogItems[0] ?? null);
   const [page, setPage] = useState(1);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [uploadedImageFile, setUploadedImageFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [previewHighlighted, setPreviewHighlighted] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
@@ -178,6 +179,7 @@ export default function BagetConfigurator({
       const parsed = JSON.parse(storedPayload) as Partial<TransferredBagetImagePayload>;
       if (typeof parsed.dataUrl === 'string' && parsed.dataUrl) {
         setImageUrl(parsed.dataUrl);
+        setUploadedImageFile(null);
         setFileName(typeof parsed.fileName === 'string' && parsed.fileName ? parsed.fileName : 'Переданное изображение');
       }
     } catch {
@@ -446,12 +448,23 @@ export default function BagetConfigurator({
     if (!file) return;
 
     const next = URL.createObjectURL(file);
+    setUploadedImageFile(file);
     setFileName(file.name);
     setImageUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
+      if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
       return next;
     });
+    event.currentTarget.value = '';
   }, []);
+
+
+  useEffect(() => {
+    return () => {
+      if (imageUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [imageUrl]);
 
   const handleSelectBaget = useCallback((item: BagetItem) => {
     const found = filteredItems.find((candidate) => candidate.id === item.id) ?? null;
@@ -897,6 +910,7 @@ export default function BagetConfigurator({
           orderSummary={orderSummary}
           orderInput={orderInput}
           previewImageUrl={imageUrl ?? undefined}
+          uploadedImageFile={uploadedImageFile}
           totalPriceRub={quote.total}
           effectiveSize={{
             wMm: Math.round(effectiveWidthMm),

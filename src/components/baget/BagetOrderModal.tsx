@@ -81,6 +81,7 @@ type BagetOrderModalProps = {
     fulfillmentType?: 'pickup' | 'selfPickup' | 'delivery';
   } | null;
   previewImageUrl?: string;
+  uploadedImageFile?: File | null;
   totalPriceRub: number;
   effectiveSize: SizeMm;
   outerSize?: SizeMm;
@@ -109,6 +110,7 @@ export default function BagetOrderModal({
   orderSummary,
   orderInput,
   previewImageUrl,
+  uploadedImageFile,
   totalPriceRub,
   effectiveSize,
   outerSize,
@@ -228,22 +230,31 @@ export default function BagetOrderModal({
 
     try {
       setSending(true);
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const requestPayload = {
+        customer: {
+          name: name.trim(),
+          phone,
+          email: email.trim() || undefined,
+          comment: comment.trim() || undefined,
         },
-        body: JSON.stringify({
-          customer: {
-            name: name.trim(),
-            phone,
-            email: email.trim() || undefined,
-            comment: comment.trim() || undefined,
-          },
-          baget: orderInput.baget,
-          fulfillmentType: orderInput.fulfillmentType ?? 'pickup',
-        }),
-      });
+        baget: orderInput.baget,
+        fulfillmentType: orderInput.fulfillmentType ?? 'pickup',
+      };
+
+      const requestInit: RequestInit = uploadedImageFile
+        ? (() => {
+            const formData = new FormData();
+            formData.set('payload', JSON.stringify(requestPayload));
+            formData.set('customerImage', uploadedImageFile, uploadedImageFile.name);
+            return { method: 'POST', body: formData };
+          })()
+        : {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestPayload),
+          };
+
+      const response = await fetch('/api/orders', requestInit);
 
       const result = (await response.json().catch(() => null)) as (OrderResponse & { error?: string }) | null;
 

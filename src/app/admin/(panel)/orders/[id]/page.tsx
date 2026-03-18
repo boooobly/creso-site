@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AdminPageSection } from '@/components/admin/AdminPageSection';
 import { prisma } from '@/lib/db/prisma';
+import { getPersistedBagetOrderSummary } from '@/lib/orders/bagetOrderSummary';
 import {
   formatAdminBoolean,
   formatAdminDateTime,
@@ -36,6 +38,15 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function DetailRow({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="grid grid-cols-1 gap-1 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:grid-cols-[220px_1fr] sm:items-start">
+      <dt className="text-sm font-medium text-slate-500">{label}</dt>
+      <dd className="text-sm text-slate-900">{value}</dd>
+    </div>
+  );
+}
+
 export default async function AdminOrderDetailPage({ params, searchParams }: OrderDetailPageProps) {
   const order = await prisma.order.findUnique({ where: { id: params.id } });
 
@@ -44,6 +55,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Ord
   const submitAction = updateOrderAdminAction.bind(null, order.id);
   const success = searchParams?.success === 'saved';
   const error = searchParams?.error === 'validation';
+  const bagetSummary = getPersistedBagetOrderSummary(order.payloadJson, order.quoteJson);
 
   return (
     <div className="space-y-6">
@@ -105,6 +117,71 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Ord
           </article>
         </div>
       </AdminPageSection>
+
+      {bagetSummary ? (
+        <AdminPageSection title="Детали заказа багета" description="Человекочитаемая сводка для менеджера и производства.">
+          <dl className="space-y-3">
+            <DetailRow
+              label="Артикул багета"
+              value={bagetSummary.baguette?.article || (bagetSummary.frameMode.value === 'noFrame' ? 'Без рамки' : '—')}
+            />
+            <DetailRow label="Название багета" value={bagetSummary.baguette?.name || '—'} />
+            <DetailRow
+              label="Размер"
+              value={
+                <div className="space-y-1">
+                  <p>Работа: {bagetSummary.size.workWidthMm} × {bagetSummary.size.workHeightMm} мм</p>
+                  <p>Эффективный: {bagetSummary.size.effectiveWidthMm} × {bagetSummary.size.effectiveHeightMm} мм</p>
+                  {bagetSummary.size.outerWidthMm && bagetSummary.size.outerHeightMm ? (
+                    <p>Габарит с рамкой: {bagetSummary.size.outerWidthMm} × {bagetSummary.size.outerHeightMm} мм</p>
+                  ) : null}
+                </div>
+              }
+            />
+            <DetailRow label="Тип работы" value={bagetSummary.workType.label} />
+            <DetailRow label="Остекление" value={bagetSummary.glazing.label} />
+            <DetailRow label="Паспарту" value={bagetSummary.passepartout.label} />
+            <DetailRow label="Задник" value={bagetSummary.backPanel.label} />
+            <DetailRow
+              label="Материалы включены"
+              value={bagetSummary.materialsBreakdown.length ? (
+                <ul className="list-disc space-y-1 pl-5">
+                  {bagetSummary.materialsBreakdown.map((item) => (
+                    <li key={item.key}>
+                      <span className="font-medium">{item.label}</span>
+                      {item.note ? ` — ${item.note}` : ''}
+                    </li>
+                  ))}
+                </ul>
+              ) : '—'}
+            />
+            <DetailRow
+              label="Печать"
+              value={bagetSummary.printRequirement.requiresPrint
+                ? `${bagetSummary.printRequirement.printMaterialLabel || 'Да'}${bagetSummary.printRequirement.transferSourceLabel ? `, источник: ${bagetSummary.printRequirement.transferSourceLabel}` : ''}`
+                : 'Не требуется'}
+            />
+            <DetailRow
+              label="Файл клиента"
+              value={bagetSummary.uploadedImage ? (
+                <div className="space-y-1">
+                  <p>{bagetSummary.uploadedImage.fileName}</p>
+                  <p className="text-slate-600">MIME: {bagetSummary.uploadedImage.mimeType || '—'}</p>
+                  <p className="text-slate-600">Размер: {bagetSummary.uploadedImage.sizeBytes ? `${Math.round(bagetSummary.uploadedImage.sizeBytes / 1024)} КБ` : '—'}</p>
+                  <Link
+                    href={bagetSummary.uploadedImage.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex text-sm font-medium text-blue-700 underline underline-offset-2 hover:text-blue-900"
+                  >
+                    Открыть оригинал
+                  </Link>
+                </div>
+              ) : 'Файл не загружен'}
+            />
+          </dl>
+        </AdminPageSection>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-3">
         <AdminPageSection title="Оплата" description="Технические детали платежа по заказу.">

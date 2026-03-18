@@ -10,10 +10,12 @@ import { getBaseUrl } from '@/lib/url/getBaseUrl';
 import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
 import { createOrderPdfAccessToken } from '@/lib/orders/pdfAccessToken';
 import { normalizePhone } from '@/lib/utils/phone';
-
 import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
 import { getBagetCatalogFromSheet, mapSheetItemsToBagetItems } from '@/lib/baget/sheetsCatalog';
+import { buildBagetOrderSummary, type PersistedOrderUpload } from '@/lib/orders/bagetOrderSummary';
+import { MAX_ORDER_IMAGE_SIZE_BYTES, storeBagetCustomerImage } from '@/lib/orders/storeCustomerImage';
+
 export const runtime = 'nodejs';
 
 const bagetItemSchema = z.object({
@@ -58,8 +60,48 @@ const orderSchema = z.object({
   company: z.string().optional(),
 });
 
+type ParsedOrderInput = z.infer<typeof orderSchema>;
+
+type ParsedOrderRequest = {
+  payload: unknown;
+  customerImageFile: File | null;
+};
+
+async function parseOrderRequest(request: NextRequest): Promise<ParsedOrderRequest> {
+  const contentType = request.headers.get('content-type') || '';
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await request.formData();
+    const payloadRaw = formData.get('payload');
+    const payloadText = typeof payloadRaw === 'string' ? payloadRaw : '';
+    const payload = payloadText ? JSON.parse(payloadText) : null;
+    const fileValue = formData.get('customerImage');
+
+    return {
+      payload,
+      customerImageFile: fileValue instanceof File && fileValue.size > 0 ? fileValue : null,
+    };
+  }
+
+  const payload = await request.json().catch(() => null);
+  return { payload, customerImageFile: null };
+}
+
+function getSafeCustomerImageFile(file: File | null): File | null {
+  if (!file) return null;
+  if (!file.type.startsWith('image/')) {
+    logger.warn('orders.customer_image.invalid_type', { type: file.type, name: file.name });
+    return null;
+  }
+  if (file.size > MAX_ORDER_IMAGE_SIZE_BYTES) {
+    logger.warn('orders.customer_image.too_large', { size: file.size, name: file.name, limit: MAX_ORDER_IMAGE_SIZE_BYTES });
+    return null;
+  }
+  return file;
+}
+
 async function createOrderWithRetry(data: {
-  inputPayload: z.infer<typeof orderSchema>;
+  payloadJson: Prisma.InputJsonValue;
   quote: ReturnType<typeof bagetQuote>;
   prepayRequired: boolean;
   prepayAmount: number | null;
@@ -70,8 +112,6 @@ async function createOrderWithRetry(data: {
     comment?: string;
   };
 }): Promise<string> {
-  // Public order numbers are intentionally short; collisions are resolved by retries
-  // and enforced DB uniqueness on Order.number.
   for (let attempt = 0; attempt < 10; attempt += 1) {
     const orderNumber = generateOrderNumber();
 
@@ -88,7 +128,7 @@ async function createOrderWithRetry(data: {
           total: data.quote.total,
           prepayRequired: data.prepayRequired,
           prepayAmount: data.prepayAmount,
-          payloadJson: data.inputPayload as Prisma.InputJsonValue,
+          payloadJson: data.payloadJson,
           quoteJson: data.quote as unknown as Prisma.InputJsonValue,
         },
       });
@@ -114,7 +154,7 @@ async function createOrderWithRetry(data: {
 export async function POST(request: NextRequest) {
   try {
     const env = getServerEnv();
-    const payload = await request.json().catch(() => null);
+    const { payload, customerImageFile } = await parseOrderRequest(request);
     const parsed = orderSchema.safeParse(payload);
 
     if (!parsed.success) {
@@ -151,32 +191,55 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Не удалось рассчитать стоимость заказа.' }, { status: 400 });
     }
 
+    const safeCustomerImageFile = getSafeCustomerImageFile(customerImageFile);
+    let uploadedImage: PersistedOrderUpload | null = null;
+
+    if (safeCustomerImageFile) {
+      uploadedImage = await storeBagetCustomerImage(safeCustomerImageFile).catch((error) => {
+        logger.error('orders.customer_image.upload_failed', { error, name: safeCustomerImageFile.name, size: safeCustomerImageFile.size });
+        return null;
+      });
+    }
+
+    const normalizedPayload: ParsedOrderInput & {
+      orderSummary: ReturnType<typeof buildBagetOrderSummary>;
+      uploadedImage: PersistedOrderUpload | null;
+    } = {
+      ...parsed.data,
+      customer: {
+        ...parsed.data.customer,
+        phone: normalizedPhone,
+      },
+      orderSummary: buildBagetOrderSummary({
+        baget: parsed.data.baget,
+        selectedBaget,
+        quote,
+        uploadedImage,
+      }),
+      uploadedImage,
+    };
+
     const prepayRequired = parsed.data.fulfillmentType === 'pickup' || parsed.data.fulfillmentType === 'selfPickup';
     const prepayAmount = prepayRequired ? Math.round(quote.total * 0.5) : null;
 
     const orderNumber = await createOrderWithRetry({
-      inputPayload: parsed.data,
+      payloadJson: normalizedPayload as unknown as Prisma.InputJsonValue,
       quote,
       prepayRequired,
       prepayAmount,
-      customer: {
-        ...parsed.data.customer,
-        phone: normalizedPhone,
-      },
+      customer: normalizedPayload.customer,
     });
 
     await notifyNewOrder({
       orderNumber,
-      customer: {
-        ...parsed.data.customer,
-        phone: normalizedPhone,
-      },
+      customer: normalizedPayload.customer,
       effectiveSize: quote.effectiveSize,
       quote,
       prepayRequired,
       prepayAmount,
+      orderSummary: normalizedPayload.orderSummary,
+      customerImageFile: safeCustomerImageFile,
     });
-
 
     const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS;
     const customerEmail = parsed.data.customer.email?.trim();
