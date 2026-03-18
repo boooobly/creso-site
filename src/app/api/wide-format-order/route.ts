@@ -5,7 +5,7 @@ import { calculateWideFormatPricing } from '@/lib/calculations/wideFormatPricing
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentWithCaption';
 import { getWideFormatMaterialLabel, WIDE_FORMAT_MATERIAL_OPTIONS } from '@/lib/pricing-config/wideFormat';
-import { getWideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
+import { getWideFormatPricingConfig, isWideFormatMaterialVisibleInConstructor } from '@/lib/wide-format/wideFormatPricing';
 
 import { logger } from '@/lib/logger';
 import { FIVE_MB_IN_BYTES, validateUploadedFile } from '@/lib/file-validation';
@@ -151,6 +151,10 @@ export async function POST(request: NextRequest) {
     }
 
     const pricing = await getWideFormatPricingConfig();
+
+    if (!isWideFormatMaterialVisibleInConstructor(materialIdRaw, pricing.config)) {
+      return NextResponse.json({ ok: false, error: 'Этот материал сейчас скрыт в конструкторе. Выберите другой материал.' }, { status: 400 });
+    }
 
     const calculated = calculateWideFormatPricing({
       material: materialIdRaw,

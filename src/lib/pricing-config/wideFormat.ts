@@ -113,6 +113,7 @@ export type WideFormatPublicPricingConfig = {
   plotterCutMinimumFee: number;
   minimumPrintPriceRUB: number;
   maxWidthByMaterial: Record<WideFormatMaterialType, number>;
+  visibleInConstructorByMaterial: Record<WideFormatMaterialType, boolean>;
 };
 
 export const WIDE_FORMAT_PUBLIC_PRICING_FALLBACK: WideFormatPublicPricingConfig = {
@@ -138,8 +139,49 @@ export const WIDE_FORMAT_PUBLIC_PRICING_FALLBACK: WideFormatPublicPricingConfig 
     backlit_1_07: 1.07,
     fxflex_translucent_banner_1_07: 1.07,
   },
+  visibleInConstructorByMaterial: {
+    banner_240_gloss_3_2m: true,
+    banner_340_matte_3_2m: true,
+    banner_440_matte_3_2m: true,
+    banner_460_cast_3_2m: true,
+    self_adhesive_film_matte_1_5: true,
+    self_adhesive_film_gloss_1_5: true,
+    perforated_film_1_37: true,
+    clear_film_matte_1_5: true,
+    paper_trans_skylight: true,
+    polyester_fabric_140_1_5: true,
+    polyester_fabric_100_0_9: true,
+    canvas_cotton_350: true,
+    canvas_poly_250: true,
+    backlit_1_07: true,
+    fxflex_translucent_banner_1_07: true,
+  },
 };
 
 export function getWideFormatMaterialMaxWidth(material: WideFormatMaterialType, pricing: WideFormatPublicPricingConfig = WIDE_FORMAT_PUBLIC_PRICING_FALLBACK): number {
   return pricing.maxWidthByMaterial[material] ?? pricing.maxWidth;
+}
+
+
+export function isWideFormatMaterialVisible(material: WideFormatMaterialType, pricing: WideFormatPublicPricingConfig = WIDE_FORMAT_PUBLIC_PRICING_FALLBACK): boolean {
+  return pricing.visibleInConstructorByMaterial[material] ?? true;
+}
+
+export function getVisibleWideFormatCategoryOptions(pricing: WideFormatPublicPricingConfig = WIDE_FORMAT_PUBLIC_PRICING_FALLBACK): ReadonlyArray<{ id: WideFormatCategory; label: string }> {
+  return WIDE_FORMAT_CATEGORY_OPTIONS.filter((category) => WIDE_FORMAT_VARIANTS_BY_CATEGORY[category.id].some((variant) => isWideFormatMaterialVisible(variant.id, pricing)));
+}
+
+export function getVisibleWideFormatVariantsByCategory(
+  category: WideFormatCategory,
+  pricing: WideFormatPublicPricingConfig = WIDE_FORMAT_PUBLIC_PRICING_FALLBACK,
+): Array<{ id: WideFormatMaterialType; label: string }> {
+  return WIDE_FORMAT_VARIANTS_BY_CATEGORY[category].filter((variant) => isWideFormatMaterialVisible(variant.id, pricing));
+}
+
+export function getFirstVisibleWideFormatMaterial(pricing: WideFormatPublicPricingConfig = WIDE_FORMAT_PUBLIC_PRICING_FALLBACK): WideFormatMaterialType | null {
+  for (const option of WIDE_FORMAT_MATERIAL_OPTIONS) {
+    if (isWideFormatMaterialVisible(option.value, pricing)) return option.value;
+  }
+
+  return null;
 }
