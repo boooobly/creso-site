@@ -109,6 +109,7 @@ function buildTshirtsText(params: {
 async function sendTshirtsTelegramNotification(params: {
   text: string;
   file: File | null;
+  referer: string;
   name: string;
   phone: string;
   size?: string;
@@ -128,17 +129,20 @@ async function sendTshirtsTelegramNotification(params: {
     return false;
   }
 
+  try {
+    await sendTelegramLead(params.text);
+  } catch (error) {
+    logger.error('tshirts.telegram.message_failed', { error });
+    return false;
+  }
+
   if (!params.file) {
-    try {
-      await sendTelegramLead(params.text);
-      return true;
-    } catch (error) {
-      logger.error('tshirts.telegram.message_failed', { error });
-      return false;
-    }
+    return true;
   }
 
   const caption = [
+    'Макет к заявке — Печать на футболках',
+    '',
     'Услуга: Печать на футболках',
     `Имя: ${params.name}`,
     `Телефон: ${params.phone}`,
@@ -149,6 +153,7 @@ async function sendTshirtsTelegramNotification(params: {
     `Тип переноса: ${transferTypeLabel(params.transferType)}`,
     `Сторона: ${sideLabel(params.side)}`,
     `Комментарий: ${params.comment || '—'}`,
+    `Страница: ${params.referer || '—'}`,
   ].join('\n');
 
   try {
@@ -161,11 +166,11 @@ async function sendTshirtsTelegramNotification(params: {
       filename: params.file.name || 'upload.bin',
       contentType: params.file.type || 'application/octet-stream',
     });
-    return true;
   } catch (error) {
     logger.error('tshirts.telegram.document_failed', { error });
-    return false;
   }
+
+  return true;
 }
 
 export async function POST(request: NextRequest) {
@@ -245,6 +250,7 @@ export async function POST(request: NextRequest) {
       sendTshirtsTelegramNotification({
         text,
         file,
+        referer: request.headers.get('referer') || request.headers.get('origin') || '',
         name: parsed.data.name,
         phone: normalizedPhone,
         size: parsed.data.size || '',

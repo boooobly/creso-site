@@ -113,7 +113,7 @@ export default async function WideFormatPrintingPage() {
                   <p className="max-w-lg text-sm text-neutral-500">
                     Подскажем по материалам, подготовке макета и постобработке до запуска в печать.
                   </p>
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex flex-wrap items-center gap-2.5">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Подходит для</p>
                     <span className="h-px flex-1 bg-neutral-200/80" aria-hidden="true" />
                   </div>
