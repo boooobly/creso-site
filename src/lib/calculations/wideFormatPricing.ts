@@ -1,5 +1,10 @@
-import { getWideFormatMaterialMaxWidth, isBannerMaterial, isFilmMaterial } from '@/lib/pricing-config/wideFormat';
-import { WIDE_FORMAT_PRICING_FALLBACK_CONFIG, type WideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
+import {
+  getWideFormatMaterialMaxWidth,
+  isBannerMaterial,
+  isFilmMaterial,
+  WIDE_FORMAT_PRICING_FALLBACK_CONFIG,
+  type WideFormatPricingConfig,
+} from '@/lib/pricing-config/wideFormat';
 import { parseNumericInput } from './shared';
 import type { BannerDensity, WideFormatMaterialType } from './types';
 

@@ -4,11 +4,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   type BannerDensity,
-  type WideFormatMaterialType,
   type WideFormatWidthWarningCode,
+  type WideFormatMaterialType,
 } from '@/lib/engine';
 import { trackEvent } from '@/lib/analytics';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
+import {
+  calculateWideFormatPricing,
+  type WideFormatCalculationResult,
+  type WideFormatPricingInput,
+} from '@/lib/calculations/wideFormatPricing';
 import {
   getWideFormatCategoryByMaterial,
   type WideFormatCategory,
@@ -21,7 +26,7 @@ import {
   isFilmMaterial,
   getWideFormatMaterialMaxWidth,
   WIDE_FORMAT_PUBLIC_PRICING_FALLBACK,
-  type WideFormatPublicPricingConfig,
+  type WideFormatPricingConfig,
 } from '@/lib/pricing-config/wideFormat';
 import {
   BAGET_TRANSFER_SOURCE_QUERY_KEY,
@@ -39,31 +44,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-type WideFormatQuote = {
-  width: number;
-  height: number;
-  quantity: number;
-  parsedValuesValid: boolean;
-  positiveInputs: boolean;
-  widthWarningCode: WideFormatWidthWarningCode;
-  areaPerUnit: number;
-  billableAreaPerUnit: number;
-  perimeterPerUnit: number;
-  materialPricePerM2: number;
-  regularMaterialCost: number;
-  minimumPrintPriceApplied: boolean;
-  basePrintCost: number;
-  edgeGluingCost: number;
-  imageWeldingCost: number;
-  requiresJoinSeam: boolean;
-  grommetsCount: number;
-  grommetsCost: number;
-  plotterCutEstimatedCost: number;
-  positioningMarksCutCost: number;
-  extrasCost: number;
-  totalCost: number;
-};
-
 type TransferredBagetImagePayload = {
   dataUrl: string;
   fileName: string;
@@ -77,7 +57,7 @@ const WIDTH_WARNING_MESSAGES: Record<Exclude<WideFormatWidthWarningCode, null>, 
   max_width_exceeded: (maxWidth) => `Размер не помещается в ширину рулона ${maxWidth ?? WIDE_FORMAT_PUBLIC_PRICING_FALLBACK.maxWidth} м. Одна из сторон макета должна быть не больше ${maxWidth ?? WIDE_FORMAT_PUBLIC_PRICING_FALLBACK.maxWidth} м.`,
 };
 
-const EMPTY_QUOTE: WideFormatQuote = {
+const EMPTY_QUOTE: WideFormatCalculationResult = {
   width: 0,
   height: 0,
   quantity: 0,
@@ -112,7 +92,7 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 type WideFormatPricingCalculatorProps = {
-  pricingConfig: WideFormatPublicPricingConfig;
+  pricingConfig: WideFormatPricingConfig;
 };
 
 export default function WideFormatPricingCalculator({ pricingConfig }: WideFormatPricingCalculatorProps) {
@@ -134,9 +114,6 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
 
   const [canvasImageFile, setCanvasImageFile] = useState<File | null>(null);
 
-  const [quote, setQuote] = useState<WideFormatQuote>(EMPTY_QUOTE);
-  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
-  const [quoteError, setQuoteError] = useState('');
   const [pricePulse, setPricePulse] = useState(false);
 
   const isCanvasMaterial = material.includes('canvas');
@@ -172,7 +149,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
     }
   }, [availableVariants, material, pricingConfig]);
 
-  const quoteRequest = useMemo(() => ({
+  const quoteRequest = useMemo<WideFormatPricingInput>(() => ({
     material,
     bannerDensity,
     widthInput: width,
@@ -195,8 +172,11 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
     quantity,
     width,
   ]);
-  const debouncedQuoteRequest = useDebouncedValue(quoteRequest, 300);
-  const isQuotePending = quoteRequest !== debouncedQuoteRequest || isQuoteLoading;
+  const quote = useMemo(
+    () => (visibleCategoryOptions.length === 0 ? EMPTY_QUOTE : calculateWideFormatPricing(quoteRequest, pricingConfig)),
+    [pricingConfig, quoteRequest, visibleCategoryOptions.length],
+  );
+  const debouncedQuote = useDebouncedValue(quote, 300);
 
   useEffect(() => {
     trackEvent('calculator_started', { calculator: 'wide_format' });
@@ -264,63 +244,13 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
 
   useEffect(() => {
     if (visibleCategoryOptions.length === 0) {
-      setQuote(EMPTY_QUOTE);
-      setQuoteError('');
-      setIsQuoteLoading(false);
       return;
     }
-
-    const controller = new AbortController();
-    let active = true;
-
-    const fetchQuote = async () => {
-      setIsQuoteLoading(true);
-      setQuoteError('');
-
-      try {
-        const response = await fetch('/api/quotes/wide-format', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(debouncedQuoteRequest),
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error('failed');
-        }
-
-        const data = (await response.json()) as { quote: WideFormatQuote };
-
-        if (active) {
-          setQuote(data.quote);
-          trackEvent('quote_generated', {
-            calculator: 'wide_format',
-            totalCost: data.quote.totalCost,
-          });
-        }
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        if (active) {
-          setQuoteError('Ошибка расчёта');
-          setQuote(EMPTY_QUOTE);
-        }
-      } finally {
-        if (active) {
-          setIsQuoteLoading(false);
-        }
-      }
-    };
-
-    fetchQuote();
-
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [debouncedQuoteRequest, visibleCategoryOptions.length]);
+    trackEvent('quote_generated', {
+      calculator: 'wide_format',
+      totalCost: debouncedQuote.totalCost,
+    });
+  }, [debouncedQuote.totalCost, visibleCategoryOptions.length]);
 
   const widthWarning = quote.widthWarningCode
     ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode](maxWidthForCurrentMaterial)
@@ -592,7 +522,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
               ≈ {pricePerM2 ? Math.round(pricePerM2).toLocaleString('ru-RU') : '—'} ₽ / м²
             </p>
           </div>
-          <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
+          <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite"> </p>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
           <Button variant="primary" className="mt-4 w-full" onClick={handleOrderClick} disabled={visibleCategoryOptions.length === 0}>Заказать печать</Button>
@@ -602,7 +532,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           <p>Срок изготовления: <b>1–2 рабочих дня</b></p>
           <p>Максимальная ширина печати: <b>3.2 м</b></p>
         </div>
-        <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
+        <span className="sr-only" aria-live="polite">{quote.totalCost.toLocaleString('ru-RU')}</span>
       </aside>
     </div>
   );
