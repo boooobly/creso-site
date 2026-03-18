@@ -3,6 +3,7 @@ import { z } from 'zod';
 import defaultsJson from '../../../data/heat-transfer-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
+import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
 import type { HeatTransferPricingConfig } from '@/lib/pricing-config/heatTransfer';
 
 export const HEAT_TRANSFER_PRICING_CATEGORY = 'heat-transfer-pricing';
@@ -106,34 +107,12 @@ function buildConfig(source: ConfigKeyMap) {
 export const HEAT_TRANSFER_PRICING_FALLBACK_CONFIG: HeatTransferPricingConfig = buildConfig(fallbackValues).config;
 
 export async function ensureHeatTransferPricingEntries() {
-  for (const entry of HEAT_TRANSFER_DEFAULT_ENTRIES) {
-    await prisma.pricingEntry.upsert({
-      where: {
-        category_subcategory_key: {
-          category: entry.category,
-          subcategory: entry.subcategory,
-          key: entry.key,
-        },
-      },
-      update: {
-        label: entry.label,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-      },
-      create: {
-        category: entry.category,
-        subcategory: entry.subcategory,
-        key: entry.key,
-        label: entry.label,
-        value: entry.value,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-        isActive: true,
-      },
-    });
-  }
+  await ensurePricingEntries(
+    HEAT_TRANSFER_DEFAULT_ENTRIES.map((entry) => ({
+      ...entry,
+      value: entry.value as Prisma.InputJsonValue,
+    }))
+  );
 }
 
 export function parseAndValidateHeatTransferPricingValue(compositeKey: string, rawValue: string) {
@@ -156,6 +135,10 @@ export async function getHeatTransferPricingConfig() {
     select: { subcategory: true, key: true, value: true },
   });
 
+  return getHeatTransferPricingConfigFromRows(rows);
+}
+
+export function getHeatTransferPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {
   const source = mapRowsToValues(rows);
   const loadedKeys = Object.keys(source);
   const { config, fallbackUsedKeys } = buildConfig(source);
@@ -209,7 +192,7 @@ export async function updateHeatTransferPricingEntry(entryId: string, rawValue: 
 export async function listHeatTransferPricingAdminData() {
   await ensureHeatTransferPricingEntries();
 
-  const [entries, histories, runtimeConfig] = await Promise.all([
+  const [entries, histories] = await Promise.all([
     prisma.pricingEntry.findMany({
       where: { category: HEAT_TRANSFER_PRICING_CATEGORY },
       orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }],
@@ -217,10 +200,10 @@ export async function listHeatTransferPricingAdminData() {
     prisma.pricingEntryHistory.findMany({
       where: { category: HEAT_TRANSFER_PRICING_CATEGORY },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      take: 20,
     }),
-    getHeatTransferPricingConfig(),
   ]);
+  const runtimeConfig = getHeatTransferPricingConfigFromRows(entries);
 
   const sections = [
     { id: 'global', title: 'Скидки', description: 'Порог и размер скидки для тиражных заказов.', subcategory: 'global' },

@@ -269,6 +269,10 @@ export async function getBaguetteExtrasPricingConfig() {
     },
   });
 
+  return getBaguetteExtrasPricingConfigFromRows(rows);
+}
+
+export function getBaguetteExtrasPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {
   const source = mapRowsToValues(rows);
   const loadedKeys = Object.keys(source);
   const { config, diagnostics } = buildConfig(source);

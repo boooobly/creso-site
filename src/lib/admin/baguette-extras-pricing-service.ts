@@ -1,9 +1,10 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
 import {
   BAGUETTE_EXTRAS_DEFAULT_ENTRIES,
   BAGUETTE_EXTRAS_PRICING_CATEGORY,
-  getBaguetteExtrasPricingConfig,
+  getBaguetteExtrasPricingConfigFromRows,
   parseAndValidateBaguettePricingValue,
 } from '@/lib/baget/baguetteExtrasPricing';
 
@@ -18,40 +19,18 @@ export const BAGUETTE_PRICING_ADMIN_GROUPS = [
 ] as const;
 
 export async function ensureBaguetteExtrasPricingEntries() {
-  for (const entry of BAGUETTE_EXTRAS_DEFAULT_ENTRIES) {
-    await prisma.pricingEntry.upsert({
-      where: {
-        category_subcategory_key: {
-          category: entry.category,
-          subcategory: entry.subcategory,
-          key: entry.key,
-        },
-      },
-      update: {
-        label: entry.label,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-      },
-      create: {
-        category: entry.category,
-        subcategory: entry.subcategory,
-        key: entry.key,
-        label: entry.label,
-        value: entry.value as Prisma.InputJsonValue,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-        isActive: true,
-      },
-    });
-  }
+  await ensurePricingEntries(
+    BAGUETTE_EXTRAS_DEFAULT_ENTRIES.map((entry) => ({
+      ...entry,
+      value: entry.value as Prisma.InputJsonValue,
+    }))
+  );
 }
 
 export async function listBaguetteExtrasPricingAdminData() {
   await ensureBaguetteExtrasPricingEntries();
 
-  const [entries, histories, runtimeConfig] = await Promise.all([
+  const [entries, histories] = await Promise.all([
     prisma.pricingEntry.findMany({
       where: { category: BAGUETTE_EXTRAS_PRICING_CATEGORY },
       orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }],
@@ -59,10 +38,10 @@ export async function listBaguetteExtrasPricingAdminData() {
     prisma.pricingEntryHistory.findMany({
       where: { category: BAGUETTE_EXTRAS_PRICING_CATEGORY },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      take: 20,
     }),
-    getBaguetteExtrasPricingConfig(),
   ]);
+  const runtimeConfig = getBaguetteExtrasPricingConfigFromRows(entries);
 
   const descriptionByCompositeKey = BAGUETTE_EXTRAS_DEFAULT_ENTRIES.reduce<Record<string, string>>((acc, entry) => {
     acc[`${entry.subcategory}.${entry.key}`] = entry.description ?? '';

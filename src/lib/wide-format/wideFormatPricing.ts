@@ -3,6 +3,7 @@ import { z } from 'zod';
 import defaultsJson from '../../../data/wide-format-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
+import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 
 export const WIDE_FORMAT_PRICING_CATEGORY = 'wide-format-pricing';
@@ -142,34 +143,12 @@ function buildConfig(source: ConfigKeyMap) {
 export const WIDE_FORMAT_PRICING_FALLBACK_CONFIG: WideFormatPricingConfig = buildConfig(fallbackValues).config;
 
 export async function ensureWideFormatPricingEntries() {
-  for (const entry of WIDE_FORMAT_DEFAULT_ENTRIES) {
-    await prisma.pricingEntry.upsert({
-      where: {
-        category_subcategory_key: {
-          category: entry.category,
-          subcategory: entry.subcategory,
-          key: entry.key,
-        },
-      },
-      update: {
-        label: entry.label,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-      },
-      create: {
-        category: entry.category,
-        subcategory: entry.subcategory,
-        key: entry.key,
-        label: entry.label,
-        value: entry.value,
-        type: entry.type,
-        unit: entry.unit ?? null,
-        sortOrder: entry.sortOrder,
-        isActive: true,
-      },
-    });
-  }
+  await ensurePricingEntries(
+    WIDE_FORMAT_DEFAULT_ENTRIES.map((entry) => ({
+      ...entry,
+      value: entry.value as Prisma.InputJsonValue,
+    }))
+  );
 }
 
 export function parseAndValidateWideFormatPricingValue(compositeKey: string, rawValue: string) {
@@ -199,6 +178,10 @@ export async function getWideFormatPricingConfig() {
     },
   });
 
+  return getWideFormatPricingConfigFromRows(rows);
+}
+
+export function getWideFormatPricingConfigFromRows(rows: Array<{ subcategory: string; key: string; value: unknown }>) {
   const source = mapRowsToValues(rows);
   const loadedKeys = Object.keys(source);
   const { config, fallbackUsedKeys } = buildConfig(source);
@@ -251,7 +234,7 @@ export async function updateWideFormatPricingEntry(entryId: string, rawValue: st
 
 export async function listWideFormatPricingAdminData() {
   await ensureWideFormatPricingEntries();
-  const [entries, histories, runtimeConfig] = await Promise.all([
+  const [entries, histories] = await Promise.all([
     prisma.pricingEntry.findMany({
       where: { category: WIDE_FORMAT_PRICING_CATEGORY },
       orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }],
@@ -259,10 +242,10 @@ export async function listWideFormatPricingAdminData() {
     prisma.pricingEntryHistory.findMany({
       where: { category: WIDE_FORMAT_PRICING_CATEGORY },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      take: 20,
     }),
-    getWideFormatPricingConfig(),
   ]);
+  const runtimeConfig = getWideFormatPricingConfigFromRows(entries);
 
   const descriptionByCompositeKey = WIDE_FORMAT_DEFAULT_ENTRIES.reduce<Record<string, string>>((acc, entry) => {
     acc[`${entry.subcategory}.${entry.key}`] = entry.description ?? '';
