@@ -250,30 +250,74 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
             </div>
 
-            <div ref={pricingReveal.ref} {...pricingReveal.revealProps} className={`card border border-neutral-200 p-7 dark:border-neutral-800 md:p-8 ${revealBase}`}>
-              <h2 className="text-2xl font-semibold">Стоимость услуг</h2>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Финальная сумма зависит от файла и сложности, но ориентиры по работам фиксированы.</p>
-              <div className="mt-5 overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
-                {pricingRows.map((item, index) => (
-                  <div
-                    key={item.label}
-                    className="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 text-sm transition-colors duration-300 odd:bg-white even:bg-neutral-100/80 hover:bg-red-50/80 dark:odd:bg-neutral-950 dark:even:bg-neutral-900 dark:hover:bg-red-500/10 md:px-5 md:py-3.5 md:text-base"
-                  >
-                    <span className="text-neutral-700 dark:text-neutral-200">{item.label}</span>
-                    <span className="text-right font-semibold text-neutral-900 dark:text-neutral-100">{item.value}</span>
-                  </div>
-                ))}
+            <div ref={pricingReveal.ref} {...pricingReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
+              <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
+                <div className="max-w-2xl">
+                  <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">Ориентиры по стоимости</span>
+                  <h2 className="mt-3 text-2xl font-semibold">Стоимость услуг</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Финальная сумма зависит от файла и сложности, но базовые ориентиры по работам и допуслугам остаются понятными уже на этапе запроса.</p>
+                </div>
+                <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900/80 md:max-w-[220px]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Минимальный заказ</p>
+                  <p className="mt-1 text-lg font-semibold text-neutral-900 dark:text-neutral-100">{pricingRows[pricingRows.length - 1]?.value}</p>
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-[1.75rem] border border-neutral-200/90 bg-neutral-50/70 p-2 dark:border-neutral-800 dark:bg-neutral-900/50">
+                <div className="flex items-center justify-between px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400 md:px-4">
+                  <span>Услуга</span>
+                  <span>Стоимость</span>
+                </div>
+                <div className="space-y-2">
+                  {pricingRows.map((item, index) => {
+                    const isMinimum = index === pricingRows.length - 1;
+
+                    return (
+                      <div
+                        key={item.label}
+                        className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border px-4 py-3.5 transition-all duration-300 md:px-5 ${
+                          isMinimum
+                            ? 'border-red-200 bg-red-50/80 shadow-sm shadow-red-100/60 dark:border-red-500/20 dark:bg-red-500/10 dark:shadow-none'
+                            : 'border-white bg-white hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(15,23,42,0.06)] dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-neutral-700 dark:hover:shadow-none'
+                        }`}
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 md:text-[15px]">{item.label}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{isMinimum ? 'Фиксированный порог для небольших заказов и тестовых запусков.' : 'Актуально для типовых задач; точная оценка зависит от макета и объёма.'}</p>
+                        </div>
+                        <span className={`rounded-full px-3 py-1.5 text-right text-sm font-semibold md:text-[15px] ${isMinimum ? 'bg-white text-red-700 dark:bg-neutral-950 dark:text-red-300' : 'bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100'}`}>{item.value}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`card border border-neutral-200 p-7 dark:border-neutral-800 md:p-8 ${revealBase}`}>
-              <h2 className="text-2xl font-semibold">Что влияет на цену</h2>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Чем сложнее контур и постобработка, тем выше итоговая стоимость заказа.</p>
-              <ul className="mt-5 grid gap-3.5 md:grid-cols-2">
+            <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
+              <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
+                <div className="max-w-2xl">
+                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">Факторы расчёта</span>
+                  <h2 className="mt-3 text-2xl font-semibold">Что влияет на цену</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Чем сложнее контур, плотнее рез и больше ручной постобработки, тем выше итоговая стоимость. Ниже — ключевые параметры, которые менеджер оценивает в первую очередь.</p>
+                </div>
+                <p className="max-w-[220px] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">Эти пункты помогают быстро понять, из чего складывается смета ещё до финальной проверки файла.</p>
+              </div>
+
+              <ul className="mt-5 grid gap-3 md:grid-cols-2">
                 {priceFactors.map((factor, index) => (
-                  <li key={factor} style={factorsReveal.getStaggerStyle(index * 80)} data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'} className={`flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-sm text-neutral-700 transition-colors hover:border-neutral-200 hover:bg-neutral-50 dark:text-neutral-200 dark:hover:border-neutral-800 dark:hover:bg-neutral-900 ${revealBase}`}>
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-200 text-[11px] font-bold text-red-700 dark:bg-red-500/25 dark:text-red-300">•</span>
-                    {factor}
+                  <li
+                    key={factor}
+                    style={factorsReveal.getStaggerStyle(index * 80)}
+                    data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
+                    className={`rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:shadow-none ${revealBase}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-sm font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{String(index + 1).padStart(2, '0')}</span>
+                      <div>
+                        <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Влияет на время подготовки, точность и объём резки.' : 'Учитывается при расчёте ручных операций и общего времени производства.'}</p>
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
