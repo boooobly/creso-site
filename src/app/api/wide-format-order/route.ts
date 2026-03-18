@@ -13,6 +13,7 @@ import { getServerEnv } from '@/lib/env';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
+const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024;
 const ALLOWED_UPLOAD_MIME_TYPES = new Set([
   'image/jpeg',
   'image/png',
@@ -118,6 +119,7 @@ export async function POST(request: NextRequest) {
     const grommets = toBooleanValue(formData.get('grommets'));
     const plotterCutByRegistrationMarks = toBooleanValue(formData.get('plotterCutByRegistrationMarks'));
     const cutByPositioningMarks = toBooleanValue(formData.get('cutByPositioningMarks'));
+    const pageUrl = toStringValue(formData.get('pageUrl'));
     const fileRaw = formData.get('file');
 
     if (website) {
@@ -180,7 +182,7 @@ export async function POST(request: NextRequest) {
 
     const extrasText = extras.length > 0
       ? extras.map((item) => `• ${item.label}: ${formatRub(item.cost)}`).join('\n')
-      : 'Доп. услуги: нет';
+      : '• Нет';
 
     const file = fileRaw instanceof File ? fileRaw : undefined;
 
@@ -189,7 +191,7 @@ export async function POST(request: NextRequest) {
         file,
         allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
         allowedExtensions: ALLOWED_UPLOAD_EXTENSIONS,
-        maxBytes: MAX_TELEGRAM_FILE_SIZE_BYTES,
+        maxBytes: MAX_UPLOAD_SIZE_BYTES,
       });
 
       if (!fileValidation.ok) {
@@ -198,9 +200,9 @@ export async function POST(request: NextRequest) {
     }
 
     const message = [
-      'Широкоформатная печать — новая заявка',
+      '🆕 Новая заявка — Широкоформатная печать',
       '',
-      `Материал: ${materialLabel} (${materialIdRaw})`,
+      `Материал: ${materialLabel}`,
       `Размер: ${Math.round(parsedWidthMm)} × ${Math.round(parsedHeightMm)} мм (${calculated.width.toFixed(2)} × ${calculated.height.toFixed(2)} м)`,
       `Кол-во: ${Math.round(parsedQuantity)}`,
       '',
@@ -219,7 +221,8 @@ export async function POST(request: NextRequest) {
       `Телефон: ${phone}`,
       `Email: ${email || '—'}`,
       `Комментарий: ${comment || '—'}`,
-      `Файл: ${file?.name ? `${file.name} (${Math.round(file.size / 1024)} KB)` : '—'}`,
+      `Файл: ${file?.name ? `${file.name} (${Math.round(file.size / 1024)} КБ)` : '—'}`,
+      `Страница: ${pageUrl || request.headers.get('referer') || request.headers.get('origin') || '—'}`,
     ].join('\n');
 
     const botToken = env.TELEGRAM_BOT_TOKEN;
@@ -228,7 +231,7 @@ export async function POST(request: NextRequest) {
     const isFileTooLarge = Boolean(file && file.size > MAX_TELEGRAM_FILE_SIZE_BYTES);
 
     const telegramText = isFileTooLarge
-      ? `${message}\n\n⚠️ File too large for bot upload (>5MB).`
+      ? `${message}\n\n⚠️ Файл превышает 5 МБ для отправки ботом в Telegram. Менеджер получит заявку без вложения.`
       : message;
 
     const [emailSent, telegramSent] = await Promise.all([

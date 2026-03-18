@@ -167,6 +167,7 @@ export default function OrderWideFormatForm() {
       formData.set('plotterCutByRegistrationMarks', String(values.plotterCutByRegistrationMarks));
       formData.set('cutByPositioningMarks', String(values.cutByPositioningMarks));
       formData.set('comment', values.comment.trim());
+      formData.set('pageUrl', typeof window !== 'undefined' ? window.location.href : '');
       formData.set('website', values.website);
       if (file) {
         formData.set('file', file, file.name);

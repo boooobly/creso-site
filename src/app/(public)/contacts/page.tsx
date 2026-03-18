@@ -102,7 +102,7 @@ export default async function ContactsPage() {
                   <Icon className="size-5" />
                 </div>
                 <p className="text-sm text-neutral-500 dark:text-neutral-300">{item.title}</p>
-                {'value' in item ? <p className="font-semibold text-neutral-900 dark:text-neutral-100">{item.value}</p> : null}
+                {'value' in item ? <p className="break-words font-semibold text-neutral-900 dark:text-neutral-100">{item.value}</p> : null}
                 {'lines' in item ? (
                   <div className="space-y-1 font-semibold text-neutral-900 dark:text-neutral-100">
                     {item.lines.map((line) => (
