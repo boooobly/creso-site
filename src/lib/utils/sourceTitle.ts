@@ -5,6 +5,8 @@ const SOURCE_TITLES: Record<string, string> = {
   outdoor: 'Наружная реклама',
   'heat-transfer': 'Термоперенос',
   'plotter-cutting': 'Плоттерная резка',
+  stands: 'Изготовление стендов',
+  tshirts: 'Печать на футболках',
   main: 'Главная страница',
 };
 

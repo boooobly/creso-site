@@ -49,6 +49,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   const [isRequirementsOpen, setIsRequirementsOpen] = useState(false);
   const [pricingRows, setPricingRows] = useState(defaultPricingRows);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.1 });
   const specsReveal = useRevealOnScroll<HTMLDivElement>();
@@ -143,21 +144,23 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
     try {
       setIsSubmitting(true);
 
-      const payload = {
-        source: 'plotter-cutting',
-        name: name.trim(),
-        phone,
-        comment: comment.trim() || undefined,
-        extras: {
-          serviceType,
-          files: files.map((file) => ({ name: file.name, size: file.size })),
-        },
-      };
+      const formData = new FormData();
+      formData.set('source', 'plotter-cutting');
+      formData.set('name', name.trim());
+      formData.set('phone', phoneDigits);
+      if (comment.trim()) formData.set('comment', comment.trim());
+      formData.set('pageUrl', typeof window !== 'undefined' ? window.location.href : '');
+      formData.set('extras', JSON.stringify({
+        service: 'Плоттерная резка',
+        serviceType,
+      }));
+      files.forEach((file) => {
+        formData.append('files', file, file.name);
+      });
 
       const response = await fetch('/api/leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -168,6 +171,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       setSubmitSuccess('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
       setComment('');
       setFiles([]);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Не удалось отправить заявку. Попробуйте ещё раз.');
     } finally {
@@ -378,6 +382,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                 <input
                   id="files"
                   type="file"
+                  ref={fileInputRef}
                   multiple
                   accept={acceptedAttr}
                   onChange={(event) => setFiles(Array.from(event.target.files ?? []))}

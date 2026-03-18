@@ -132,6 +132,8 @@ export default function OrderTshirtsForm() {
       formData.set('phone', getPhoneDigits(values.phone));
       formData.set('size', values.size);
       formData.set('tshirtSource', values.tshirtSource);
+      formData.set('fabric', values.fabric);
+      formData.set('color', values.color);
       formData.set('transferType', values.transferType);
       formData.set('side', values.side);
       formData.set('comment', values.comment.trim());
@@ -207,7 +209,7 @@ export default function OrderTshirtsForm() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
-              <span className="text-sm font-semibold">Ткань</span>
+              <span className="text-sm font-semibold">Тип ткани</span>
               <select className={inputClass('fabric')} value={values.fabric} onChange={(e) => setValues((prev) => ({ ...prev, fabric: e.target.value }))}>
                 <option value="">Не выбрано</option>
                 {fabricOptions.map((option) => (
