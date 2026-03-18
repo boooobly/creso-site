@@ -54,6 +54,47 @@ export interface BagetQuoteResult {
   meta?: Record<string, any>;
 }
 
+function roundCurrency(value: number): number {
+  return Number.isFinite(value) ? Math.round(value) : 0;
+}
+
+function toMetersFromMillimeters(valueMm: number): number {
+  return Number.isFinite(valueMm) && valueMm > 0 ? valueMm / 1000 : 0;
+}
+
+export function calculateStretchingPrice(params: {
+  widthMm: number;
+  heightMm: number;
+  areaRate: number;
+  perimeterDividedByAreaRate: number;
+}): number {
+  const widthM = toMetersFromMillimeters(Number(params.widthMm));
+  const heightM = toMetersFromMillimeters(Number(params.heightMm));
+  const areaRate = Number(params.areaRate);
+  const perimeterDividedByAreaRate = Number(params.perimeterDividedByAreaRate);
+
+  if (!Number.isFinite(widthM) || !Number.isFinite(heightM) || widthM <= 0 || heightM <= 0) {
+    return 0;
+  }
+
+  if (!Number.isFinite(areaRate) || areaRate < 0 || !Number.isFinite(perimeterDividedByAreaRate) || perimeterDividedByAreaRate < 0) {
+    return 0;
+  }
+
+  const areaM2 = widthM * heightM;
+  if (!Number.isFinite(areaM2) || areaM2 <= 0) {
+    return 0;
+  }
+
+  const perimeterM = 2 * (widthM + heightM);
+  if (!Number.isFinite(perimeterM) || perimeterM < 0) {
+    return 0;
+  }
+
+  const price = areaM2 * areaRate + (perimeterM / areaM2) * perimeterDividedByAreaRate;
+  return Number.isFinite(price) && price > 0 ? price : 0;
+}
+
 export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasPricingConfig = getBaguetteExtrasDefaultConfig()): BagetQuoteResult {
   const warnings: string[] = [];
   const width = Number(input.width);
@@ -85,6 +126,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     ? (input.stretcherType ?? 'narrow')
     : (input.stretcherType === 'narrow' && !stretcherNarrowAllowed ? 'wide' : (input.stretcherType ?? 'narrow'));
   const effectiveStand = input.stand && standAllowed;
+  const stretchingRequired = Boolean(autoAdditions.stretchingRequired);
 
   if (!validSize) {
     warnings.push('Введите корректные значения не менее 50 мм.');
@@ -119,6 +161,8 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
         stretcherType: effectiveStretcherType,
         frameMode: effectiveFrameMode,
         requiresBaget,
+        stretchingRequired,
+        stretchingCost: 0,
       },
     };
   }
@@ -164,6 +208,14 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     : 0;
   const printCost = requiresPrint && printMaterial
     ? Math.max(printAreaM2, extrasConfig.print.minimumBillableAreaM2) * getBaguettePrintPricePerM2(printMaterial, extrasConfig)
+    : 0;
+  const stretchingCost = stretchingRequired
+    ? calculateStretchingPrice({
+        widthMm: width,
+        heightMm: height,
+        areaRate: extrasConfig.stretching.areaRate,
+        perimeterDividedByAreaRate: extrasConfig.stretching.perimeterDividedByAreaRate,
+      })
     : 0;
 
   const rawItems: QuoteLineItem[] = [
@@ -220,8 +272,15 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       key: 'stretcher',
       title: 'Подрамник',
       qty: quantity,
-      unitPrice: Math.round(stretcherCost),
+      unitPrice: roundCurrency(stretcherCost),
       total: stretcherCost * quantity,
+    },
+    {
+      key: 'stretching',
+      title: 'Натяжка',
+      qty: quantity,
+      unitPrice: roundCurrency(stretchingCost),
+      total: stretchingCost * quantity,
     },
   ];
 
@@ -259,6 +318,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       hangingLabel: hangerType === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик + ${extrasConfig.hanging.wireLoopDefaultQty} петли`,
       standCost,
       stretcherCost,
+      stretchingCost,
       autoBadges,
       autoAdditions,
       standAllowed,
@@ -270,6 +330,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       stretcherType: effectiveStretcherType,
       frameMode: effectiveFrameMode,
       requiresBaget,
+      stretchingRequired,
     },
   };
 }

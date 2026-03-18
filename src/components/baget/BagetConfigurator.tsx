@@ -339,10 +339,18 @@ export default function BagetConfigurator({
           ? <span className="ml-2 text-xs text-neutral-500">{materials.stretcherType === 'narrow' ? 'Узкий (2 см)' : 'Широкий (4 см)'}</span>
           : undefined,
       },
+      {
+        key: 'stretching',
+        label: 'Натяжка:',
+        value: Number(calcMeta.stretchingCost ?? 0),
+        note: calcMeta.stretchingRequired
+          ? <span className="ml-2 text-xs text-neutral-500">Рассчитано автоматически</span>
+          : undefined,
+      },
     ];
 
     return rows.filter((row) => row.value > 0);
-  }, [autoAdditions?.addOrabond, autoAdditions?.pvcType, calcMeta.hangingCost, calcMeta.hangingLabel, calcMeta.materialsCost, calcMeta.orabondCost, calcMeta.printCost, calcMeta.printMaterial, calcMeta.pvcCost, calcMeta.standCost, calcMeta.stretcherCost, materials.stretcherType, materials.workType]);
+  }, [autoAdditions?.addOrabond, autoAdditions?.pvcType, calcMeta.hangingCost, calcMeta.hangingLabel, calcMeta.materialsCost, calcMeta.orabondCost, calcMeta.printCost, calcMeta.printMaterial, calcMeta.pvcCost, calcMeta.standCost, calcMeta.stretcherCost, calcMeta.stretchingCost, calcMeta.stretchingRequired, materials.stretcherType, materials.workType]);
 
   useEffect(() => {
     if (!standAllowed && materials.stand) {
@@ -499,6 +507,10 @@ export default function BagetConfigurator({
       }
     }
 
+    if (autoAdditions?.stretchingRequired) {
+      materialItems.push('Натяжка');
+    }
+
     return materialItems;
   }, [autoAdditions, materials.backPanel, materials.frameMode, materials.glazing, materials.stretcherType, materials.workType]);
 
@@ -551,6 +563,11 @@ export default function BagetConfigurator({
         transferSource: printRequirement.transferSource,
         printCost: Math.round(Number(calcMeta.printCost ?? 0)),
       },
+      priceItems: quote.items.map((item) => ({
+        key: item.key,
+        title: item.title,
+        total: item.total,
+      })),
     };
   }, [
     effectiveWidthMm,
@@ -568,6 +585,7 @@ export default function BagetConfigurator({
     printRequirement.printMaterial,
     printRequirement.requiresPrint,
     printRequirement.transferSource,
+    quote.items,
     quote.meta,
     widthMm,
     heightMm,

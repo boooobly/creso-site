@@ -239,6 +239,12 @@ function normalizeMaterialsBreakdown(params: {
       note: stretcherType ? labelFromMap(STRETCHER_LABELS, stretcherType, stretcherType) : undefined,
     },
     {
+      key: 'stretching',
+      label: 'Натяжка',
+      included: Boolean(meta.stretchingRequired),
+      costRub: numberFromMeta(meta, 'stretchingCost'),
+    },
+    {
       key: 'print',
       label: 'Печать',
       included: Boolean(params.baget.requiresPrint),
