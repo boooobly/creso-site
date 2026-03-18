@@ -130,15 +130,15 @@ export default function LeadForm({
       const commentLines = [
         submitMessagePrefix?.trim(),
         data.message?.trim(),
-        pageUrl ? `Страница: ${pageUrl}` : undefined,
       ].filter(Boolean);
 
       const res = await postJSON<{ ok: true }>(`/api/leads`, {
         source,
         name: data.name,
-        phone: phoneDigits,
-        email: data.email,
+        phone: phoneDigits || undefined,
+        email: data.email?.trim() || undefined,
         comment: commentLines.length > 0 ? commentLines.join('\n') : undefined,
+        pageUrl,
         extras: {
           service: data.service,
           consent: data.consent,
