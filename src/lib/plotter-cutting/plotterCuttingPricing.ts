@@ -104,13 +104,15 @@ export function parseAndValidatePlotterCuttingPricingValue(compositeKey: string,
   return parsed.data;
 }
 
-export async function getPlotterCuttingPricingConfig() {
-  await ensurePlotterCuttingPricingEntries();
-
-  const rows = await prisma.pricingEntry.findMany({
+async function listActivePlotterCuttingPricingRows() {
+  return prisma.pricingEntry.findMany({
     where: { category: PLOTTER_CUTTING_PRICING_CATEGORY, isActive: true },
     select: { subcategory: true, key: true, value: true },
   });
+}
+
+export async function getPlotterCuttingPricingConfig() {
+  const rows = await listActivePlotterCuttingPricingRows();
 
   return getPlotterCuttingPricingConfigFromRows(rows);
 }
