@@ -14,10 +14,10 @@ export type RawWideFormatDefaultEntry = {
   key: string;
   label: string;
   description?: string;
-  type: 'number';
+  type: 'number' | 'boolean';
   unit?: string;
   sortOrder: number;
-  value: number;
+  value: number | boolean;
 };
 
 export const WIDE_FORMAT_DEFAULT_ENTRIES = defaultsJson as RawWideFormatDefaultEntry[];
@@ -42,6 +42,7 @@ const MATERIAL_KEYS: ReadonlyArray<WideFormatMaterialType> = [
 
 const nonNegativeSchema = z.number().min(0).max(1_000_000);
 const percentSchema = z.number().min(0).max(5);
+const booleanSchema = z.boolean();
 
 const WIDE_FORMAT_KEY_SCHEMAS: Record<string, z.ZodTypeAny> = {
   'global.max_width': z.number().positive().max(10),
@@ -59,9 +60,10 @@ const WIDE_FORMAT_KEY_SCHEMAS: Record<string, z.ZodTypeAny> = {
 for (const material of MATERIAL_KEYS) {
   WIDE_FORMAT_KEY_SCHEMAS[`price_per_m2.${material}`] = nonNegativeSchema;
   WIDE_FORMAT_KEY_SCHEMAS[`max_width_by_material.${material}`] = z.number().positive().max(10);
+  WIDE_FORMAT_KEY_SCHEMAS[`visibility_in_constructor.${material}`] = booleanSchema;
 }
 
-type ConfigKeyMap = Record<string, number>;
+type ConfigValueMap = Record<string, unknown>;
 type FallbackReason = 'missing' | 'invalid';
 export type WideFormatPricingFallbackItem = { key: string; reason: FallbackReason };
 
@@ -78,10 +80,11 @@ export type WideFormatPricingConfig = {
   minimumPrintPriceRUB: number;
   pricesRUBPerM2: Record<WideFormatMaterialType, number>;
   maxWidthByMaterial: Record<WideFormatMaterialType, number>;
+  visibleInConstructorByMaterial: Record<WideFormatMaterialType, boolean>;
 };
 
-function mapDefaults(entries: RawWideFormatDefaultEntry[]): ConfigKeyMap {
-  return entries.reduce<ConfigKeyMap>((acc, entry) => {
+function mapDefaults(entries: RawWideFormatDefaultEntry[]): ConfigValueMap {
+  return entries.reduce<ConfigValueMap>((acc, entry) => {
     acc[`${entry.subcategory}.${entry.key}`] = entry.value;
     return acc;
   }, {});
@@ -90,51 +93,61 @@ function mapDefaults(entries: RawWideFormatDefaultEntry[]): ConfigKeyMap {
 const fallbackValues = mapDefaults(WIDE_FORMAT_DEFAULT_ENTRIES);
 export const WIDE_FORMAT_REQUIRED_KEYS = Object.keys(fallbackValues);
 
-function readWithFallback(source: ConfigKeyMap, compositeKey: string, diagnostics: WideFormatPricingFallbackItem[]) {
+function readWithFallback<T>(
+  source: ConfigValueMap,
+  compositeKey: string,
+  diagnostics: WideFormatPricingFallbackItem[],
+): T {
   const schema = WIDE_FORMAT_KEY_SCHEMAS[compositeKey] ?? nonNegativeSchema;
   const parsed = schema.safeParse(source[compositeKey]);
-  if (parsed.success) return parsed.data as number;
+  if (parsed.success) return parsed.data as T;
 
   diagnostics.push({ key: compositeKey, reason: compositeKey in source ? 'invalid' : 'missing' });
   const fallbackParsed = schema.safeParse(fallbackValues[compositeKey]);
-  if (fallbackParsed.success) return fallbackParsed.data as number;
+  if (fallbackParsed.success) return fallbackParsed.data as T;
 
   throw new Error(`[wide-format-pricing] invalid fallback for key ${compositeKey}`);
 }
 
-function mapRowsToValues(rows: Array<{ subcategory: string; key: string; value: unknown }>): ConfigKeyMap {
-  return rows.reduce<ConfigKeyMap>((acc, row) => {
-    acc[`${row.subcategory}.${row.key}`] = Number(row.value);
+function mapRowsToValues(rows: Array<{ subcategory: string; key: string; value: unknown }>): ConfigValueMap {
+  return rows.reduce<ConfigValueMap>((acc, row) => {
+    acc[`${row.subcategory}.${row.key}`] = row.value;
     return acc;
   }, {});
 }
 
-function buildConfig(source: ConfigKeyMap) {
+function buildConfig(source: ConfigValueMap) {
   const diagnostics: WideFormatPricingFallbackItem[] = [];
 
   const pricesRUBPerM2 = MATERIAL_KEYS.reduce<Record<WideFormatMaterialType, number>>((acc, material) => {
-    acc[material] = readWithFallback(source, `price_per_m2.${material}`, diagnostics);
+    acc[material] = readWithFallback<number>(source, `price_per_m2.${material}`, diagnostics);
     return acc;
   }, {} as Record<WideFormatMaterialType, number>);
 
   const maxWidthByMaterial = MATERIAL_KEYS.reduce<Record<WideFormatMaterialType, number>>((acc, material) => {
-    acc[material] = readWithFallback(source, `max_width_by_material.${material}`, diagnostics);
+    acc[material] = readWithFallback<number>(source, `max_width_by_material.${material}`, diagnostics);
     return acc;
   }, {} as Record<WideFormatMaterialType, number>);
 
+  const visibleInConstructorByMaterial = MATERIAL_KEYS.reduce<Record<WideFormatMaterialType, boolean>>((acc, material) => {
+    acc[material] = readWithFallback<boolean>(source, `visibility_in_constructor.${material}`, diagnostics);
+    return acc;
+  }, {} as Record<WideFormatMaterialType, boolean>);
+
   const config: WideFormatPricingConfig = {
-    maxWidth: readWithFallback(source, 'global.max_width', diagnostics),
-    bannerJoinSeamWidthThreshold: readWithFallback(source, 'global.banner_join_seam_width_threshold', diagnostics),
-    edgeGluingPerimeterPrice: readWithFallback(source, 'global.edge_gluing_perimeter_price', diagnostics),
-    imageWeldingPerimeterPrice: readWithFallback(source, 'global.image_welding_perimeter_price', diagnostics),
-    grommetPrice: readWithFallback(source, 'global.grommet_price', diagnostics),
-    grommetStepM: readWithFallback(source, 'global.grommet_step_m', diagnostics),
-    plotterCutPerimeterPrice: readWithFallback(source, 'global.plotter_cut_perimeter_price', diagnostics),
-    plotterCutMinimumFee: readWithFallback(source, 'global.plotter_cut_minimum_fee', diagnostics),
-    positioningMarksCutPercent: readWithFallback(source, 'global.positioning_marks_cut_percent', diagnostics),
-    minimumPrintPriceRUB: readWithFallback(source, 'global.minimum_print_price_rub', diagnostics),
+    maxWidth: readWithFallback<number>(source, 'global.max_width', diagnostics),
+    bannerJoinSeamWidthThreshold: readWithFallback<number>(source, 'global.banner_join_seam_width_threshold', diagnostics),
+    edgeGluingPerimeterPrice: readWithFallback<number>(source, 'global.edge_gluing_perimeter_price', diagnostics),
+    imageWeldingPerimeterPrice: readWithFallback<number>(source, 'global.image_welding_perimeter_price', diagnostics),
+    grommetPrice: readWithFallback<number>(source, 'global.grommet_price', diagnostics),
+    grommetStepM: readWithFallback<number>(source, 'global.grommet_step_m', diagnostics),
+    plotterCutPerimeterPrice: readWithFallback<number>(source, 'global.plotter_cut_perimeter_price', diagnostics),
+    plotterCutMinimumFee: readWithFallback<number>(source, 'global.plotter_cut_minimum_fee', diagnostics),
+    positioningMarksCutPercent: readWithFallback<number>(source, 'global.positioning_marks_cut_percent', diagnostics),
+    minimumPrintPriceRUB: readWithFallback<number>(source, 'global.minimum_print_price_rub', diagnostics),
     pricesRUBPerM2,
     maxWidthByMaterial,
+    visibleInConstructorByMaterial,
   };
 
   return { config, fallbackUsedKeys: diagnostics };
@@ -151,8 +164,20 @@ export async function ensureWideFormatPricingEntries() {
   );
 }
 
+function parseBooleanInput(rawValue: string) {
+  const normalized = rawValue.trim().toLowerCase();
+  if (normalized === 'true' || normalized === '1' || normalized === 'on') return true;
+  if (normalized === 'false' || normalized === '0' || normalized === 'off' || normalized === '') return false;
+  throw new Error('Выберите, показывать ли материал в конструкторе.');
+}
+
 export function parseAndValidateWideFormatPricingValue(compositeKey: string, rawValue: string) {
   const schema = WIDE_FORMAT_KEY_SCHEMAS[compositeKey] ?? nonNegativeSchema;
+
+  if (schema === booleanSchema) {
+    return parseBooleanInput(rawValue);
+  }
+
   const parsedValue = parseNumericInput(rawValue);
   const parsed = schema.safeParse(parsedValue);
 
@@ -161,6 +186,19 @@ export function parseAndValidateWideFormatPricingValue(compositeKey: string, raw
   }
 
   return parsed.data;
+}
+
+export function isWideFormatMaterialVisibleInConstructor(
+  material: WideFormatMaterialType,
+  config: Pick<WideFormatPricingConfig, 'visibleInConstructorByMaterial'>,
+) {
+  return config.visibleInConstructorByMaterial[material] ?? true;
+}
+
+export function getVisibleWideFormatMaterials(
+  config: Pick<WideFormatPricingConfig, 'visibleInConstructorByMaterial'>,
+): WideFormatMaterialType[] {
+  return MATERIAL_KEYS.filter((material) => isWideFormatMaterialVisibleInConstructor(material, config));
 }
 
 export async function getWideFormatPricingConfig() {
@@ -260,6 +298,7 @@ export async function listWideFormatPricingAdminData() {
   const sections = [
     { id: 'global', title: 'Общие правила расчёта', description: 'Минимальный чек, наценки и ставки доп. работ.', subcategory: 'global' },
     { id: 'price_per_m2', title: 'Цены материалов за м²', description: 'Тариф печати для каждого материала.', subcategory: 'price_per_m2' },
+    { id: 'visibility_in_constructor', title: 'Показ материалов в конструкторе', description: 'Включайте только те материалы, которые должны видеть клиенты в публичном конструкторе.', subcategory: 'visibility_in_constructor' },
     { id: 'max_width_by_material', title: 'Максимальная ширина рулона', description: 'Ограничения для проверки размеров.', subcategory: 'max_width_by_material' },
   ] as const;
 

@@ -12,8 +12,9 @@ import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import {
   getWideFormatCategoryByMaterial,
   type WideFormatCategory,
-  WIDE_FORMAT_CATEGORY_OPTIONS,
-  WIDE_FORMAT_VARIANTS_BY_CATEGORY,
+  getFirstVisibleWideFormatMaterial,
+  getVisibleWideFormatCategoryOptions,
+  getVisibleWideFormatVariantsByCategory,
   getWideFormatMaterialLabel,
   isExtrasAllowedForWideFormat,
   isBannerMaterial,
@@ -27,6 +28,7 @@ import {
   BAGET_TRANSFER_SOURCE_WIDE_FORMAT_CANVAS,
 } from '@/lib/baget/transfer';
 import ImageDropzone from '@/components/ImageDropzone';
+import Button from '@/components/ui/Button';
 import {
   Select,
   SelectContent,
@@ -116,13 +118,13 @@ type WideFormatPricingCalculatorProps = {
 export default function WideFormatPricingCalculator({ pricingConfig }: WideFormatPricingCalculatorProps) {
   const router = useRouter();
 
-  const [material, setMaterial] = useState<WideFormatMaterialType>('banner_240_gloss_3_2m');
-  const [category, setCategory] = useState<WideFormatCategory>(getWideFormatCategoryByMaterial('banner_240_gloss_3_2m'));
+  const initialMaterial = getFirstVisibleWideFormatMaterial(pricingConfig) ?? 'banner_240_gloss_3_2m';
+  const [material, setMaterial] = useState<WideFormatMaterialType>(initialMaterial);
+  const [category, setCategory] = useState<WideFormatCategory>(getWideFormatCategoryByMaterial(initialMaterial));
   const [bannerDensity] = useState<BannerDensity>(300);
   const [width, setWidth] = useState<string>('1.2');
   const [height, setHeight] = useState<string>('1');
   const [quantity, setQuantity] = useState<string>('1');
-  const [materialSearchTerm, setMaterialSearchTerm] = useState('');
 
   const [edgeGluing, setEdgeGluing] = useState(false);
   const [imageWelding, setImageWelding] = useState(false);
@@ -143,13 +145,14 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
   const isBanner = isBannerMaterial(material);
   const isFilm = isFilmMaterial(material);
   const isExtrasAllowed = isExtrasAllowedForWideFormat(material);
-  const availableVariants = WIDE_FORMAT_VARIANTS_BY_CATEGORY[category];
+  const visibleCategoryOptions = useMemo(() => getVisibleWideFormatCategoryOptions(pricingConfig), [pricingConfig]);
+  const availableVariants = useMemo(() => getVisibleWideFormatVariantsByCategory(category, pricingConfig), [category, pricingConfig]);
   const parsedWidth = Number(width);
   const canShowWelding = Number.isFinite(parsedWidth) && parsedWidth > pricingConfig.bannerJoinSeamWidthThreshold;
 
   const handleCategoryChange = (nextCategory: WideFormatCategory) => {
     setCategory(nextCategory);
-    const nextMaterial = WIDE_FORMAT_VARIANTS_BY_CATEGORY[nextCategory][0]?.id;
+    const nextMaterial = getVisibleWideFormatVariantsByCategory(nextCategory, pricingConfig)[0]?.id;
     if (nextMaterial) {
       setMaterial(nextMaterial);
     }
@@ -158,6 +161,16 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
   useEffect(() => {
     setCategory(getWideFormatCategoryByMaterial(material));
   }, [material]);
+
+  useEffect(() => {
+    if (availableVariants.some((variant) => variant.id === material)) return;
+
+    const nextVisibleMaterial = availableVariants[0]?.id ?? getFirstVisibleWideFormatMaterial(pricingConfig);
+    if (nextVisibleMaterial) {
+      setMaterial(nextVisibleMaterial);
+      setCategory(getWideFormatCategoryByMaterial(nextVisibleMaterial));
+    }
+  }, [availableVariants, material, pricingConfig]);
 
   const quoteRequest = useMemo(() => ({
     material,
@@ -250,6 +263,13 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
   }, [isExtrasAllowed]);
 
   useEffect(() => {
+    if (visibleCategoryOptions.length === 0) {
+      setQuote(EMPTY_QUOTE);
+      setQuoteError('');
+      setIsQuoteLoading(false);
+      return;
+    }
+
     const controller = new AbortController();
     let active = true;
 
@@ -300,7 +320,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
       active = false;
       controller.abort();
     };
-  }, [debouncedQuoteRequest]);
+  }, [debouncedQuoteRequest, visibleCategoryOptions.length]);
 
   const widthWarning = quote.widthWarningCode
     ? WIDTH_WARNING_MESSAGES[quote.widthWarningCode](maxWidthForCurrentMaterial)
@@ -378,17 +398,23 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
       <section className="card p-5 md:p-6 space-y-4">
         <h2 className="text-xl font-semibold">Параметры заказа</h2>
 
+        {visibleCategoryOptions.length === 0 ? (
+          <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Сейчас в публичном конструкторе нет доступных материалов. Попросите менеджера включить хотя бы один материал в разделе цен.
+          </div>
+        ) : null}
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <label htmlFor="material-category" className="text-sm font-medium">Категория</label>
-            <Select value={category} onValueChange={(value) => handleCategoryChange(value as WideFormatCategory)}>
+            <Select value={category} onValueChange={(value) => handleCategoryChange(value as WideFormatCategory)} disabled={visibleCategoryOptions.length === 0}>
               <SelectTrigger id="material-category" className="h-[46px]">
                 <SelectValue placeholder="Выберите категорию" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Категории</SelectLabel>
-                  {WIDE_FORMAT_CATEGORY_OPTIONS.map((option) => (
+                  {visibleCategoryOptions.map((option) => (
                     <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
                   ))}
                 </SelectGroup>
@@ -398,7 +424,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
 
           <div className="space-y-2">
             <label htmlFor="material-variant" className="text-sm font-medium">Вариант</label>
-            <Select value={material} onValueChange={(value) => setMaterial(value as WideFormatMaterialType)}>
+            <Select value={material} onValueChange={(value) => setMaterial(value as WideFormatMaterialType)} disabled={availableVariants.length === 0}>
               <SelectTrigger id="material-variant" className="h-[46px]">
                 <SelectValue placeholder="Выберите вариант">
                   {getWideFormatMaterialLabel(material)}
@@ -406,7 +432,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>{WIDE_FORMAT_CATEGORY_OPTIONS.find((option) => option.id === category)?.label}</SelectLabel>
+                  <SelectLabel>{visibleCategoryOptions.find((option) => option.id === category)?.label ?? 'Материалы'}</SelectLabel>
                   {availableVariants.map((variant) => (
                     <SelectItem key={variant.id} value={variant.id}>
                       {variant.label}
@@ -569,7 +595,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Финальная цена без скрытых платежей.</p>
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
-          <Button variant="primary" className="mt-4 w-full" onClick={handleOrderClick}>Заказать печать</Button>
+          <Button variant="primary" className="mt-4 w-full" onClick={handleOrderClick} disabled={visibleCategoryOptions.length === 0}>Заказать печать</Button>
         </div>
 
         <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
@@ -604,26 +630,4 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <b>{value}</b>
     </p>
   );
-}
-
-function Button({
-  children,
-  variant,
-  className = '',
-  onClick,
-}: {
-  children: React.ReactNode;
-  variant: 'primary';
-  className?: string;
-  onClick?: () => void;
-}) {
-  if (variant === 'primary') {
-    return (
-      <button type="button" onClick={onClick} className={`btn-primary ${className}`.trim()}>
-        {children}
-      </button>
-    );
-  }
-
-  return null;
 }
