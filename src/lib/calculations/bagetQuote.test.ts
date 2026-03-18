@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bagetQuote } from './bagetQuote';
+import { bagetQuote, calculateStretchingPrice } from './bagetQuote';
 import { getBaguetteExtrasDefaultConfig } from '@/lib/baget/baguetteExtrasPricing';
 
 const selectedBaget = {
@@ -254,4 +254,39 @@ describe('bagetQuote', () => {
     expect(result.items.some((item) => item.key === 'stretcher')).toBe(true);
     expect(result.total).toBeGreaterThan(0);
   });
+
+
+  it('adds stretching as a separate line item using admin-managed coefficients', () => {
+    const config = getBaguetteExtrasDefaultConfig();
+    config.stretching.areaRate = 500;
+    config.stretching.perimeterDividedByAreaRate = 4;
+
+    const result = bagetQuote({
+      width: 1000,
+      height: 500,
+      quantity: 1,
+      selectedBaget,
+      workType: 'stretchedCanvas',
+      frameMode: 'noFrame',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'wire',
+      stand: false,
+      stretcherType: 'wide',
+    }, config);
+
+    const stretchingItem = result.items.find((item) => item.key === 'stretching');
+    expect(stretchingItem).toBeTruthy();
+    expect(result.meta?.stretchingRequired).toBe(true);
+    expect(result.meta?.stretchingCost).toBeCloseTo(274, 5);
+    expect(stretchingItem?.total).toBeCloseTo(274, 5);
+  });
+
+  it('returns 0 stretching price for invalid math inputs', () => {
+    expect(calculateStretchingPrice({ widthMm: 0, heightMm: 500, areaRate: 500, perimeterDividedByAreaRate: 4 })).toBe(0);
+    expect(calculateStretchingPrice({ widthMm: 500, heightMm: 0, areaRate: 500, perimeterDividedByAreaRate: 4 })).toBe(0);
+    expect(calculateStretchingPrice({ widthMm: 500, heightMm: 500, areaRate: Number.NaN, perimeterDividedByAreaRate: 4 })).toBe(0);
+  });
+
 });

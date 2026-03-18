@@ -50,6 +50,11 @@ export type BagetOrderSummary = {
     transferSource: BagetTransferSource | null;
     printCost: number;
   };
+  priceItems?: Array<{
+    key: string;
+    title: string;
+    total: number;
+  }>;
 };
 
 export type BagetOrderRequestBagetInput = {
@@ -440,6 +445,16 @@ export default function BagetOrderModal({
                 <div className="rounded-xl border border-red-200 bg-red-50 p-4 shadow-[0_10px_30px_rgba(220,38,38,0.12)] dark:border-red-800 dark:bg-red-950/30 dark:shadow-[0_10px_30px_rgba(220,38,38,0.18)]">
                   <p className="text-xs uppercase tracking-wide text-red-700/80 dark:text-red-200/80">Итоговая стоимость</p>
                   <p className="mt-1 text-3xl font-bold text-red-700 dark:text-red-200">{finalTotalRub.toLocaleString('ru-RU')} ₽</p>
+                  {orderSummary.priceItems?.length ? (
+                    <dl className="mt-4 space-y-2 border-t border-red-200/70 pt-3 text-sm text-neutral-700 dark:border-red-800/60 dark:text-neutral-200">
+                      {orderSummary.priceItems.map((item) => (
+                        <div key={item.key} className="flex items-start justify-between gap-3">
+                          <dt>{item.title}</dt>
+                          <dd className="font-medium">{Math.round(item.total).toLocaleString('ru-RU')} ₽</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
                   <p className="mt-3 text-sm text-neutral-700 dark:text-neutral-200">
                     К оплате сейчас: <span className="font-semibold">{prepayNow.toLocaleString('ru-RU')} ₽</span>
                   </p>

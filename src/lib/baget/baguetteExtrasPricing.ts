@@ -68,6 +68,10 @@ export type BaguetteExtrasPricingConfig = {
     narrowMaxWidthMm: number;
     narrowMaxHeightMm: number;
   };
+  stretching: {
+    areaRate: number;
+    perimeterDividedByAreaRate: number;
+  };
   materials: {
     glass: MaterialRate;
     antiReflectiveGlass: MaterialRate;
@@ -110,6 +114,8 @@ const BAGUETTE_KEY_SCHEMAS: Record<string, z.ZodTypeAny> = {
   'print.minimum_billable_area_m2': positiveAreaSchema,
   'stretcher.stretcher_price_per_meter_narrow': nonNegativePriceSchema,
   'stretcher.stretcher_price_per_meter_wide': nonNegativePriceSchema,
+  'stretching.stretching_area_rate': nonNegativePriceSchema,
+  'stretching.stretching_perimeter_divided_by_area_rate': nonNegativePriceSchema,
   'stretcher.stretcher_narrow_max_width_mm': millimeterLimitSchema,
   'stretcher.stretcher_narrow_max_height_mm': millimeterLimitSchema,
   'materials.glass': materialRateSchema,
@@ -220,6 +226,10 @@ function buildConfig(source: ConfigKeyMap) {
       },
       narrowMaxWidthMm: readWithFallback(source, 'stretcher.stretcher_narrow_max_width_mm', millimeterLimitSchema, diagnostics),
       narrowMaxHeightMm: readWithFallback(source, 'stretcher.stretcher_narrow_max_height_mm', millimeterLimitSchema, diagnostics),
+    },
+    stretching: {
+      areaRate: readWithFallback(source, 'stretching.stretching_area_rate', nonNegativePriceSchema, diagnostics),
+      perimeterDividedByAreaRate: readWithFallback(source, 'stretching.stretching_perimeter_divided_by_area_rate', nonNegativePriceSchema, diagnostics),
     },
     materials: {
       glass: readWithFallback(source, 'materials.glass', materialRateSchema, diagnostics),

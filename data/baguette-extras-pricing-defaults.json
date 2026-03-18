@@ -111,6 +111,28 @@
   },
   {
     "category": "baguette-extra-pricing",
+    "subcategory": "stretching",
+    "key": "stretching_area_rate",
+    "label": "Натяжка: ставка за площадь",
+    "description": "Коэффициент для части формулы S × ставка, где S — площадь работы в м².",
+    "type": "number",
+    "unit": "₽/м²",
+    "sortOrder": 101,
+    "value": 500
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "stretching",
+    "key": "stretching_perimeter_divided_by_area_rate",
+    "label": "Натяжка: коэффициент P / S",
+    "description": "Коэффициент для части формулы (P / S) × коэффициент, где P — периметр в метрах, S — площадь в м².",
+    "type": "number",
+    "unit": "₽",
+    "sortOrder": 102,
+    "value": 4
+  },
+  {
+    "category": "baguette-extra-pricing",
     "subcategory": "stretcher",
     "key": "stretcher_narrow_max_width_mm",
     "label": "Подрамник узкий: макс. ширина",
