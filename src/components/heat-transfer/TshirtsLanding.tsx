@@ -227,7 +227,6 @@ export default function TshirtsLanding({
   return (
     <div className="bg-white pb-10 dark:bg-neutral-950">
       <section id="tshirts-hero" className="relative overflow-hidden py-16 md:py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(220,38,38,0.14),transparent_55%)]" aria-hidden="true" />
         <div className="container relative">
           <div
             ref={heroReveal.ref}
