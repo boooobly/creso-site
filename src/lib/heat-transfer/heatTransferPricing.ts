@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import defaultsJson from '../../../data/heat-transfer-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
+import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import type { HeatTransferPricingConfig } from '@/lib/pricing-config/heatTransfer';
 
 export const HEAT_TRANSFER_PRICING_CATEGORY = 'heat-transfer-pricing';
@@ -137,10 +138,11 @@ export async function ensureHeatTransferPricingEntries() {
 
 export function parseAndValidateHeatTransferPricingValue(compositeKey: string, rawValue: string) {
   const schema = HEAT_TRANSFER_KEY_SCHEMAS[compositeKey] ?? nonNegativeSchema;
-  const parsed = schema.safeParse(Number(rawValue));
+  const parsedValue = parseNumericInput(rawValue);
+  const parsed = schema.safeParse(parsedValue);
 
   if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? 'Некорректное значение. Проверьте формат и диапазон.');
+    throw new Error(getFriendlyNumericValidationMessage(rawValue, parsed.error.issues[0]));
   }
 
   return parsed.data;

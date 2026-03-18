@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import defaultsJson from '../../../data/plotter-cutting-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
+import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import type { PlotterCuttingPricingConfig } from '@/lib/pricing-config/plotterCutting';
 
 export const PLOTTER_CUTTING_PRICING_CATEGORY = 'plotter-cutting-pricing';
@@ -114,10 +115,11 @@ export async function ensurePlotterCuttingPricingEntries() {
 
 export function parseAndValidatePlotterCuttingPricingValue(compositeKey: string, rawValue: string) {
   const schema = PLOTTER_CUTTING_KEY_SCHEMAS[compositeKey] ?? nonNegativeSchema;
-  const parsed = schema.safeParse(Number(rawValue));
+  const parsedValue = parseNumericInput(rawValue);
+  const parsed = schema.safeParse(parsedValue);
 
   if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? 'Некорректное значение. Проверьте формат и диапазон.');
+    throw new Error(getFriendlyNumericValidationMessage(rawValue, parsed.error.issues[0]));
   }
 
   return parsed.data;

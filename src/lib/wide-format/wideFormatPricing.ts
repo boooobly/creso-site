@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import defaultsJson from '../../../data/wide-format-pricing-defaults.json';
 import { prisma } from '@/lib/db/prisma';
+import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 
 export const WIDE_FORMAT_PRICING_CATEGORY = 'wide-format-pricing';
@@ -173,10 +174,11 @@ export async function ensureWideFormatPricingEntries() {
 
 export function parseAndValidateWideFormatPricingValue(compositeKey: string, rawValue: string) {
   const schema = WIDE_FORMAT_KEY_SCHEMAS[compositeKey] ?? nonNegativeSchema;
-  const parsed = schema.safeParse(Number(rawValue));
+  const parsedValue = parseNumericInput(rawValue);
+  const parsed = schema.safeParse(parsedValue);
 
   if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? 'Некорректное значение. Проверьте формат и диапазон.');
+    throw new Error(getFriendlyNumericValidationMessage(rawValue, parsed.error.issues[0]));
   }
 
   return parsed.data;
