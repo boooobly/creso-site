@@ -5,6 +5,12 @@ import { prisma } from '@/lib/db/prisma';
 import { getFriendlyNumericValidationMessage, parseNumericInput } from '@/lib/admin/pricing-input';
 import { ensurePricingEntries } from '@/lib/admin/pricing-defaults';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
+import {
+  WIDE_FORMAT_PRICING_FALLBACK_CONFIG,
+  type WideFormatPricingConfig,
+} from '@/lib/pricing-config/wideFormat';
+
+export { WIDE_FORMAT_PRICING_FALLBACK_CONFIG };
 
 export const WIDE_FORMAT_PRICING_CATEGORY = 'wide-format-pricing';
 
@@ -66,22 +72,6 @@ for (const material of MATERIAL_KEYS) {
 type ConfigValueMap = Record<string, unknown>;
 type FallbackReason = 'missing' | 'invalid';
 export type WideFormatPricingFallbackItem = { key: string; reason: FallbackReason };
-
-export type WideFormatPricingConfig = {
-  maxWidth: number;
-  bannerJoinSeamWidthThreshold: number;
-  edgeGluingPerimeterPrice: number;
-  imageWeldingPerimeterPrice: number;
-  grommetPrice: number;
-  grommetStepM: number;
-  plotterCutPerimeterPrice: number;
-  plotterCutMinimumFee: number;
-  positioningMarksCutPercent: number;
-  minimumPrintPriceRUB: number;
-  pricesRUBPerM2: Record<WideFormatMaterialType, number>;
-  maxWidthByMaterial: Record<WideFormatMaterialType, number>;
-  visibleInConstructorByMaterial: Record<WideFormatMaterialType, boolean>;
-};
 
 function mapDefaults(entries: RawWideFormatDefaultEntry[]): ConfigValueMap {
   return entries.reduce<ConfigValueMap>((acc, entry) => {
@@ -152,8 +142,6 @@ function buildConfig(source: ConfigValueMap) {
 
   return { config, fallbackUsedKeys: diagnostics };
 }
-
-export const WIDE_FORMAT_PRICING_FALLBACK_CONFIG: WideFormatPricingConfig = buildConfig(fallbackValues).config;
 
 export async function ensureWideFormatPricingEntries() {
   await ensurePricingEntries(

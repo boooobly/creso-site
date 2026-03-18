@@ -116,6 +116,15 @@ export type WideFormatPublicPricingConfig = {
   visibleInConstructorByMaterial: Record<WideFormatMaterialType, boolean>;
 };
 
+export type WideFormatPricingConfig = WideFormatPublicPricingConfig & {
+  edgeGluingPerimeterPrice: number;
+  imageWeldingPerimeterPrice: number;
+  grommetStepM: number;
+  plotterCutPerimeterPrice: number;
+  positioningMarksCutPercent: number;
+  pricesRUBPerM2: Record<WideFormatMaterialType, number>;
+};
+
 export const WIDE_FORMAT_PUBLIC_PRICING_FALLBACK: WideFormatPublicPricingConfig = {
   maxWidth: 3.2,
   bannerJoinSeamWidthThreshold: 3.1,
@@ -155,6 +164,32 @@ export const WIDE_FORMAT_PUBLIC_PRICING_FALLBACK: WideFormatPublicPricingConfig 
     canvas_poly_250: true,
     backlit_1_07: true,
     fxflex_translucent_banner_1_07: true,
+  },
+};
+
+export const WIDE_FORMAT_PRICING_FALLBACK_CONFIG: WideFormatPricingConfig = {
+  ...WIDE_FORMAT_PUBLIC_PRICING_FALLBACK,
+  edgeGluingPerimeterPrice: 50,
+  imageWeldingPerimeterPrice: 150,
+  grommetStepM: 0.3,
+  plotterCutPerimeterPrice: 25,
+  positioningMarksCutPercent: 0.3,
+  pricesRUBPerM2: {
+    banner_240_gloss_3_2m: 450,
+    banner_340_matte_3_2m: 450,
+    banner_440_matte_3_2m: 500,
+    banner_460_cast_3_2m: 550,
+    self_adhesive_film_matte_1_5: 500,
+    self_adhesive_film_gloss_1_5: 500,
+    perforated_film_1_37: 650,
+    clear_film_matte_1_5: 500,
+    paper_trans_skylight: 500,
+    polyester_fabric_140_1_5: 450,
+    polyester_fabric_100_0_9: 400,
+    canvas_cotton_350: 1500,
+    canvas_poly_250: 1000,
+    backlit_1_07: 1300,
+    fxflex_translucent_banner_1_07: 700,
   },
 };
 
