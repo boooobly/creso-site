@@ -496,7 +496,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
 
   const displayedWidth = viewportWidth;
   const displayedHeight = Math.round((displayedWidth * MOCKUP_HEIGHT) / MOCKUP_WIDTH);
-  const stageScale = displayedWidth / MOCKUP_WIDTH;
 
   return (
     <div className="space-y-6">
@@ -519,8 +518,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                   <Stage
                     width={MOCKUP_WIDTH}
                     height={MOCKUP_HEIGHT}
-                    scaleX={stageScale}
-                    scaleY={stageScale}
                     ref={stageRef}
                     style={{ width: displayedWidth, height: displayedHeight }}
                     onMouseDown={(event) => {
