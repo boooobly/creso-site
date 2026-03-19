@@ -7,7 +7,6 @@ import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
 import { dataUrlToFile } from '@/lib/mugDesigner/exportPreview';
-import type { MugDesignerExport } from '@/components/mug-designer/MugDesigner';
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
@@ -70,8 +69,6 @@ export default function OrderMugsForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
   const [isSending, setIsSending] = useState(false);
-  const [exportLayout, setExportLayout] = useState<(() => Promise<MugDesignerExport | null>) | null>(null);
-  const [hasHandleOverlap, setHasHandleOverlap] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
   const [needsDesign, setNeedsDesign] = useState(false);
@@ -196,7 +193,6 @@ export default function OrderMugsForm() {
       setValues(defaultValues);
       setFile(null);
       setNeedsDesign(false);
-      setHasHandleOverlap(false);
       setErrors({});
     } catch {
       setFormError('Не удалось отправить заявку. Попробуйте позже.');
