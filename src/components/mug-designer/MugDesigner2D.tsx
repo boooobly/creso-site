@@ -78,6 +78,9 @@ function clampPosition(x: number, y: number, width: number, height: number): { x
 }
 
 const SAFE_INSET = 16;
+const PREVIEW_MAX_WIDTH = 1100;
+const PREVIEW_MAX_HEIGHT = 560;
+const PREVIEW_STAGE_GUTTER = 24;
 
 const defaultTransform: TransformState = {
   x: PRINT_RECT.x + PRINT_RECT.width / 2,
@@ -305,13 +308,12 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     if (!node) return;
 
     const observer = new ResizeObserver((entries) => {
-      const width = entries[0]?.contentRect.width ?? 900;
-      const maxWidthByAspect = Math.floor((560 * MOCKUP_WIDTH) / MOCKUP_HEIGHT);
-      const maxWidth = Math.min(width, 1100, maxWidthByAspect);
-      const maxHeight = 560;
-      const scale = Math.min(maxWidth / MOCKUP_WIDTH, maxHeight / MOCKUP_HEIGHT);
+      const contentWidth = entries[0]?.contentRect.width ?? PREVIEW_MAX_WIDTH;
+      const availableWidth = Math.max(Math.min(contentWidth, PREVIEW_MAX_WIDTH) - PREVIEW_STAGE_GUTTER * 2, 1);
+      const availableHeight = PREVIEW_MAX_HEIGHT - PREVIEW_STAGE_GUTTER * 2;
+      const scale = Math.min(availableWidth / MOCKUP_WIDTH, availableHeight / MOCKUP_HEIGHT);
 
-      setViewportWidth(MOCKUP_WIDTH * scale);
+      setViewportWidth(Math.round(MOCKUP_WIDTH * scale));
     });
 
     observer.observe(node);
@@ -511,26 +513,27 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
             <span>Перетащите объект внутрь рамки</span>
           </div>
           <div className="rounded-xl border border-neutral-200 bg-white p-3 sm:p-4">
-            <div ref={wrapperRef} className="mx-auto w-full max-w-[1100px] overflow-hidden rounded-xl border border-neutral-200 bg-white p-2">
-              <div className="relative mx-auto" style={{ width: displayedWidth, height: displayedHeight }}>
-                <Stage
-                  width={MOCKUP_WIDTH}
-                  height={MOCKUP_HEIGHT}
-                  scaleX={stageScale}
-                  scaleY={stageScale}
-                  ref={stageRef}
-                  style={{ width: displayedWidth, height: displayedHeight }}
-                  onMouseDown={(event) => {
-                    if (event.target === event.target.getStage()) setSelectedElement(null);
-                  }}
-                  onTouchStart={(event) => {
-                    if (event.target === event.target.getStage()) setSelectedElement(null);
-                  }}
-                >
-                <Layer>
-                  <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="#ffffff" listening={false} />
-                  <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
-                </Layer>
+            <div className="mx-auto w-full max-w-[1100px] rounded-xl border border-neutral-200 bg-white">
+              <div ref={wrapperRef} className="flex w-full items-center justify-center overflow-hidden p-4 sm:p-6">
+                <div className="relative shrink-0" style={{ width: displayedWidth, height: displayedHeight }}>
+                  <Stage
+                    width={MOCKUP_WIDTH}
+                    height={MOCKUP_HEIGHT}
+                    scaleX={stageScale}
+                    scaleY={stageScale}
+                    ref={stageRef}
+                    style={{ width: displayedWidth, height: displayedHeight }}
+                    onMouseDown={(event) => {
+                      if (event.target === event.target.getStage()) setSelectedElement(null);
+                    }}
+                    onTouchStart={(event) => {
+                      if (event.target === event.target.getStage()) setSelectedElement(null);
+                    }}
+                  >
+                    <Layer>
+                      <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="#ffffff" listening={false} />
+                      <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
+                    </Layer>
 
                 <Layer ref={printLayerRef}>
                   <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0)" listening={false} />
@@ -716,8 +719,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                       }}
                     />
                   )}
-                </Layer>
-                </Stage>
+                    </Layer>
+                  </Stage>
+                </div>
               </div>
             </div>
           </div>
