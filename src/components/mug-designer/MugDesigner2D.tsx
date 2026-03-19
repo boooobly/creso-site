@@ -77,6 +77,18 @@ function clampPosition(x: number, y: number, width: number, height: number): { x
   };
 }
 
+function scaleRect(
+  rect: { x: number; y: number; width: number; height: number },
+  scale: number,
+): { x: number; y: number; width: number; height: number } {
+  return {
+    x: rect.x * scale,
+    y: rect.y * scale,
+    width: rect.width * scale,
+    height: rect.height * scale,
+  };
+}
+
 const SAFE_INSET = 16;
 const PREVIEW_MAX_WIDTH = 1240;
 const PREVIEW_MAX_HEIGHT = 600;
@@ -159,6 +171,11 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     };
   }, [quantity]);
 
+  const previewScale = viewportWidth / MOCKUP_WIDTH;
+  const displayedWidth = viewportWidth;
+  const displayedHeight = Math.round((displayedWidth * MOCKUP_HEIGHT) / MOCKUP_WIDTH);
+  const scaledPrintRect = scaleRect(PRINT_RECT, previewScale);
+
 
   const buildLayoutJson = () => JSON.stringify(
     {
@@ -198,13 +215,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     if (!stageRef.current || !printLayerRef.current || (!userImage && !textLayer)) return null;
 
     const stage = stageRef.current;
-    const sourceCanvas = stage.toCanvas({
-      x: 0,
-      y: 0,
-      width: MOCKUP_WIDTH,
-      height: MOCKUP_HEIGHT,
-      pixelRatio: 1,
-    });
+    const exportPixelRatio = MOCKUP_WIDTH / stage.width();
+    const printExportRect = scaleRect(PRINT_RECT, stage.width() / MOCKUP_WIDTH);
+    const sourceCanvas = stage.toCanvas({ pixelRatio: exportPixelRatio });
 
     const shouldDownscale = sourceCanvas.width > 2000;
     const targetWidth = shouldDownscale ? Math.min(TARGET_MOCK_EXPORT_WIDTH, sourceCanvas.width) : sourceCanvas.width;
@@ -225,11 +238,11 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     const mockPngDataUrl = exportCanvas.toDataURL('image/png', 1.0);
 
     const printPngDataUrl = printLayerRef.current.toDataURL({
-      x: PRINT_RECT.x,
-      y: PRINT_RECT.y,
-      width: PRINT_RECT.width,
-      height: PRINT_RECT.height,
-      pixelRatio: 1,
+      x: printExportRect.x,
+      y: printExportRect.y,
+      width: printExportRect.width,
+      height: printExportRect.height,
+      pixelRatio: exportPixelRatio,
       mimeType: 'image/png',
     });
 
@@ -390,10 +403,10 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         try {
           const mockPngDataUrl = stageRef.current.toDataURL({ pixelRatio: 1, mimeType: 'image/png' });
           const printPngDataUrl = printLayerRef.current.toDataURL({
-            x: PRINT_RECT.x,
-            y: PRINT_RECT.y,
-            width: PRINT_RECT.width,
-            height: PRINT_RECT.height,
+            x: scaledPrintRect.x,
+            y: scaledPrintRect.y,
+            width: scaledPrintRect.width,
+            height: scaledPrintRect.height,
             pixelRatio: 1,
             mimeType: 'image/png',
           });
@@ -411,7 +424,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     }, 500);
 
     return () => window.clearTimeout(timeoutId);
-  }, [buildLayoutJson, quantity, textLayer, transform, userImage]);
+  }, [buildLayoutJson, quantity, scaledPrintRect.height, scaledPrintRect.width, scaledPrintRect.x, scaledPrintRect.y, textLayer, transform, userImage]);
 
 
 
@@ -494,9 +507,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     return <div className="rounded-2xl border border-neutral-200 bg-white p-6 text-sm text-neutral-600 shadow-sm">Загрузка конструктора…</div>;
   }
 
-  const displayedWidth = viewportWidth;
-  const displayedHeight = Math.round((displayedWidth * MOCKUP_HEIGHT) / MOCKUP_WIDTH);
-
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
@@ -516,10 +526,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
               <div ref={wrapperRef} className="flex w-full items-center justify-center overflow-hidden p-3 sm:p-4 lg:p-5">
                 <div className="relative shrink-0" style={{ width: displayedWidth, height: displayedHeight }}>
                   <Stage
-                    width={MOCKUP_WIDTH}
-                    height={MOCKUP_HEIGHT}
+                    width={displayedWidth}
+                    height={displayedHeight}
                     ref={stageRef}
-                    style={{ width: displayedWidth, height: displayedHeight }}
                     onMouseDown={(event) => {
                       if (event.target === event.target.getStage()) setSelectedElement(null);
                     }}
@@ -528,11 +537,14 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                     }}
                   >
                     <Layer>
-                      <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="#ffffff" listening={false} />
-                      <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
+                      <Group scaleX={previewScale} scaleY={previewScale}>
+                        <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="#ffffff" listening={false} />
+                        <KonvaImage image={mockupImage} x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} />
+                      </Group>
                     </Layer>
 
                 <Layer ref={printLayerRef}>
+                  <Group scaleX={previewScale} scaleY={previewScale}>
                   <Rect x={0} y={0} width={MOCKUP_WIDTH} height={MOCKUP_HEIGHT} fill="rgba(0,0,0,0)" listening={false} />
                   <Rect
                     x={PRINT_RECT.x}
@@ -716,6 +728,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                       }}
                     />
                   )}
+                  </Group>
                     </Layer>
                   </Stage>
                 </div>
