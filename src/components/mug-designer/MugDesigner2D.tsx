@@ -78,9 +78,9 @@ function clampPosition(x: number, y: number, width: number, height: number): { x
 }
 
 const SAFE_INSET = 16;
-const PREVIEW_MAX_WIDTH = 1100;
-const PREVIEW_MAX_HEIGHT = 560;
-const PREVIEW_STAGE_GUTTER = 24;
+const PREVIEW_MAX_WIDTH = 1240;
+const PREVIEW_MAX_HEIGHT = 600;
+const PREVIEW_STAGE_GUTTER = 20;
 
 const defaultTransform: TransformState = {
   x: PRINT_RECT.x + PRINT_RECT.width / 2,
@@ -506,15 +506,15 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         <p className="mt-2 text-xs text-neutral-500">Подсказка: выделите объект, чтобы изменить размер и поворот.</p>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="self-start rounded-2xl border border-neutral-200 bg-neutral-50 p-4 shadow-sm sm:p-5">
-          <div className="mb-3 flex items-center justify-between text-xs text-neutral-500">
+      <div className="grid grid-cols-1 items-start gap-5 xl:gap-6 lg:grid-cols-[minmax(0,1.65fr)_340px] xl:grid-cols-[minmax(0,1.8fr)_380px]">
+        <section className="self-start rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
             <span>Область печати</span>
             <span>Перетащите объект внутрь рамки</span>
           </div>
-          <div className="rounded-xl border border-neutral-200 bg-white p-3 sm:p-4">
-            <div className="mx-auto w-full max-w-[1100px] rounded-xl border border-neutral-200 bg-white">
-              <div ref={wrapperRef} className="flex w-full items-center justify-center overflow-hidden p-4 sm:p-6">
+          <div className="rounded-2xl border border-neutral-200 bg-gradient-to-b from-white to-neutral-50 p-2 sm:p-3">
+            <div className="mx-auto w-full max-w-[1240px] rounded-[20px] border border-neutral-200 bg-white shadow-sm">
+              <div ref={wrapperRef} className="flex w-full items-center justify-center overflow-hidden p-3 sm:p-4 lg:p-5">
                 <div className="relative shrink-0" style={{ width: displayedWidth, height: displayedHeight }}>
                   <Stage
                     width={MOCKUP_WIDTH}
@@ -727,20 +727,30 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
           </div>
         </section>
 
-        <aside className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="space-y-3">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
+        <aside className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5">
+          <section className="space-y-3 rounded-xl border border-neutral-200 bg-neutral-50/80 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
+                <p className="mt-1 text-sm text-neutral-600">Загрузите изображение для печати.</p>
+              </div>
+            </div>
             <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
               Загрузить изображение
               <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
             </label>
             {error && <p className="text-sm text-red-600">{error}</p>}
-          </div>
+          </section>
 
           {selectedElement && (
-            <div className="space-y-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Настройки объекта</p>
-              <p className="text-xs text-neutral-600">Выбрано: {selectedElement === 'image' ? 'Изображение' : 'Текст'}</p>
+            <section className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Настройки объекта</p>
+                  <p className="mt-1 text-sm text-neutral-700">Выбрано: {selectedElement === 'image' ? 'Изображение' : 'Текст'}</p>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -772,79 +782,96 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
                   Повернуть на 90°
                 </button>
               </div>
-            </div>
-          )}
 
-          {selectedElement === 'text' && textLayer && (
-            <div className="space-y-2">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Текст</p>
-              <label className="space-y-1 text-sm text-neutral-700">
-                <span>Содержимое текста</span>
-                <input
-                  type="text"
-                  value={textLayer.text}
-                  onChange={(event) => setTextLayer((prev) => (prev ? { ...prev, text: event.target.value } : prev))}
-                  className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                />
-              </label>
-            </div>
-          )}
-
-          {selectedElement === 'image' && userImage && (
-            <div className="space-y-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Настройки изображения</p>
-              <label className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-neutral-600">Непрозрачность</span>
-                  <span className="text-xs text-neutral-500">{imageOpacity}%</span>
+              {selectedElement === 'text' && textLayer && (
+                <div className="space-y-2 border-t border-neutral-200 pt-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Текст</p>
+                  <label className="space-y-1 text-sm text-neutral-700">
+                    <span>Содержимое текста</span>
+                    <input
+                      type="text"
+                      value={textLayer.text}
+                      onChange={(event) => setTextLayer((prev) => (prev ? { ...prev, text: event.target.value } : prev))}
+                      className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                    />
+                  </label>
                 </div>
-                <input type="range" min={0} max={100} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))} className="w-full accent-red-600" />
-              </label>
-              <button type="button" className={secondaryButtonClass} onClick={onFitToPrint}>
-                Вписать в зону печати
-              </button>
-            </div>
+              )}
+
+              {selectedElement === 'image' && userImage && (
+                <div className="space-y-3 border-t border-neutral-200 pt-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Изображение</p>
+                  </div>
+                  <label className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-neutral-600">Непрозрачность</span>
+                      <span className="text-xs text-neutral-500">{imageOpacity}%</span>
+                    </div>
+                    <input type="range" min={0} max={100} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))} className="w-full accent-red-600" />
+                  </label>
+                  <button type="button" className={secondaryButtonClass} onClick={onFitToPrint}>
+                    Вписать в зону печати
+                  </button>
+                </div>
+              )}
+            </section>
           )}
 
-          <div className="space-y-3">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Параметры</p>
-            <p className="text-sm text-neutral-700">Количество</p>
-            <div className="flex items-center gap-2">
-              <button type="button" className="h-10 w-10 rounded-md border border-neutral-200 bg-white hover:bg-neutral-50" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>
-                -
-              </button>
-              <div className="flex h-10 flex-1 items-center justify-center rounded-md border border-neutral-200 bg-white text-sm">{quantity}</div>
-              <button type="button" className="h-10 w-10 rounded-md border border-neutral-200 bg-white hover:bg-neutral-50" onClick={() => setQuantity((prev) => prev + 1)}>
-                +
-              </button>
+          <section className="space-y-4 rounded-xl border border-neutral-200 bg-neutral-50/70 p-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Параметры</p>
+                  <p className="mt-1 text-sm text-neutral-600">Количество и итоговая стоимость.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button type="button" className="h-10 w-10 rounded-md border border-neutral-200 bg-white hover:bg-neutral-50" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>
+                  -
+                </button>
+                <div className="flex h-10 flex-1 items-center justify-center rounded-md border border-neutral-200 bg-white text-sm font-medium">{quantity}</div>
+                <button type="button" className="h-10 w-10 rounded-md border border-neutral-200 bg-white hover:bg-neutral-50" onClick={() => setQuantity((prev) => prev + 1)}>
+                  +
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-3 border-t border-neutral-200 pt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Стоимость</p>
-            <div className="space-y-1">
-              <p className="text-sm text-neutral-600">Базовая стоимость: {pricing.baseTotal.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₽</p>
-              <p className="text-sm text-neutral-600">Скидка: {(pricing.discountRate * 100).toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%</p>
+            <div className="space-y-2 border-t border-neutral-200 pt-4">
+              <div className="flex items-center justify-between gap-4 text-sm text-neutral-600">
+                <span>Базовая стоимость</span>
+                <span>{pricing.baseTotal.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₽</span>
+              </div>
+              <div className="flex items-center justify-between gap-4 text-sm text-neutral-600">
+                <span>Скидка</span>
+                <span>{(pricing.discountRate * 100).toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%</span>
+              </div>
+              <div className="flex items-end justify-between gap-4 pt-1">
+                <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Итого</span>
+                <span className="text-3xl font-semibold tracking-tight">{pricing.finalTotal.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₽</span>
+              </div>
             </div>
-            <p className="text-4xl font-semibold tracking-tight">{pricing.finalTotal.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₽</p>
-            <button
-              type="button"
-              className="w-full rounded-md bg-red-600 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
-              onClick={() => {
-                document.getElementById('mug-order-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-            >
-              Добавить в заказ
-            </button>
-            <button
-              type="button"
-              onClick={onReset}
-              disabled={!userImage && !textLayer}
-              className="w-full rounded-md border border-neutral-200 bg-white py-3 text-sm font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Сбросить макет
-            </button>
-          </div>
+
+            <div className="grid gap-2 border-t border-neutral-200 pt-4">
+              <button
+                type="button"
+                className="w-full rounded-md bg-red-600 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+                onClick={() => {
+                  document.getElementById('mug-order-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
+                Добавить в заказ
+              </button>
+              <button
+                type="button"
+                onClick={onReset}
+                disabled={!userImage && !textLayer}
+                className="w-full rounded-md border border-neutral-200 bg-white py-3 text-sm font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Сбросить макет
+              </button>
+            </div>
+          </section>
         </aside>
       </div>
     </div>
