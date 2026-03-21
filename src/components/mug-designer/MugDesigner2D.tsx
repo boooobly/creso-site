@@ -608,6 +608,18 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
           </div>
         </div>
       </div>
+
+      <div className="grid gap-2 text-xs text-neutral-500 sm:grid-cols-3">
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+          Рабочий кадр уменьшает видимые пустые поля и держит фокус на зоне печати.
+        </div>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+          Изображение можно свободно двигать, вращать и масштабировать без клиппинга в live preview.
+        </div>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+          Экспорт по-прежнему берётся из полного мокапа и реального print rect.
+        </div>
+      </div>
     </section>
   );
 }
@@ -657,7 +669,16 @@ function ControlsDock({
         title="Объект"
         description={hasSelection ? `Активно: ${selectedElement === "image" ? "изображение" : "текст"}.` : undefined}
       >
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-2">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-600">
+          <span className={`rounded-full px-2.5 py-1 ${hasSelection ? "bg-red-50 text-red-700" : "bg-neutral-100 text-neutral-500"}`}>
+            {hasSelection ? "Слой выбран" : "Нет выбранного слоя"}
+          </span>
+          {hasImageSelection ? (
+            <span className="rounded-full bg-neutral-100 px-2.5 py-1">Можно менять прозрачность и вписать</span>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2">
           <button
             type="button"
             className={`${toolButtonClass} cursor-not-allowed opacity-60`}
@@ -711,7 +732,7 @@ function ControlsDock({
           </button>
 
           {hasTextSelection && textLayer ? (
-            <label className="space-y-1 text-sm text-neutral-700">
+            <label className="space-y-1.5 text-sm text-neutral-700">
               <span>Содержимое текста</span>
               <input
                 type="text"
@@ -874,6 +895,8 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
         stageOffsetX: Math.round(focusRect.x * previewScale),
         stageOffsetY: Math.round(focusRect.y * previewScale),
         scaledPrintRect: scaleRect(PRINT_RECT, previewScale),
+        scaledSafeRect: scaleRect(SAFE_RECT, previewScale),
+        focusRect,
       };
     }, [focusRect, previewViewportWidth]);
 
