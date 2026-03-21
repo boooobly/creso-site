@@ -5,6 +5,7 @@ import {
   forwardRef,
   MutableRefObject,
   ReactNode,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useMemo,
@@ -26,6 +27,7 @@ import {
   MOCKUP_SRC,
   MOCKUP_WIDTH,
   PRINT_AREA,
+  SAFE_INSET,
 } from "@/components/mug-designer/mugMockupConfig";
 import { MAX_IMAGE_SCALE, MIN_IMAGE_SIDE } from "@/lib/mugDesigner/constants";
 
@@ -34,6 +36,13 @@ export const PRINT_RECT = {
   y: PRINT_AREA.y,
   width: PRINT_AREA.width,
   height: PRINT_AREA.height,
+} as const;
+
+const SAFE_RECT = {
+  x: PRINT_RECT.x + SAFE_INSET,
+  y: PRINT_RECT.y + SAFE_INSET,
+  width: PRINT_RECT.width - SAFE_INSET * 2,
+  height: PRINT_RECT.height - SAFE_INSET * 2,
 } as const;
 
 type TransformState = {
@@ -80,11 +89,19 @@ type Props = {
   onExportChange?: (next: MugDesigner2DExport | null) => void;
 };
 
+type RectShape = { x: number; y: number; width: number; height: number };
+
 type StageMetrics = {
   previewScale: number;
-  displayedWidth: number;
-  displayedHeight: number;
-  scaledPrintRect: { x: number; y: number; width: number; height: number };
+  displayedStageWidth: number;
+  displayedStageHeight: number;
+  windowWidth: number;
+  windowHeight: number;
+  stageOffsetX: number;
+  stageOffsetY: number;
+  scaledPrintRect: RectShape;
+  scaledSafeRect: RectShape;
+  focusRect: RectShape;
 };
 
 type PreviewWorkspaceProps = {
@@ -135,10 +152,11 @@ type ControlsDockProps = {
   onReset: () => void;
 };
 
-const SAFE_INSET = 16;
-const PREVIEW_STAGE_GUTTER = 24;
-const PREVIEW_STAGE_MAX_HEIGHT = 780;
-const PREVIEW_STAGE_MIN_WIDTH = 320;
+const PREVIEW_WINDOW_MAX_HEIGHT = 520;
+const PREVIEW_MIN_WIDTH = 280;
+const PREVIEW_SIDE_FOCUS_MARGIN = 210;
+const PREVIEW_TOP_FOCUS_MARGIN = 56;
+const PREVIEW_BOTTOM_FOCUS_MARGIN = 64;
 const DRAFT_KEY = "mugsDesignerDraft:v1";
 const TARGET_MOCK_EXPORT_WIDTH = 1800;
 const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -148,8 +166,8 @@ const MUG_DISCOUNT_STEP_RATE = 0.025;
 const MUG_MAX_DISCOUNT_RATE = 0.2;
 
 const defaultTransform: TransformState = {
-  x: PRINT_RECT.x + PRINT_RECT.width / 2,
-  y: PRINT_RECT.y + PRINT_RECT.height / 2,
+  x: SAFE_RECT.x + SAFE_RECT.width / 2,
+  y: SAFE_RECT.y + SAFE_RECT.height / 2,
   scaleX: 1,
   scaleY: 1,
   rotation: 0,
@@ -165,8 +183,8 @@ type DesignerDraft = {
   printPngDataUrl?: string;
 };
 
-function fitScale(imgW: number, imgH: number): number {
-  return Math.min(PRINT_RECT.width / imgW, PRINT_RECT.height / imgH);
+function fitScale(imgW: number, imgH: number, bounds: RectShape = SAFE_RECT): number {
+  return Math.min(bounds.width / imgW, bounds.height / imgH);
 }
 
 function clampScale(value: number): number {
@@ -180,8 +198,8 @@ function clampPosition(
   width: number,
   height: number,
 ): { x: number; y: number } {
-  const requiredOverlapX = Math.min(width * 0.1, PRINT_RECT.width * 0.2);
-  const requiredOverlapY = Math.min(height * 0.1, PRINT_RECT.height * 0.2);
+  const requiredOverlapX = Math.min(width * 0.1, SAFE_RECT.width * 0.2);
+  const requiredOverlapY = Math.min(height * 0.1, SAFE_RECT.height * 0.2);
 
   const minX = PRINT_RECT.x - width / 2 + requiredOverlapX;
   const maxX = PRINT_RECT.x + PRINT_RECT.width + width / 2 - requiredOverlapX;
@@ -194,16 +212,33 @@ function clampPosition(
   };
 }
 
-function scaleRect(
-  rect: { x: number; y: number; width: number; height: number },
-  scale: number,
-): { x: number; y: number; width: number; height: number } {
+function scaleRect(rect: RectShape, scale: number): RectShape {
   return {
     x: rect.x * scale,
     y: rect.y * scale,
     width: rect.width * scale,
     height: rect.height * scale,
   };
+}
+
+function clampRectToMockup(rect: RectShape): RectShape {
+  const width = Math.min(rect.width, MOCKUP_WIDTH);
+  const height = Math.min(rect.height, MOCKUP_HEIGHT);
+  return {
+    x: Math.min(Math.max(rect.x, 0), MOCKUP_WIDTH - width),
+    y: Math.min(Math.max(rect.y, 0), MOCKUP_HEIGHT - height),
+    width,
+    height,
+  };
+}
+
+function getFocusRect(): RectShape {
+  return clampRectToMockup({
+    x: PRINT_RECT.x - PREVIEW_SIDE_FOCUS_MARGIN,
+    y: PRINT_RECT.y - PREVIEW_TOP_FOCUS_MARGIN,
+    width: PRINT_RECT.width + PREVIEW_SIDE_FOCUS_MARGIN * 2,
+    height: PRINT_RECT.height + PREVIEW_TOP_FOCUS_MARGIN + PREVIEW_BOTTOM_FOCUS_MARGIN,
+  });
 }
 
 function parseDraft(raw: string | null): DesignerDraft | null {
@@ -243,18 +278,16 @@ function SectionCard({
   children: ReactNode;
   tone?: "default" | "muted";
 }) {
-  const toneClass = tone === "muted" ? "bg-neutral-50/80" : "bg-white";
+  const toneClass = tone === "muted" ? "bg-neutral-50/90" : "bg-white";
 
   return (
-    <section
-      className={`space-y-3 rounded-xl border border-neutral-200 p-4 ${toneClass}`}
-    >
+    <section className={`space-y-3 rounded-2xl border border-neutral-200 p-3.5 ${toneClass}`}>
       <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
           {title}
         </p>
         {description ? (
-          <p className="text-sm text-neutral-600">{description}</p>
+          <p className="text-sm leading-5 text-neutral-600">{description}</p>
         ) : null}
       </div>
       {children}
@@ -286,28 +319,74 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
   } = props;
 
   return (
-    <section className="self-start rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm sm:p-4 lg:p-5">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
-        <span>Область печати</span>
-        <span>Горизонтальный макет кружки без жёсткой маски в live preview</span>
+    <section className="space-y-3 rounded-[28px] border border-neutral-200 bg-white p-3 shadow-sm sm:p-4 lg:p-5">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-neutral-600">
+            <span className="rounded-full bg-red-50 px-2.5 py-1 text-red-700">
+              Safe zone — главный ориентир
+            </span>
+            <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-neutral-600">
+              Внешний контур — реальная печать
+            </span>
+          </div>
+          <p className="max-w-2xl text-sm leading-6 text-neutral-600">
+            Рабочее окно сфокусировано на полезной зоне печати, поэтому края кружки не
+            забирают лишнее место. Полный мокап остаётся видимым внутри кадра и при
+            экспорте не изменяется.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-xs text-neutral-500 sm:w-auto">
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2">
+            <span className="block font-semibold uppercase tracking-wide text-neutral-500">
+              Печать
+            </span>
+            <span className="mt-1 block text-neutral-700">
+              {Math.round(PRINT_RECT.width)} × {Math.round(PRINT_RECT.height)} px
+            </span>
+          </div>
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2">
+            <span className="block font-semibold uppercase tracking-wide text-neutral-500">
+              Safe zone
+            </span>
+            <span className="mt-1 block text-neutral-700">
+              {Math.round(SAFE_RECT.width)} × {Math.round(SAFE_RECT.height)} px
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-gradient-to-b from-white to-neutral-50 p-2 sm:p-3">
-        <div className="w-full rounded-[20px] border border-neutral-200 bg-white shadow-sm">
+      <div className="rounded-[26px] border border-neutral-200 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.98),_rgba(245,245,244,0.94))] p-2.5 sm:p-3.5">
+        <div ref={wrapperRef} className="w-full">
           <div
-            ref={wrapperRef}
-            className="flex w-full items-center justify-center overflow-hidden px-2 py-3 sm:px-3 sm:py-4 lg:px-4 lg:py-5"
+            className="relative mx-auto overflow-hidden rounded-[24px] border border-neutral-200 bg-[#f7f2ed] shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]"
+            style={{
+              width: metrics.windowWidth,
+              height: metrics.windowHeight,
+              maxWidth: "100%",
+            }}
           >
             <div
-              className="relative shrink-0"
+              className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#f7f2ed] via-[#f7f2ed]/80 to-transparent sm:w-16"
+              aria-hidden="true"
+            />
+            <div
+              className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#f7f2ed] via-[#f7f2ed]/80 to-transparent sm:w-16"
+              aria-hidden="true"
+            />
+
+            <div
+              className="absolute left-0 top-0"
               style={{
-                width: metrics.displayedWidth,
-                height: metrics.displayedHeight,
+                width: metrics.displayedStageWidth,
+                height: metrics.displayedStageHeight,
+                transform: `translate(${-metrics.stageOffsetX}px, ${-metrics.stageOffsetY}px)`,
+                transformOrigin: "top left",
               }}
             >
               <Stage
-                width={metrics.displayedWidth}
-                height={metrics.displayedHeight}
+                width={metrics.displayedStageWidth}
+                height={metrics.displayedStageHeight}
                 ref={stageRef}
                 onMouseDown={(event) => {
                   if (event.target === event.target.getStage()) {
@@ -327,7 +406,7 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                       y={0}
                       width={MOCKUP_WIDTH}
                       height={MOCKUP_HEIGHT}
-                      fill="#ffffff"
+                      fill="#fffaf5"
                     />
                     <KonvaImage
                       image={mockupImage}
@@ -537,45 +616,88 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                       y={PRINT_RECT.y}
                       width={PRINT_RECT.width}
                       height={PRINT_RECT.height}
-                      cornerRadius={8}
+                      cornerRadius={18}
+                      fill="rgba(255,255,255,0.1)"
                       stroke="#dc2626"
                       dash={[10, 8]}
                       strokeWidth={4}
                     />
                     <Rect
-                      x={PRINT_RECT.x + SAFE_INSET}
-                      y={PRINT_RECT.y + SAFE_INSET}
-                      width={PRINT_RECT.width - SAFE_INSET * 2}
-                      height={PRINT_RECT.height - SAFE_INSET * 2}
-                      cornerRadius={6}
-                      stroke="rgba(220,38,38,0.35)"
-                      dash={[6, 8]}
-                      strokeWidth={2}
+                      x={SAFE_RECT.x}
+                      y={SAFE_RECT.y}
+                      width={SAFE_RECT.width}
+                      height={SAFE_RECT.height}
+                      cornerRadius={14}
+                      fill="rgba(255,255,255,0.08)"
+                      stroke="rgba(220,38,38,0.85)"
+                      dash={[8, 7]}
+                      strokeWidth={3}
                     />
 
-                    {isDragging ? (
-                      <>
-                        <Rect
-                          x={PRINT_RECT.x + PRINT_RECT.width / 2}
-                          y={PRINT_RECT.y}
-                          width={2}
-                          height={PRINT_RECT.height}
-                          fill="rgba(220,38,38,0.35)"
-                        />
-                        <Rect
-                          x={PRINT_RECT.x}
-                          y={PRINT_RECT.y + PRINT_RECT.height / 2}
-                          width={PRINT_RECT.width}
-                          height={2}
-                          fill="rgba(220,38,38,0.35)"
-                        />
-                      </>
-                    ) : null}
+                    <Rect
+                      x={SAFE_RECT.x}
+                      y={SAFE_RECT.y - 36}
+                      width={176}
+                      height={26}
+                      cornerRadius={13}
+                      fill="rgba(220,38,38,0.92)"
+                    />
+                    <KonvaText
+                      x={SAFE_RECT.x + 14}
+                      y={SAFE_RECT.y - 31}
+                      text="Safe zone"
+                      fontSize={15}
+                      fill="#ffffff"
+                      fontStyle="bold"
+                    />
+
+                    <Rect
+                      x={PRINT_RECT.x}
+                      y={PRINT_RECT.y + PRINT_RECT.height + 10}
+                      width={194}
+                      height={24}
+                      cornerRadius={12}
+                      fill="rgba(38,38,38,0.85)"
+                    />
+                    <KonvaText
+                      x={PRINT_RECT.x + 12}
+                      y={PRINT_RECT.y + PRINT_RECT.height + 15}
+                      text="Граница реальной печати"
+                      fontSize={13}
+                      fill="#ffffff"
+                    />
+
+                    <Rect
+                      x={SAFE_RECT.x + SAFE_RECT.width / 2}
+                      y={SAFE_RECT.y}
+                      width={1.5}
+                      height={SAFE_RECT.height}
+                      fill={isDragging ? "rgba(220,38,38,0.5)" : "rgba(220,38,38,0.18)"}
+                    />
+                    <Rect
+                      x={SAFE_RECT.x}
+                      y={SAFE_RECT.y + SAFE_RECT.height / 2}
+                      width={SAFE_RECT.width}
+                      height={1.5}
+                      fill={isDragging ? "rgba(220,38,38,0.5)" : "rgba(220,38,38,0.18)"}
+                    />
                   </Group>
                 </Layer>
               </Stage>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="grid gap-2 text-xs text-neutral-500 sm:grid-cols-3">
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+          Рабочий кадр уменьшает видимые пустые поля и держит фокус на зоне печати.
+        </div>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+          Изображение можно свободно двигать, вращать и масштабировать без клиппинга в live preview.
+        </div>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+          Экспорт по-прежнему берётся из полного мокапа и реального print rect.
         </div>
       </div>
     </section>
@@ -609,15 +731,13 @@ function ControlsDock({
   const canReset = Boolean(userImage || textLayer);
 
   return (
-    <aside className="space-y-3 rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm sm:p-4 lg:sticky lg:top-24">
+    <aside className="space-y-3 md:sticky md:top-24 md:max-h-[calc(100vh-7rem)] md:self-start md:overflow-y-auto">
       <SectionCard
         title="Добавить"
-        description="Загрузите изображение для печати на кружке."
+        description="Загрузите файл для печати. Поддерживаются png, jpg, jpeg и webp."
         tone="muted"
       >
-        <label
-          className={`block cursor-pointer text-center ${primaryButtonClass}`}
-        >
+        <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
           Загрузить изображение
           <input
             type="file"
@@ -630,14 +750,23 @@ function ControlsDock({
       </SectionCard>
 
       <SectionCard
-        title="Выбранный объект"
+        title="Объект"
         description={
           hasSelection
-            ? `Выбрано: ${selectedElement === "image" ? "Изображение" : "Текст"}`
-            : "Выберите объект на кружке, чтобы управлять им без длинных разворачивающихся блоков."
+            ? `Активный слой: ${selectedElement === "image" ? "изображение" : "текст"}.`
+            : "Выберите объект в рабочей зоне, чтобы быстро управлять им без лишних раскрывающихся блоков."
         }
       >
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-2">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-600">
+          <span className={`rounded-full px-2.5 py-1 ${hasSelection ? "bg-red-50 text-red-700" : "bg-neutral-100 text-neutral-500"}`}>
+            {hasSelection ? "Слой выбран" : "Нет выбранного слоя"}
+          </span>
+          {hasImageSelection ? (
+            <span className="rounded-full bg-neutral-100 px-2.5 py-1">Можно менять прозрачность и вписать</span>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2">
           <button
             type="button"
             className={`${toolButtonClass} cursor-not-allowed opacity-60`}
@@ -656,7 +785,7 @@ function ControlsDock({
           </button>
           <button
             type="button"
-            className={`${toolButtonClass} sm:col-span-2 lg:col-span-2`}
+            className={`${toolButtonClass} sm:col-span-2`}
             disabled={!hasSelection}
             onClick={onRotateSelected}
           >
@@ -664,10 +793,8 @@ function ControlsDock({
           </button>
         </div>
 
-        <div className="grid gap-3 border-t border-neutral-200 pt-3 min-h-[154px] content-start">
-          <label
-            className={`space-y-1 ${hasImageSelection ? "" : "opacity-50"}`}
-          >
+        <div className="grid gap-3 border-t border-neutral-200 pt-3">
+          <label className={`space-y-1.5 ${hasImageSelection ? "" : "opacity-50"}`}>
             <div className="flex items-center justify-between gap-3 text-xs">
               <span className="text-neutral-600">Непрозрачность</span>
               <span className="text-neutral-500">{imageOpacity}%</span>
@@ -689,58 +816,57 @@ function ControlsDock({
             disabled={!hasImageSelection}
             onClick={onFitToPrint}
           >
-            Вписать в зону печати
+            Вписать по safe zone
           </button>
 
           {hasTextSelection && textLayer ? (
-            <label className="space-y-1 text-sm text-neutral-700">
+            <label className="space-y-1.5 text-sm text-neutral-700">
               <span>Содержимое текста</span>
               <input
                 type="text"
                 value={textLayer.text}
                 onChange={(event) => onTextChange(event.target.value)}
-                className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
               />
             </label>
           ) : (
-            <p className="text-xs text-neutral-500">
-              Пунктирная рамка — это ориентир печати. Live preview не обрезает
-              объект до этой области.
-            </p>
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-xs leading-5 text-neutral-500">
+              Внешний контур показывает полный print rect, а внутренняя рамка safe zone помогает центрировать важные элементы без риска подойти к краю печати слишком близко.
+            </div>
           )}
         </div>
       </SectionCard>
 
       <SectionCard
-        title="Параметры заказа"
-        description="Количество, стоимость и переход к оформлению."
+        title="Заказ"
+        description="Количество и стоимость считаются сразу, без лишнего вертикального шума."
         tone="muted"
       >
         <div className="grid gap-3">
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="h-10 w-10 rounded-md border border-neutral-200 bg-white hover:bg-neutral-50"
+              className="h-10 w-10 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
               onClick={() => onQuantityChange((prev) => Math.max(1, prev - 1))}
             >
               -
             </button>
-            <div className="flex h-10 flex-1 items-center justify-center rounded-md border border-neutral-200 bg-white text-sm font-medium">
+            <div className="flex h-10 flex-1 items-center justify-center rounded-xl border border-neutral-200 bg-white text-sm font-medium">
               {quantity}
             </div>
             <button
               type="button"
-              className="h-10 w-10 rounded-md border border-neutral-200 bg-white hover:bg-neutral-50"
+              className="h-10 w-10 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
               onClick={() => onQuantityChange((prev) => prev + 1)}
             >
               +
             </button>
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="rounded-lg border border-neutral-200 bg-white px-3 py-2.5">
+          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
+            <div className="rounded-2xl border border-neutral-200 bg-white px-3 py-2.5">
               <span className="block text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
-                Базовая стоимость
+                База
               </span>
               <span className="mt-1 block text-sm text-neutral-700">
                 {pricing.baseTotal.toLocaleString("ru-RU", {
@@ -750,7 +876,7 @@ function ControlsDock({
                 ₽
               </span>
             </div>
-            <div className="rounded-lg border border-neutral-200 bg-white px-3 py-2.5">
+            <div className="rounded-2xl border border-neutral-200 bg-white px-3 py-2.5">
               <span className="block text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
                 Скидка
               </span>
@@ -764,12 +890,12 @@ function ControlsDock({
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 bg-white px-4 py-3">
+          <div className="rounded-[20px] border border-neutral-200 bg-white px-4 py-3">
             <div className="flex items-end justify-between gap-3">
-              <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
                 Итого
               </span>
-              <span className="text-3xl font-semibold tracking-tight">
+              <span className="text-3xl font-semibold tracking-tight text-neutral-900">
                 {pricing.finalTotal.toLocaleString("ru-RU", {
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 2,
@@ -823,16 +949,12 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
     const [error, setError] = useState("");
-    const [mockupImage, setMockupImage] = useState<HTMLImageElement | null>(
-      null,
-    );
+    const [mockupImage, setMockupImage] = useState<HTMLImageElement | null>(null);
     const [userImage, setUserImage] = useState<HTMLImageElement | null>(null);
-    const [viewportWidth, setViewportWidth] = useState(960);
-    const [transform, setTransform] =
-      useState<TransformState>(defaultTransform);
+    const [previewViewportWidth, setPreviewViewportWidth] = useState(960);
+    const [transform, setTransform] = useState<TransformState>(defaultTransform);
     const [isDragging, setIsDragging] = useState(false);
-    const [selectedElement, setSelectedElement] =
-      useState<SelectedElement>(null);
+    const [selectedElement, setSelectedElement] = useState<SelectedElement>(null);
     const [imageOpacity, setImageOpacity] = useState(100);
     const [quantity, setQuantity] = useState(1);
     const [textLayer, setTextLayer] = useState<TextLayerState | null>(null);
@@ -853,55 +975,74 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
       };
     }, [quantity]);
 
+    const focusRect = useMemo(() => getFocusRect(), []);
+
     const stageMetrics = useMemo<StageMetrics>(() => {
-      const previewScale = viewportWidth / MOCKUP_WIDTH;
-      const displayedWidth = viewportWidth;
-      const displayedHeight = Math.round(
-        (displayedWidth * MOCKUP_HEIGHT) / MOCKUP_WIDTH,
+      const previewScale = Math.min(
+        previewViewportWidth / focusRect.width,
+        PREVIEW_WINDOW_MAX_HEIGHT / focusRect.height,
+        1,
       );
+      const displayedStageWidth = Math.round(MOCKUP_WIDTH * previewScale);
+      const displayedStageHeight = Math.round(MOCKUP_HEIGHT * previewScale);
+      const windowWidth = Math.max(
+        Math.round(focusRect.width * previewScale),
+        PREVIEW_MIN_WIDTH,
+      );
+      const windowHeight = Math.round(focusRect.height * previewScale);
+
       return {
         previewScale,
-        displayedWidth,
-        displayedHeight,
+        displayedStageWidth,
+        displayedStageHeight,
+        windowWidth,
+        windowHeight,
+        stageOffsetX: Math.round(focusRect.x * previewScale),
+        stageOffsetY: Math.round(focusRect.y * previewScale),
         scaledPrintRect: scaleRect(PRINT_RECT, previewScale),
+        scaledSafeRect: scaleRect(SAFE_RECT, previewScale),
+        focusRect,
       };
-    }, [viewportWidth]);
+    }, [focusRect, previewViewportWidth]);
 
-    const buildLayoutJson = () =>
-      JSON.stringify(
-        {
-          fileName: file?.name ?? null,
-          printRect: PRINT_RECT,
-          image: userImage
-            ? {
-                x: transform.x,
-                y: transform.y,
-                scaleX: transform.scaleX,
-                scaleY: transform.scaleY,
-                rotation: transform.rotation,
-                width: userImage.width,
-                height: userImage.height,
-              }
-            : null,
-          text: textLayer
-            ? {
-                text: textLayer.text,
-                x: textLayer.x,
-                y: textLayer.y,
-                rotation: textLayer.rotation,
-                width: textLayer.width,
-                height: textLayer.height,
-                scaleX: textLayer.scaleX,
-                scaleY: textLayer.scaleY,
-                fontSize: textLayer.fontSize,
-              }
-            : null,
-        },
-        null,
-        2,
-      );
+    const buildLayoutJson = useCallback(
+      () =>
+        JSON.stringify(
+          {
+            fileName: file?.name ?? null,
+            printRect: PRINT_RECT,
+            image: userImage
+              ? {
+                  x: transform.x,
+                  y: transform.y,
+                  scaleX: transform.scaleX,
+                  scaleY: transform.scaleY,
+                  rotation: transform.rotation,
+                  width: userImage.width,
+                  height: userImage.height,
+                }
+              : null,
+            text: textLayer
+              ? {
+                  text: textLayer.text,
+                  x: textLayer.x,
+                  y: textLayer.y,
+                  rotation: textLayer.rotation,
+                  width: textLayer.width,
+                  height: textLayer.height,
+                  scaleX: textLayer.scaleX,
+                  scaleY: textLayer.scaleY,
+                  fontSize: textLayer.fontSize,
+                }
+              : null,
+          },
+          null,
+          2,
+        ),
+      [file?.name, textLayer, transform, userImage],
+    );
 
-    const withGuidesHidden = <T,>(callback: () => T): T => {
+    const withGuidesHidden = useCallback(<T,>(callback: () => T): T => {
       const guidesLayer = guidesLayerRef.current;
       const previousVisible = guidesLayer?.visible() ?? true;
 
@@ -918,9 +1059,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
           guidesLayer.getLayer()?.batchDraw();
         }
       }
-    };
+    }, []);
 
-    const buildExport = async (): Promise<MugDesigner2DExport | null> => {
+    const buildExport = useCallback(async (): Promise<MugDesigner2DExport | null> => {
       if (
         !stageRef.current ||
         !contentLayerRef.current ||
@@ -931,10 +1072,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
 
       const stage = stageRef.current;
       const exportPixelRatio = MOCKUP_WIDTH / stage.width();
-      const printExportRect = scaleRect(
-        PRINT_RECT,
-        stage.width() / MOCKUP_WIDTH,
-      );
+      const printExportRect = scaleRect(PRINT_RECT, stage.width() / MOCKUP_WIDTH);
 
       const sourceCanvas = withGuidesHidden(() =>
         stage.toCanvas({ pixelRatio: exportPixelRatio }),
@@ -974,82 +1112,85 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
         printPngDataUrl,
         layoutJson: buildLayoutJson(),
       };
-    };
+    }, [buildLayoutJson, textLayer, userImage, withGuidesHidden]);
 
-    const applyLayoutJson = (layoutJson: string) => {
-      try {
-        const parsed = JSON.parse(layoutJson) as {
-          image?: Partial<TransformState> | null;
-          text?: Partial<TextLayerState> | null;
-        };
+    const applyLayoutJson = useCallback(
+      (layoutJson: string) => {
+        try {
+          const parsed = JSON.parse(layoutJson) as {
+            image?: Partial<TransformState> | null;
+            text?: Partial<TextLayerState> | null;
+          };
 
-        if (parsed.image && userImage) {
-          setTransform((prev) => ({
-            ...prev,
-            x: typeof parsed.image?.x === "number" ? parsed.image.x : prev.x,
-            y: typeof parsed.image?.y === "number" ? parsed.image.y : prev.y,
-            scaleX:
-              typeof parsed.image?.scaleX === "number"
-                ? parsed.image.scaleX
-                : prev.scaleX,
-            scaleY:
-              typeof parsed.image?.scaleY === "number"
-                ? parsed.image.scaleY
-                : prev.scaleY,
-            rotation:
-              typeof parsed.image?.rotation === "number"
-                ? parsed.image.rotation
-                : prev.rotation,
-          }));
-        }
-
-        if (parsed.text) {
-          setTextLayer((prev) => {
-            if (!prev && typeof parsed.text?.text !== "string") return prev;
-            return {
-              text:
-                typeof parsed.text?.text === "string"
-                  ? parsed.text.text
-                  : (prev?.text ?? "Текст на кружке"),
-              x:
-                typeof parsed.text?.x === "number"
-                  ? parsed.text.x
-                  : (prev?.x ?? PRINT_RECT.x + PRINT_RECT.width / 2),
-              y:
-                typeof parsed.text?.y === "number"
-                  ? parsed.text.y
-                  : (prev?.y ?? PRINT_RECT.y + PRINT_RECT.height / 2),
-              rotation:
-                typeof parsed.text?.rotation === "number"
-                  ? parsed.text.rotation
-                  : (prev?.rotation ?? 0),
-              width:
-                typeof parsed.text?.width === "number"
-                  ? parsed.text.width
-                  : (prev?.width ?? 260),
-              height:
-                typeof parsed.text?.height === "number"
-                  ? parsed.text.height
-                  : (prev?.height ?? 40),
+          if (parsed.image && userImage) {
+            setTransform((prev) => ({
+              ...prev,
+              x: typeof parsed.image?.x === "number" ? parsed.image.x : prev.x,
+              y: typeof parsed.image?.y === "number" ? parsed.image.y : prev.y,
               scaleX:
-                typeof parsed.text?.scaleX === "number"
-                  ? parsed.text.scaleX
-                  : (prev?.scaleX ?? 1),
+                typeof parsed.image?.scaleX === "number"
+                  ? parsed.image.scaleX
+                  : prev.scaleX,
               scaleY:
-                typeof parsed.text?.scaleY === "number"
-                  ? parsed.text.scaleY
-                  : (prev?.scaleY ?? 1),
-              fontSize:
-                typeof parsed.text?.fontSize === "number"
-                  ? parsed.text.fontSize
-                  : (prev?.fontSize ?? 36),
-            };
-          });
+                typeof parsed.image?.scaleY === "number"
+                  ? parsed.image.scaleY
+                  : prev.scaleY,
+              rotation:
+                typeof parsed.image?.rotation === "number"
+                  ? parsed.image.rotation
+                  : prev.rotation,
+            }));
+          }
+
+          if (parsed.text) {
+            setTextLayer((prev) => {
+              if (!prev && typeof parsed.text?.text !== "string") return prev;
+              return {
+                text:
+                  typeof parsed.text?.text === "string"
+                    ? parsed.text.text
+                    : (prev?.text ?? "Текст на кружке"),
+                x:
+                  typeof parsed.text?.x === "number"
+                    ? parsed.text.x
+                    : (prev?.x ?? SAFE_RECT.x + SAFE_RECT.width / 2),
+                y:
+                  typeof parsed.text?.y === "number"
+                    ? parsed.text.y
+                    : (prev?.y ?? SAFE_RECT.y + SAFE_RECT.height / 2),
+                rotation:
+                  typeof parsed.text?.rotation === "number"
+                    ? parsed.text.rotation
+                    : (prev?.rotation ?? 0),
+                width:
+                  typeof parsed.text?.width === "number"
+                    ? parsed.text.width
+                    : (prev?.width ?? 260),
+                height:
+                  typeof parsed.text?.height === "number"
+                    ? parsed.text.height
+                    : (prev?.height ?? 40),
+                scaleX:
+                  typeof parsed.text?.scaleX === "number"
+                    ? parsed.text.scaleX
+                    : (prev?.scaleX ?? 1),
+                scaleY:
+                  typeof parsed.text?.scaleY === "number"
+                    ? parsed.text.scaleY
+                    : (prev?.scaleY ?? 1),
+                fontSize:
+                  typeof parsed.text?.fontSize === "number"
+                    ? parsed.text.fontSize
+                    : (prev?.fontSize ?? 36),
+              };
+            });
+          }
+        } catch {
+          // ignore corrupted layout
         }
-      } catch {
-        // ignore corrupted layout
-      }
-    };
+      },
+      [userImage],
+    );
 
     useImperativeHandle(
       ref,
@@ -1073,7 +1214,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
           window.localStorage.removeItem(DRAFT_KEY);
         },
       }),
-      [buildExport, file, textLayer, transform, userImage],
+      [applyLayoutJson, buildExport],
     );
 
     useEffect(() => {
@@ -1087,22 +1228,8 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
       if (!node) return;
 
       const observer = new ResizeObserver((entries) => {
-        const contentWidth =
-          entries[0]?.contentRect.width ?? node.clientWidth ?? 960;
-        const availableWidth = Math.max(
-          contentWidth - PREVIEW_STAGE_GUTTER * 2,
-          PREVIEW_STAGE_MIN_WIDTH,
-        );
-        const availableHeight =
-          PREVIEW_STAGE_MAX_HEIGHT - PREVIEW_STAGE_GUTTER * 2;
-        const scale = Math.min(
-          availableWidth / MOCKUP_WIDTH,
-          availableHeight / MOCKUP_HEIGHT,
-          1,
-        );
-        setViewportWidth(
-          Math.max(Math.round(MOCKUP_WIDTH * scale), PREVIEW_STAGE_MIN_WIDTH),
-        );
+        const contentWidth = entries[0]?.contentRect.width ?? node.clientWidth ?? 960;
+        setPreviewViewportWidth(Math.max(Math.round(contentWidth), PREVIEW_MIN_WIDTH));
       });
 
       observer.observe(node);
@@ -1128,8 +1255,8 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
         setImageOpacity(100);
         setIsDragging(false);
         setTransform({
-          x: PRINT_RECT.x + PRINT_RECT.width / 2,
-          y: PRINT_RECT.y + PRINT_RECT.height / 2,
+          x: SAFE_RECT.x + SAFE_RECT.width / 2,
+          y: SAFE_RECT.y + SAFE_RECT.height / 2,
           scaleX: nextScale,
           scaleY: nextScale,
           rotation: 0,
@@ -1215,6 +1342,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
       textLayer,
       transform,
       userImage,
+      withGuidesHidden,
     ]);
 
     useEffect(() => {
@@ -1265,14 +1393,15 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
       }
 
       onFileChange(next);
+      event.target.value = "";
     };
 
     const onFitToPrint = () => {
       if (!userImage) return;
       const nextScale = fitScale(userImage.width, userImage.height);
       setTransform({
-        x: PRINT_RECT.x + PRINT_RECT.width / 2,
-        y: PRINT_RECT.y + PRINT_RECT.height / 2,
+        x: SAFE_RECT.x + SAFE_RECT.width / 2,
+        y: SAFE_RECT.y + SAFE_RECT.height / 2,
         scaleX: nextScale,
         scaleY: nextScale,
         rotation: 0,
@@ -1294,11 +1423,11 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     };
 
     const primaryButtonClass =
-      "w-full rounded-md bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700";
+      "w-full rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700";
     const secondaryButtonClass =
-      "w-full rounded-md border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
+      "w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
     const toolButtonClass =
-      "rounded-md border border-neutral-200 bg-white px-3 py-2 text-xs font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
+      "rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
 
     if (!mockupImage) {
       return (
@@ -1310,26 +1439,27 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
 
     return (
       <div className="space-y-4 lg:space-y-5">
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
-            <div>
+        <div className="rounded-[30px] border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
               <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-                Соберите макет
+                Соберите макет кружки
               </h2>
-              <p className="mt-2 text-sm text-neutral-600 sm:text-base">
-                Загрузите изображение или добавьте текст. Live workspace
-                остаётся свободным, а ограничения печати применяются только при
-                выводе результата.
+              <p className="mt-2 text-sm leading-6 text-neutral-600 sm:text-base">
+                Конструктор перестроен вокруг полезной рабочей зоны: безопасная рамка задаёт
+                композицию, preview остаётся компактным, а финальный экспорт всё так же
+                использует реальный размер печати.
               </p>
             </div>
-            <p className="text-xs text-neutral-500 lg:max-w-[240px] lg:text-right">
-              Пунктирная рамка показывает печатную область кружки, но не
-              превращает editor preview в жёсткую маску.
-            </p>
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm leading-6 text-neutral-600 lg:max-w-sm">
+              Печать идёт по <span className="font-medium text-neutral-900">print rect</span>,
+              а действие «Вписать» теперь центрирует макет по <span className="font-medium text-neutral-900">safe zone</span>,
+              чтобы важные элементы не прилипали к краям.
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,2.25fr)_minmax(320px,360px)] xl:gap-5">
+        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[minmax(0,1.35fr)_minmax(260px,320px)] lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,360px)] xl:gap-5">
           <PreviewWorkspace
             wrapperRef={wrapperRef}
             stageRef={stageRef}
@@ -1348,12 +1478,8 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
             isDragging={isDragging}
             onSelectElement={setSelectedElement}
             onDragStateChange={setIsDragging}
-            onTransformChange={(updater) =>
-              setTransform((prev) => updater(prev))
-            }
-            onTextLayerChange={(updater) =>
-              setTextLayer((prev) => updater(prev))
-            }
+            onTransformChange={(updater) => setTransform((prev) => updater(prev))}
+            onTextLayerChange={(updater) => setTextLayer((prev) => updater(prev))}
           />
 
           <ControlsDock
