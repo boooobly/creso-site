@@ -87,6 +87,9 @@ type Props = {
   allowedMimeTypes: readonly string[];
   maxUploadMb: number;
   onExportChange?: (next: MugDesigner2DExport | null) => void;
+  showTitle?: boolean;
+  applyButtonLabel?: string;
+  onApply?: () => void;
 };
 
 type RectShape = { x: number; y: number; width: number; height: number };
@@ -138,6 +141,7 @@ type ControlsDockProps = {
   primaryButtonClass: string;
   secondaryButtonClass: string;
   toolButtonClass: string;
+  applyButtonLabel: string;
   onUpload: (event: ChangeEvent<HTMLInputElement>) => void;
   onDeleteSelected: () => void;
   onRotateSelected: () => void;
@@ -145,7 +149,7 @@ type ControlsDockProps = {
   onFitToPrint: () => void;
   onTextChange: (next: string) => void;
   onQuantityChange: (updater: (prev: number) => number) => void;
-  onScrollToOrder: () => void;
+  onApply: () => void;
   onReset: () => void;
 };
 
@@ -634,6 +638,7 @@ function ControlsDock({
   primaryButtonClass,
   secondaryButtonClass,
   toolButtonClass,
+  applyButtonLabel,
   onUpload,
   onDeleteSelected,
   onRotateSelected,
@@ -641,7 +646,7 @@ function ControlsDock({
   onFitToPrint,
   onTextChange,
   onQuantityChange,
-  onScrollToOrder,
+  onApply,
   onReset,
 }: ControlsDockProps) {
   const hasSelection = selectedElement !== null;
@@ -812,9 +817,9 @@ function ControlsDock({
             <button
               type="button"
               className={primaryButtonClass}
-              onClick={onScrollToOrder}
+              onClick={onApply}
             >
-              Добавить в заказ
+              {applyButtonLabel}
             </button>
             <button
               type="button"
@@ -840,6 +845,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
       allowedMimeTypes,
       maxUploadMb,
       onExportChange,
+      showTitle = true,
+      applyButtonLabel = "Добавить в заказ",
+      onApply,
     },
     ref,
   ) {
@@ -1333,11 +1341,13 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
 
     return (
       <div className="space-y-3 lg:space-y-4">
-        <div className="flex items-center justify-between gap-3 px-1">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-            Соберите макет кружки
-          </h2>
-        </div>
+        {showTitle ? (
+          <div className="flex items-center justify-between gap-3 px-1">
+            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+              Соберите макет кружки
+            </h2>
+          </div>
+        ) : null}
 
         <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,2.05fr)_minmax(320px,360px)] xl:grid-cols-[minmax(0,2.2fr)_minmax(340px,370px)] xl:gap-4">
           <PreviewWorkspace
@@ -1373,6 +1383,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
             primaryButtonClass={primaryButtonClass}
             secondaryButtonClass={secondaryButtonClass}
             toolButtonClass={toolButtonClass}
+            applyButtonLabel={applyButtonLabel}
             onUpload={onUpload}
             onDeleteSelected={() => {
               if (selectedElement === "image") onFileChange(null);
@@ -1400,7 +1411,12 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
               setTextLayer((prev) => (prev ? { ...prev, text: next } : prev))
             }
             onQuantityChange={(updater) => setQuantity((prev) => updater(prev))}
-            onScrollToOrder={() => {
+            onApply={() => {
+              if (onApply) {
+                onApply();
+                return;
+              }
+
               document
                 .getElementById("mug-order-form")
                 ?.scrollIntoView({ behavior: "smooth", block: "start" });
