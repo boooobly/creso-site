@@ -164,6 +164,8 @@ const MUG_DISCOUNT_STEP_RATE = 0.025;
 const MUG_MAX_DISCOUNT_RATE = 0.2;
 const SELECTION_STROKE = "#0f172a";
 const SELECTION_SHADOW = "rgba(15,23,42,0.2)";
+const VISIBLE_PREVIEW_MARGIN_X = 290;
+const VISIBLE_PREVIEW_MARGIN_Y = 18;
 
 const defaultTransform: TransformState = {
   x: SAFE_RECT.x + SAFE_RECT.width / 2,
@@ -236,13 +238,13 @@ function clampRectToMockup(rect: RectShape): RectShape {
   };
 }
 
-function getFocusRect(): RectShape {
-  return {
-    x: 0,
-    y: 0,
-    width: MOCKUP_WIDTH,
-    height: MOCKUP_HEIGHT,
-  };
+function getVisiblePreviewRect(): RectShape {
+  return clampRectToMockup({
+    x: PRINT_RECT.x - VISIBLE_PREVIEW_MARGIN_X,
+    y: PRINT_RECT.y - VISIBLE_PREVIEW_MARGIN_Y,
+    width: PRINT_RECT.width + VISIBLE_PREVIEW_MARGIN_X * 2,
+    height: PRINT_RECT.height + VISIBLE_PREVIEW_MARGIN_Y * 2,
+  });
 }
 
 function parseDraft(raw: string | null): DesignerDraft | null {
@@ -892,26 +894,26 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
       };
     }, [quantity]);
 
-    const focusRect = useMemo(() => getFocusRect(), []);
+    const visiblePreviewRect = useMemo(() => getVisiblePreviewRect(), []);
 
     const stageMetrics = useMemo<StageMetrics>(() => {
-      const previewScale = Math.max(previewViewportWidth / focusRect.width, 0.01);
-      const displayedStageWidth = Math.round(MOCKUP_WIDTH * previewScale);
-      const displayedStageHeight = Math.round(MOCKUP_HEIGHT * previewScale);
-      const windowHeight = Math.round(focusRect.height * previewScale);
+      const previewScale = Math.max(previewViewportWidth / visiblePreviewRect.width, 0.01);
+      const displayedStageWidth = MOCKUP_WIDTH * previewScale;
+      const displayedStageHeight = MOCKUP_HEIGHT * previewScale;
+      const windowHeight = visiblePreviewRect.height * previewScale;
 
       return {
         previewScale,
         displayedStageWidth,
         displayedStageHeight,
         windowHeight,
-        stageOffsetX: Math.round(focusRect.x * previewScale),
-        stageOffsetY: Math.round(focusRect.y * previewScale),
+        stageOffsetX: visiblePreviewRect.x * previewScale,
+        stageOffsetY: visiblePreviewRect.y * previewScale,
         scaledPrintRect: scaleRect(PRINT_RECT, previewScale),
         scaledSafeRect: scaleRect(SAFE_RECT, previewScale),
-        focusRect,
+        focusRect: visiblePreviewRect,
       };
-    }, [focusRect, previewViewportWidth]);
+    }, [previewViewportWidth, visiblePreviewRect]);
 
     const buildLayoutJson = useCallback(
       () =>
