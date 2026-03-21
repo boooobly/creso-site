@@ -95,13 +95,10 @@ type StageMetrics = {
   previewScale: number;
   displayedStageWidth: number;
   displayedStageHeight: number;
-  windowWidth: number;
   windowHeight: number;
   stageOffsetX: number;
   stageOffsetY: number;
   scaledPrintRect: RectShape;
-  scaledSafeRect: RectShape;
-  focusRect: RectShape;
 };
 
 type PreviewWorkspaceProps = {
@@ -152,7 +149,6 @@ type ControlsDockProps = {
   onReset: () => void;
 };
 
-const PREVIEW_WINDOW_MAX_HEIGHT = 520;
 const PREVIEW_MIN_WIDTH = 280;
 const PREVIEW_SIDE_FOCUS_MARGIN = 210;
 const PREVIEW_TOP_FOCUS_MARGIN = 56;
@@ -281,13 +277,13 @@ function SectionCard({
   const toneClass = tone === "muted" ? "bg-neutral-50/90" : "bg-white";
 
   return (
-    <section className={`space-y-3 rounded-2xl border border-neutral-200 p-3.5 ${toneClass}`}>
-      <div className="space-y-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
+    <section className={`space-y-2.5 rounded-2xl border border-neutral-200 p-3 ${toneClass}`}>
+      <div className="space-y-0.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
           {title}
         </p>
         {description ? (
-          <p className="text-sm leading-5 text-neutral-600">{description}</p>
+          <p className="text-xs leading-5 text-neutral-500">{description}</p>
         ) : null}
       </div>
       {children}
@@ -319,372 +315,296 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
   } = props;
 
   return (
-    <section className="space-y-3 rounded-[28px] border border-neutral-200 bg-white p-3 shadow-sm sm:p-4 lg:p-5">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-neutral-600">
-            <span className="rounded-full bg-red-50 px-2.5 py-1 text-red-700">
-              Safe zone — главный ориентир
-            </span>
-            <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-neutral-600">
-              Внешний контур — реальная печать
-            </span>
-          </div>
-          <p className="max-w-2xl text-sm leading-6 text-neutral-600">
-            Рабочее окно сфокусировано на полезной зоне печати, поэтому края кружки не
-            забирают лишнее место. Полный мокап остаётся видимым внутри кадра и при
-            экспорте не изменяется.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-xs text-neutral-500 sm:w-auto">
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2">
-            <span className="block font-semibold uppercase tracking-wide text-neutral-500">
-              Печать
-            </span>
-            <span className="mt-1 block text-neutral-700">
-              {Math.round(PRINT_RECT.width)} × {Math.round(PRINT_RECT.height)} px
-            </span>
-          </div>
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2">
-            <span className="block font-semibold uppercase tracking-wide text-neutral-500">
-              Safe zone
-            </span>
-            <span className="mt-1 block text-neutral-700">
-              {Math.round(SAFE_RECT.width)} × {Math.round(SAFE_RECT.height)} px
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-[26px] border border-neutral-200 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.98),_rgba(245,245,244,0.94))] p-2.5 sm:p-3.5">
-        <div ref={wrapperRef} className="w-full">
+    <section className="rounded-[26px] border border-neutral-200 bg-white p-2 shadow-sm sm:p-3 lg:p-4">
+      <div ref={wrapperRef} className="w-full">
+        <div
+          className="relative w-full overflow-hidden rounded-[22px] border border-neutral-200 bg-[#f8f2ed]"
+          style={{ height: metrics.windowHeight }}
+        >
           <div
-            className="relative mx-auto overflow-hidden rounded-[24px] border border-neutral-200 bg-[#f7f2ed] shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[#f8f2ed] via-[#f8f2ed]/75 to-transparent sm:w-14"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[#f8f2ed] via-[#f8f2ed]/75 to-transparent sm:w-14"
+            aria-hidden="true"
+          />
+
+          <div
+            className="absolute left-0 top-0"
             style={{
-              width: metrics.windowWidth,
-              height: metrics.windowHeight,
-              maxWidth: "100%",
+              width: metrics.displayedStageWidth,
+              height: metrics.displayedStageHeight,
+              transform: `translate(${-metrics.stageOffsetX}px, ${-metrics.stageOffsetY}px)`,
+              transformOrigin: "top left",
             }}
           >
-            <div
-              className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#f7f2ed] via-[#f7f2ed]/80 to-transparent sm:w-16"
-              aria-hidden="true"
-            />
-            <div
-              className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#f7f2ed] via-[#f7f2ed]/80 to-transparent sm:w-16"
-              aria-hidden="true"
-            />
-
-            <div
-              className="absolute left-0 top-0"
-              style={{
-                width: metrics.displayedStageWidth,
-                height: metrics.displayedStageHeight,
-                transform: `translate(${-metrics.stageOffsetX}px, ${-metrics.stageOffsetY}px)`,
-                transformOrigin: "top left",
+            <Stage
+              width={metrics.displayedStageWidth}
+              height={metrics.displayedStageHeight}
+              ref={stageRef}
+              onMouseDown={(event) => {
+                if (event.target === event.target.getStage()) {
+                  onSelectElement(null);
+                }
+              }}
+              onTouchStart={(event) => {
+                if (event.target === event.target.getStage()) {
+                  onSelectElement(null);
+                }
               }}
             >
-              <Stage
-                width={metrics.displayedStageWidth}
-                height={metrics.displayedStageHeight}
-                ref={stageRef}
-                onMouseDown={(event) => {
-                  if (event.target === event.target.getStage()) {
-                    onSelectElement(null);
-                  }
-                }}
-                onTouchStart={(event) => {
-                  if (event.target === event.target.getStage()) {
-                    onSelectElement(null);
-                  }
-                }}
-              >
-                <Layer listening={false}>
-                  <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
-                    <Rect
-                      x={0}
-                      y={0}
-                      width={MOCKUP_WIDTH}
-                      height={MOCKUP_HEIGHT}
-                      fill="#fffaf5"
-                    />
+              <Layer listening={false}>
+                <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
+                  <Rect
+                    x={0}
+                    y={0}
+                    width={MOCKUP_WIDTH}
+                    height={MOCKUP_HEIGHT}
+                    fill="#fffaf5"
+                  />
+                  <KonvaImage
+                    image={mockupImage}
+                    x={0}
+                    y={0}
+                    width={MOCKUP_WIDTH}
+                    height={MOCKUP_HEIGHT}
+                  />
+                </Group>
+              </Layer>
+
+              <Layer ref={contentLayerRef}>
+                <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
+                  {userImage ? (
                     <KonvaImage
-                      image={mockupImage}
-                      x={0}
-                      y={0}
-                      width={MOCKUP_WIDTH}
-                      height={MOCKUP_HEIGHT}
-                    />
-                  </Group>
-                </Layer>
-
-                <Layer ref={contentLayerRef}>
-                  <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
-                    {userImage ? (
-                      <KonvaImage
-                        ref={userImageRef}
-                        image={userImage}
-                        x={transform.x}
-                        y={transform.y}
-                        offsetX={userImage.width / 2}
-                        offsetY={userImage.height / 2}
-                        width={userImage.width}
-                        height={userImage.height}
-                        scaleX={transform.scaleX}
-                        scaleY={transform.scaleY}
-                        rotation={transform.rotation}
-                        opacity={imageOpacity / 100}
-                        shadowEnabled={selectedElement === "image"}
-                        shadowColor="rgba(220,38,38,0.35)"
-                        shadowBlur={selectedElement === "image" ? 16 : 0}
-                        shadowOpacity={selectedElement === "image" ? 0.5 : 0}
-                        draggable
-                        dragBoundFunc={(position) => {
-                          const width = userImage.width * Math.abs(transform.scaleX);
-                          const height = userImage.height * Math.abs(transform.scaleY);
-                          return clampPosition(position.x, position.y, width, height);
-                        }}
-                        onClick={() => onSelectElement("image")}
-                        onTap={() => onSelectElement("image")}
-                        onDragStart={() => {
-                          onDragStateChange(true);
-                          onSelectElement("image");
-                        }}
-                        onDragMove={(event) => {
-                          const width = userImage.width * Math.abs(transform.scaleX);
-                          const height = userImage.height * Math.abs(transform.scaleY);
-                          const next = clampPosition(
-                            event.target.x(),
-                            event.target.y(),
-                            width,
-                            height,
-                          );
-                          event.target.x(next.x);
-                          event.target.y(next.y);
-                        }}
-                        onDragEnd={(event) => {
-                          onDragStateChange(false);
-                          onTransformChange((prev) => ({
-                            ...prev,
-                            x: event.target.x(),
-                            y: event.target.y(),
-                          }));
-                        }}
-                      />
-                    ) : null}
-
-                    {textLayer ? (
-                      <KonvaText
-                        ref={textNodeRef}
-                        text={textLayer.text}
-                        x={textLayer.x}
-                        y={textLayer.y}
-                        offsetX={textLayer.width / 2}
-                        offsetY={textLayer.height / 2}
-                        width={textLayer.width}
-                        height={textLayer.height}
-                        fontSize={textLayer.fontSize}
-                        align="center"
-                        verticalAlign="middle"
-                        fill="#dc2626"
-                        rotation={textLayer.rotation}
-                        scaleX={textLayer.scaleX}
-                        scaleY={textLayer.scaleY}
-                        shadowEnabled={selectedElement === "text"}
-                        shadowColor="rgba(220,38,38,0.35)"
-                        shadowBlur={selectedElement === "text" ? 14 : 0}
-                        shadowOpacity={selectedElement === "text" ? 0.45 : 0}
-                        draggable
-                        onClick={() => onSelectElement("text")}
-                        onTap={() => onSelectElement("text")}
-                        onDragStart={() => onSelectElement("text")}
-                        onDragEnd={(event) => {
-                          onTextLayerChange((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  x: event.target.x(),
-                                  y: event.target.y(),
-                                }
-                              : prev,
-                          );
-                        }}
-                      />
-                    ) : null}
-                  </Group>
-
-                  {selectedElement ? (
-                    <Transformer
-                      ref={transformerRef}
-                      keepRatio={selectedElement === "image"}
-                      rotateEnabled
-                      enabledAnchors={[
-                        "top-left",
-                        "top-center",
-                        "top-right",
-                        "middle-left",
-                        "middle-right",
-                        "bottom-left",
-                        "bottom-center",
-                        "bottom-right",
-                      ]}
-                      anchorStroke="#dc2626"
-                      anchorFill="#dc2626"
-                      borderStroke="#dc2626"
-                      anchorSize={14}
-                      boundBoxFunc={(oldBox, newBox) => {
-                        if (
-                          !Number.isFinite(newBox.width) ||
-                          !Number.isFinite(newBox.height) ||
-                          newBox.width <= 0 ||
-                          newBox.height <= 0
-                        ) {
-                          return oldBox;
-                        }
-
-                        if (selectedElement === "text") {
-                          return newBox;
-                        }
-
-                        if (
-                          newBox.width < MIN_IMAGE_SIDE ||
-                          newBox.height < MIN_IMAGE_SIDE
-                        ) {
-                          return oldBox;
-                        }
-
-                        if (
-                          newBox.width > PRINT_RECT.width * MAX_IMAGE_SCALE ||
-                          newBox.height > PRINT_RECT.height * MAX_IMAGE_SCALE
-                        ) {
-                          return oldBox;
-                        }
-
-                        return newBox;
+                      ref={userImageRef}
+                      image={userImage}
+                      x={transform.x}
+                      y={transform.y}
+                      offsetX={userImage.width / 2}
+                      offsetY={userImage.height / 2}
+                      width={userImage.width}
+                      height={userImage.height}
+                      scaleX={transform.scaleX}
+                      scaleY={transform.scaleY}
+                      rotation={transform.rotation}
+                      opacity={imageOpacity / 100}
+                      shadowEnabled={selectedElement === "image"}
+                      shadowColor="rgba(220,38,38,0.35)"
+                      shadowBlur={selectedElement === "image" ? 16 : 0}
+                      shadowOpacity={selectedElement === "image" ? 0.5 : 0}
+                      draggable
+                      dragBoundFunc={(position) => {
+                        const width = userImage.width * Math.abs(transform.scaleX);
+                        const height = userImage.height * Math.abs(transform.scaleY);
+                        return clampPosition(position.x, position.y, width, height);
                       }}
-                      onTransformEnd={() => {
-                        if (selectedElement === "text") {
-                          const node = textNodeRef.current;
-                          if (!node) return;
-
-                          onTextLayerChange((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  x: node.x(),
-                                  y: node.y(),
-                                  rotation: node.rotation(),
-                                  scaleX: clampScale(node.scaleX()),
-                                  scaleY: clampScale(node.scaleY()),
-                                  width: Math.max(40, node.width()),
-                                  height: Math.max(20, node.height()),
-                                }
-                              : prev,
-                          );
-                          return;
-                        }
-
-                        const node = userImageRef.current;
-                        if (!node || !userImage) return;
-
-                        const nextScaleX = clampScale(node.scaleX());
-                        const nextScaleY = clampScale(node.scaleY());
-                        const width = userImage.width * Math.abs(nextScaleX);
-                        const height = userImage.height * Math.abs(nextScaleY);
-                        const next = clampPosition(node.x(), node.y(), width, height);
-
-                        node.x(next.x);
-                        node.y(next.y);
-
+                      onClick={() => onSelectElement("image")}
+                      onTap={() => onSelectElement("image")}
+                      onDragStart={() => {
+                        onDragStateChange(true);
+                        onSelectElement("image");
+                      }}
+                      onDragMove={(event) => {
+                        const width = userImage.width * Math.abs(transform.scaleX);
+                        const height = userImage.height * Math.abs(transform.scaleY);
+                        const next = clampPosition(
+                          event.target.x(),
+                          event.target.y(),
+                          width,
+                          height,
+                        );
+                        event.target.x(next.x);
+                        event.target.y(next.y);
+                      }}
+                      onDragEnd={(event) => {
+                        onDragStateChange(false);
                         onTransformChange((prev) => ({
                           ...prev,
-                          x: next.x,
-                          y: next.y,
-                          scaleX: nextScaleX,
-                          scaleY: nextScaleY,
-                          rotation: node.rotation(),
+                          x: event.target.x(),
+                          y: event.target.y(),
                         }));
                       }}
                     />
                   ) : null}
-                </Layer>
 
-                <Layer ref={guidesLayerRef} listening={false}>
-                  <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
-                    <Rect
-                      x={PRINT_RECT.x}
-                      y={PRINT_RECT.y}
-                      width={PRINT_RECT.width}
-                      height={PRINT_RECT.height}
-                      cornerRadius={18}
-                      fill="rgba(255,255,255,0.1)"
-                      stroke="#dc2626"
-                      dash={[10, 8]}
-                      strokeWidth={4}
-                    />
-                    <Rect
-                      x={SAFE_RECT.x}
-                      y={SAFE_RECT.y}
-                      width={SAFE_RECT.width}
-                      height={SAFE_RECT.height}
-                      cornerRadius={14}
-                      fill="rgba(255,255,255,0.08)"
-                      stroke="rgba(220,38,38,0.85)"
-                      dash={[8, 7]}
-                      strokeWidth={3}
-                    />
-
-                    <Rect
-                      x={SAFE_RECT.x}
-                      y={SAFE_RECT.y - 36}
-                      width={176}
-                      height={26}
-                      cornerRadius={13}
-                      fill="rgba(220,38,38,0.92)"
-                    />
+                  {textLayer ? (
                     <KonvaText
-                      x={SAFE_RECT.x + 14}
-                      y={SAFE_RECT.y - 31}
-                      text="Safe zone"
-                      fontSize={15}
-                      fill="#ffffff"
-                      fontStyle="bold"
+                      ref={textNodeRef}
+                      text={textLayer.text}
+                      x={textLayer.x}
+                      y={textLayer.y}
+                      offsetX={textLayer.width / 2}
+                      offsetY={textLayer.height / 2}
+                      width={textLayer.width}
+                      height={textLayer.height}
+                      fontSize={textLayer.fontSize}
+                      align="center"
+                      verticalAlign="middle"
+                      fill="#dc2626"
+                      rotation={textLayer.rotation}
+                      scaleX={textLayer.scaleX}
+                      scaleY={textLayer.scaleY}
+                      shadowEnabled={selectedElement === "text"}
+                      shadowColor="rgba(220,38,38,0.35)"
+                      shadowBlur={selectedElement === "text" ? 14 : 0}
+                      shadowOpacity={selectedElement === "text" ? 0.45 : 0}
+                      draggable
+                      onClick={() => onSelectElement("text")}
+                      onTap={() => onSelectElement("text")}
+                      onDragStart={() => onSelectElement("text")}
+                      onDragEnd={(event) => {
+                        onTextLayerChange((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                x: event.target.x(),
+                                y: event.target.y(),
+                              }
+                            : prev,
+                        );
+                      }}
                     />
+                  ) : null}
+                </Group>
 
-                    <Rect
-                      x={PRINT_RECT.x}
-                      y={PRINT_RECT.y + PRINT_RECT.height + 10}
-                      width={194}
-                      height={24}
-                      cornerRadius={12}
-                      fill="rgba(38,38,38,0.85)"
-                    />
-                    <KonvaText
-                      x={PRINT_RECT.x + 12}
-                      y={PRINT_RECT.y + PRINT_RECT.height + 15}
-                      text="Граница реальной печати"
-                      fontSize={13}
-                      fill="#ffffff"
-                    />
+                {selectedElement ? (
+                  <Transformer
+                    ref={transformerRef}
+                    keepRatio={selectedElement === "image"}
+                    rotateEnabled
+                    enabledAnchors={[
+                      "top-left",
+                      "top-center",
+                      "top-right",
+                      "middle-left",
+                      "middle-right",
+                      "bottom-left",
+                      "bottom-center",
+                      "bottom-right",
+                    ]}
+                    anchorStroke="#dc2626"
+                    anchorFill="#dc2626"
+                    borderStroke="#dc2626"
+                    anchorSize={14}
+                    boundBoxFunc={(oldBox, newBox) => {
+                      if (
+                        !Number.isFinite(newBox.width) ||
+                        !Number.isFinite(newBox.height) ||
+                        newBox.width <= 0 ||
+                        newBox.height <= 0
+                      ) {
+                        return oldBox;
+                      }
 
-                    <Rect
-                      x={SAFE_RECT.x + SAFE_RECT.width / 2}
-                      y={SAFE_RECT.y}
-                      width={1.5}
-                      height={SAFE_RECT.height}
-                      fill={isDragging ? "rgba(220,38,38,0.5)" : "rgba(220,38,38,0.18)"}
-                    />
-                    <Rect
-                      x={SAFE_RECT.x}
-                      y={SAFE_RECT.y + SAFE_RECT.height / 2}
-                      width={SAFE_RECT.width}
-                      height={1.5}
-                      fill={isDragging ? "rgba(220,38,38,0.5)" : "rgba(220,38,38,0.18)"}
-                    />
-                  </Group>
-                </Layer>
-              </Stage>
-            </div>
+                      if (selectedElement === "text") {
+                        return newBox;
+                      }
+
+                      if (
+                        newBox.width < MIN_IMAGE_SIDE ||
+                        newBox.height < MIN_IMAGE_SIDE
+                      ) {
+                        return oldBox;
+                      }
+
+                      if (
+                        newBox.width > PRINT_RECT.width * MAX_IMAGE_SCALE ||
+                        newBox.height > PRINT_RECT.height * MAX_IMAGE_SCALE
+                      ) {
+                        return oldBox;
+                      }
+
+                      return newBox;
+                    }}
+                    onTransformEnd={() => {
+                      if (selectedElement === "text") {
+                        const node = textNodeRef.current;
+                        if (!node) return;
+
+                        onTextLayerChange((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                x: node.x(),
+                                y: node.y(),
+                                rotation: node.rotation(),
+                                scaleX: clampScale(node.scaleX()),
+                                scaleY: clampScale(node.scaleY()),
+                                width: Math.max(40, node.width()),
+                                height: Math.max(20, node.height()),
+                              }
+                            : prev,
+                        );
+                        return;
+                      }
+
+                      const node = userImageRef.current;
+                      if (!node || !userImage) return;
+
+                      const nextScaleX = clampScale(node.scaleX());
+                      const nextScaleY = clampScale(node.scaleY());
+                      const width = userImage.width * Math.abs(nextScaleX);
+                      const height = userImage.height * Math.abs(nextScaleY);
+                      const next = clampPosition(node.x(), node.y(), width, height);
+
+                      node.x(next.x);
+                      node.y(next.y);
+
+                      onTransformChange((prev) => ({
+                        ...prev,
+                        x: next.x,
+                        y: next.y,
+                        scaleX: nextScaleX,
+                        scaleY: nextScaleY,
+                        rotation: node.rotation(),
+                      }));
+                    }}
+                  />
+                ) : null}
+              </Layer>
+
+              <Layer ref={guidesLayerRef} listening={false}>
+                <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
+                  <Rect
+                    x={PRINT_RECT.x}
+                    y={PRINT_RECT.y}
+                    width={PRINT_RECT.width}
+                    height={PRINT_RECT.height}
+                    cornerRadius={18}
+                    fill="rgba(255,255,255,0.08)"
+                    stroke="#dc2626"
+                    dash={[10, 8]}
+                    strokeWidth={4}
+                  />
+                  <Rect
+                    x={SAFE_RECT.x}
+                    y={SAFE_RECT.y}
+                    width={SAFE_RECT.width}
+                    height={SAFE_RECT.height}
+                    cornerRadius={14}
+                    fill="rgba(255,255,255,0.06)"
+                    stroke="rgba(220,38,38,0.82)"
+                    dash={[8, 7]}
+                    strokeWidth={3}
+                  />
+                  <Rect
+                    x={SAFE_RECT.x + SAFE_RECT.width / 2}
+                    y={SAFE_RECT.y}
+                    width={1.5}
+                    height={SAFE_RECT.height}
+                    fill={isDragging ? "rgba(220,38,38,0.5)" : "rgba(220,38,38,0.16)"}
+                  />
+                  <Rect
+                    x={SAFE_RECT.x}
+                    y={SAFE_RECT.y + SAFE_RECT.height / 2}
+                    width={SAFE_RECT.width}
+                    height={1.5}
+                    fill={isDragging ? "rgba(220,38,38,0.5)" : "rgba(220,38,38,0.16)"}
+                  />
+                </Group>
+              </Layer>
+            </Stage>
           </div>
         </div>
       </div>
@@ -731,12 +651,8 @@ function ControlsDock({
   const canReset = Boolean(userImage || textLayer);
 
   return (
-    <aside className="space-y-3 md:sticky md:top-24 md:max-h-[calc(100vh-7rem)] md:self-start md:overflow-y-auto">
-      <SectionCard
-        title="Добавить"
-        description="Загрузите файл для печати. Поддерживаются png, jpg, jpeg и webp."
-        tone="muted"
-      >
+    <aside className="space-y-2.5 lg:sticky lg:top-24 lg:self-start">
+      <SectionCard title="Файл" tone="muted">
         <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
           Загрузить изображение
           <input
@@ -751,11 +667,7 @@ function ControlsDock({
 
       <SectionCard
         title="Объект"
-        description={
-          hasSelection
-            ? `Активный слой: ${selectedElement === "image" ? "изображение" : "текст"}.`
-            : "Выберите объект в рабочей зоне, чтобы быстро управлять им без лишних раскрывающихся блоков."
-        }
+        description={hasSelection ? `Активно: ${selectedElement === "image" ? "изображение" : "текст"}.` : undefined}
       >
         <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-600">
           <span className={`rounded-full px-2.5 py-1 ${hasSelection ? "bg-red-50 text-red-700" : "bg-neutral-100 text-neutral-500"}`}>
@@ -793,8 +705,8 @@ function ControlsDock({
           </button>
         </div>
 
-        <div className="grid gap-3 border-t border-neutral-200 pt-3">
-          <label className={`space-y-1.5 ${hasImageSelection ? "" : "opacity-50"}`}>
+        <div className="grid gap-2.5 border-t border-neutral-200 pt-2.5">
+          <label className={`space-y-1 ${hasImageSelection ? "" : "opacity-50"}`}>
             <div className="flex items-center justify-between gap-3 text-xs">
               <span className="text-neutral-600">Непрозрачность</span>
               <span className="text-neutral-500">{imageOpacity}%</span>
@@ -829,42 +741,34 @@ function ControlsDock({
                 className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
               />
             </label>
-          ) : (
-            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-xs leading-5 text-neutral-500">
-              Внешний контур показывает полный print rect, а внутренняя рамка safe zone помогает центрировать важные элементы без риска подойти к краю печати слишком близко.
-            </div>
-          )}
+          ) : null}
         </div>
       </SectionCard>
 
-      <SectionCard
-        title="Заказ"
-        description="Количество и стоимость считаются сразу, без лишнего вертикального шума."
-        tone="muted"
-      >
-        <div className="grid gap-3">
+      <SectionCard title="Заказ" tone="muted">
+        <div className="grid gap-2.5">
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="h-10 w-10 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
+              className="h-9 w-9 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
               onClick={() => onQuantityChange((prev) => Math.max(1, prev - 1))}
             >
               -
             </button>
-            <div className="flex h-10 flex-1 items-center justify-center rounded-xl border border-neutral-200 bg-white text-sm font-medium">
+            <div className="flex h-9 flex-1 items-center justify-center rounded-xl border border-neutral-200 bg-white text-sm font-medium">
               {quantity}
             </div>
             <button
               type="button"
-              className="h-10 w-10 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
+              className="h-9 w-9 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
               onClick={() => onQuantityChange((prev) => prev + 1)}
             >
               +
             </button>
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
-            <div className="rounded-2xl border border-neutral-200 bg-white px-3 py-2.5">
+          <div className="grid gap-2 xl:grid-cols-2">
+            <div className="rounded-2xl border border-neutral-200 bg-white px-3 py-2">
               <span className="block text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
                 База
               </span>
@@ -876,7 +780,7 @@ function ControlsDock({
                 ₽
               </span>
             </div>
-            <div className="rounded-2xl border border-neutral-200 bg-white px-3 py-2.5">
+            <div className="rounded-2xl border border-neutral-200 bg-white px-3 py-2">
               <span className="block text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
                 Скидка
               </span>
@@ -892,10 +796,10 @@ function ControlsDock({
 
           <div className="rounded-[20px] border border-neutral-200 bg-white px-4 py-3">
             <div className="flex items-end justify-between gap-3">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
                 Итого
               </span>
-              <span className="text-3xl font-semibold tracking-tight text-neutral-900">
+              <span className="text-[2rem] font-semibold tracking-tight text-neutral-900">
                 {pricing.finalTotal.toLocaleString("ru-RU", {
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 2,
@@ -905,7 +809,7 @@ function ControlsDock({
             </div>
           </div>
 
-          <div className="grid gap-2 border-t border-neutral-200 pt-3">
+          <div className="grid gap-2 border-t border-neutral-200 pt-2.5">
             <button
               type="button"
               className={primaryButtonClass}
@@ -978,24 +882,15 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     const focusRect = useMemo(() => getFocusRect(), []);
 
     const stageMetrics = useMemo<StageMetrics>(() => {
-      const previewScale = Math.min(
-        previewViewportWidth / focusRect.width,
-        PREVIEW_WINDOW_MAX_HEIGHT / focusRect.height,
-        1,
-      );
+      const previewScale = Math.max(previewViewportWidth / focusRect.width, 0.01);
       const displayedStageWidth = Math.round(MOCKUP_WIDTH * previewScale);
       const displayedStageHeight = Math.round(MOCKUP_HEIGHT * previewScale);
-      const windowWidth = Math.max(
-        Math.round(focusRect.width * previewScale),
-        PREVIEW_MIN_WIDTH,
-      );
       const windowHeight = Math.round(focusRect.height * previewScale);
 
       return {
         previewScale,
         displayedStageWidth,
         displayedStageHeight,
-        windowWidth,
         windowHeight,
         stageOffsetX: Math.round(focusRect.x * previewScale),
         stageOffsetY: Math.round(focusRect.y * previewScale),
@@ -1438,28 +1333,14 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     }
 
     return (
-      <div className="space-y-4 lg:space-y-5">
-        <div className="rounded-[30px] border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
-              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-                Соберите макет кружки
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-neutral-600 sm:text-base">
-                Конструктор перестроен вокруг полезной рабочей зоны: безопасная рамка задаёт
-                композицию, preview остаётся компактным, а финальный экспорт всё так же
-                использует реальный размер печати.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm leading-6 text-neutral-600 lg:max-w-sm">
-              Печать идёт по <span className="font-medium text-neutral-900">print rect</span>,
-              а действие «Вписать» теперь центрирует макет по <span className="font-medium text-neutral-900">safe zone</span>,
-              чтобы важные элементы не прилипали к краям.
-            </div>
-          </div>
+      <div className="space-y-3 lg:space-y-4">
+        <div className="flex items-center justify-between gap-3 px-1">
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            Соберите макет кружки
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[minmax(0,1.35fr)_minmax(260px,320px)] lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,360px)] xl:gap-5">
+        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,2.05fr)_minmax(320px,360px)] xl:grid-cols-[minmax(0,2.2fr)_minmax(340px,370px)] xl:gap-4">
           <PreviewWorkspace
             wrapperRef={wrapperRef}
             stageRef={stageRef}
