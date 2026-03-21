@@ -562,8 +562,44 @@ function PreviewWorkspace({
                           return;
                         }
 
-                        const node = userImageRef.current;
-                        if (!node || !userImage) return;
+                                const node = userImageRef.current;
+                                if (!node || !userImage) return;
+
+                                const nextScaleX = clampScale(node.scaleX());
+                                const nextScaleY = clampScale(node.scaleY());
+                                const width =
+                                  userImage.width * Math.abs(nextScaleX);
+                                const height =
+                                  userImage.height * Math.abs(nextScaleY);
+                                const next = clampPosition(
+                                  node.x(),
+                                  node.y(),
+                                  width,
+                                  height,
+                                );
+
+                                node.x(next.x);
+                                node.y(next.y);
+
+                                setTransform((prev) => ({
+                                  ...prev,
+                                  x: next.x,
+                                  y: next.y,
+                                  scaleX: nextScaleX,
+                                  scaleY: nextScaleY,
+                                  rotation: node.rotation(),
+                                }));
+                              }}
+                            />
+                          )}
+                        </Group>
+                      </Layer>
+                    </Stage>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
                         const nextScaleX = clampScale(node.scaleX());
                         const nextScaleY = clampScale(node.scaleY());
@@ -576,16 +612,21 @@ function PreviewWorkspace({
                           height,
                         );
 
-                        node.x(next.x);
-                        node.y(next.y);
+            {selectedElement && (
+              <section className="space-y-2.5 rounded-xl border border-neutral-200 bg-white p-3.5">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                    Настройки объекта
+                  </p>
+                  <p className="mt-1 text-sm text-neutral-700">
+                    Выбрано:{" "}
+                    {selectedElement === "image" ? "Изображение" : "Текст"}
+                  </p>
+                </div>
 
                         onTransformChange((prev) => ({
                           ...prev,
-                          x: next.x,
-                          y: next.y,
-                          scaleX: nextScaleX,
-                          scaleY: nextScaleY,
-                          rotation: node.rotation(),
+                          rotation: (prev.rotation + 90) % 360,
                         }));
                       }}
                     />
