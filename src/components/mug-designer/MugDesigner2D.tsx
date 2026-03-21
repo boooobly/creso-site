@@ -90,9 +90,7 @@ function scaleRect(
 }
 
 const SAFE_INSET = 16;
-const PREVIEW_MAX_WIDTH = 1240;
-const PREVIEW_MAX_HEIGHT = 600;
-const PREVIEW_STAGE_GUTTER = 20;
+const PREVIEW_STAGE_GUTTER = 24;
 
 const defaultTransform: TransformState = {
   x: PRINT_RECT.x + PRINT_RECT.width / 2,
@@ -170,6 +168,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
       finalTotal: Math.round(finalTotal * 100) / 100,
     };
   }, [quantity]);
+  const hasDesignLayer = Boolean(userImage || textLayer);
 
   const previewScale = viewportWidth / MOCKUP_WIDTH;
   const displayedWidth = viewportWidth;
@@ -321,12 +320,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
     if (!node) return;
 
     const observer = new ResizeObserver((entries) => {
-      const contentWidth = entries[0]?.contentRect.width ?? PREVIEW_MAX_WIDTH;
-      const availableWidth = Math.max(Math.min(contentWidth, PREVIEW_MAX_WIDTH) - PREVIEW_STAGE_GUTTER * 2, 1);
-      const availableHeight = PREVIEW_MAX_HEIGHT - PREVIEW_STAGE_GUTTER * 2;
-      const scale = Math.min(availableWidth / MOCKUP_WIDTH, availableHeight / MOCKUP_HEIGHT);
-
-      setViewportWidth(Math.round(MOCKUP_WIDTH * scale));
+      const contentWidth = entries[0]?.contentRect.width ?? node.clientWidth;
+      const availableWidth = Math.max(contentWidth - PREVIEW_STAGE_GUTTER * 2, 1);
+      setViewportWidth(Math.round(availableWidth));
     });
 
     observer.observe(node);
@@ -515,16 +511,22 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
         <p className="mt-2 text-xs text-neutral-500">Подсказка: выделите объект, чтобы изменить размер и поворот.</p>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-5 xl:gap-6 lg:grid-cols-[minmax(0,1.65fr)_340px] xl:grid-cols-[minmax(0,1.8fr)_380px]">
-        <section className="self-start rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
-            <span>Область печати</span>
-            <span>Перетащите объект внутрь рамки</span>
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(260px,320px)_minmax(0,1.7fr)_minmax(280px,340px)] xl:gap-6">
+        <section className="order-1 self-start rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6 xl:order-2">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Рабочая область</p>
+              <p className="mt-1 text-sm text-neutral-600">Свободно размещайте объект внутри красной зоны и проверяйте композицию прямо на мокапе.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs text-neutral-500">
+              <span className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">Область печати</span>
+              <span className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1">Drag & resize</span>
+            </div>
           </div>
-          <div className="rounded-2xl border border-neutral-200 bg-gradient-to-b from-white to-neutral-50 p-2 sm:p-3">
-            <div className="mx-auto w-full max-w-[1240px] rounded-[20px] border border-neutral-200 bg-white shadow-sm">
-              <div ref={wrapperRef} className="flex w-full items-center justify-center overflow-hidden p-3 sm:p-4 lg:p-5">
-                <div className="relative shrink-0" style={{ width: displayedWidth, height: displayedHeight }}>
+          <div className="rounded-[28px] border border-neutral-200 bg-[radial-gradient(circle_at_top,_rgba(254,226,226,0.38),_transparent_42%),linear-gradient(to_bottom,_#ffffff,_#f5f5f5)] p-2 sm:p-3 lg:p-4">
+            <div className="w-full rounded-[24px] border border-neutral-200 bg-white/90 shadow-sm">
+              <div ref={wrapperRef} className="flex w-full items-center justify-center overflow-hidden p-3 sm:p-4 lg:p-6">
+                <div className="relative w-full shrink-0" style={{ width: displayedWidth, height: displayedHeight }}>
                   <Stage
                     width={displayedWidth}
                     height={displayedHeight}
@@ -737,97 +739,112 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
           </div>
         </section>
 
-        <aside className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5">
-          <section className="space-y-3 rounded-xl border border-neutral-200 bg-neutral-50/80 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
-                <p className="mt-1 text-sm text-neutral-600">Загрузите изображение для печати.</p>
-              </div>
+        <aside className="order-2 space-y-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5 lg:order-2 xl:order-1 xl:sticky xl:top-6">
+          <section className="space-y-4 rounded-xl border border-neutral-200 bg-neutral-50/80 p-4">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Инструменты</p>
+              <p className="text-sm text-neutral-600">Загружайте макет и управляйте выбранным объектом без длинной вертикальной панели.</p>
             </div>
-            <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
-              Загрузить изображение
-              <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
-            </label>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-          </section>
 
-          {selectedElement && (
-            <section className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4">
+            <div className="rounded-xl border border-neutral-200 bg-white p-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Настройки объекта</p>
-                  <p className="mt-1 text-sm text-neutral-700">Выбрано: {selectedElement === 'image' ? 'Изображение' : 'Текст'}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Добавить</p>
+                  <p className="mt-1 text-sm text-neutral-600">Загрузите изображение для печати.</p>
                 </div>
+                {hasDesignLayer && <span className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-medium text-red-700">Макет активен</span>}
+              </div>
+              <label className={`mt-3 block cursor-pointer text-center ${primaryButtonClass}`}>
+                Загрузить изображение
+                <input type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={onUpload} />
+              </label>
+              {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+            </div>
+
+            <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Выбранный объект</p>
+                  <p className="mt-1 text-sm text-neutral-700">{selectedElement ? `Сейчас редактируется: ${selectedElement === 'image' ? 'изображение' : 'текст'}` : 'Выберите изображение или текст на мокапе.'}</p>
+                </div>
+                {selectedElement && (
+                  <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-[11px] font-medium text-neutral-600">
+                    {selectedElement === 'image' ? 'Image' : 'Text'}
+                  </span>
+                )}
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  className={`${toolButtonClass} cursor-not-allowed opacity-60`}
-                  disabled
-                  title="Дублирование появится вместе с поддержкой нескольких слоев."
-                >
-                  Дублировать
-                </button>
-                <button
-                  type="button"
-                  className={toolButtonClass}
-                  onClick={() => {
-                    if (selectedElement === 'image') onFileChange(null);
-                    if (selectedElement === 'text') setTextLayer(null);
-                    setSelectedElement(null);
-                  }}
-                >
-                  Удалить
-                </button>
-                <button
-                  type="button"
-                  className={`${toolButtonClass} col-span-2`}
-                  onClick={() => {
-                    if (selectedElement === 'image') setTransform((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }));
-                    if (selectedElement === 'text') setTextLayer((prev) => (prev ? { ...prev, rotation: (prev.rotation + 90) % 360 } : prev));
-                  }}
-                >
-                  Повернуть на 90°
-                </button>
-              </div>
-
-              {selectedElement === 'text' && textLayer && (
-                <div className="space-y-2 border-t border-neutral-200 pt-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Текст</p>
-                  <label className="space-y-1 text-sm text-neutral-700">
-                    <span>Содержимое текста</span>
-                    <input
-                      type="text"
-                      value={textLayer.text}
-                      onChange={(event) => setTextLayer((prev) => (prev ? { ...prev, text: event.target.value } : prev))}
-                      className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                    />
-                  </label>
-                </div>
-              )}
-
-              {selectedElement === 'image' && userImage && (
-                <div className="space-y-3 border-t border-neutral-200 pt-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Изображение</p>
+              {selectedElement ? (
+                <div className="mt-3 space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      className={`${toolButtonClass} cursor-not-allowed opacity-60`}
+                      disabled
+                      title="Дублирование появится вместе с поддержкой нескольких слоев."
+                    >
+                      Дублировать
+                    </button>
+                    <button
+                      type="button"
+                      className={toolButtonClass}
+                      onClick={() => {
+                        if (selectedElement === 'image') onFileChange(null);
+                        if (selectedElement === 'text') setTextLayer(null);
+                        setSelectedElement(null);
+                      }}
+                    >
+                      Удалить
+                    </button>
+                    <button
+                      type="button"
+                      className={`${toolButtonClass} col-span-2`}
+                      onClick={() => {
+                        if (selectedElement === 'image') setTransform((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }));
+                        if (selectedElement === 'text') setTextLayer((prev) => (prev ? { ...prev, rotation: (prev.rotation + 90) % 360 } : prev));
+                      }}
+                    >
+                      Повернуть на 90°
+                    </button>
                   </div>
-                  <label className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-neutral-600">Непрозрачность</span>
-                      <span className="text-xs text-neutral-500">{imageOpacity}%</span>
+
+                  {selectedElement === 'text' && textLayer && (
+                    <label className="grid gap-1.5 text-sm text-neutral-700">
+                      <span className="text-xs font-medium uppercase tracking-wide text-neutral-500">Текст</span>
+                      <input
+                        type="text"
+                        value={textLayer.text}
+                        onChange={(event) => setTextLayer((prev) => (prev ? { ...prev, text: event.target.value } : prev))}
+                        className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                      />
+                    </label>
+                  )}
+
+                  {selectedElement === 'image' && userImage && (
+                    <div className="grid gap-3">
+                      <label className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs font-medium uppercase tracking-wide text-neutral-500">Непрозрачность</span>
+                          <span className="text-xs text-neutral-500">{imageOpacity}%</span>
+                        </div>
+                        <input type="range" min={0} max={100} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))} className="w-full accent-red-600" />
+                      </label>
+                      <button type="button" className={secondaryButtonClass} onClick={onFitToPrint}>
+                        Вписать в зону печати
+                      </button>
                     </div>
-                    <input type="range" min={0} max={100} value={imageOpacity} onChange={(event) => setImageOpacity(Number(event.target.value))} className="w-full accent-red-600" />
-                  </label>
-                  <button type="button" className={secondaryButtonClass} onClick={onFitToPrint}>
-                    Вписать в зону печати
-                  </button>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-3 rounded-lg border border-dashed border-neutral-200 bg-neutral-50 px-3 py-4 text-sm text-neutral-500">
+                  После выбора объекта здесь появятся быстрые действия: удаление, поворот и точная настройка.
                 </div>
               )}
-            </section>
-          )}
+            </div>
+          </section>
+        </aside>
 
+        <aside className="order-3 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5 lg:col-span-2 xl:col-span-1 xl:sticky xl:top-6">
           <section className="space-y-4 rounded-xl border border-neutral-200 bg-neutral-50/70 p-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
@@ -875,7 +892,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(function MugDesigne
               <button
                 type="button"
                 onClick={onReset}
-                disabled={!userImage && !textLayer}
+                disabled={!hasDesignLayer}
                 className="w-full rounded-md border border-neutral-200 bg-white py-3 text-sm font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Сбросить макет
