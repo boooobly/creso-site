@@ -265,7 +265,6 @@ export default function OrderMugsForm() {
       <MugDesignerFullscreenOverlay
         isOpen={isDesignerOpen}
         onClose={closeDesigner}
-        onApply={handleApplyDesign}
       >
         <MugDesigner
           ref={designerRef}

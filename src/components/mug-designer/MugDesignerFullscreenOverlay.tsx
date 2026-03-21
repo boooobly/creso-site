@@ -6,10 +6,9 @@ import { X } from 'lucide-react';
 type Props = PropsWithChildren<{
   isOpen: boolean;
   onClose: () => void;
-  onApply: () => void;
 }>;
 
-export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply, children }: Props) {
+export default function MugDesignerFullscreenOverlay({ isOpen, onClose, children }: Props) {
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -42,13 +41,13 @@ export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply,
   return (
     <div
       aria-hidden={!isOpen}
-      className={`fixed inset-0 z-[120] flex items-stretch justify-center px-3 py-3 transition duration-200 sm:px-4 sm:py-4 lg:px-6 lg:py-6 ${
+      className={`fixed inset-0 z-[120] flex items-center justify-center px-3 py-3 transition duration-200 sm:px-4 sm:py-4 lg:px-6 lg:py-6 ${
         isOpen
           ? 'bg-neutral-950/70 opacity-100 backdrop-blur-sm'
           : 'pointer-events-none invisible bg-neutral-950/0 opacity-0'
       }`}
     >
-      <div className="flex h-full w-full max-w-[1680px] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#f4f1ee] shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
+      <div className="flex max-h-[calc(100vh-1.5rem)] w-full max-w-[1680px] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#f4f1ee] shadow-[0_30px_80px_rgba(0,0,0,0.35)] sm:max-h-[calc(100vh-2rem)] lg:max-h-[calc(100vh-3rem)]">
         <div className="flex items-start justify-between gap-4 border-b border-neutral-200 bg-white/90 px-5 py-4 backdrop-blur sm:px-6 lg:px-7">
           <div className="min-w-0 space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">Полноэкранный редактор</p>
@@ -70,7 +69,7 @@ export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply,
         </div>
 
         <div className="flex flex-col gap-3 border-t border-neutral-200 bg-white/90 px-5 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-7">
-          <p className="text-sm text-neutral-600">Страница заявки остаётся на месте на фоне, а текущий макет можно применить в один клик.</p>
+          <p className="text-sm text-neutral-600">Страница заявки остаётся на месте на фоне, а применение макета доступно в блоке заказа справа.</p>
           <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
@@ -78,13 +77,6 @@ export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply,
               className="inline-flex items-center justify-center rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
             >
               Закрыть
-            </button>
-            <button
-              type="button"
-              onClick={onApply}
-              className="inline-flex items-center justify-center rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
-            >
-              Применить макет
             </button>
           </div>
         </div>
