@@ -150,7 +150,6 @@ type ControlsDockProps = {
 };
 
 const PREVIEW_MIN_WIDTH = 280;
-const PREVIEW_SIDE_FOCUS_MARGIN = 120;
 const PREVIEW_TOP_FOCUS_MARGIN = 40;
 const PREVIEW_BOTTOM_FOCUS_MARGIN = 48;
 const DRAFT_KEY = "mugsDesignerDraft:v1";
@@ -230,9 +229,9 @@ function clampRectToMockup(rect: RectShape): RectShape {
 
 function getFocusRect(): RectShape {
   return clampRectToMockup({
-    x: PRINT_RECT.x - PREVIEW_SIDE_FOCUS_MARGIN,
+    x: PRINT_RECT.x,
     y: PRINT_RECT.y - PREVIEW_TOP_FOCUS_MARGIN,
-    width: PRINT_RECT.width + PREVIEW_SIDE_FOCUS_MARGIN * 2,
+    width: PRINT_RECT.width,
     height: PRINT_RECT.height + PREVIEW_TOP_FOCUS_MARGIN + PREVIEW_BOTTOM_FOCUS_MARGIN,
   });
 }
@@ -882,7 +881,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     const focusRect = useMemo(() => getFocusRect(), []);
 
     const stageMetrics = useMemo<StageMetrics>(() => {
-      const previewScale = Math.max(previewViewportWidth / focusRect.width, 0.01);
+      const previewScale = Math.max(previewViewportWidth / PRINT_RECT.width, 0.01);
       const displayedStageWidth = Math.round(MOCKUP_WIDTH * previewScale);
       const displayedStageHeight = Math.round(MOCKUP_HEIGHT * previewScale);
       const windowHeight = Math.round(focusRect.height * previewScale);
@@ -892,7 +891,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
         displayedStageWidth,
         displayedStageHeight,
         windowHeight,
-        stageOffsetX: Math.round(focusRect.x * previewScale),
+        stageOffsetX: Math.round(PRINT_RECT.x * previewScale),
         stageOffsetY: Math.round(focusRect.y * previewScale),
         scaledPrintRect: scaleRect(PRINT_RECT, previewScale),
         scaledSafeRect: scaleRect(SAFE_RECT, previewScale),
