@@ -49,7 +49,7 @@ export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply,
       }`}
     >
       <div className="flex h-full w-full max-w-[1680px] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#f4f1ee] shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
-        <div className="flex items-start justify-between gap-4 border-b border-neutral-200 bg-white/90 px-5 py-4 backdrop-blur sm:px-6 lg:px-8">
+        <div className="flex items-start justify-between gap-4 border-b border-neutral-200 bg-white/90 px-5 py-4 backdrop-blur sm:px-6 lg:px-7">
           <div className="min-w-0 space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">Полноэкранный редактор</p>
             <h3 className="text-xl font-semibold tracking-tight text-neutral-950 sm:text-2xl">Конструктор кружки</h3>
@@ -65,11 +65,11 @@ export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply,
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2 sm:px-4 sm:py-3 lg:px-5 lg:py-4">
           {children}
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-neutral-200 bg-white/90 px-5 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-3 border-t border-neutral-200 bg-white/90 px-5 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-7">
           <p className="text-sm text-neutral-600">Страница заявки остаётся на месте на фоне, а текущий макет можно применить в один клик.</p>
           <div className="flex flex-col gap-2 sm:flex-row">
             <button

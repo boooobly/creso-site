@@ -119,9 +119,7 @@ type PreviewWorkspaceProps = {
   textLayer: TextLayerState | null;
   imageOpacity: number;
   selectedElement: SelectedElement;
-  isDragging: boolean;
   onSelectElement: (next: SelectedElement) => void;
-  onDragStateChange: (next: boolean) => void;
   onTransformChange: (
     updater: (prev: TransformState) => TransformState,
   ) => void;
@@ -146,7 +144,10 @@ type ControlsDockProps = {
   onDeleteSelected: () => void;
   onRotateSelected: () => void;
   onOpacityChange: (next: number) => void;
-  onFitToPrint: () => void;
+  onFitToSafeZone: () => void;
+  onFitToPrintArea: () => void;
+  onFillPrintArea: () => void;
+  onCenterSelected: () => void;
   onTextChange: (next: string) => void;
   onQuantityChange: (updater: (prev: number) => number) => void;
   onApply: () => void;
@@ -161,6 +162,8 @@ const MUG_UNIT_PRICE = 450;
 const MUG_DISCOUNT_STEP_QUANTITY = 12;
 const MUG_DISCOUNT_STEP_RATE = 0.025;
 const MUG_MAX_DISCOUNT_RATE = 0.2;
+const SELECTION_STROKE = "#0f172a";
+const SELECTION_SHADOW = "rgba(15,23,42,0.2)";
 
 const defaultTransform: TransformState = {
   x: SAFE_RECT.x + SAFE_RECT.width / 2,
@@ -182,6 +185,10 @@ type DesignerDraft = {
 
 function fitScale(imgW: number, imgH: number, bounds: RectShape = SAFE_RECT): number {
   return Math.min(bounds.width / imgW, bounds.height / imgH);
+}
+
+function fillScale(imgW: number, imgH: number, bounds: RectShape = PRINT_RECT): number {
+  return Math.max(bounds.width / imgW, bounds.height / imgH);
 }
 
 function clampScale(value: number): number {
@@ -308,20 +315,26 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
     textLayer,
     imageOpacity,
     selectedElement,
-    isDragging,
     onSelectElement,
-    onDragStateChange,
     onTransformChange,
     onTextLayerChange,
   } = props;
 
   return (
-    <section className="rounded-[26px] border border-neutral-200 bg-white p-2 shadow-sm sm:p-3 lg:p-4">
+    <section className="rounded-[24px] border border-neutral-200 bg-white/95 p-2 shadow-sm sm:p-2.5 lg:p-3">
       <div ref={wrapperRef} className="w-full">
         <div
-          className="relative w-full overflow-hidden rounded-[22px] border border-neutral-200 bg-[#f8f2ed]"
+          className="relative w-full overflow-hidden rounded-[20px] border border-neutral-200 bg-[#f5efe9]"
           style={{ height: metrics.windowHeight }}
         >
+          <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-wrap gap-2">
+            <span className="rounded-full border border-red-200 bg-white/90 px-3 py-1 text-[11px] font-medium text-red-700 shadow-sm">
+              Область печати
+            </span>
+            <span className="rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
+              Безопасная зона
+            </span>
+          </div>
           <div
             className="absolute left-0 top-0"
             style={{
@@ -388,9 +401,9 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                         rotation={transform.rotation}
                         opacity={imageOpacity / 100}
                         shadowEnabled={selectedElement === "image"}
-                        shadowColor="rgba(220,38,38,0.35)"
-                        shadowBlur={selectedElement === "image" ? 16 : 0}
-                        shadowOpacity={selectedElement === "image" ? 0.5 : 0}
+                        shadowColor={SELECTION_SHADOW}
+                        shadowBlur={selectedElement === "image" ? 10 : 0}
+                        shadowOpacity={selectedElement === "image" ? 0.2 : 0}
                         draggable
                         dragBoundFunc={(position) => {
                           const width = userImage.width * Math.abs(transform.scaleX);
@@ -400,7 +413,6 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                         onClick={() => onSelectElement("image")}
                         onTap={() => onSelectElement("image")}
                         onDragStart={() => {
-                          onDragStateChange(true);
                           onSelectElement("image");
                         }}
                         onDragMove={(event) => {
@@ -416,7 +428,6 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                           event.target.y(next.y);
                         }}
                         onDragEnd={(event) => {
-                          onDragStateChange(false);
                           onTransformChange((prev) => ({
                             ...prev,
                             x: event.target.x(),
@@ -444,9 +455,9 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                         scaleX={textLayer.scaleX}
                         scaleY={textLayer.scaleY}
                         shadowEnabled={selectedElement === "text"}
-                        shadowColor="rgba(220,38,38,0.35)"
-                        shadowBlur={selectedElement === "text" ? 14 : 0}
-                        shadowOpacity={selectedElement === "text" ? 0.45 : 0}
+                        shadowColor={SELECTION_SHADOW}
+                        shadowBlur={selectedElement === "text" ? 10 : 0}
+                        shadowOpacity={selectedElement === "text" ? 0.2 : 0}
                         draggable
                         onClick={() => onSelectElement("text")}
                         onTap={() => onSelectElement("text")}
@@ -482,10 +493,11 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                       "bottom-center",
                       "bottom-right",
                     ]}
-                    anchorStroke="#dc2626"
-                    anchorFill="#dc2626"
-                    borderStroke="#dc2626"
-                    anchorSize={14}
+                    anchorStroke={SELECTION_STROKE}
+                    anchorFill="#ffffff"
+                    borderStroke={SELECTION_STROKE}
+                    borderDash={[10, 8]}
+                    anchorSize={12}
                     boundBoxFunc={(oldBox, newBox) => {
                       if (
                         !Number.isFinite(newBox.width) ||
@@ -574,7 +586,7 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                     fill="rgba(255,255,255,0.08)"
                     stroke="#dc2626"
                     dash={[10, 8]}
-                    strokeWidth={4}
+                    strokeWidth={3}
                   />
                   <Rect
                     x={SAFE_RECT.x}
@@ -582,24 +594,10 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                     width={SAFE_RECT.width}
                     height={SAFE_RECT.height}
                     cornerRadius={14}
-                    fill="rgba(255,255,255,0.06)"
-                    stroke="rgba(220,38,38,0.82)"
-                    dash={[8, 7]}
-                    strokeWidth={3}
-                  />
-                  <Rect
-                    x={SAFE_RECT.x + SAFE_RECT.width / 2}
-                    y={SAFE_RECT.y}
-                    width={1.5}
-                    height={SAFE_RECT.height}
-                    fill={isDragging ? "rgba(220,38,38,0.5)" : "rgba(220,38,38,0.16)"}
-                  />
-                  <Rect
-                    x={SAFE_RECT.x}
-                    y={SAFE_RECT.y + SAFE_RECT.height / 2}
-                    width={SAFE_RECT.width}
-                    height={1.5}
-                    fill={isDragging ? "rgba(220,38,38,0.5)" : "rgba(220,38,38,0.16)"}
+                    fill="rgba(255,255,255,0.03)"
+                    stroke="rgba(71,85,105,0.85)"
+                    dash={[9, 8]}
+                    strokeWidth={2}
                   />
                 </Group>
               </Layer>
@@ -627,7 +625,10 @@ function ControlsDock({
   onDeleteSelected,
   onRotateSelected,
   onOpacityChange,
-  onFitToPrint,
+  onFitToSafeZone,
+  onFitToPrintArea,
+  onFillPrintArea,
+  onCenterSelected,
   onTextChange,
   onQuantityChange,
   onApply,
@@ -639,7 +640,7 @@ function ControlsDock({
   const canReset = Boolean(userImage || textLayer);
 
   return (
-    <aside className="space-y-2.5 lg:sticky lg:top-24 lg:self-start">
+    <aside className="space-y-2 lg:sticky lg:top-8 lg:self-start">
       <SectionCard title="Файл" tone="muted">
         <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
           Загрузить изображение
@@ -654,27 +655,16 @@ function ControlsDock({
       </SectionCard>
 
       <SectionCard
-        title="Объект"
-        description={hasSelection ? `Активно: ${selectedElement === "image" ? "изображение" : "текст"}.` : undefined}
+        title="Редактирование"
+        description={hasSelection ? `Выбрано: ${selectedElement === "image" ? "изображение" : "текст"}.` : "Выберите объект на кружке, чтобы изменить его."}
       >
         <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-600">
-          <span className={`rounded-full px-2.5 py-1 ${hasSelection ? "bg-red-50 text-red-700" : "bg-neutral-100 text-neutral-500"}`}>
-            {hasSelection ? "Слой выбран" : "Нет выбранного слоя"}
+          <span className={`rounded-full px-2.5 py-1 ${hasSelection ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-500"}`}>
+            {hasSelection ? "Объект выделен" : "Пока ничего не выбрано"}
           </span>
-          {hasImageSelection ? (
-            <span className="rounded-full bg-neutral-100 px-2.5 py-1">Можно менять прозрачность и вписать</span>
-          ) : null}
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <button
-            type="button"
-            className={`${toolButtonClass} cursor-not-allowed opacity-60`}
-            disabled
-            title="Дублирование появится вместе с поддержкой нескольких слоёв."
-          >
-            Дублировать
-          </button>
           <button
             type="button"
             className={toolButtonClass}
@@ -696,7 +686,7 @@ function ControlsDock({
         <div className="grid gap-2.5 border-t border-neutral-200 pt-2.5">
           <label className={`space-y-1 ${hasImageSelection ? "" : "opacity-50"}`}>
             <div className="flex items-center justify-between gap-3 text-xs">
-              <span className="text-neutral-600">Непрозрачность</span>
+              <span className="text-neutral-600">Прозрачность</span>
               <span className="text-neutral-500">{imageOpacity}%</span>
             </div>
             <input
@@ -710,18 +700,44 @@ function ControlsDock({
             />
           </label>
 
-          <button
-            type="button"
-            className={secondaryButtonClass}
-            disabled={!hasImageSelection}
-            onClick={onFitToPrint}
-          >
-            Вписать по safe zone
-          </button>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              className={secondaryButtonClass}
+              disabled={!hasSelection}
+              onClick={onCenterSelected}
+            >
+              Выровнять по центру
+            </button>
+            <button
+              type="button"
+              className={secondaryButtonClass}
+              disabled={!hasImageSelection}
+              onClick={onFitToSafeZone}
+            >
+              Вписать в безопасную зону
+            </button>
+            <button
+              type="button"
+              className={secondaryButtonClass}
+              disabled={!hasImageSelection}
+              onClick={onFitToPrintArea}
+            >
+              Вписать в область печати
+            </button>
+            <button
+              type="button"
+              className={secondaryButtonClass}
+              disabled={!hasImageSelection}
+              onClick={onFillPrintArea}
+            >
+              Заполнить область печати
+            </button>
+          </div>
 
           {hasTextSelection && textLayer ? (
             <label className="space-y-1.5 text-sm text-neutral-700">
-              <span>Содержимое текста</span>
+              <span>Текст</span>
               <input
                 type="text"
                 value={textLayer.text}
@@ -735,30 +751,33 @@ function ControlsDock({
 
       <SectionCard title="Заказ" tone="muted">
         <div className="grid gap-2.5">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="h-9 w-9 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
-              onClick={() => onQuantityChange((prev) => Math.max(1, prev - 1))}
-            >
-              -
-            </button>
-            <div className="flex h-9 flex-1 items-center justify-center rounded-xl border border-neutral-200 bg-white text-sm font-medium">
-              {quantity}
+          <div className="space-y-1">
+            <span className="text-xs text-neutral-500">Тираж</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="h-9 w-9 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
+                onClick={() => onQuantityChange((prev) => Math.max(1, prev - 1))}
+              >
+                -
+              </button>
+              <div className="flex h-9 flex-1 items-center justify-center rounded-xl border border-neutral-200 bg-white text-sm font-medium">
+                {quantity}
+              </div>
+              <button
+                type="button"
+                className="h-9 w-9 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
+                onClick={() => onQuantityChange((prev) => prev + 1)}
+              >
+                +
+              </button>
             </div>
-            <button
-              type="button"
-              className="h-9 w-9 rounded-xl border border-neutral-200 bg-white text-lg leading-none transition hover:bg-neutral-50"
-              onClick={() => onQuantityChange((prev) => prev + 1)}
-            >
-              +
-            </button>
           </div>
 
           <div className="grid gap-2 xl:grid-cols-2">
             <div className="rounded-2xl border border-neutral-200 bg-white px-3 py-2">
               <span className="block text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
-                База
+                Стоимость
               </span>
               <span className="mt-1 block text-sm text-neutral-700">
                 {pricing.baseTotal.toLocaleString("ru-RU", {
@@ -782,7 +801,7 @@ function ControlsDock({
             </div>
           </div>
 
-          <div className="rounded-[20px] border border-neutral-200 bg-white px-4 py-3">
+          <div className="rounded-[20px] border border-red-100 bg-red-50/70 px-4 py-3">
             <div className="flex items-end justify-between gap-3">
               <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
                 Итого
@@ -848,7 +867,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     const [userImage, setUserImage] = useState<HTMLImageElement | null>(null);
     const [previewViewportWidth, setPreviewViewportWidth] = useState(960);
     const [transform, setTransform] = useState<TransformState>(defaultTransform);
-    const [isDragging, setIsDragging] = useState(false);
     const [selectedElement, setSelectedElement] = useState<SelectedElement>(null);
     const [imageOpacity, setImageOpacity] = useState(100);
     const [quantity, setQuantity] = useState(1);
@@ -1128,7 +1146,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
         setSelectedElement(null);
         setTransform(defaultTransform);
         setImageOpacity(100);
-        setIsDragging(false);
         setTextLayer(null);
         return;
       }
@@ -1139,7 +1156,6 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
         const nextScale = fitScale(image.width, image.height);
         setUserImage(image);
         setImageOpacity(100);
-        setIsDragging(false);
         setTransform({
           x: SAFE_RECT.x + SAFE_RECT.width / 2,
           y: SAFE_RECT.y + SAFE_RECT.height / 2,
@@ -1282,12 +1298,44 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
       event.target.value = "";
     };
 
-    const onFitToPrint = () => {
+    const centerPoint = useMemo(
+      () => ({
+        x: PRINT_RECT.x + PRINT_RECT.width / 2,
+        y: PRINT_RECT.y + PRINT_RECT.height / 2,
+      }),
+      [],
+    );
+
+    const onFitToSafeZone = () => {
       if (!userImage) return;
       const nextScale = fitScale(userImage.width, userImage.height);
       setTransform({
-        x: SAFE_RECT.x + SAFE_RECT.width / 2,
-        y: SAFE_RECT.y + SAFE_RECT.height / 2,
+        x: centerPoint.x,
+        y: centerPoint.y,
+        scaleX: nextScale,
+        scaleY: nextScale,
+        rotation: 0,
+      });
+    };
+
+    const onFitToPrintArea = () => {
+      if (!userImage) return;
+      const nextScale = fitScale(userImage.width, userImage.height, PRINT_RECT);
+      setTransform({
+        x: centerPoint.x,
+        y: centerPoint.y,
+        scaleX: nextScale,
+        scaleY: nextScale,
+        rotation: 0,
+      });
+    };
+
+    const onFillPrintArea = () => {
+      if (!userImage) return;
+      const nextScale = fillScale(userImage.width, userImage.height, PRINT_RECT);
+      setTransform({
+        x: centerPoint.x,
+        y: centerPoint.y,
         scaleX: nextScale,
         scaleY: nextScale,
         rotation: 0,
@@ -1311,9 +1359,9 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     const primaryButtonClass =
       "w-full rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700";
     const secondaryButtonClass =
-      "w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
+      "w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
     const toolButtonClass =
-      "rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs font-medium transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
+      "rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
 
     if (!mockupImage) {
       return (
@@ -1333,7 +1381,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
           </div>
         ) : null}
 
-        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,2.05fr)_minmax(320px,360px)] xl:grid-cols-[minmax(0,2.2fr)_minmax(340px,370px)] xl:gap-4">
+        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,2.15fr)_minmax(320px,360px)] xl:grid-cols-[minmax(0,2.25fr)_minmax(330px,360px)] xl:gap-4">
           <PreviewWorkspace
             wrapperRef={wrapperRef}
             stageRef={stageRef}
@@ -1349,9 +1397,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
             textLayer={textLayer}
             imageOpacity={imageOpacity}
             selectedElement={selectedElement}
-            isDragging={isDragging}
             onSelectElement={setSelectedElement}
-            onDragStateChange={setIsDragging}
             onTransformChange={(updater) => setTransform((prev) => updater(prev))}
             onTextLayerChange={(updater) => setTextLayer((prev) => updater(prev))}
           />
@@ -1390,7 +1436,30 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
               }
             }}
             onOpacityChange={setImageOpacity}
-            onFitToPrint={onFitToPrint}
+            onFitToSafeZone={onFitToSafeZone}
+            onFitToPrintArea={onFitToPrintArea}
+            onFillPrintArea={onFillPrintArea}
+            onCenterSelected={() => {
+              if (selectedElement === "image") {
+                setTransform((prev) => ({
+                  ...prev,
+                  x: centerPoint.x,
+                  y: centerPoint.y,
+                }));
+              }
+
+              if (selectedElement === "text") {
+                setTextLayer((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        x: centerPoint.x,
+                        y: centerPoint.y,
+                      }
+                    : prev,
+                );
+              }
+            }}
             onTextChange={(next) =>
               setTextLayer((prev) => (prev ? { ...prev, text: next } : prev))
             }
