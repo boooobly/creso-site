@@ -6,10 +6,9 @@ import { X } from 'lucide-react';
 type Props = PropsWithChildren<{
   isOpen: boolean;
   onClose: () => void;
-  onApply: () => void;
 }>;
 
-export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply, children }: Props) {
+export default function MugDesignerFullscreenOverlay({ isOpen, onClose, children }: Props) {
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -70,7 +69,7 @@ export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply,
         </div>
 
         <div className="flex flex-col gap-3 border-t border-neutral-200 bg-white/90 px-5 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-7">
-          <p className="text-sm text-neutral-600">Страница заявки остаётся на месте на фоне, а текущий макет можно применить в один клик.</p>
+          <p className="text-sm text-neutral-600">Страница заявки остаётся на месте на фоне, а применение макета доступно в блоке заказа справа.</p>
           <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
@@ -78,13 +77,6 @@ export default function MugDesignerFullscreenOverlay({ isOpen, onClose, onApply,
               className="inline-flex items-center justify-center rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
             >
               Закрыть
-            </button>
-            <button
-              type="button"
-              onClick={onApply}
-              className="inline-flex items-center justify-center rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
-            >
-              Применить макет
             </button>
           </div>
         </div>

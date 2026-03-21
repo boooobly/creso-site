@@ -164,8 +164,12 @@ const MUG_DISCOUNT_STEP_RATE = 0.025;
 const MUG_MAX_DISCOUNT_RATE = 0.2;
 const SELECTION_STROKE = "#0f172a";
 const SELECTION_SHADOW = "rgba(15,23,42,0.2)";
-const VISIBLE_PREVIEW_MARGIN_X = 290;
-const VISIBLE_PREVIEW_MARGIN_Y = 18;
+const MUG_VISIBLE_BOUNDS = {
+  x: 120,
+  y: 12,
+  width: 3248,
+  height: 1192,
+} as const;
 
 const defaultTransform: TransformState = {
   x: SAFE_RECT.x + SAFE_RECT.width / 2,
@@ -239,12 +243,7 @@ function clampRectToMockup(rect: RectShape): RectShape {
 }
 
 function getVisiblePreviewRect(): RectShape {
-  return clampRectToMockup({
-    x: PRINT_RECT.x - VISIBLE_PREVIEW_MARGIN_X,
-    y: PRINT_RECT.y - VISIBLE_PREVIEW_MARGIN_Y,
-    width: PRINT_RECT.width + VISIBLE_PREVIEW_MARGIN_X * 2,
-    height: PRINT_RECT.height + VISIBLE_PREVIEW_MARGIN_Y * 2,
-  });
+  return clampRectToMockup(MUG_VISIBLE_BOUNDS);
 }
 
 function parseDraft(raw: string | null): DesignerDraft | null {
@@ -643,8 +642,8 @@ function ControlsDock({
 
   return (
     <aside className="space-y-2 lg:sticky lg:top-6 lg:self-start">
-      <div className="flex flex-col gap-2 lg:max-h-[calc(100vh-220px)] lg:min-h-[560px]">
-        <div className="space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+      <div className="flex flex-col gap-2">
+        <div className="space-y-2">
           <SectionCard title="Файл" tone="muted">
             <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
               Загрузить изображение
