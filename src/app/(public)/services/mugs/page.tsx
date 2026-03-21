@@ -122,7 +122,7 @@ export default async function MugsServicePage() {
       </Section>
 
       <Section id="mugs-designer" className="pb-8 pt-8 sm:py-10 lg:py-12">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Конструктор</h2>
           <p className="mt-2 text-sm text-neutral-600 sm:text-base">Соберите макет прямо на сайте - или прикрепите файл, если уже готов.</p>
 
