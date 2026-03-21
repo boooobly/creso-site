@@ -285,7 +285,7 @@ function SectionCard({
   const toneClass = tone === "muted" ? "bg-neutral-50/90" : "bg-white";
 
   return (
-    <section className={`space-y-2.5 rounded-2xl border border-neutral-200 p-3 ${toneClass}`}>
+    <section className={`space-y-2 rounded-2xl border border-neutral-200 p-2.5 ${toneClass}`}>
       <div className="space-y-0.5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
           {title}
@@ -640,117 +640,120 @@ function ControlsDock({
   const canReset = Boolean(userImage || textLayer);
 
   return (
-    <aside className="space-y-2 lg:sticky lg:top-8 lg:self-start">
-      <SectionCard title="Файл" tone="muted">
-        <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
-          Загрузить изображение
-          <input
-            type="file"
-            accept=".png,.jpg,.jpeg,.webp"
-            className="hidden"
-            onChange={onUpload}
-          />
-        </label>
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      </SectionCard>
-
-      <SectionCard
-        title="Редактирование"
-        description={hasSelection ? `Выбрано: ${selectedElement === "image" ? "изображение" : "текст"}.` : "Выберите объект на кружке, чтобы изменить его."}
-      >
-        <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-600">
-          <span className={`rounded-full px-2.5 py-1 ${hasSelection ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-500"}`}>
-            {hasSelection ? "Объект выделен" : "Пока ничего не выбрано"}
-          </span>
-        </div>
-
-        <div className="grid gap-2 sm:grid-cols-2">
-          <button
-            type="button"
-            className={toolButtonClass}
-            disabled={!hasSelection}
-            onClick={onDeleteSelected}
-          >
-            Удалить
-          </button>
-          <button
-            type="button"
-            className={`${toolButtonClass} sm:col-span-2`}
-            disabled={!hasSelection}
-            onClick={onRotateSelected}
-          >
-            Повернуть на 90°
-          </button>
-        </div>
-
-        <div className="grid gap-2.5 border-t border-neutral-200 pt-2.5">
-          <label className={`space-y-1 ${hasImageSelection ? "" : "opacity-50"}`}>
-            <div className="flex items-center justify-between gap-3 text-xs">
-              <span className="text-neutral-600">Прозрачность</span>
-              <span className="text-neutral-500">{imageOpacity}%</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={imageOpacity}
-              disabled={!hasImageSelection}
-              onChange={(event) => onOpacityChange(Number(event.target.value))}
-              className="w-full accent-red-600"
-            />
-          </label>
-
-          <div className="grid gap-2 sm:grid-cols-2">
-            <button
-              type="button"
-              className={secondaryButtonClass}
-              disabled={!hasSelection}
-              onClick={onCenterSelected}
-            >
-              Выровнять по центру
-            </button>
-            <button
-              type="button"
-              className={secondaryButtonClass}
-              disabled={!hasImageSelection}
-              onClick={onFitToSafeZone}
-            >
-              Вписать в безопасную зону
-            </button>
-            <button
-              type="button"
-              className={secondaryButtonClass}
-              disabled={!hasImageSelection}
-              onClick={onFitToPrintArea}
-            >
-              Вписать в область печати
-            </button>
-            <button
-              type="button"
-              className={secondaryButtonClass}
-              disabled={!hasImageSelection}
-              onClick={onFillPrintArea}
-            >
-              Заполнить область печати
-            </button>
-          </div>
-
-          {hasTextSelection && textLayer ? (
-            <label className="space-y-1.5 text-sm text-neutral-700">
-              <span>Текст</span>
+    <aside className="space-y-2 lg:sticky lg:top-6 lg:self-start">
+      <div className="flex flex-col gap-2 lg:max-h-[calc(100vh-220px)] lg:min-h-[560px]">
+        <div className="space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+          <SectionCard title="Файл" tone="muted">
+            <label className={`block cursor-pointer text-center ${primaryButtonClass}`}>
+              Загрузить изображение
               <input
-                type="text"
-                value={textLayer.text}
-                onChange={(event) => onTextChange(event.target.value)}
-                className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                type="file"
+                accept=".png,.jpg,.jpeg,.webp"
+                className="hidden"
+                onChange={onUpload}
               />
             </label>
-          ) : null}
-        </div>
-      </SectionCard>
+            {error ? <p className="text-sm text-red-600">{error}</p> : null}
+          </SectionCard>
 
-      <SectionCard title="Заказ" tone="muted">
-        <div className="grid gap-2.5">
+          <SectionCard
+            title="Редактирование"
+            description={hasSelection ? `Выбрано: ${selectedElement === "image" ? "изображение" : "текст"}.` : "Выберите объект на кружке, чтобы изменить его."}
+          >
+            <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-600">
+              <span className={`rounded-full px-2.5 py-1 ${hasSelection ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-500"}`}>
+                {hasSelection ? "Объект выделен" : "Пока ничего не выбрано"}
+              </span>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                className={toolButtonClass}
+                disabled={!hasSelection}
+                onClick={onDeleteSelected}
+              >
+                Удалить
+              </button>
+              <button
+                type="button"
+                className={toolButtonClass}
+                disabled={!hasSelection}
+                onClick={onRotateSelected}
+              >
+                Повернуть на 90°
+              </button>
+            </div>
+
+            <div className="grid gap-2 border-t border-neutral-200 pt-2">
+              <label className={`space-y-1 ${hasImageSelection ? "" : "opacity-50"}`}>
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="text-neutral-600">Прозрачность</span>
+                  <span className="text-neutral-500">{imageOpacity}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={imageOpacity}
+                  disabled={!hasImageSelection}
+                  onChange={(event) => onOpacityChange(Number(event.target.value))}
+                  className="w-full accent-red-600"
+                />
+              </label>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  className={secondaryButtonClass}
+                  disabled={!hasSelection}
+                  onClick={onCenterSelected}
+                >
+                  Выровнять по центру
+                </button>
+                <button
+                  type="button"
+                  className={secondaryButtonClass}
+                  disabled={!hasImageSelection}
+                  onClick={onFitToSafeZone}
+                >
+                  Вписать в безопасную зону
+                </button>
+                <button
+                  type="button"
+                  className={secondaryButtonClass}
+                  disabled={!hasImageSelection}
+                  onClick={onFitToPrintArea}
+                >
+                  Вписать в область печати
+                </button>
+                <button
+                  type="button"
+                  className={secondaryButtonClass}
+                  disabled={!hasImageSelection}
+                  onClick={onFillPrintArea}
+                >
+                  Заполнить область печати
+                </button>
+              </div>
+
+              {hasTextSelection && textLayer ? (
+                <label className="space-y-1.5 text-sm text-neutral-700">
+                  <span>Текст</span>
+                  <input
+                    type="text"
+                    value={textLayer.text}
+                    onChange={(event) => onTextChange(event.target.value)}
+                    className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                  />
+                </label>
+              ) : null}
+            </div>
+          </SectionCard>
+        </div>
+
+        <SectionCard title="Заказ" tone="muted">
+          <div className="grid gap-2.5">
           <div className="space-y-1">
             <span className="text-xs text-neutral-500">Тираж</span>
             <div className="flex items-center gap-2">
@@ -816,7 +819,7 @@ function ControlsDock({
             </div>
           </div>
 
-          <div className="grid gap-2 border-t border-neutral-200 pt-2.5">
+          <div className="grid gap-2 border-t border-neutral-200 pt-2">
             <button
               type="button"
               className={primaryButtonClass}
@@ -833,8 +836,9 @@ function ControlsDock({
               Сбросить макет
             </button>
           </div>
-        </div>
-      </SectionCard>
+          </div>
+        </SectionCard>
+      </div>
     </aside>
   );
 }
@@ -1359,7 +1363,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     const primaryButtonClass =
       "w-full rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700";
     const secondaryButtonClass =
-      "w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
+      "w-full rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
     const toolButtonClass =
       "rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50";
 
@@ -1381,7 +1385,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
           </div>
         ) : null}
 
-        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,2.15fr)_minmax(320px,360px)] xl:grid-cols-[minmax(0,2.25fr)_minmax(330px,360px)] xl:gap-4">
+        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,1.68fr)_minmax(380px,420px)] xl:grid-cols-[minmax(0,1.74fr)_minmax(400px,440px)] xl:gap-4">
           <PreviewWorkspace
             wrapperRef={wrapperRef}
             stageRef={stageRef}
