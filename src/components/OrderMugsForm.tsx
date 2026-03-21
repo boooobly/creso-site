@@ -14,6 +14,7 @@ import {
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
 import type { MugDesigner2DExport, MugDesigner2DHandle } from '@/components/mug-designer/MugDesigner2D';
+import MugDesignerFullscreenOverlay from '@/components/mug-designer/MugDesignerFullscreenOverlay';
 
 const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner2D'), { ssr: false });
 
@@ -22,7 +23,6 @@ const complexityLevels = [
   { title: 'II', description: 'Комбинация текста и графики, умеренная подготовка и правки.' },
   { title: 'III', description: 'Сложный коллаж, много элементов, детальная допечатная подготовка.' },
 ];
-
 
 async function fileToDataUrl(file: File): Promise<string> {
   return await new Promise((resolve, reject) => {
@@ -74,11 +74,29 @@ export default function OrderMugsForm() {
   const [needsDesign, setNeedsDesign] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
   const [designerExport, setDesignerExport] = useState<MugDesigner2DExport | null>(null);
-
+  const [isDesignerOpen, setIsDesignerOpen] = useState(false);
 
   useEffect(() => {
     setHasDraft(designerRef.current?.hasRestorableDraft() ?? false);
   }, []);
+
+  const openDesigner = () => {
+    setHasDraft(designerRef.current?.hasRestorableDraft() ?? false);
+    setIsDesignerOpen(true);
+  };
+
+  const closeDesigner = () => {
+    setIsDesignerOpen(false);
+    setHasDraft(designerRef.current?.hasRestorableDraft() ?? false);
+  };
+
+  const handleApplyDesign = async () => {
+    const exported = await designerRef.current?.exportDesign();
+    if (exported) {
+      setDesignerExport(exported);
+    }
+    closeDesigner();
+  };
 
   const handleRestoreDraft = () => {
     const restored = designerRef.current?.restoreDraft() ?? false;
@@ -87,6 +105,7 @@ export default function OrderMugsForm() {
       return;
     }
     setHasDraft(false);
+    openDesigner();
   };
 
   const handleDeleteDraft = () => {
@@ -194,6 +213,8 @@ export default function OrderMugsForm() {
       setFile(null);
       setNeedsDesign(false);
       setErrors({});
+      setDesignerExport(null);
+      setHasDraft(false);
     } catch {
       setFormError('Не удалось отправить заявку. Попробуйте позже.');
     } finally {
@@ -203,15 +224,62 @@ export default function OrderMugsForm() {
 
   return (
     <div className="space-y-5">
-      <MugDesigner
-        ref={designerRef}
-        file={file}
-        onFileChange={setFile}
-        allowedExtensions={MUGS_ALLOWED_EXTENSIONS}
-        allowedMimeTypes={MUGS_ALLOWED_MIME_TYPES}
-        maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
-        onExportChange={setDesignerExport}
-      />
+      <div className="rounded-[28px] border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 p-5 shadow-sm md:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-2xl space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">Редактор макета</p>
+            <h2 className="text-2xl font-semibold tracking-tight text-neutral-950 md:text-3xl">Соберите макет кружки в отдельном полноэкранном редакторе</h2>
+            <p className="text-sm leading-6 text-neutral-600 md:text-base">
+              Откроем просторное рабочее пространство с превью, направляющими печати и всеми текущими инструментами редактирования прямо в этой вкладке.
+            </p>
+          </div>
+
+          <div className="flex w-full flex-col gap-3 md:w-auto md:min-w-[280px] md:items-end">
+            <button
+              type="button"
+              onClick={openDesigner}
+              className="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
+            >
+              Создать макет кружки
+            </button>
+            <p className="text-xs text-neutral-500 md:max-w-[260px] md:text-right">
+              Макет сохраняется как черновик и после применения остаётся привязан к заявке.
+            </p>
+          </div>
+        </div>
+
+        {(designerExport || file) && (
+          <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            <span className="font-medium">Макет подготовлен и будет приложен к заявке.</span>
+            <button
+              type="button"
+              onClick={openDesigner}
+              className="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-white px-3 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100"
+            >
+              Открыть редактор снова
+            </button>
+          </div>
+        )}
+      </div>
+
+      <MugDesignerFullscreenOverlay
+        isOpen={isDesignerOpen}
+        onClose={closeDesigner}
+        onApply={handleApplyDesign}
+      >
+        <MugDesigner
+          ref={designerRef}
+          file={file}
+          onFileChange={setFile}
+          allowedExtensions={MUGS_ALLOWED_EXTENSIONS}
+          allowedMimeTypes={MUGS_ALLOWED_MIME_TYPES}
+          maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
+          onExportChange={setDesignerExport}
+          showTitle={false}
+          applyButtonLabel="Применить макет"
+          onApply={handleApplyDesign}
+        />
+      </MugDesignerFullscreenOverlay>
 
       {hasDraft && (
         <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
