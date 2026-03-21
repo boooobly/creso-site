@@ -120,7 +120,7 @@ function scaleRect(
 }
 
 const SAFE_INSET = 16;
-const PREVIEW_MAX_HEIGHT = 680;
+const PREVIEW_MAX_HEIGHT = 760;
 const PREVIEW_STAGE_GUTTER = 20;
 
 const defaultTransform: TransformState = {
@@ -667,7 +667,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
           </div>
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(320px,360px)] xl:gap-5">
+        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(320px,360px)] xl:gap-4">
           <section className="self-start rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm sm:p-4 lg:p-5">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
               <span>Область печати</span>
