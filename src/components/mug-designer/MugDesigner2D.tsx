@@ -262,27 +262,29 @@ function SectionCard({
   );
 }
 
-function PreviewWorkspace({
-  wrapperRef,
-  stageRef,
-  guidesLayerRef,
-  contentLayerRef,
-  userImageRef,
-  textNodeRef,
-  transformerRef,
-  metrics,
-  mockupImage,
-  userImage,
-  transform,
-  textLayer,
-  imageOpacity,
-  selectedElement,
-  isDragging,
-  onSelectElement,
-  onDragStateChange,
-  onTransformChange,
-  onTextLayerChange,
-}: PreviewWorkspaceProps) {
+function PreviewWorkspace(props: PreviewWorkspaceProps) {
+  const {
+    wrapperRef,
+    stageRef,
+    guidesLayerRef,
+    contentLayerRef,
+    userImageRef,
+    textNodeRef,
+    transformerRef,
+    metrics,
+    mockupImage,
+    userImage,
+    transform,
+    textLayer,
+    imageOpacity,
+    selectedElement,
+    isDragging,
+    onSelectElement,
+    onDragStateChange,
+    onTransformChange,
+    onTextLayerChange,
+  } = props;
+
   return (
     <section className="self-start rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm sm:p-4 lg:p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
@@ -497,6 +499,35 @@ function PreviewWorkspace({
                       </>
                     ) : null}
                   </Group>
+                </Layer>
+
+                <Layer ref={guidesLayerRef}>
+                  <Group
+                    scaleX={metrics.previewScale}
+                    scaleY={metrics.previewScale}
+                  >
+                    <Rect
+                      x={PRINT_RECT.x}
+                      y={PRINT_RECT.y}
+                      width={PRINT_RECT.width}
+                      height={PRINT_RECT.height}
+                      cornerRadius={8}
+                      stroke="#dc2626"
+                      dash={[10, 8]}
+                      strokeWidth={4}
+                      listening={false}
+                    />
+                    <Rect
+                      x={PRINT_RECT.x + SAFE_INSET}
+                      y={PRINT_RECT.y + SAFE_INSET}
+                      width={PRINT_RECT.width - SAFE_INSET * 2}
+                      height={PRINT_RECT.height - SAFE_INSET * 2}
+                      cornerRadius={6}
+                      stroke="rgba(220,38,38,0.35)"
+                      dash={[6, 8]}
+                      strokeWidth={2}
+                      listening={false}
+                    />
 
                   {selectedElement ? (
                     <Transformer
@@ -612,17 +643,8 @@ function PreviewWorkspace({
                           height,
                         );
 
-            {selectedElement && (
-              <section className="space-y-2.5 rounded-xl border border-neutral-200 bg-white p-3.5">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                    Настройки объекта
-                  </p>
-                  <p className="mt-1 text-sm text-neutral-700">
-                    Выбрано:{" "}
-                    {selectedElement === "image" ? "Изображение" : "Текст"}
-                  </p>
-                </div>
+                        node.x(next.x);
+                        node.y(next.y);
 
                         onTransformChange((prev) => ({
                           ...prev,
