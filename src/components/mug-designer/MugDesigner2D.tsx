@@ -154,8 +154,6 @@ type ControlsDockProps = {
 };
 
 const PREVIEW_MIN_WIDTH = 280;
-const PREVIEW_TOP_FOCUS_MARGIN = 40;
-const PREVIEW_BOTTOM_FOCUS_MARGIN = 48;
 const DRAFT_KEY = "mugsDesignerDraft:v1";
 const TARGET_MOCK_EXPORT_WIDTH = 1800;
 const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -232,12 +230,12 @@ function clampRectToMockup(rect: RectShape): RectShape {
 }
 
 function getFocusRect(): RectShape {
-  return clampRectToMockup({
-    x: PRINT_RECT.x,
-    y: PRINT_RECT.y - PREVIEW_TOP_FOCUS_MARGIN,
-    width: PRINT_RECT.width,
-    height: PRINT_RECT.height + PREVIEW_TOP_FOCUS_MARGIN + PREVIEW_BOTTOM_FOCUS_MARGIN,
-  });
+  return {
+    x: 0,
+    y: 0,
+    width: MOCKUP_WIDTH,
+    height: MOCKUP_HEIGHT,
+  };
 }
 
 function parseDraft(raw: string | null): DesignerDraft | null {
@@ -325,15 +323,6 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
           style={{ height: metrics.windowHeight }}
         >
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[#f8f2ed] via-[#f8f2ed]/75 to-transparent sm:w-14"
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[#f8f2ed] via-[#f8f2ed]/75 to-transparent sm:w-14"
-            aria-hidden="true"
-          />
-
-          <div
             className="absolute left-0 top-0"
             style={{
               width: metrics.displayedStageWidth,
@@ -378,97 +367,104 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
 
               <Layer ref={contentLayerRef}>
                 <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
-                  {userImage ? (
-                    <KonvaImage
-                      ref={userImageRef}
-                      image={userImage}
-                      x={transform.x}
-                      y={transform.y}
-                      offsetX={userImage.width / 2}
-                      offsetY={userImage.height / 2}
-                      width={userImage.width}
-                      height={userImage.height}
-                      scaleX={transform.scaleX}
-                      scaleY={transform.scaleY}
-                      rotation={transform.rotation}
-                      opacity={imageOpacity / 100}
-                      shadowEnabled={selectedElement === "image"}
-                      shadowColor="rgba(220,38,38,0.35)"
-                      shadowBlur={selectedElement === "image" ? 16 : 0}
-                      shadowOpacity={selectedElement === "image" ? 0.5 : 0}
-                      draggable
-                      dragBoundFunc={(position) => {
-                        const width = userImage.width * Math.abs(transform.scaleX);
-                        const height = userImage.height * Math.abs(transform.scaleY);
-                        return clampPosition(position.x, position.y, width, height);
-                      }}
-                      onClick={() => onSelectElement("image")}
-                      onTap={() => onSelectElement("image")}
-                      onDragStart={() => {
-                        onDragStateChange(true);
-                        onSelectElement("image");
-                      }}
-                      onDragMove={(event) => {
-                        const width = userImage.width * Math.abs(transform.scaleX);
-                        const height = userImage.height * Math.abs(transform.scaleY);
-                        const next = clampPosition(
-                          event.target.x(),
-                          event.target.y(),
-                          width,
-                          height,
-                        );
-                        event.target.x(next.x);
-                        event.target.y(next.y);
-                      }}
-                      onDragEnd={(event) => {
-                        onDragStateChange(false);
-                        onTransformChange((prev) => ({
-                          ...prev,
-                          x: event.target.x(),
-                          y: event.target.y(),
-                        }));
-                      }}
-                    />
-                  ) : null}
+                  <Group
+                    clipX={PRINT_RECT.x}
+                    clipY={PRINT_RECT.y}
+                    clipWidth={PRINT_RECT.width}
+                    clipHeight={PRINT_RECT.height}
+                  >
+                    {userImage ? (
+                      <KonvaImage
+                        ref={userImageRef}
+                        image={userImage}
+                        x={transform.x}
+                        y={transform.y}
+                        offsetX={userImage.width / 2}
+                        offsetY={userImage.height / 2}
+                        width={userImage.width}
+                        height={userImage.height}
+                        scaleX={transform.scaleX}
+                        scaleY={transform.scaleY}
+                        rotation={transform.rotation}
+                        opacity={imageOpacity / 100}
+                        shadowEnabled={selectedElement === "image"}
+                        shadowColor="rgba(220,38,38,0.35)"
+                        shadowBlur={selectedElement === "image" ? 16 : 0}
+                        shadowOpacity={selectedElement === "image" ? 0.5 : 0}
+                        draggable
+                        dragBoundFunc={(position) => {
+                          const width = userImage.width * Math.abs(transform.scaleX);
+                          const height = userImage.height * Math.abs(transform.scaleY);
+                          return clampPosition(position.x, position.y, width, height);
+                        }}
+                        onClick={() => onSelectElement("image")}
+                        onTap={() => onSelectElement("image")}
+                        onDragStart={() => {
+                          onDragStateChange(true);
+                          onSelectElement("image");
+                        }}
+                        onDragMove={(event) => {
+                          const width = userImage.width * Math.abs(transform.scaleX);
+                          const height = userImage.height * Math.abs(transform.scaleY);
+                          const next = clampPosition(
+                            event.target.x(),
+                            event.target.y(),
+                            width,
+                            height,
+                          );
+                          event.target.x(next.x);
+                          event.target.y(next.y);
+                        }}
+                        onDragEnd={(event) => {
+                          onDragStateChange(false);
+                          onTransformChange((prev) => ({
+                            ...prev,
+                            x: event.target.x(),
+                            y: event.target.y(),
+                          }));
+                        }}
+                      />
+                    ) : null}
 
-                  {textLayer ? (
-                    <KonvaText
-                      ref={textNodeRef}
-                      text={textLayer.text}
-                      x={textLayer.x}
-                      y={textLayer.y}
-                      offsetX={textLayer.width / 2}
-                      offsetY={textLayer.height / 2}
-                      width={textLayer.width}
-                      height={textLayer.height}
-                      fontSize={textLayer.fontSize}
-                      align="center"
-                      verticalAlign="middle"
-                      fill="#dc2626"
-                      rotation={textLayer.rotation}
-                      scaleX={textLayer.scaleX}
-                      scaleY={textLayer.scaleY}
-                      shadowEnabled={selectedElement === "text"}
-                      shadowColor="rgba(220,38,38,0.35)"
-                      shadowBlur={selectedElement === "text" ? 14 : 0}
-                      shadowOpacity={selectedElement === "text" ? 0.45 : 0}
-                      draggable
-                      onClick={() => onSelectElement("text")}
-                      onTap={() => onSelectElement("text")}
-                      onDragStart={() => onSelectElement("text")}
-                      onDragEnd={(event) => {
-                        onTextLayerChange((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                x: event.target.x(),
-                                y: event.target.y(),
-                              }
-                            : prev,
-                        );
-                      }}
-                    />
-                  ) : null}
+                    {textLayer ? (
+                      <KonvaText
+                        ref={textNodeRef}
+                        text={textLayer.text}
+                        x={textLayer.x}
+                        y={textLayer.y}
+                        offsetX={textLayer.width / 2}
+                        offsetY={textLayer.height / 2}
+                        width={textLayer.width}
+                        height={textLayer.height}
+                        fontSize={textLayer.fontSize}
+                        align="center"
+                        verticalAlign="middle"
+                        fill="#dc2626"
+                        rotation={textLayer.rotation}
+                        scaleX={textLayer.scaleX}
+                        scaleY={textLayer.scaleY}
+                        shadowEnabled={selectedElement === "text"}
+                        shadowColor="rgba(220,38,38,0.35)"
+                        shadowBlur={selectedElement === "text" ? 14 : 0}
+                        shadowOpacity={selectedElement === "text" ? 0.45 : 0}
+                        draggable
+                        onClick={() => onSelectElement("text")}
+                        onTap={() => onSelectElement("text")}
+                        onDragStart={() => onSelectElement("text")}
+                        onDragEnd={(event) => {
+                          onTextLayerChange((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  x: event.target.x(),
+                                  y: event.target.y(),
+                                }
+                              : prev,
+                          );
+                        }}
+                      />
+                    ) : null}
+                  </Group>
                 </Group>
 
                 {selectedElement ? (
@@ -609,18 +605,6 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
               </Layer>
             </Stage>
           </div>
-        </div>
-      </div>
-
-      <div className="grid gap-2 text-xs text-neutral-500 sm:grid-cols-3">
-        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
-          Рабочий кадр уменьшает видимые пустые поля и держит фокус на зоне печати.
-        </div>
-        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
-          Изображение можно свободно двигать, вращать и масштабировать без клиппинга в live preview.
-        </div>
-        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
-          Экспорт по-прежнему берётся из полного мокапа и реального print rect.
         </div>
       </div>
     </section>
@@ -889,7 +873,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
     const focusRect = useMemo(() => getFocusRect(), []);
 
     const stageMetrics = useMemo<StageMetrics>(() => {
-      const previewScale = Math.max(previewViewportWidth / PRINT_RECT.width, 0.01);
+      const previewScale = Math.max(previewViewportWidth / focusRect.width, 0.01);
       const displayedStageWidth = Math.round(MOCKUP_WIDTH * previewScale);
       const displayedStageHeight = Math.round(MOCKUP_HEIGHT * previewScale);
       const windowHeight = Math.round(focusRect.height * previewScale);
@@ -899,7 +883,7 @@ const MugDesigner2D = forwardRef<MugDesigner2DHandle, Props>(
         displayedStageWidth,
         displayedStageHeight,
         windowHeight,
-        stageOffsetX: Math.round(PRINT_RECT.x * previewScale),
+        stageOffsetX: Math.round(focusRect.x * previewScale),
         stageOffsetY: Math.round(focusRect.y * previewScale),
         scaledPrintRect: scaleRect(PRINT_RECT, previewScale),
         scaledSafeRect: scaleRect(SAFE_RECT, previewScale),
