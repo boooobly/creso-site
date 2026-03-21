@@ -499,6 +499,35 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                       </>
                     ) : null}
                   </Group>
+                </Layer>
+
+                <Layer ref={guidesLayerRef}>
+                  <Group
+                    scaleX={metrics.previewScale}
+                    scaleY={metrics.previewScale}
+                  >
+                    <Rect
+                      x={PRINT_RECT.x}
+                      y={PRINT_RECT.y}
+                      width={PRINT_RECT.width}
+                      height={PRINT_RECT.height}
+                      cornerRadius={8}
+                      stroke="#dc2626"
+                      dash={[10, 8]}
+                      strokeWidth={4}
+                      listening={false}
+                    />
+                    <Rect
+                      x={PRINT_RECT.x + SAFE_INSET}
+                      y={PRINT_RECT.y + SAFE_INSET}
+                      width={PRINT_RECT.width - SAFE_INSET * 2}
+                      height={PRINT_RECT.height - SAFE_INSET * 2}
+                      cornerRadius={6}
+                      stroke="rgba(220,38,38,0.35)"
+                      dash={[6, 8]}
+                      strokeWidth={2}
+                      listening={false}
+                    />
 
                   {selectedElement ? (
                     <Transformer
@@ -564,8 +593,44 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                           return;
                         }
 
-                        const node = userImageRef.current;
-                        if (!node || !userImage) return;
+                                const node = userImageRef.current;
+                                if (!node || !userImage) return;
+
+                                const nextScaleX = clampScale(node.scaleX());
+                                const nextScaleY = clampScale(node.scaleY());
+                                const width =
+                                  userImage.width * Math.abs(nextScaleX);
+                                const height =
+                                  userImage.height * Math.abs(nextScaleY);
+                                const next = clampPosition(
+                                  node.x(),
+                                  node.y(),
+                                  width,
+                                  height,
+                                );
+
+                                node.x(next.x);
+                                node.y(next.y);
+
+                                setTransform((prev) => ({
+                                  ...prev,
+                                  x: next.x,
+                                  y: next.y,
+                                  scaleX: nextScaleX,
+                                  scaleY: nextScaleY,
+                                  rotation: node.rotation(),
+                                }));
+                              }}
+                            />
+                          )}
+                        </Group>
+                      </Layer>
+                    </Stage>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
                         const nextScaleX = clampScale(node.scaleX());
                         const nextScaleY = clampScale(node.scaleY());
@@ -583,11 +648,7 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
 
                         onTransformChange((prev) => ({
                           ...prev,
-                          x: next.x,
-                          y: next.y,
-                          scaleX: nextScaleX,
-                          scaleY: nextScaleY,
-                          rotation: node.rotation(),
+                          rotation: (prev.rotation + 90) % 360,
                         }));
                       }}
                     />
