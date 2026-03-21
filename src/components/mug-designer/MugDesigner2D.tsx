@@ -289,9 +289,7 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
     <section className="self-start rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm sm:p-4 lg:p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
         <span>Область печати</span>
-        <span>
-          Горизонтальный макет кружки без жёсткой маски в live preview
-        </span>
+        <span>Горизонтальный макет кружки без жёсткой маски в live preview</span>
       </div>
 
       <div className="rounded-2xl border border-neutral-200 bg-gradient-to-b from-white to-neutral-50 p-2 sm:p-3">
@@ -312,19 +310,18 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                 height={metrics.displayedHeight}
                 ref={stageRef}
                 onMouseDown={(event) => {
-                  if (event.target === event.target.getStage())
+                  if (event.target === event.target.getStage()) {
                     onSelectElement(null);
+                  }
                 }}
                 onTouchStart={(event) => {
-                  if (event.target === event.target.getStage())
+                  if (event.target === event.target.getStage()) {
                     onSelectElement(null);
+                  }
                 }}
               >
                 <Layer listening={false}>
-                  <Group
-                    scaleX={metrics.previewScale}
-                    scaleY={metrics.previewScale}
-                  >
+                  <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
                     <Rect
                       x={0}
                       y={0}
@@ -343,10 +340,7 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                 </Layer>
 
                 <Layer ref={contentLayerRef}>
-                  <Group
-                    scaleX={metrics.previewScale}
-                    scaleY={metrics.previewScale}
-                  >
+                  <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
                     {userImage ? (
                       <KonvaImage
                         ref={userImageRef}
@@ -367,16 +361,9 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                         shadowOpacity={selectedElement === "image" ? 0.5 : 0}
                         draggable
                         dragBoundFunc={(position) => {
-                          const width =
-                            userImage.width * Math.abs(transform.scaleX);
-                          const height =
-                            userImage.height * Math.abs(transform.scaleY);
-                          return clampPosition(
-                            position.x,
-                            position.y,
-                            width,
-                            height,
-                          );
+                          const width = userImage.width * Math.abs(transform.scaleX);
+                          const height = userImage.height * Math.abs(transform.scaleY);
+                          return clampPosition(position.x, position.y, width, height);
                         }}
                         onClick={() => onSelectElement("image")}
                         onTap={() => onSelectElement("image")}
@@ -385,10 +372,8 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                           onSelectElement("image");
                         }}
                         onDragMove={(event) => {
-                          const width =
-                            userImage.width * Math.abs(transform.scaleX);
-                          const height =
-                            userImage.height * Math.abs(transform.scaleY);
+                          const width = userImage.width * Math.abs(transform.scaleX);
+                          const height = userImage.height * Math.abs(transform.scaleY);
                           const next = clampPosition(
                             event.target.x(),
                             event.target.y(),
@@ -448,86 +433,6 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                       />
                     ) : null}
                   </Group>
-                </Layer>
-
-                <Layer ref={guidesLayerRef}>
-                  <Group
-                    scaleX={metrics.previewScale}
-                    scaleY={metrics.previewScale}
-                  >
-                    <Rect
-                      x={PRINT_RECT.x}
-                      y={PRINT_RECT.y}
-                      width={PRINT_RECT.width}
-                      height={PRINT_RECT.height}
-                      cornerRadius={8}
-                      stroke="#dc2626"
-                      dash={[10, 8]}
-                      strokeWidth={4}
-                      listening={false}
-                    />
-                    <Rect
-                      x={PRINT_RECT.x + SAFE_INSET}
-                      y={PRINT_RECT.y + SAFE_INSET}
-                      width={PRINT_RECT.width - SAFE_INSET * 2}
-                      height={PRINT_RECT.height - SAFE_INSET * 2}
-                      cornerRadius={6}
-                      stroke="rgba(220,38,38,0.35)"
-                      dash={[6, 8]}
-                      strokeWidth={2}
-                      listening={false}
-                    />
-
-                    {isDragging ? (
-                      <>
-                        <Rect
-                          x={PRINT_RECT.x + PRINT_RECT.width / 2}
-                          y={PRINT_RECT.y}
-                          width={2}
-                          height={PRINT_RECT.height}
-                          fill="rgba(220,38,38,0.35)"
-                          listening={false}
-                        />
-                        <Rect
-                          x={PRINT_RECT.x}
-                          y={PRINT_RECT.y + PRINT_RECT.height / 2}
-                          width={PRINT_RECT.width}
-                          height={2}
-                          fill="rgba(220,38,38,0.35)"
-                          listening={false}
-                        />
-                      </>
-                    ) : null}
-                  </Group>
-                </Layer>
-
-                <Layer ref={guidesLayerRef}>
-                  <Group
-                    scaleX={metrics.previewScale}
-                    scaleY={metrics.previewScale}
-                  >
-                    <Rect
-                      x={PRINT_RECT.x}
-                      y={PRINT_RECT.y}
-                      width={PRINT_RECT.width}
-                      height={PRINT_RECT.height}
-                      cornerRadius={8}
-                      stroke="#dc2626"
-                      dash={[10, 8]}
-                      strokeWidth={4}
-                      listening={false}
-                    />
-                    <Rect
-                      x={PRINT_RECT.x + SAFE_INSET}
-                      y={PRINT_RECT.y + SAFE_INSET}
-                      width={PRINT_RECT.width - SAFE_INSET * 2}
-                      height={PRINT_RECT.height - SAFE_INSET * 2}
-                      cornerRadius={6}
-                      stroke="rgba(220,38,38,0.35)"
-                      dash={[6, 8]}
-                      strokeWidth={2}
-                      listening={false}
-                    />
 
                   {selectedElement ? (
                     <Transformer
@@ -557,18 +462,25 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                         ) {
                           return oldBox;
                         }
-                        if (selectedElement === "text") return newBox;
+
+                        if (selectedElement === "text") {
+                          return newBox;
+                        }
+
                         if (
                           newBox.width < MIN_IMAGE_SIDE ||
                           newBox.height < MIN_IMAGE_SIDE
-                        )
+                        ) {
                           return oldBox;
+                        }
+
                         if (
                           newBox.width > PRINT_RECT.width * MAX_IMAGE_SCALE ||
                           newBox.height > PRINT_RECT.height * MAX_IMAGE_SCALE
                         ) {
                           return oldBox;
                         }
+
                         return newBox;
                       }}
                       onTransformEnd={() => {
@@ -593,66 +505,73 @@ function PreviewWorkspace(props: PreviewWorkspaceProps) {
                           return;
                         }
 
-                                const node = userImageRef.current;
-                                if (!node || !userImage) return;
-
-                                const nextScaleX = clampScale(node.scaleX());
-                                const nextScaleY = clampScale(node.scaleY());
-                                const width =
-                                  userImage.width * Math.abs(nextScaleX);
-                                const height =
-                                  userImage.height * Math.abs(nextScaleY);
-                                const next = clampPosition(
-                                  node.x(),
-                                  node.y(),
-                                  width,
-                                  height,
-                                );
-
-                                node.x(next.x);
-                                node.y(next.y);
-
-                                setTransform((prev) => ({
-                                  ...prev,
-                                  x: next.x,
-                                  y: next.y,
-                                  scaleX: nextScaleX,
-                                  scaleY: nextScaleY,
-                                  rotation: node.rotation(),
-                                }));
-                              }}
-                            />
-                          )}
-                        </Group>
-                      </Layer>
-                    </Stage>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+                        const node = userImageRef.current;
+                        if (!node || !userImage) return;
 
                         const nextScaleX = clampScale(node.scaleX());
                         const nextScaleY = clampScale(node.scaleY());
                         const width = userImage.width * Math.abs(nextScaleX);
                         const height = userImage.height * Math.abs(nextScaleY);
-                        const next = clampPosition(
-                          node.x(),
-                          node.y(),
-                          width,
-                          height,
-                        );
+                        const next = clampPosition(node.x(), node.y(), width, height);
 
                         node.x(next.x);
                         node.y(next.y);
 
                         onTransformChange((prev) => ({
                           ...prev,
-                          rotation: (prev.rotation + 90) % 360,
+                          x: next.x,
+                          y: next.y,
+                          scaleX: nextScaleX,
+                          scaleY: nextScaleY,
+                          rotation: node.rotation(),
                         }));
                       }}
                     />
                   ) : null}
+                </Layer>
+
+                <Layer ref={guidesLayerRef} listening={false}>
+                  <Group scaleX={metrics.previewScale} scaleY={metrics.previewScale}>
+                    <Rect
+                      x={PRINT_RECT.x}
+                      y={PRINT_RECT.y}
+                      width={PRINT_RECT.width}
+                      height={PRINT_RECT.height}
+                      cornerRadius={8}
+                      stroke="#dc2626"
+                      dash={[10, 8]}
+                      strokeWidth={4}
+                    />
+                    <Rect
+                      x={PRINT_RECT.x + SAFE_INSET}
+                      y={PRINT_RECT.y + SAFE_INSET}
+                      width={PRINT_RECT.width - SAFE_INSET * 2}
+                      height={PRINT_RECT.height - SAFE_INSET * 2}
+                      cornerRadius={6}
+                      stroke="rgba(220,38,38,0.35)"
+                      dash={[6, 8]}
+                      strokeWidth={2}
+                    />
+
+                    {isDragging ? (
+                      <>
+                        <Rect
+                          x={PRINT_RECT.x + PRINT_RECT.width / 2}
+                          y={PRINT_RECT.y}
+                          width={2}
+                          height={PRINT_RECT.height}
+                          fill="rgba(220,38,38,0.35)"
+                        />
+                        <Rect
+                          x={PRINT_RECT.x}
+                          y={PRINT_RECT.y + PRINT_RECT.height / 2}
+                          width={PRINT_RECT.width}
+                          height={2}
+                          fill="rgba(220,38,38,0.35)"
+                        />
+                      </>
+                    ) : null}
+                  </Group>
                 </Layer>
               </Stage>
             </div>
