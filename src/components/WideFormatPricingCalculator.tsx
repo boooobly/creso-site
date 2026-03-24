@@ -324,9 +324,9 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <section className="card p-5 md:p-6 space-y-4">
-        <h2 className="text-xl font-semibold">Параметры заказа</h2>
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-start">
+      <section className="card space-y-6 border-neutral-200/85 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
+        <h2 className="text-xl font-semibold tracking-tight">Параметры заказа</h2>
 
         {visibleCategoryOptions.length === 0 ? (
           <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -338,7 +338,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           <div className="space-y-2">
             <label htmlFor="material-category" className="text-sm font-medium">Категория</label>
             <Select value={category} onValueChange={(value) => handleCategoryChange(value as WideFormatCategory)} disabled={visibleCategoryOptions.length === 0}>
-              <SelectTrigger id="material-category" className="h-[46px]">
+              <SelectTrigger id="material-category" className="h-11 rounded-xl border-neutral-300 bg-neutral-50 px-3.5 text-[15px]">
                 <SelectValue placeholder="Выберите категорию" />
               </SelectTrigger>
               <SelectContent>
@@ -355,7 +355,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           <div className="space-y-2">
             <label htmlFor="material-variant" className="text-sm font-medium">Вариант</label>
             <Select value={material} onValueChange={(value) => setMaterial(value as WideFormatMaterialType)} disabled={availableVariants.length === 0}>
-              <SelectTrigger id="material-variant" className="h-[46px]">
+              <SelectTrigger id="material-variant" className="h-11 rounded-xl border-neutral-300 bg-neutral-50 px-3.5 text-[15px]">
                 <SelectValue placeholder="Выберите вариант">
                   {getWideFormatMaterialLabel(material)}
                 </SelectValue>
@@ -384,7 +384,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
               step="0.01"
               value={width}
               onChange={(e) => setWidth(e.target.value)}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+              className="h-11 w-full rounded-xl border border-neutral-300 bg-neutral-50 px-3.5 text-[15px] transition-colors focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 dark:border-neutral-700 dark:bg-neutral-900"
             />
           </div>
 
@@ -397,7 +397,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
               step="0.01"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
-              className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+              className="h-11 w-full rounded-xl border border-neutral-300 bg-neutral-50 px-3.5 text-[15px] transition-colors focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 dark:border-neutral-700 dark:bg-neutral-900"
             />
           </div>
         </div>
@@ -411,13 +411,13 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
             step="1"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
-            className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+            className="h-11 w-full rounded-xl border border-neutral-300 bg-neutral-50 px-3.5 text-[15px] transition-colors focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 dark:border-neutral-700 dark:bg-neutral-900"
           />
         </div>
 
         {isExtrasAllowed && (
-          <div className="space-y-2 pt-1">
-            <p className="text-sm font-medium">Дополнительные услуги</p>
+          <div className="space-y-2.5 border-t border-neutral-200/80 pt-4">
+            <p className="text-sm font-medium text-neutral-800">Дополнительные услуги</p>
             {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
             {isBanner && <CheckboxRow label={`Люверсы (${pricingConfig.grommetPrice} ₽/шт${quote.grommetsCount > 0 ? `, ~${quote.grommetsCount} шт` : ""})`} checked={grommets} onChange={setGrommets} />}
             {isBanner && canShowWelding && (
@@ -437,7 +437,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
         )}
 
         {isCanvasMaterial && (
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/85 p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
             <h3 className="text-base font-semibold">Печать на холсте</h3>
             <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
               Для последующего оформления в багет можно сразу передать размеры и изображение в конфигуратор.
@@ -472,15 +472,17 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
         )}
       </section>
 
-      <aside className="card h-fit p-5 md:p-6 space-y-4 lg:sticky lg:top-24">
-        <h2 className="text-xl font-semibold">Расчёт</h2>
-        <div className="space-y-2 text-sm">
+      <aside className="card h-fit space-y-5 border-neutral-200/85 p-5 shadow-sm shadow-neutral-200/50 md:p-6 lg:sticky lg:top-24">
+        <h2 className="text-xl font-semibold tracking-tight">Расчёт</h2>
+        <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3.5 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
           <SummaryRow label="Фактическая площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
           <SummaryRow label="Тарифицируемая площадь" value={quote.parsedValuesValid ? `${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
-          <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
-            <p className="text-sm font-medium">Материал</p>
+        </div>
+        <div className="space-y-2.5 text-sm">
+          <div className="rounded-xl border border-neutral-200/80 bg-white p-3.5 dark:border-neutral-800 dark:bg-neutral-900/60">
+            <p className="text-sm font-medium text-neutral-900">Материал</p>
             <p className="text-xs text-neutral-600 dark:text-neutral-400">({(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м² × {pricePerM2 ? formatRubles(pricePerM2) : '—'})</p>
-            <p className="text-sm font-semibold">= {formatRubles(quote.regularMaterialCost)}</p>
+            <p className="mt-1 text-sm font-semibold text-neutral-900">= {formatRubles(quote.regularMaterialCost)}</p>
             {pricePerM2 && (
               <p className="text-right text-xs text-neutral-500 dark:text-neutral-400">
                 {formatRubles(pricePerM2)} / м²
@@ -488,9 +490,9 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
             )}
           </div>
           {quote.extrasCost > 0 && (
-            <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900/60">
-              <p className="text-sm font-medium">Доп. услуги</p>
-              <p className="text-sm font-semibold">= {formatRubles(quote.extrasCost)}</p>
+            <div className="rounded-xl border border-neutral-200/80 bg-white p-3.5 dark:border-neutral-800 dark:bg-neutral-900/60">
+              <p className="text-sm font-medium text-neutral-900">Доп. услуги</p>
+              <p className="mt-1 text-sm font-semibold text-neutral-900">= {formatRubles(quote.extrasCost)}</p>
             </div>
           )}
           {quote.minimumPrintPriceApplied && (
@@ -505,16 +507,16 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           {quote.grommetsCost > 0 && <SummaryRow label={`— Люверсы (${quote.grommetsCount} шт)`} value={`${quote.grommetsCost.toLocaleString('ru-RU')} ₽`} />}
           {quote.positioningMarksCutCost > 0 && <SummaryRow label="— Метки позиционирования" value={`${quote.positioningMarksCutCost.toLocaleString('ru-RU')} ₽`} />}
           {isFilm && (
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            <p className="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
               Стоимость резки по меткам рассчитывается менеджером после проверки и утверждения макета.
             </p>
           )}
         </div>
 
-        <div className="rounded-2xl border-2 border-red-500/30 bg-white p-5 shadow-xl dark:bg-neutral-900">
-          <div className="border-t border-neutral-200 pt-3 dark:border-neutral-700">
+        <div className="rounded-2xl border border-red-500/25 bg-gradient-to-b from-red-50/35 via-white to-white p-5 shadow-[0_20px_36px_-30px_rgba(220,38,38,0.5)] dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-900">
+          <div className="space-y-2 border-t border-neutral-200 pt-3 dark:border-neutral-700">
             <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-            <p className={`mt-1 text-5xl font-semibold tracking-tight transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
+            <p className={`text-[2.55rem] font-semibold leading-none tracking-tight text-neutral-900 transition-transform duration-300 dark:text-neutral-50 ${pricePulse ? 'scale-[1.02]' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
             <p className="mt-2 text-sm text-muted-foreground">
               Цена за 1 шт: {totalPerUnit ? totalPerUnit.toLocaleString('ru-RU') : '—'} ₽
             </p>
@@ -528,7 +530,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           <Button variant="primary" className="mt-4 w-full" onClick={handleOrderClick} disabled={visibleCategoryOptions.length === 0}>Заказать печать</Button>
         </div>
 
-        <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+        <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50/80 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
           <p>Срок изготовления: <b>1–2 рабочих дня</b></p>
           <p>Максимальная ширина печати: <b>3.2 м</b></p>
         </div>
@@ -540,24 +542,24 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
 
 function CheckboxRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
   return (
-    <label className="flex items-center gap-3 cursor-pointer">
+    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-200/80 bg-neutral-50/70 px-3.5 py-2.5 transition-colors hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900/50">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4"
+        className="h-4 w-4 accent-[var(--brand-red)]"
       />
-      <span className="text-sm">{label}</span>
+      <span className="text-sm leading-5 text-neutral-700 dark:text-neutral-200">{label}</span>
     </label>
   );
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <p className="flex items-center">
-      <span>{label}</span>
+    <p className="flex items-center text-sm leading-6">
+      <span className="text-neutral-600 dark:text-neutral-300">{label}</span>
       <span className="mx-3 flex-1 border-b border-dashed border-neutral-300 dark:border-neutral-700" />
-      <b>{value}</b>
+      <b className="font-semibold text-neutral-900 dark:text-neutral-50">{value}</b>
     </p>
   );
 }
