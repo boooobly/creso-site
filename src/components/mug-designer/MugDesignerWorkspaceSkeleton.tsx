@@ -134,7 +134,7 @@ export default function MugDesignerWorkspaceSkeleton() {
 
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width ?? MUG_NATIVE_WIDTH;
-      setStageWidth(Math.min(width, 1180));
+      setStageWidth(width);
     });
 
     observer.observe(node);
@@ -356,8 +356,8 @@ export default function MugDesignerWorkspaceSkeleton() {
   };
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.8fr)_380px] 2xl:grid-cols-[minmax(0,2fr)_400px]">
-      <section className="rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
+    <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.8fr)_380px] 2xl:grid-cols-[minmax(0,2fr)_400px]">
+      <section className="self-start rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-neutral-900 sm:text-xl">Рабочее превью</h2>
@@ -369,7 +369,7 @@ export default function MugDesignerWorkspaceSkeleton() {
         <div className="rounded-2xl border border-neutral-200 bg-gradient-to-b from-neutral-100 to-neutral-50 p-3 sm:p-4">
           <div
             ref={stageWrapRef}
-            className="relative mx-auto aspect-[1457/630] w-full max-w-[1180px] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.02)]"
+            className="relative aspect-[1457/630] w-full overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.02)]"
           >
             <Image
               src={MUG_BASE_SRC}
