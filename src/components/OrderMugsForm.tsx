@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import Link from 'next/link';
+import { FormEvent, useEffect, useState } from 'react';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
@@ -10,6 +11,10 @@ import {
   MUGS_COVERING_OPTIONS,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
+import {
+  clearMugDesignerTransfer,
+  readMugDesignerTransfer,
+} from '@/lib/mugDesigner/sessionTransfer';
 
 const complexityLevels = [
   { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
@@ -24,6 +29,20 @@ async function fileToDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(new Error('Не удалось прочитать файл.'));
     reader.readAsDataURL(file);
   });
+}
+
+function dataUrlToFile(dataUrl: string, filename: string, fallbackType: string): File {
+  const [meta, content = ''] = dataUrl.split(',');
+  const mimeMatch = meta?.match(/data:(.*?);base64/);
+  const mimeType = mimeMatch?.[1] || fallbackType;
+  const binary = window.atob(content);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return new File([bytes], filename, { type: mimeType });
 }
 
 const checklist = [
@@ -47,6 +66,13 @@ type FormValues = {
 
 type FormErrors = Partial<Record<keyof FormValues | 'file', string>>;
 
+type PreparedDesign = {
+  createdAt: string;
+  mockPreview: File;
+  printPreview: File;
+  layout: File;
+};
+
 const defaultValues: FormValues = {
   name: '',
   phone: '',
@@ -64,6 +90,24 @@ export default function OrderMugsForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
   const [needsDesign, setNeedsDesign] = useState(false);
+  const [preparedDesign, setPreparedDesign] = useState<PreparedDesign | null>(null);
+
+  useEffect(() => {
+    const transfer = readMugDesignerTransfer();
+    if (!transfer) return;
+
+    try {
+      setPreparedDesign({
+        createdAt: transfer.createdAt,
+        mockPreview: dataUrlToFile(transfer.mockPreview.dataUrl, transfer.mockPreview.filename, transfer.mockPreview.mimeType),
+        printPreview: dataUrlToFile(transfer.printPreview.dataUrl, transfer.printPreview.filename, transfer.printPreview.mimeType),
+        layout: new File([transfer.layout.json], transfer.layout.filename, { type: transfer.layout.mimeType }),
+      });
+      setFormError('');
+    } catch {
+      clearMugDesignerTransfer();
+    }
+  }, []);
 
   const inputClass = (name: keyof FormValues) => [
     'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
@@ -119,6 +163,12 @@ export default function OrderMugsForm() {
         formData.set('rawImageDataUrl', rawImageDataUrl);
       }
 
+      if (preparedDesign) {
+        formData.set('mockPreview', preparedDesign.mockPreview, preparedDesign.mockPreview.name);
+        formData.set('printPreview', preparedDesign.printPreview, preparedDesign.printPreview.name);
+        formData.set('layout', preparedDesign.layout, preparedDesign.layout.name);
+      }
+
       const response = await fetch('/api/requests/mugs', {
         method: 'POST',
         body: formData,
@@ -135,6 +185,8 @@ export default function OrderMugsForm() {
       setValues(defaultValues);
       setFile(null);
       setNeedsDesign(false);
+      setPreparedDesign(null);
+      clearMugDesignerTransfer();
       setErrors({});
     } catch {
       setFormError('Не удалось отправить заявку. Попробуйте позже.');
@@ -153,8 +205,11 @@ export default function OrderMugsForm() {
             Сейчас мы улучшаем конструктор, чтобы он работал стабильнее и удобнее.
           </p>
           <p className="text-sm leading-6 text-neutral-600 md:text-base">
-            Уже сейчас можно отправить свой файл макета или описание идеи через форму ниже — мы подготовим всё перед печатью.
+            Уже сейчас можно отправить свой файл макета или собрать макет в отдельном конструкторе, а затем приложить его к заявке.
           </p>
+          <Link href="/mugs/designer" className="mt-2 inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700">
+            Открыть конструктор
+          </Link>
         </div>
       </div>
 
@@ -164,6 +219,28 @@ export default function OrderMugsForm() {
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          {preparedDesign && (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+              <p className="text-sm font-semibold text-emerald-800">Макет подготовлен и будет приложен к заявке.</p>
+              <p className="mt-1 text-xs text-emerald-700">Прикреплены файлы: превью кружки, область печати и JSON макета.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link href="/mugs/designer" className="inline-flex items-center justify-center rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100">
+                  Открыть конструктор
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPreparedDesign(null);
+                    clearMugDesignerTransfer();
+                  }}
+                  className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
+                >
+                  Удалить макет
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
             <label className="flex items-start gap-3">
               <input

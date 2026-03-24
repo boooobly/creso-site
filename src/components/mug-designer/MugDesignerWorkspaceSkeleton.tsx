@@ -2,8 +2,10 @@
 
 import type Konva from 'konva';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Group, Image as KonvaImage, Layer, Rect, Stage, Text, Transformer } from 'react-konva';
+import { MUGS_ORDER_RETURN_URL, saveMugDesignerTransfer } from '@/lib/mugDesigner/sessionTransfer';
 
 type EditableImageState = {
   x: number;
@@ -105,6 +107,7 @@ function drawPlacedImage(params: {
 }
 
 export default function MugDesignerWorkspaceSkeleton() {
+  const router = useRouter();
   const stageWrapRef = useRef<HTMLDivElement | null>(null);
   const imageNodeRef = useRef<Konva.Image | null>(null);
   const transformerRef = useRef<Konva.Transformer | null>(null);
@@ -217,10 +220,37 @@ export default function MugDesignerWorkspaceSkeleton() {
     setError('');
   };
 
-  const onExportMockPreview = () => {
+  const getLayoutPayload = () => ({
+    schemaVersion: 1,
+    generatedAt: new Date().toISOString(),
+    mug: {
+      baseImage: MUG_BASE_SRC,
+      nativeSize: {
+        width: MUG_NATIVE_WIDTH,
+        height: MUG_NATIVE_HEIGHT,
+      },
+    },
+    printRect: PRINT_AREA,
+    safeRect: SAFE_AREA,
+    artwork: imageState
+      ? {
+          transform: imageState,
+          source: imageElement
+            ? {
+                fileName: sourceFile?.name ?? null,
+                mimeType: sourceFile?.type ?? null,
+                pixelWidth: imageElement.width,
+                pixelHeight: imageElement.height,
+              }
+            : null,
+        }
+      : null,
+  });
+
+  const buildMockPreviewDataUrl = () => {
     if (!mugBaseImage) {
       setError('Мокап еще загружается. Попробуйте снова через секунду.');
-      return;
+      return null;
     }
 
     const canvas = document.createElement('canvas');
@@ -230,7 +260,7 @@ export default function MugDesignerWorkspaceSkeleton() {
 
     if (!ctx) {
       setError('Не удалось создать превью для экспорта.');
-      return;
+      return null;
     }
 
     ctx.drawImage(mugBaseImage, 0, 0, MUG_NATIVE_WIDTH, MUG_NATIVE_HEIGHT);
@@ -245,10 +275,10 @@ export default function MugDesignerWorkspaceSkeleton() {
       });
     }
 
-    makeDownload(canvas.toDataURL('image/png'), 'mug-mock-preview.png');
+    return canvas.toDataURL('image/png');
   };
 
-  const onExportPrintArea = () => {
+  const buildPrintAreaDataUrl = () => {
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(PRINT_AREA.width);
     canvas.height = Math.round(PRINT_AREA.height);
@@ -256,7 +286,7 @@ export default function MugDesignerWorkspaceSkeleton() {
 
     if (!ctx) {
       setError('Не удалось создать файл области печати.');
-      return;
+      return null;
     }
 
     if (imageElement && imageState) {
@@ -269,41 +299,60 @@ export default function MugDesignerWorkspaceSkeleton() {
       });
     }
 
-    makeDownload(canvas.toDataURL('image/png'), 'mug-print-area.png');
+    return canvas.toDataURL('image/png');
+  };
+
+  const onExportMockPreview = () => {
+    const dataUrl = buildMockPreviewDataUrl();
+    if (!dataUrl) return;
+    makeDownload(dataUrl, 'mug-mock-preview.png');
+  };
+
+  const onExportPrintArea = () => {
+    const dataUrl = buildPrintAreaDataUrl();
+    if (!dataUrl) return;
+    makeDownload(dataUrl, 'mug-print-area.png');
   };
 
   const onExportJson = () => {
-    const layoutPayload = {
-      schemaVersion: 1,
-      generatedAt: new Date().toISOString(),
-      mug: {
-        baseImage: MUG_BASE_SRC,
-        nativeSize: {
-          width: MUG_NATIVE_WIDTH,
-          height: MUG_NATIVE_HEIGHT,
-        },
-      },
-      printRect: PRINT_AREA,
-      safeRect: SAFE_AREA,
-      artwork: imageState
-        ? {
-            transform: imageState,
-            source: imageElement
-              ? {
-                  fileName: sourceFile?.name ?? null,
-                  mimeType: sourceFile?.type ?? null,
-                  pixelWidth: imageElement.width,
-                  pixelHeight: imageElement.height,
-                }
-              : null,
-          }
-        : null,
-    };
-
-    const blob = new Blob([JSON.stringify(layoutPayload, null, 2)], { type: 'application/json' });
+    const layoutJson = JSON.stringify(getLayoutPayload(), null, 2);
+    const blob = new Blob([layoutJson], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     makeDownload(url, 'mug-layout.json');
     URL.revokeObjectURL(url);
+  };
+
+  const onApplyToOrder = () => {
+    const mockDataUrl = buildMockPreviewDataUrl();
+    const printDataUrl = buildPrintAreaDataUrl();
+
+    if (!mockDataUrl || !printDataUrl) return;
+
+    try {
+      saveMugDesignerTransfer({
+        version: 1,
+        createdAt: new Date().toISOString(),
+        mockPreview: {
+          filename: 'mug-mock-preview.png',
+          mimeType: 'image/png',
+          dataUrl: mockDataUrl,
+        },
+        printPreview: {
+          filename: 'mug-print-preview.png',
+          mimeType: 'image/png',
+          dataUrl: printDataUrl,
+        },
+        layout: {
+          filename: 'mug-layout.json',
+          mimeType: 'application/json',
+          json: JSON.stringify(getLayoutPayload(), null, 2),
+        },
+      });
+
+      router.push(MUGS_ORDER_RETURN_URL);
+    } catch {
+      setError('Не удалось сохранить макет для заявки. Попробуйте снова.');
+    }
   };
 
   return (
@@ -481,6 +530,14 @@ export default function MugDesignerWorkspaceSkeleton() {
           </div>
 
           <div className="h-px bg-neutral-200" />
+
+          <button
+            type="button"
+            onClick={onApplyToOrder}
+            className="inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+          >
+            Применить к заявке
+          </button>
 
           <div className="grid gap-2">
             <button type="button" onClick={onExportMockPreview} className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100">
