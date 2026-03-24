@@ -1,9 +1,13 @@
+import dynamic from 'next/dynamic';
 import Section from '@/components/Section';
-import MugDesignerWorkspaceSkeleton from '@/components/mug-designer/MugDesignerWorkspaceSkeleton';
+
+const MugDesignerWorkspaceSkeleton = dynamic(() => import('@/components/mug-designer/MugDesignerWorkspaceSkeleton'), {
+  ssr: false,
+});
 
 export const metadata = {
   title: 'Конструктор кружек — новая версия',
-  description: 'Новая рабочая страница конструктора кружек. Базовый layout для следующего этапа разработки.',
+  description: 'Standalone-версия конструктора кружек с первым интерактивным этапом редактирования изображения.',
 };
 
 export default function MugsDesignerPage() {
@@ -14,8 +18,8 @@ export default function MugsDesignerPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600">Standalone workspace</p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-neutral-950 sm:text-3xl">Конструктор кружек</h1>
           <p className="mt-2 max-w-4xl text-sm leading-6 text-neutral-600 sm:text-base">
-            Отдельная рабочая страница нового редактора. На этом этапе реализован только фундамент интерфейса: превью, зоны
-            направляющих, структурированная панель инструментов и основная action-строка.
+            Первый рабочий интерактивный этап: загрузка изображения, базовое редактирование на мокапе и управление положением
+            в рамках области печати.
           </p>
         </header>
 
