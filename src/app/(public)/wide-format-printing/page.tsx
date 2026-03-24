@@ -76,52 +76,52 @@ export default async function WideFormatPrintingPage() {
 
   return (
     <div>
-      <Section className="pt-5 pb-3 md:pt-8 md:pb-5">
-        <div className="card overflow-hidden border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/30 p-5 shadow-sm shadow-neutral-200/60 md:p-7 lg:p-8">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(260px,320px)] lg:items-stretch">
-            <div className="flex h-full flex-col lg:min-h-[28rem]">
-              <div className="space-y-3.5">
+      <Section className="pt-5 pb-4 md:pt-8 md:pb-6">
+        <div className="card overflow-hidden border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/30 p-5 shadow-sm shadow-neutral-200/60 md:p-7 lg:p-9">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.14fr)_minmax(280px,350px)] lg:gap-8 lg:items-stretch">
+            <div className="flex h-full flex-col lg:min-h-[29rem]">
+              <div className="space-y-4">
                 <p className="t-eyebrow inline-flex rounded-full border border-[var(--brand-red)]/15 bg-[var(--brand-red)]/[0.06] px-3.5 py-1">
                   Широкоформатная печать
                 </p>
                 <h1 className="max-w-3xl text-[clamp(2.35rem,5.2vw,4.05rem)] font-bold leading-[1.01] tracking-[-0.035em] text-neutral-900">
                   {heroTitle}
                 </h1>
-                <p className="max-w-xl text-sm leading-6 text-neutral-600 md:text-[1.05rem] md:leading-7">
+                <p className="max-w-[41rem] text-sm leading-6 text-neutral-600 md:text-[1.05rem] md:leading-7">
                   {heroDescription} Поможем быстро согласовать материал, формат и запуск в нужный срок.
                 </p>
               </div>
 
-              <div className="mt-6 flex flex-1 flex-col justify-end gap-4 lg:pt-8">
-                <div className="flex flex-wrap items-center gap-2.5">
+              <div className="mt-7 flex flex-1 flex-col justify-end gap-4 lg:pt-7">
+                <div className="flex flex-wrap items-center gap-3">
                   <Link
                     href="#wide-format-calculator"
-                    className="btn-primary min-h-10 gap-2 px-4 py-2.5 text-sm no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
+                    className="btn-primary min-h-11 gap-2 px-5 py-3 text-sm no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
                   >
                     Рассчитать стоимость
                     <ArrowRight size={16} aria-hidden="true" />
                   </Link>
                   <Link
                     href="#wide-format-form"
-                    className="btn-secondary min-h-10 border-neutral-200 bg-white/80 px-4 py-2.5 text-sm text-neutral-700 no-underline"
+                    className="btn-secondary min-h-11 border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline"
                   >
                     Отправить параметры
                   </Link>
                 </div>
 
-                <div className="space-y-2.5 border-t border-neutral-200/80 pt-4">
-                  <p className="max-w-lg text-sm text-neutral-500">
+                <div className="space-y-3 border-t border-neutral-200/80 pt-4">
+                  <p className="max-w-lg text-sm leading-6 text-neutral-500">
                     Подскажем по материалам, подготовке макета и постобработке до запуска в печать.
                   </p>
                   <div className="flex flex-wrap items-center gap-2.5">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Подходит для</p>
                     <span className="h-px flex-1 bg-neutral-200/80" aria-hidden="true" />
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2.5">
                     {trustMarkers.map((marker) => (
                       <span
                         key={marker}
-                        className="chip-elevated inline-flex items-center gap-1.5 rounded-full border-neutral-200/80 bg-white/70 px-3 py-1.5 text-[11px] font-semibold text-neutral-700 shadow-none md:text-xs"
+                        className="chip-elevated inline-flex min-h-8 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-white/75 px-3.5 py-1.5 text-[11px] font-semibold text-neutral-700 shadow-none md:text-xs"
                       >
                         <span className="card-dot h-1.5 w-1.5" aria-hidden="true" />
                         {marker}
@@ -132,8 +132,8 @@ export default async function WideFormatPrintingPage() {
               </div>
             </div>
 
-            <div className="h-full rounded-[1.75rem] border border-neutral-200/70 bg-white/80 p-4 shadow-[0_12px_30px_-28px_rgba(15,23,42,0.4)] backdrop-blur-sm md:p-5">
-              <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3">
+            <div className="h-full rounded-[1.75rem] border border-neutral-200/70 bg-white/75 p-4 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm md:p-5">
+              <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3.5">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Производственный профиль</p>
                   <p className="mt-1 text-sm leading-5 text-neutral-500">Ключевые параметры услуги.</p>
@@ -143,22 +143,22 @@ export default async function WideFormatPrintingPage() {
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                 {heroHighlights.map((item) => {
                   const Icon = item.icon;
 
                   return (
                     <article
                       key={item.title}
-                      className="rounded-2xl border border-neutral-200/70 bg-white/65 p-3.5 transition-colors duration-200 hover:border-neutral-300 hover:bg-white"
+                      className="rounded-2xl border border-neutral-200/70 bg-white/70 p-4 transition-colors duration-200 hover:border-neutral-300 hover:bg-white"
                     >
                       <div className="flex items-start gap-3">
-                        <span className="inline-flex h-[2.125rem] w-[2.125rem] shrink-0 items-center justify-center rounded-xl border border-[var(--brand-red)]/10 bg-[var(--brand-red)]/[0.07] text-[var(--brand-red)]">
-                          <Icon size={16} strokeWidth={1.9} aria-hidden="true" />
+                        <span className="inline-flex h-[2.25rem] w-[2.25rem] shrink-0 items-center justify-center rounded-xl border border-[var(--brand-red)]/10 bg-[var(--brand-red)]/[0.07] text-[var(--brand-red)]">
+                          <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
                         </span>
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                           <h3 className="text-sm font-semibold leading-5 text-neutral-900">{item.title}</h3>
-                          <p className="text-sm leading-5 text-neutral-600">{item.description}</p>
+                          <p className="text-sm leading-[1.45] text-neutral-600">{item.description}</p>
                         </div>
                       </div>
                     </article>
@@ -170,38 +170,38 @@ export default async function WideFormatPrintingPage() {
         </div>
       </Section>
 
-      <Section className="pt-4 pb-12 md:pt-6">
+      <Section className="pt-4 pb-14 md:pt-6 md:pb-16">
         <div className="space-y-10">
           <div id="wide-format-calculator" className="scroll-mt-24">
             <WideFormatPricingCalculator pricingConfig={pricing.config} />
           </div>
 
-          <div className="card flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between md:p-8">
-            <div>
-              <h2 className="text-2xl font-semibold">{ctaTitle}</h2>
-              <p className="text-neutral-700">{ctaDescription}</p>
+          <div className="card flex flex-col gap-5 border-neutral-200/80 bg-neutral-50/70 p-6 md:flex-row md:items-center md:justify-between md:gap-8 md:p-8">
+            <div className="max-w-2xl space-y-2">
+              <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">{ctaTitle}</h2>
+              <p className="text-sm leading-6 text-neutral-600 md:text-base">{ctaDescription}</p>
             </div>
-            <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
+            <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center">
               <Link href="/plotter-cutting" className="btn-primary w-full text-center no-underline md:w-auto">{ctaButtonText}</Link>
             </div>
           </div>
 
           <section className="mt-10 rounded-2xl border border-neutral-200/70 bg-muted/30 p-6 md:p-8">
-            <h3 className="text-xl font-semibold md:text-2xl">Почему выбирают нас</h3>
-            <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <h3 className="text-xl font-semibold tracking-tight md:text-2xl">Почему выбирают нас</h3>
+            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {features.map((feature) => {
                 const Icon = feature.icon;
 
                 return (
                   <div
                     key={feature.title}
-                    className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+                    className="h-full rounded-2xl border border-neutral-200/90 bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-[0_12px_28px_-24px_rgba(15,23,42,0.45)] md:p-6"
                   >
-                    <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
-                      <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                    <div className="mb-3 inline-flex size-10 items-center justify-center rounded-xl border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                      <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
                     </div>
-                    <h3 className="text-sm font-semibold text-neutral-900">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-neutral-600">{feature.description}</p>
+                    <h3 className="text-base font-semibold leading-6 text-neutral-900">{feature.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-neutral-600">{feature.description}</p>
                   </div>
                 );
               })}

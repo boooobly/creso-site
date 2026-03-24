@@ -204,13 +204,13 @@ export default function OrderWideFormatForm() {
   }`;
 
   return (
-    <div id="wide-format-form" className={`card p-6 shadow-sm transition-all duration-300 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
-      <div className="mb-6">
-        <h2 id="wide-format-form-title" className="text-2xl font-semibold">Рассчитать стоимость</h2>
-        <p className="mt-2 text-sm text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
+    <div id="wide-format-form" className={`card border-neutral-200/85 p-6 shadow-sm shadow-neutral-200/45 transition-all duration-300 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
+      <div className="mb-7 space-y-2">
+        <h2 id="wide-format-form-title" className="text-2xl font-semibold tracking-tight">Рассчитать стоимость</h2>
+        <p className="text-sm leading-6 text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
       </div>
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-6" onSubmit={handleSubmit} noValidate>
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-medium">Имя *</span>
@@ -237,7 +237,7 @@ export default function OrderWideFormatForm() {
             {errors.email && <span className="text-xs text-red-600">{errors.email}</span>}
           </label>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3.5 dark:border-neutral-800 dark:bg-neutral-900/50 md:p-4">
             <ImageDropzone
               value={file}
               onChange={setFile}
@@ -256,15 +256,15 @@ export default function OrderWideFormatForm() {
               ]}
               allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
               invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
-              className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
+              className="rounded-xl border-2 border-dashed border-neutral-300 bg-white p-3 transition hover:border-red-400 dark:border-neutral-700 dark:bg-neutral-900 md:p-4"
               helperTextClassName="mt-1 text-xs text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
-            <p className="text-xs text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 border-t border-neutral-200/80 pt-5 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-medium">Ширина (мм)</span>
             <input className={inputClass('width')} inputMode="numeric" value={values.width} onChange={(e) => setValues((prev) => ({ ...prev, width: e.target.value }))} />
@@ -288,7 +288,7 @@ export default function OrderWideFormatForm() {
           </label>
         </div>
 
-        <label className="space-y-2 block">
+        <label className="block space-y-2">
           <span className="text-sm font-medium">Комментарий</span>
           <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
         </label>
@@ -302,11 +302,11 @@ export default function OrderWideFormatForm() {
           aria-hidden="true"
         />
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex flex-col gap-3 border-t border-neutral-200/80 pt-2 md:flex-row md:items-center">
           <button
             type="submit"
             disabled={isSending}
-            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
