@@ -47,7 +47,7 @@ export default async function MugsServicePage() {
 
                 <div className="mt-8 flex flex-wrap gap-3">
                   <a href="#mugs-designer" className="inline-flex h-12 items-center rounded-xl bg-red-600 px-6 text-sm font-medium text-white shadow-sm transition hover:bg-red-700">
-                    Собрать макет
+                    Оставить заявку
                   </a>
                 </div>
               </div>
@@ -123,8 +123,8 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-designer" className="pb-8 pt-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Конструктор</h2>
-          <p className="mt-2 text-sm text-neutral-600 sm:text-base">Соберите макет прямо на сайте - или прикрепите файл, если уже готов.</p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Оформление заказа</h2>
+          <p className="mt-2 text-sm text-neutral-600 sm:text-base">Прикрепите готовый файл макета или опишите задачу — мы подготовим всё к печати.</p>
 
           <div className="mt-6">
             <OrderMugsForm />
