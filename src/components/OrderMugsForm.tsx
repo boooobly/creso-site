@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
@@ -11,10 +10,6 @@ import {
   MUGS_COVERING_OPTIONS,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
-import {
-  clearMugDesignerTransfer,
-  readMugDesignerTransfer,
-} from '@/lib/mugDesigner/sessionTransfer';
 
 const complexityLevels = [
   { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
@@ -29,20 +24,6 @@ async function fileToDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(new Error('Не удалось прочитать файл.'));
     reader.readAsDataURL(file);
   });
-}
-
-function dataUrlToFile(dataUrl: string, filename: string, fallbackType: string): File {
-  const [meta, content = ''] = dataUrl.split(',');
-  const mimeMatch = meta?.match(/data:(.*?);base64/);
-  const mimeType = mimeMatch?.[1] || fallbackType;
-  const binary = window.atob(content);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-
-  return new File([bytes], filename, { type: mimeType });
 }
 
 const checklist = [
@@ -66,13 +47,6 @@ type FormValues = {
 
 type FormErrors = Partial<Record<keyof FormValues | 'file', string>>;
 
-type PreparedDesign = {
-  createdAt: string;
-  mockPreview: File;
-  printPreview: File;
-  layout: File;
-};
-
 const defaultValues: FormValues = {
   name: '',
   phone: '',
@@ -90,24 +64,6 @@ export default function OrderMugsForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
   const [needsDesign, setNeedsDesign] = useState(false);
-  const [preparedDesign, setPreparedDesign] = useState<PreparedDesign | null>(null);
-
-  useEffect(() => {
-    const transfer = readMugDesignerTransfer();
-    if (!transfer) return;
-
-    try {
-      setPreparedDesign({
-        createdAt: transfer.createdAt,
-        mockPreview: dataUrlToFile(transfer.mockPreview.dataUrl, transfer.mockPreview.filename, transfer.mockPreview.mimeType),
-        printPreview: dataUrlToFile(transfer.printPreview.dataUrl, transfer.printPreview.filename, transfer.printPreview.mimeType),
-        layout: new File([transfer.layout.json], transfer.layout.filename, { type: transfer.layout.mimeType }),
-      });
-      setFormError('');
-    } catch {
-      clearMugDesignerTransfer();
-    }
-  }, []);
 
   const inputClass = (name: keyof FormValues) => [
     'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
@@ -163,12 +119,6 @@ export default function OrderMugsForm() {
         formData.set('rawImageDataUrl', rawImageDataUrl);
       }
 
-      if (preparedDesign) {
-        formData.set('mockPreview', preparedDesign.mockPreview, preparedDesign.mockPreview.name);
-        formData.set('printPreview', preparedDesign.printPreview, preparedDesign.printPreview.name);
-        formData.set('layout', preparedDesign.layout, preparedDesign.layout.name);
-      }
-
       const response = await fetch('/api/requests/mugs', {
         method: 'POST',
         body: formData,
@@ -185,8 +135,6 @@ export default function OrderMugsForm() {
       setValues(defaultValues);
       setFile(null);
       setNeedsDesign(false);
-      setPreparedDesign(null);
-      clearMugDesignerTransfer();
       setErrors({});
     } catch {
       setFormError('Не удалось отправить заявку. Попробуйте позже.');
@@ -196,176 +144,136 @@ export default function OrderMugsForm() {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="rounded-[28px] border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 p-5 shadow-sm md:p-6">
-        <div className="max-w-3xl space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">Обновление сервиса</p>
-          <h2 className="text-2xl font-semibold tracking-tight text-neutral-950 md:text-3xl">Онлайн-конструктор кружек временно обновляется</h2>
-          <p className="text-sm leading-6 text-neutral-600 md:text-base">
-            Сейчас мы улучшаем конструктор, чтобы он работал стабильнее и удобнее.
-          </p>
-          <p className="text-sm leading-6 text-neutral-600 md:text-base">
-            Уже сейчас можно отправить свой файл макета или собрать макет в отдельном конструкторе, а затем приложить его к заявке.
-          </p>
-          <Link href="/mugs/designer" className="mt-2 inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700">
-            Открыть конструктор
-          </Link>
-        </div>
+    <div id="mug-order-form" className="card p-6 md:p-8">
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold">Заявка на печать кружек</h2>
       </div>
 
-      <div id="mug-order-form" className="card p-6 md:p-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold">Заявка на печать кружек</h2>
-        </div>
-
-        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-          {preparedDesign && (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-              <p className="text-sm font-semibold text-emerald-800">Макет подготовлен и будет приложен к заявке.</p>
-              <p className="mt-1 text-xs text-emerald-700">Прикреплены файлы: превью кружки, область печати и JSON макета.</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Link href="/mugs/designer" className="inline-flex items-center justify-center rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100">
-                  Открыть конструктор
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPreparedDesign(null);
-                    clearMugDesignerTransfer();
-                  }}
-                  className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
-                >
-                  Удалить макет
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-            <label className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                checked={needsDesign}
-                onChange={(event) => {
-                  const checked = event.target.checked;
-                  setNeedsDesign(checked);
-                  if (checked) {
-                    requestAnimationFrame(() => {
-                      document.getElementById('mug-design-info')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    });
-                  }
-                }}
-                className="mt-1 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500"
-              />
-              <span>
-                <span className="text-sm font-medium text-neutral-900">Нужен дизайн макета для кружки</span>
-                <span className="mt-1 block text-xs text-neutral-600">Если отметите, покажем варианты сложности и что входит в подготовку.</span>
-              </span>
-            </label>
-
-            <div
-              id="mug-design-info"
-              className={needsDesign
-                ? 'mt-4 overflow-hidden transition-all duration-300 ease-out opacity-100 max-h-[2000px]'
-                : 'mt-0 overflow-hidden transition-all duration-300 ease-out opacity-0 max-h-0 pointer-events-none'}
-            >
-              <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4">
-                <h3 className="text-xl font-semibold">Дизайн</h3>
-                <p className="text-sm text-neutral-700">2 макета входит в стоимость.</p>
-                <p className="text-sm text-neutral-700">К двум макетам включены 2 правки 1-й категории.</p>
-
-                <div>
-                  <h4 className="text-lg font-medium">Категории сложности I/II/III</h4>
-                  <ul className="mt-3 space-y-2 text-sm text-neutral-700">
-                    {complexityLevels.map((level) => (
-                      <li key={level.title}><span className="font-semibold">{level.title}:</span> {level.description}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-medium">Чек-лист (+1 за каждый пункт)</h4>
-                  <ul className="mt-3 grid gap-2 text-sm text-neutral-700 md:grid-cols-2">
-                    {checklist.map((item) => (
-                      <li key={item}>• {item}</li>
-                    ))}
-                  </ul>
-                  <p className="mt-4 text-sm text-neutral-700">Интерпретация: 0–2 → I, 3–5 → II, 6–8 → III.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="space-y-2">
-              <span className="text-sm font-medium">Имя *</span>
-              <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-              {errors.name && <span className="mt-1 text-xs text-red-600">{errors.name}</span>}
-            </label>
-
-            <label className="space-y-2">
-              <span className="text-sm font-medium">Телефон *</span>
-              <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
-              {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
-            </label>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="space-y-2">
-              <span className="text-sm font-medium">Количество *</span>
-              <input type="number" min={1} className={inputClass('quantity')} value={values.quantity} onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))} />
-              {errors.quantity && <span className="mt-1 text-xs text-red-600">{errors.quantity}</span>}
-            </label>
-
-            <label className="space-y-2">
-              <span className="text-sm font-medium">Покрытие *</span>
-              <select className={inputClass('covering')} value={values.covering} onChange={(e) => setValues((prev) => ({ ...prev, covering: e.target.value }))}>
-                {MUGS_COVERING_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-              {errors.covering && <span className="mt-1 text-xs text-red-600">{errors.covering}</span>}
-            </label>
-          </div>
-
-          <label className="space-y-2 block">
-            <span className="text-sm font-medium">Комментарий</span>
-            <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
+      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              checked={needsDesign}
+              onChange={(event) => {
+                const checked = event.target.checked;
+                setNeedsDesign(checked);
+                if (checked) {
+                  requestAnimationFrame(() => {
+                    document.getElementById('mug-design-info')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  });
+                }
+              }}
+              className="mt-1 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500"
+            />
+            <span>
+              <span className="text-sm font-medium text-neutral-900">Нужен дизайн макета для кружки</span>
+              <span className="mt-1 block text-xs text-neutral-600">Если отметите, покажем варианты сложности и что входит в подготовку.</span>
+            </span>
           </label>
 
-          <div className="space-y-2">
-            <ImageDropzone
-              value={file}
-              onChange={setFile}
-              title="Файл (необязательно)"
-              accept={MUGS_ALLOWED_EXTENSIONS.join(',')}
-              helperText={`Растровые: PNG, JPG, JPEG, WEBP. Векторные: PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`}
-              allowedMimeTypes={[...MUGS_ALLOWED_MIME_TYPES]}
-              allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
-              invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
-              maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
-              className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
-              helperTextClassName="mt-1 text-xs text-muted-foreground"
-              icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
-            />
-            {errors.file && <p className="mt-1 text-xs text-red-600">{errors.file}</p>}
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
-          </div>
-
-          <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
-
-          <button
-            type="submit"
-            disabled={isSending}
-            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all motion-reduce:transition-none hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
+          <div
+            id="mug-design-info"
+            className={needsDesign
+              ? 'mt-4 overflow-hidden transition-all duration-300 ease-out opacity-100 max-h-[2000px]'
+              : 'mt-0 overflow-hidden transition-all duration-300 ease-out opacity-0 max-h-0 pointer-events-none'}
           >
-            {isSending ? 'Отправка…' : 'Отправить заявку'}
-          </button>
+            <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4">
+              <h3 className="text-xl font-semibold">Дизайн</h3>
+              <p className="text-sm text-neutral-700">2 макета входит в стоимость.</p>
+              <p className="text-sm text-neutral-700">К двум макетам включены 2 правки 1-й категории.</p>
 
-          {formError && <p className="text-sm text-red-600">{formError}</p>}
-          {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
-        </form>
-      </div>
+              <div>
+                <h4 className="text-lg font-medium">Категории сложности I/II/III</h4>
+                <ul className="mt-3 space-y-2 text-sm text-neutral-700">
+                  {complexityLevels.map((level) => (
+                    <li key={level.title}><span className="font-semibold">{level.title}:</span> {level.description}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-medium">Чек-лист (+1 за каждый пункт)</h4>
+                <ul className="mt-3 grid gap-2 text-sm text-neutral-700 md:grid-cols-2">
+                  {checklist.map((item) => (
+                    <li key={item}>• {item}</li>
+                  ))}
+                </ul>
+                <p className="mt-4 text-sm text-neutral-700">Интерпретация: 0–2 → I, 3–5 → II, 6–8 → III.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Имя *</span>
+            <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
+            {errors.name && <span className="mt-1 text-xs text-red-600">{errors.name}</span>}
+          </label>
+
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Телефон *</span>
+            <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
+            {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Количество *</span>
+            <input type="number" min={1} className={inputClass('quantity')} value={values.quantity} onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))} />
+            {errors.quantity && <span className="mt-1 text-xs text-red-600">{errors.quantity}</span>}
+          </label>
+
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Покрытие *</span>
+            <select className={inputClass('covering')} value={values.covering} onChange={(e) => setValues((prev) => ({ ...prev, covering: e.target.value }))}>
+              {MUGS_COVERING_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+            {errors.covering && <span className="mt-1 text-xs text-red-600">{errors.covering}</span>}
+          </label>
+        </div>
+
+        <label className="space-y-2 block">
+          <span className="text-sm font-medium">Комментарий</span>
+          <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
+        </label>
+
+        <div className="space-y-2">
+          <ImageDropzone
+            value={file}
+            onChange={setFile}
+            title="Файл (необязательно)"
+            accept={MUGS_ALLOWED_EXTENSIONS.join(',')}
+            helperText={`Растровые: PNG, JPG, JPEG, WEBP. Векторные: PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`}
+            allowedMimeTypes={[...MUGS_ALLOWED_MIME_TYPES]}
+            allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
+            invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
+            maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
+            className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
+            helperTextClassName="mt-1 text-xs text-muted-foreground"
+            icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
+          />
+          {errors.file && <p className="mt-1 text-xs text-red-600">{errors.file}</p>}
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
+        </div>
+
+        <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
+
+        <button
+          type="submit"
+          disabled={isSending}
+          className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all motion-reduce:transition-none hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
+        >
+          {isSending ? 'Отправка…' : 'Отправить заявку'}
+        </button>
+
+        {formError && <p className="text-sm text-red-600">{formError}</p>}
+        {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
+      </form>
     </div>
   );
 }

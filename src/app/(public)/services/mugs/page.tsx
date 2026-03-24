@@ -1,6 +1,5 @@
 import Section from '@/components/Section';
 import Image from 'next/image';
-import MugPrintAreaCalibrator from '@/components/mug-designer/MugPrintAreaCalibrator';
 import OrderMugsForm from '@/components/OrderMugsForm';
 import { getSiteImage } from '@/lib/site-images';
 
@@ -46,7 +45,7 @@ export default async function MugsServicePage() {
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <a href="#mugs-designer" className="inline-flex h-12 items-center rounded-xl bg-red-600 px-6 text-sm font-medium text-white shadow-sm transition hover:bg-red-700">
+                  <a href="#mugs-order" className="inline-flex h-12 items-center rounded-xl bg-red-600 px-6 text-sm font-medium text-white shadow-sm transition hover:bg-red-700">
                     Оставить заявку
                   </a>
                 </div>
@@ -85,7 +84,7 @@ export default async function MugsServicePage() {
       <Section id="mugs-description" className="py-0">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-sm leading-relaxed text-neutral-700 sm:text-base">Печатаем на белых керамических кружках 330 мл. Макет проверяем перед запуском, чтобы не было сюрпризов по цвету и обрезке.</p>
+            <p className="text-sm leading-relaxed text-neutral-700 sm:text-base">Печатаем на белых керамических кружках 330 мл. Прикрепите готовый файл макета или опишите задачу — подготовим всё к печати.</p>
           </div>
         </div>
       </Section>
@@ -121,7 +120,7 @@ export default async function MugsServicePage() {
         </div>
       </Section>
 
-      <Section id="mugs-designer" className="pb-8 pt-8 sm:py-10 lg:py-12">
+      <Section id="mugs-order" className="pb-8 pt-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Оформление заказа</h2>
           <p className="mt-2 text-sm text-neutral-600 sm:text-base">Прикрепите готовый файл макета или опишите задачу — мы подготовим всё к печати.</p>
@@ -148,19 +147,6 @@ export default async function MugsServicePage() {
           </div>
         </div>
       </Section>
-
-      {process.env.NODE_ENV !== 'production' && (
-        <Section className="pt-0 pb-6">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <details className="card p-4 md:p-6">
-              <summary className="cursor-pointer text-sm font-semibold text-neutral-700">Print area calibrator</summary>
-              <div className="mt-4">
-                <MugPrintAreaCalibrator />
-              </div>
-            </details>
-          </div>
-        </Section>
-      )}
     </div>
   );
 }
