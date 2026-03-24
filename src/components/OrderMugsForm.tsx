@@ -1,22 +1,15 @@
 'use client';
 
-import { FormEvent, useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { FormEvent, useState } from 'react';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
-import { LAYOUT_MAX_SIZE_KB, PREVIEW_MAX_SIZE_MB } from '@/lib/mugDesigner/constants';
-import { dataUrlToFile } from '@/lib/mugDesigner/exportPreview';
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
   MUGS_COVERING_OPTIONS,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
-import type { MugDesigner2DExport, MugDesigner2DHandle } from '@/components/mug-designer/MugDesigner2D';
-import MugDesignerFullscreenOverlay from '@/components/mug-designer/MugDesignerFullscreenOverlay';
-
-const MugDesigner = dynamic(() => import('@/components/mug-designer/MugDesigner2D'), { ssr: false });
 
 const complexityLevels = [
   { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
@@ -64,7 +57,6 @@ const defaultValues: FormValues = {
 };
 
 export default function OrderMugsForm() {
-  const designerRef = useRef<MugDesigner2DHandle | null>(null);
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
@@ -72,46 +64,6 @@ export default function OrderMugsForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
   const [needsDesign, setNeedsDesign] = useState(false);
-  const [hasDraft, setHasDraft] = useState(false);
-  const [designerExport, setDesignerExport] = useState<MugDesigner2DExport | null>(null);
-  const [isDesignerOpen, setIsDesignerOpen] = useState(false);
-
-  useEffect(() => {
-    setHasDraft(designerRef.current?.hasRestorableDraft() ?? false);
-  }, []);
-
-  const openDesigner = () => {
-    setHasDraft(designerRef.current?.hasRestorableDraft() ?? false);
-    setIsDesignerOpen(true);
-  };
-
-  const closeDesigner = () => {
-    setIsDesignerOpen(false);
-    setHasDraft(designerRef.current?.hasRestorableDraft() ?? false);
-  };
-
-  const handleApplyDesign = async () => {
-    const exported = await designerRef.current?.exportDesign();
-    if (exported) {
-      setDesignerExport(exported);
-    }
-    closeDesigner();
-  };
-
-  const handleRestoreDraft = () => {
-    const restored = designerRef.current?.restoreDraft() ?? false;
-    if (!restored) {
-      setHasDraft(false);
-      return;
-    }
-    setHasDraft(false);
-    openDesigner();
-  };
-
-  const handleDeleteDraft = () => {
-    designerRef.current?.clearDraft();
-    setHasDraft(false);
-  };
 
   const inputClass = (name: keyof FormValues) => [
     'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
@@ -167,35 +119,6 @@ export default function OrderMugsForm() {
         formData.set('rawImageDataUrl', rawImageDataUrl);
       }
 
-      const exportedAtSubmit = await designerRef.current?.exportDesign();
-      const latestExport = exportedAtSubmit ?? designerExport;
-
-      if (latestExport?.mockPngDataUrl) {
-        formData.set('mockPngDataUrl', latestExport.mockPngDataUrl);
-      }
-
-      if (latestExport) {
-        const mockPreview = await dataUrlToFile(latestExport.mockPngDataUrl, 'mug-mock-preview.png');
-        const printPreview = await dataUrlToFile(latestExport.printPngDataUrl, 'mug-print-preview.png');
-        const layout = new File([latestExport.layoutJson], 'mug-layout.json', { type: 'application/json' });
-
-        if (mockPreview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024 || printPreview.size > PREVIEW_MAX_SIZE_MB * 1024 * 1024) {
-          setFormError(`Файл превью слишком большой. Максимум ${PREVIEW_MAX_SIZE_MB} МБ.`);
-          setIsSending(false);
-          return;
-        }
-
-        if (layout.size > LAYOUT_MAX_SIZE_KB * 1024) {
-          setFormError(`JSON состояния слишком большой. Максимум ${LAYOUT_MAX_SIZE_KB} КБ.`);
-          setIsSending(false);
-          return;
-        }
-
-        formData.set('mockPreview', mockPreview, mockPreview.name);
-        formData.set('printPreview', printPreview, printPreview.name);
-        formData.set('layout', layout, layout.name);
-      }
-
       const response = await fetch('/api/requests/mugs', {
         method: 'POST',
         body: formData,
@@ -213,8 +136,6 @@ export default function OrderMugsForm() {
       setFile(null);
       setNeedsDesign(false);
       setErrors({});
-      setDesignerExport(null);
-      setHasDraft(false);
     } catch {
       setFormError('Не удалось отправить заявку. Попробуйте позже.');
     } finally {
@@ -225,72 +146,17 @@ export default function OrderMugsForm() {
   return (
     <div className="space-y-5">
       <div className="rounded-[28px] border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 p-5 shadow-sm md:p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">Редактор макета</p>
-            <h2 className="text-2xl font-semibold tracking-tight text-neutral-950 md:text-3xl">Соберите макет кружки в отдельном полноэкранном редакторе</h2>
-            <p className="text-sm leading-6 text-neutral-600 md:text-base">
-              Откроем просторное рабочее пространство с превью, направляющими печати и всеми текущими инструментами редактирования прямо в этой вкладке.
-            </p>
-          </div>
-
-          <div className="flex w-full flex-col gap-3 md:w-auto md:min-w-[280px] md:items-end">
-            <button
-              type="button"
-              onClick={openDesigner}
-              className="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
-            >
-              Создать макет кружки
-            </button>
-            <p className="text-xs text-neutral-500 md:max-w-[260px] md:text-right">
-              Макет сохраняется как черновик и после применения остаётся привязан к заявке.
-            </p>
-          </div>
+        <div className="max-w-3xl space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">Обновление сервиса</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-neutral-950 md:text-3xl">Онлайн-конструктор кружек временно обновляется</h2>
+          <p className="text-sm leading-6 text-neutral-600 md:text-base">
+            Сейчас мы улучшаем конструктор, чтобы он работал стабильнее и удобнее.
+          </p>
+          <p className="text-sm leading-6 text-neutral-600 md:text-base">
+            Уже сейчас можно отправить свой файл макета или описание идеи через форму ниже — мы подготовим всё перед печатью.
+          </p>
         </div>
-
-        {(designerExport || file) && (
-          <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            <span className="font-medium">Макет подготовлен и будет приложен к заявке.</span>
-            <button
-              type="button"
-              onClick={openDesigner}
-              className="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-white px-3 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100"
-            >
-              Открыть редактор снова
-            </button>
-          </div>
-        )}
       </div>
-
-      <MugDesignerFullscreenOverlay
-        isOpen={isDesignerOpen}
-        onClose={closeDesigner}
-      >
-        <MugDesigner
-          ref={designerRef}
-          file={file}
-          onFileChange={setFile}
-          allowedExtensions={MUGS_ALLOWED_EXTENSIONS}
-          allowedMimeTypes={MUGS_ALLOWED_MIME_TYPES}
-          maxUploadMb={MUGS_MAX_UPLOAD_SIZE_MB}
-          onExportChange={setDesignerExport}
-          showTitle={false}
-          applyButtonLabel="Применить макет"
-          onApply={handleApplyDesign}
-        />
-      </MugDesignerFullscreenOverlay>
-
-      {hasDraft && (
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-neutral-800">Найден черновик макета. Восстановить?</p>
-            <div className="flex gap-2">
-              <button type="button" onClick={handleRestoreDraft} className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-700">Восстановить</button>
-              <button type="button" onClick={handleDeleteDraft} className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100">Удалить</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div id="mug-order-form" className="card p-6 md:p-8">
         <div className="mb-6">
