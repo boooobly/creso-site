@@ -13,6 +13,14 @@ type EditableImageState = {
   rotation: number;
 };
 
+type RectSpec = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+const MUG_BASE_SRC = '/images/mug/mug-base.png';
 const MUG_NATIVE_WIDTH = 1457;
 const MUG_NATIVE_HEIGHT = 630;
 
@@ -49,7 +57,7 @@ function fillRect(imgW: number, imgH: number, rectW: number, rectH: number) {
   };
 }
 
-function centeredPlacement(width: number, height: number, rect: { x: number; y: number; width: number; height: number }): EditableImageState {
+function centeredPlacement(width: number, height: number, rect: { width: number; height: number }): EditableImageState {
   return {
     x: rect.width / 2,
     y: rect.height / 2,
@@ -67,6 +75,35 @@ const isSupportedFile = (file: File) => {
   return byMime || byExt;
 };
 
+function makeDownload(dataUrl: string, filename: string) {
+  const anchor = document.createElement('a');
+  anchor.href = dataUrl;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+}
+
+function drawPlacedImage(params: {
+  ctx: CanvasRenderingContext2D;
+  image: CanvasImageSource;
+  placement: EditableImageState;
+  clipRect: RectSpec;
+  origin: { x: number; y: number };
+}) {
+  const { ctx, image, placement, clipRect, origin } = params;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+  ctx.clip();
+
+  ctx.translate(origin.x + placement.x, origin.y + placement.y);
+  ctx.rotate((placement.rotation * Math.PI) / 180);
+  ctx.drawImage(image, -placement.width / 2, -placement.height / 2, placement.width, placement.height);
+  ctx.restore();
+}
+
 export default function MugDesignerWorkspaceSkeleton() {
   const stageWrapRef = useRef<HTMLDivElement | null>(null);
   const imageNodeRef = useRef<Konva.Image | null>(null);
@@ -75,10 +112,18 @@ export default function MugDesignerWorkspaceSkeleton() {
   const [stageWidth, setStageWidth] = useState(960);
   const [error, setError] = useState<string>('');
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
+  const [sourceFile, setSourceFile] = useState<File | null>(null);
+  const [mugBaseImage, setMugBaseImage] = useState<HTMLImageElement | null>(null);
   const [imageState, setImageState] = useState<EditableImageState | null>(null);
 
   const stageHeight = useMemo(() => Math.round((stageWidth / MUG_NATIVE_WIDTH) * MUG_NATIVE_HEIGHT), [stageWidth]);
   const stageScale = useMemo(() => stageWidth / MUG_NATIVE_WIDTH, [stageWidth]);
+
+  useEffect(() => {
+    const mugImage = new window.Image();
+    mugImage.onload = () => setMugBaseImage(mugImage);
+    mugImage.src = MUG_BASE_SRC;
+  }, []);
 
   useEffect(() => {
     const node = stageWrapRef.current;
@@ -117,6 +162,7 @@ export default function MugDesignerWorkspaceSkeleton() {
     loaded.onload = () => {
       const initial = fitIntoRect(loaded.width, loaded.height, SAFE_AREA.width, SAFE_AREA.height);
       setImageElement(loaded);
+      setSourceFile(nextFile);
       setImageState(centeredPlacement(initial.width, initial.height, PRINT_AREA));
       URL.revokeObjectURL(src);
     };
@@ -166,8 +212,98 @@ export default function MugDesignerWorkspaceSkeleton() {
 
   const onRemoveImage = () => {
     setImageElement(null);
+    setSourceFile(null);
     setImageState(null);
     setError('');
+  };
+
+  const onExportMockPreview = () => {
+    if (!mugBaseImage) {
+      setError('Мокап еще загружается. Попробуйте снова через секунду.');
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = MUG_NATIVE_WIDTH;
+    canvas.height = MUG_NATIVE_HEIGHT;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      setError('Не удалось создать превью для экспорта.');
+      return;
+    }
+
+    ctx.drawImage(mugBaseImage, 0, 0, MUG_NATIVE_WIDTH, MUG_NATIVE_HEIGHT);
+
+    if (imageElement && imageState) {
+      drawPlacedImage({
+        ctx,
+        image: imageElement,
+        placement: imageState,
+        clipRect: PRINT_AREA,
+        origin: { x: PRINT_AREA.x, y: PRINT_AREA.y },
+      });
+    }
+
+    makeDownload(canvas.toDataURL('image/png'), 'mug-mock-preview.png');
+  };
+
+  const onExportPrintArea = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(PRINT_AREA.width);
+    canvas.height = Math.round(PRINT_AREA.height);
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      setError('Не удалось создать файл области печати.');
+      return;
+    }
+
+    if (imageElement && imageState) {
+      drawPlacedImage({
+        ctx,
+        image: imageElement,
+        placement: imageState,
+        clipRect: { x: 0, y: 0, width: PRINT_AREA.width, height: PRINT_AREA.height },
+        origin: { x: 0, y: 0 },
+      });
+    }
+
+    makeDownload(canvas.toDataURL('image/png'), 'mug-print-area.png');
+  };
+
+  const onExportJson = () => {
+    const layoutPayload = {
+      schemaVersion: 1,
+      generatedAt: new Date().toISOString(),
+      mug: {
+        baseImage: MUG_BASE_SRC,
+        nativeSize: {
+          width: MUG_NATIVE_WIDTH,
+          height: MUG_NATIVE_HEIGHT,
+        },
+      },
+      printRect: PRINT_AREA,
+      safeRect: SAFE_AREA,
+      artwork: imageState
+        ? {
+            transform: imageState,
+            source: imageElement
+              ? {
+                  fileName: sourceFile?.name ?? null,
+                  mimeType: sourceFile?.type ?? null,
+                  pixelWidth: imageElement.width,
+                  pixelHeight: imageElement.height,
+                }
+              : null,
+          }
+        : null,
+    };
+
+    const blob = new Blob([JSON.stringify(layoutPayload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    makeDownload(url, 'mug-layout.json');
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -187,7 +323,7 @@ export default function MugDesignerWorkspaceSkeleton() {
             className="relative mx-auto aspect-[1457/630] w-full max-w-[1180px] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.02)]"
           >
             <Image
-              src="/images/mug/mug-base.png"
+              src={MUG_BASE_SRC}
               alt="Базовый мокап кружки"
               fill
               priority
@@ -341,6 +477,20 @@ export default function MugDesignerWorkspaceSkeleton() {
             </button>
             <button type="button" onClick={onRemoveImage} disabled={!imageState} className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50">
               Удалить изображение
+            </button>
+          </div>
+
+          <div className="h-px bg-neutral-200" />
+
+          <div className="grid gap-2">
+            <button type="button" onClick={onExportMockPreview} className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100">
+              Скачать превью
+            </button>
+            <button type="button" onClick={onExportPrintArea} className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100">
+              Скачать область печати
+            </button>
+            <button type="button" onClick={onExportJson} className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100">
+              Скачать JSON макета
             </button>
           </div>
         </div>
