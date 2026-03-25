@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Brush, CheckCheck, ChevronDown, ClipboardCheck, FileUp, Palette, Shirt, Sparkles, Timer, Truck, UploadCloud } from 'lucide-react';
+import { Brush, CheckCheck, ChevronDown, ClipboardCheck, FileUp, Palette, Shirt, Sparkles, Truck, UploadCloud } from 'lucide-react';
 import { CSSProperties, ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
 import FloatingTshirtsCTA from '@/components/heat-transfer/FloatingTshirtsCTA';
@@ -22,7 +22,11 @@ type SectionBlockProps = {
   children: (state: SectionRenderState) => ReactNode;
 };
 
-const kpiChips = ['A4 - 250 ₽/сторона', 'Футболки - от 500 ₽', 'Без минималки'];
+const kpiChips = [
+  { title: 'Свои или наши футболки', subtitle: 'Печатаем на любых заготовках' },
+  { title: 'Мерч и форма', subtitle: 'Для команд, брендов и событий' },
+  { title: 'Макет под контролем', subtitle: 'Проверка перед запуском' },
+];
 
 const pricingCards = [
   {
@@ -43,21 +47,17 @@ const pricingCards = [
 const printTechnologyCards = [
   {
     title: 'Сублимация',
-    lines: [
-      'Полноцветная печать методом сублимации',
-      'Только белая синтетическая ткань',
-      'Идеально для фотографий и градиентов',
-      'Максимальная яркость и стойкость цвета',
-    ],
+    label: 'Для полноцвета',
+    descriptor: 'Яркая полноцветная печать для светлого полиэстера с высокой стойкостью.',
+    points: ['Фото, градиенты и сложные иллюстрации', 'Лёгкие спортивные и промо-футболки', 'Цвет не трескается и не ощущается плёнкой'],
+    bestFor: 'Лучше всего: когда важны насыщенные цвета и долговечность на синтетике.',
   },
   {
     title: 'Термотрансферная пленка',
-    lines: [
-      'Подходит для хлопковой ткани (ХБ)',
-      'Монохромные или цветные пленки',
-      'Четкие логотипы и надписи',
-      'Надежная фиксация изображения',
-    ],
+    label: 'Для надписей и логотипов',
+    descriptor: 'Чёткие графические элементы на хлопке и смесовых тканях.',
+    points: ['Логотипы, имена, номера и короткие надписи', 'Футбольная и рабочая форма, корпоративная одежда', 'Ровные контуры и аккуратная посадка плёнки'],
+    bestFor: 'Лучше всего: когда нужен контрастный знак, номер или бренд-элемент.',
   },
 ] as const;
 
@@ -226,56 +226,116 @@ export default function TshirtsLanding({
 
   return (
     <div className="bg-white pb-10 dark:bg-neutral-950">
-      <section id="tshirts-hero" className="relative overflow-hidden py-16 md:py-24">
+      <section id="tshirts-hero" className="relative overflow-hidden py-10 md:py-14">
         <div className="container relative">
           <div
             ref={heroReveal.ref}
-            className={`rounded-3xl border border-neutral-200 bg-white/95 p-7 shadow-xl backdrop-blur transition-all duration-700 dark:border-neutral-800 dark:bg-neutral-900/90 md:p-10 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+            className={`rounded-3xl border border-neutral-200/90 bg-white p-5 shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-all duration-700 dark:border-neutral-800 dark:bg-neutral-900 md:p-8 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600">Студийный уровень печати</p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
-            <p className="mt-4 max-w-3xl text-sm text-neutral-600 dark:text-neutral-300 md:text-lg">{heroDescription}</p>
-            <p className="mt-2 flex items-start gap-2 text-sm text-neutral-500 dark:text-neutral-300">
-              <Timer className="mt-0.5 size-4 shrink-0 text-red-500" aria-hidden="true" />
-              Итоговую стоимость и сроки подтверждает менеджер после проверки макета.
-            </p>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600">Брендированная одежда</p>
+                <h1 className="mt-3 max-w-[16ch] text-3xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
+                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-base">
+                  {heroDescription} Печатаем для мерча, формы и брендированной одежды — от одной вещи до корпоративных партий.
+                </p>
 
-            <div className="mt-6 grid gap-2 sm:grid-cols-3">
-              {kpiChips.map((chip, index) => (
-                <span
-                  key={chip}
-                  style={delayStyle(index, heroReveal.prefersReducedMotion)}
-                  className={`rounded-2xl border border-red-200/90 bg-gradient-to-br from-red-50 to-white px-4 py-3 text-center text-sm font-bold text-red-700 shadow-sm transition-all duration-500 dark:border-red-900/50 dark:from-red-950/40 dark:to-neutral-900 dark:text-red-200 md:text-base ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
-                >
-                  {chip}
-                </span>
-              ))}
-            </div>
+                <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
+                  {kpiChips.map((chip, index) => (
+                    <div
+                      key={chip.title}
+                      style={delayStyle(index, heroReveal.prefersReducedMotion)}
+                      className={`rounded-xl border border-neutral-200 bg-neutral-50/80 px-3 py-2.5 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900/70 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+                    >
+                      <p className="text-xs font-semibold leading-snug text-neutral-900 dark:text-neutral-100">{chip.title}</p>
+                      <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{chip.subtitle}</p>
+                    </div>
+                  ))}
+                </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link href="#tshirts-order" className="inline-flex items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none">{heroPrimaryButtonText}</Link>
-              <Link href="#examples" className="text-sm font-semibold text-neutral-700 underline-offset-4 transition hover:text-red-600 hover:underline dark:text-neutral-200 dark:hover:text-red-300">{heroSecondaryButtonText}</Link>
+                <div className="mt-7 flex flex-wrap items-center gap-3">
+                  <Link
+                    href="#tshirts-order"
+                    className="inline-flex h-11 items-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none"
+                  >
+                    {heroPrimaryButtonText}
+                  </Link>
+                  <Link
+                    href="#examples"
+                    className="inline-flex h-11 items-center rounded-xl border border-neutral-300 px-5 text-sm font-semibold text-neutral-700 no-underline transition hover:border-neutral-400 hover:text-neutral-950 motion-reduce:transition-none dark:border-neutral-700 dark:text-neutral-100 dark:hover:border-neutral-500"
+                  >
+                    {heroSecondaryButtonText}
+                  </Link>
+                </div>
+              </div>
+
+              <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100/70 p-3 dark:border-neutral-800 dark:bg-neutral-950">
+                <div className="grid h-full gap-3">
+                  <div className="relative min-h-[280px] overflow-hidden rounded-xl md:min-h-[320px]">
+                    <Image
+                      src={galleryImages['tshirts.examples.team']?.url ?? '/images/t-shirt/eurochem.png'}
+                      alt="Брендированные футболки для команды"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1280px) 420px, (min-width: 1024px) 34vw, 100vw"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3">
+                      <p className="text-sm font-semibold text-white">Мерч и корпоративная форма</p>
+                      <p className="mt-0.5 text-xs text-white/85">Логотипы, надписи, номера и полноцветные принты</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="relative min-h-[108px] overflow-hidden rounded-xl">
+                      <Image
+                        src={galleryImages['tshirts.examples.logo']?.url ?? '/images/t-shirt/logo.png'}
+                        alt="Логотипы на футболках"
+                        fill
+                        className="object-cover"
+                        sizes="(min-width: 1280px) 200px, 50vw"
+                      />
+                    </div>
+                    <div className="flex min-h-[108px] flex-col justify-center rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-700 dark:bg-neutral-900">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">Подходит для</p>
+                      <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-neutral-100">Логотипов, имён и номеров</p>
+                      <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">Чёткая графика для формы и мерча</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </div>
             </div>
           </div>
-        </div>
       </section>
 
-      <SectionBlock title="Технологии печати" subtitle="Подбираем технологию под материал и задачу, чтобы принт выглядел ярко и держался долго.">
+      <SectionBlock title="Технологии печати" subtitle="Две рабочие технологии под разные задачи: подскажем оптимальный вариант по ткани, макету и тиражу.">
         {(reveal) => (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             {printTechnologyCards.map((card, index) => (
               <AnimatedCard
                 key={card.title}
                 index={index}
                 reveal={reveal}
-                className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm hover:-translate-y-1 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
+                className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_14px_30px_rgba(15,23,42,0.08)] dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700"
               >
-                <h3 className="text-lg font-semibold">{card.title}</h3>
-                <ul className="mt-4 space-y-2 text-sm text-neutral-600 dark:text-neutral-300">
-                  {card.lines.map((line) => (
-                    <li key={line}>• {line}</li>
+                <span className="inline-flex rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
+                  {card.label}
+                </span>
+                <h3 className="mt-4 text-xl font-semibold">{card.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{card.descriptor}</p>
+
+                <ul className="mt-5 space-y-2.5 text-sm text-neutral-700 dark:text-neutral-200">
+                  {card.points.map((point) => (
+                    <li key={point} className="flex items-start gap-2.5">
+                      <span className="mt-[6px] size-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
+                      <span>{point}</span>
+                    </li>
                   ))}
                 </ul>
+
+                <p className="mt-5 border-t border-neutral-200 pt-4 text-xs font-medium leading-relaxed text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
+                  {card.bestFor}
+                </p>
               </AnimatedCard>
             ))}
           </div>
