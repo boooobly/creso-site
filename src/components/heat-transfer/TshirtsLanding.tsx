@@ -270,13 +270,13 @@ export default function TshirtsLanding({
               </div>
 
               <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100/70 p-3 dark:border-neutral-800 dark:bg-neutral-950">
-                <div className="relative min-h-[280px] overflow-hidden rounded-xl md:min-h-[340px]">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
                   <Image
-                    src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/eurochem.png'}
+                    src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/termoplenka.png'}
                     alt={galleryImages['tshirts.hero.main']?.altText || 'Брендированные футболки для команды'}
                     fill
                     className="object-cover"
-                    sizes="(min-width: 1280px) 420px, (min-width: 1024px) 36vw, 100vw"
+                    sizes="(min-width: 1280px) 420px, (min-width: 1024px) 34vw, 100vw"
                   />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3">
                     <p className="text-sm font-semibold text-white">Печать для мерча, формы и промо</p>
