@@ -3,6 +3,7 @@ import { ArrowRight, Building2, ClipboardCheck, Clock3, Droplets, FileText, Rule
 import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 import OrderWideFormatForm from '@/components/OrderWideFormatForm';
+import WideFormatTrustCards from '@/components/wide-format/WideFormatTrustCards';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getWideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
 
@@ -55,24 +56,24 @@ export default async function WideFormatPrintingPage() {
     {
       title: 'Собственное производство',
       description: 'Полный цикл печати без посредников.',
-      icon: Building2,
+      icon: 'building',
     },
     {
       title: 'Проверка макета',
       description: 'Проверяем файл перед запуском в печать.',
-      icon: ClipboardCheck,
+      icon: 'check',
     },
     {
       title: 'Контроль цвета',
       description: 'Калиброванное оборудование и точность передачи.',
-      icon: Droplets,
+      icon: 'drops',
     },
     {
       title: 'Работа по договору',
       description: 'Заключаем официальный договор при необходимости.',
-      icon: FileText,
+      icon: 'file',
     },
-  ];
+  ] as const;
 
   return (
     <div>
@@ -117,7 +118,7 @@ export default async function WideFormatPrintingPage() {
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Подходит для</p>
                     <span className="h-px flex-1 bg-neutral-200/80" aria-hidden="true" />
                   </div>
-                  <div className="flex flex-wrap gap-2.5">
+                  <div className="grid max-w-[34rem] gap-2 sm:grid-cols-2">
                     {trustMarkers.map((marker) => (
                       <span
                         key={marker}
@@ -176,36 +177,22 @@ export default async function WideFormatPrintingPage() {
             <WideFormatPricingCalculator pricingConfig={pricing.config} />
           </div>
 
-          <div className="card flex flex-col gap-5 border-neutral-200/80 bg-neutral-50/70 p-6 md:flex-row md:items-center md:justify-between md:gap-8 md:p-8">
-            <div className="max-w-2xl space-y-2">
-              <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">{ctaTitle}</h2>
-              <p className="text-sm leading-6 text-neutral-600 md:text-base">{ctaDescription}</p>
-            </div>
-            <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center">
-              <Link href="/plotter-cutting" className="btn-primary w-full text-center no-underline md:w-auto">{ctaButtonText}</Link>
+          <div className="card border-neutral-200/80 bg-neutral-50/70 p-5 md:p-7">
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
+              <div className="max-w-2xl space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Связанная услуга</p>
+                <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">{ctaTitle}</h2>
+                <p className="text-sm leading-6 text-neutral-600 md:text-base">{ctaDescription}</p>
+              </div>
+              <div className="flex w-full md:w-auto md:justify-end">
+                <Link href="/plotter-cutting" className="btn-primary w-full text-center no-underline md:w-auto">{ctaButtonText}</Link>
+              </div>
             </div>
           </div>
 
           <section className="mt-10 rounded-2xl border border-neutral-200/70 bg-muted/30 p-6 md:p-8">
             <h3 className="text-xl font-semibold tracking-tight md:text-2xl">Почему выбирают нас</h3>
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {features.map((feature) => {
-                const Icon = feature.icon;
-
-                return (
-                  <div
-                    key={feature.title}
-                    className="h-full rounded-2xl border border-neutral-200/90 bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-[0_12px_28px_-24px_rgba(15,23,42,0.45)] md:p-6"
-                  >
-                    <div className="mb-3 inline-flex size-10 items-center justify-center rounded-xl border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
-                      <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
-                    </div>
-                    <h3 className="text-base font-semibold leading-6 text-neutral-900">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-neutral-600">{feature.description}</p>
-                  </div>
-                );
-              })}
-            </div>
+            <WideFormatTrustCards features={features} />
           </section>
 
           <OrderWideFormatForm />
