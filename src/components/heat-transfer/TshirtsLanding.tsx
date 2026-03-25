@@ -23,9 +23,9 @@ type SectionBlockProps = {
 };
 
 const kpiChips = [
-  { title: 'На ваших или наших футболках', subtitle: 'Готовые изделия и чистые заготовки в наличии' },
-  { title: 'Под мерч и форму', subtitle: 'Команды, персонал, промо и частные заказы' },
-  { title: 'Контроль макета до печати', subtitle: 'Подсказываем по файлу и подтверждаем результат' },
+  { title: 'Свои или наши футболки', subtitle: 'Печатаем на любых заготовках' },
+  { title: 'Мерч и форма', subtitle: 'Для команд, брендов и событий' },
+  { title: 'Макет под контролем', subtitle: 'Проверка перед запуском' },
 ];
 
 const pricingCards = [
@@ -226,38 +226,34 @@ export default function TshirtsLanding({
 
   return (
     <div className="bg-white pb-10 dark:bg-neutral-950">
-      <section id="tshirts-hero" className="relative overflow-hidden py-16 md:py-24">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-red-50/50 dark:bg-red-950/15" aria-hidden="true" />
+      <section id="tshirts-hero" className="relative overflow-hidden py-10 md:py-14">
         <div className="container relative">
           <div
             ref={heroReveal.ref}
-            className={`rounded-3xl border border-neutral-200/90 bg-white p-6 shadow-[0_22px_65px_rgba(15,23,42,0.08)] transition-all duration-700 dark:border-neutral-800 dark:bg-neutral-900 md:p-10 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+            className={`rounded-3xl border border-neutral-200/90 bg-white p-5 shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-all duration-700 dark:border-neutral-800 dark:bg-neutral-900 md:p-8 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
           >
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-stretch">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-red-600">Печать на футболках в Невинномысске</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600">Брендированная одежда</p>
                 <h1 className="mt-3 max-w-[16ch] text-3xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
-                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-lg">
+                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-base">
                   {heroDescription} Печатаем для мерча, формы и брендированной одежды — от одной вещи до корпоративных партий.
                 </p>
-                <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-300">
-                  Поможем выбрать технологию под ткань и задачу, чтобы принт выглядел профессионально и держался в носке.
-                </p>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
                   {kpiChips.map((chip, index) => (
                     <div
                       key={chip.title}
                       style={delayStyle(index, heroReveal.prefersReducedMotion)}
-                      className={`rounded-2xl border border-neutral-200 bg-neutral-50/70 px-4 py-3.5 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900/70 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+                      className={`rounded-xl border border-neutral-200 bg-neutral-50/80 px-3 py-2.5 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900/70 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
                     >
-                      <p className="text-sm font-semibold leading-snug text-neutral-900 dark:text-neutral-100">{chip.title}</p>
-                      <p className="mt-1 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{chip.subtitle}</p>
+                      <p className="text-xs font-semibold leading-snug text-neutral-900 dark:text-neutral-100">{chip.title}</p>
+                      <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{chip.subtitle}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-8 flex flex-wrap items-center gap-3">
+                <div className="mt-7 flex flex-wrap items-center gap-3">
                   <Link
                     href="#tshirts-order"
                     className="inline-flex h-11 items-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none"
@@ -273,9 +269,9 @@ export default function TshirtsLanding({
                 </div>
               </div>
 
-              <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 p-3 dark:border-neutral-800 dark:bg-neutral-950">
-                <div className="grid h-full gap-3 sm:grid-cols-2">
-                  <div className="relative overflow-hidden rounded-xl sm:col-span-2">
+              <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100/70 p-3 dark:border-neutral-800 dark:bg-neutral-950">
+                <div className="grid h-full gap-3">
+                  <div className="relative min-h-[280px] overflow-hidden rounded-xl md:min-h-[320px]">
                     <Image
                       src={galleryImages['tshirts.examples.team']?.url ?? '/images/t-shirt/eurochem.png'}
                       alt="Брендированные футболки для команды"
@@ -289,23 +285,21 @@ export default function TshirtsLanding({
                     </div>
                   </div>
 
-                  <div className="relative overflow-hidden rounded-xl">
-                    <Image
-                      src={galleryImages['tshirts.examples.logo']?.url ?? '/images/t-shirt/logo.png'}
-                      alt="Логотипы на футболках"
-                      fill
-                      className="object-cover"
-                      sizes="(min-width: 1280px) 200px, 50vw"
-                    />
-                  </div>
-                  <div className="relative overflow-hidden rounded-xl">
-                    <Image
-                      src={galleryImages['tshirts.examples.film']?.url ?? '/images/t-shirt/termoplenka.png'}
-                      alt="Надписи термопленкой"
-                      fill
-                      className="object-cover"
-                      sizes="(min-width: 1280px) 200px, 50vw"
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="relative min-h-[108px] overflow-hidden rounded-xl">
+                      <Image
+                        src={galleryImages['tshirts.examples.logo']?.url ?? '/images/t-shirt/logo.png'}
+                        alt="Логотипы на футболках"
+                        fill
+                        className="object-cover"
+                        sizes="(min-width: 1280px) 200px, 50vw"
+                      />
+                    </div>
+                    <div className="flex min-h-[108px] flex-col justify-center rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-700 dark:bg-neutral-900">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">Подходит для</p>
+                      <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-neutral-100">Логотипов, имён и номеров</p>
+                      <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">Чёткая графика для формы и мерча</p>
+                    </div>
                   </div>
                 </div>
               </div>
