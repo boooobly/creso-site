@@ -286,6 +286,7 @@ export default function TshirtsLanding({
               </div>
             </div>
           </div>
+        </div>{/* container relative */}
       </section>
 
       <SectionBlock title="Технологии печати" subtitle="Две рабочие технологии под разные задачи: подскажем оптимальный вариант по ткани, макету и тиражу.">
