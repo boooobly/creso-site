@@ -211,32 +211,33 @@ export default function OrderWideFormatForm() {
       </div>
 
       <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Имя *</span>
-            <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-            {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
-          </label>
+        <div className="grid gap-4 md:grid-cols-2 md:items-start">
+          <div className="space-y-4">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Имя *</span>
+              <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
+              {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+            </label>
 
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Email</span>
-            <input className={inputClass('email')} type="email" value={values.email} onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))} />
-            {errors.email && <span className="text-xs text-red-600">{errors.email}</span>}
-          </label>
-        </div>
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Телефон *</span>
+              <PhoneInput
+                value={values.phone}
+                onChange={(phone) => setValues((prev) => ({ ...prev, phone }))}
+                placeholder="+7 (___) ___-__-__"
+                className={inputClass('phone')}
+              />
+              {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
+            </label>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-medium">Телефон *</span>
-            <PhoneInput
-              value={values.phone}
-              onChange={(phone) => setValues((prev) => ({ ...prev, phone }))}
-              placeholder="+7 (___) ___-__-__"
-              className={inputClass('phone')}
-            />
-            {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
-          </label>
-          <div className="flex flex-col gap-2.5 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3.5 dark:border-neutral-800 dark:bg-neutral-900/50 md:p-4">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">Email</span>
+              <input className={inputClass('email')} type="email" value={values.email} onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))} />
+              {errors.email && <span className="text-xs text-red-600">{errors.email}</span>}
+            </label>
+          </div>
+
+          <div className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3 dark:border-neutral-800 dark:bg-neutral-900/50 md:p-3.5">
             <ImageDropzone
               value={file}
               onChange={setFile}
@@ -255,8 +256,8 @@ export default function OrderWideFormatForm() {
               ]}
               allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
               invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
-              className="rounded-xl border-2 border-dashed border-neutral-300 bg-white p-2.5 transition hover:border-red-400 dark:border-neutral-700 dark:bg-neutral-900 md:p-3"
-              helperTextClassName="mt-1 text-xs text-muted-foreground"
+              className="rounded-xl border-2 border-dashed border-neutral-300 bg-white px-2.5 py-2 transition hover:border-red-400 dark:border-neutral-700 dark:bg-neutral-900 md:px-3 md:py-2.5"
+              helperTextClassName="mt-0.5 text-xs text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
             <p className="text-xs leading-relaxed text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
