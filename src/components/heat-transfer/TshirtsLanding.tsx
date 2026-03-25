@@ -232,8 +232,8 @@ export default function TshirtsLanding({
             ref={heroReveal.ref}
             className={`rounded-3xl border border-neutral-200/90 bg-white p-5 shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-all duration-700 dark:border-neutral-800 dark:bg-neutral-900 md:p-8 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
           >
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
-              <div>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,560px)_minmax(320px,420px)] lg:items-center lg:justify-between">
+              <div className="max-w-[560px]">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600">Брендированная одежда</p>
                 <h1 className="mt-3 max-w-[16ch] text-3xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
                 <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-base">
@@ -270,39 +270,19 @@ export default function TshirtsLanding({
               </div>
 
               <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100/70 p-3 dark:border-neutral-800 dark:bg-neutral-950">
-                <div className="grid h-full gap-3">
-                  <div className="relative min-h-[280px] overflow-hidden rounded-xl md:min-h-[320px]">
-                    <Image
-                      src={galleryImages['tshirts.examples.team']?.url ?? '/images/t-shirt/eurochem.png'}
-                      alt="Брендированные футболки для команды"
-                      fill
-                      className="object-cover"
-                      sizes="(min-width: 1280px) 420px, (min-width: 1024px) 34vw, 100vw"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3">
-                      <p className="text-sm font-semibold text-white">Мерч и корпоративная форма</p>
-                      <p className="mt-0.5 text-xs text-white/85">Логотипы, надписи, номера и полноцветные принты</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="relative min-h-[108px] overflow-hidden rounded-xl">
-                      <Image
-                        src={galleryImages['tshirts.examples.logo']?.url ?? '/images/t-shirt/logo.png'}
-                        alt="Логотипы на футболках"
-                        fill
-                        className="object-cover"
-                        sizes="(min-width: 1280px) 200px, 50vw"
-                      />
-                    </div>
-                    <div className="flex min-h-[108px] flex-col justify-center rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-700 dark:bg-neutral-900">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">Подходит для</p>
-                      <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-neutral-100">Логотипов, имён и номеров</p>
-                      <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">Чёткая графика для формы и мерча</p>
-                    </div>
+                <div className="relative min-h-[280px] overflow-hidden rounded-xl md:min-h-[340px]">
+                  <Image
+                    src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/eurochem.png'}
+                    alt={galleryImages['tshirts.hero.main']?.altText || 'Брендированные футболки для команды'}
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1280px) 420px, (min-width: 1024px) 36vw, 100vw"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3">
+                    <p className="text-sm font-semibold text-white">Печать для мерча, формы и промо</p>
+                    <p className="mt-0.5 text-xs text-white/85">Стабильная цветопередача и аккуратная посадка принта</p>
                   </div>
                 </div>
-              </div>
               </div>
             </div>
           </div>
