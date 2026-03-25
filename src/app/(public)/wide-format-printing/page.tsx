@@ -56,24 +56,24 @@ export default async function WideFormatPrintingPage() {
     {
       title: 'Собственное производство',
       description: 'Полный цикл печати без посредников.',
-      icon: Building2,
+      icon: 'building',
     },
     {
       title: 'Проверка макета',
       description: 'Проверяем файл перед запуском в печать.',
-      icon: ClipboardCheck,
+      icon: 'check',
     },
     {
       title: 'Контроль цвета',
       description: 'Калиброванное оборудование и точность передачи.',
-      icon: Droplets,
+      icon: 'drops',
     },
     {
       title: 'Работа по договору',
       description: 'Заключаем официальный договор при необходимости.',
-      icon: FileText,
+      icon: 'file',
     },
-  ];
+  ] as const;
 
   return (
     <div>

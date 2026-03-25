@@ -1,16 +1,23 @@
 'use client';
 
-import { type LucideIcon } from 'lucide-react';
+import { Building2, ClipboardCheck, Droplets, FileText } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
 
 type WideFormatTrustCardsProps = {
-  features: Array<{
+  features: ReadonlyArray<{
     title: string;
     description: string;
-    icon: LucideIcon;
+    icon: 'building' | 'check' | 'drops' | 'file';
   }>;
 };
+
+const iconByKey = {
+  building: Building2,
+  check: ClipboardCheck,
+  drops: Droplets,
+  file: FileText,
+} as const;
 
 export default function WideFormatTrustCards({ features }: WideFormatTrustCardsProps) {
   const shouldReduceMotion = useReducedMotion();
@@ -24,7 +31,7 @@ export default function WideFormatTrustCards({ features }: WideFormatTrustCardsP
       viewport={viewportOnce}
     >
       {features.map((feature) => {
-        const Icon = feature.icon;
+        const Icon = iconByKey[feature.icon];
 
         return (
           <motion.div
