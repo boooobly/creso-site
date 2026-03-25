@@ -324,8 +324,8 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-start">
-      <section className="card space-y-6 border-neutral-200/85 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-stretch">
+      <section className="card flex h-full flex-col space-y-6 border-neutral-200/85 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
         <h2 className="text-xl font-semibold tracking-tight">Параметры заказа</h2>
 
         {visibleCategoryOptions.length === 0 ? (
@@ -472,7 +472,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
         )}
       </section>
 
-      <aside className="card h-fit space-y-5 border-neutral-200/85 p-5 shadow-sm shadow-neutral-200/50 md:p-6 lg:sticky lg:top-24">
+      <aside className="card flex h-full flex-col space-y-5 border-neutral-200/85 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
         <h2 className="text-xl font-semibold tracking-tight">Расчёт</h2>
         <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3.5 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
           <SummaryRow label="Фактическая площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
@@ -530,7 +530,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           <Button variant="primary" className="mt-4 w-full" onClick={handleOrderClick} disabled={visibleCategoryOptions.length === 0}>Заказать печать</Button>
         </div>
 
-        <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50/80 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+        <div className="mt-auto space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50/80 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
           <p>Срок изготовления: <b>1–2 рабочих дня</b></p>
           <p>Максимальная ширина печати: <b>3.2 м</b></p>
         </div>
