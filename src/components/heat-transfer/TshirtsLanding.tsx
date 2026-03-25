@@ -270,9 +270,9 @@ export default function TshirtsLanding({
               </div>
 
               <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100/70 p-3 dark:border-neutral-800 dark:bg-neutral-950">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
+                <div className="relative aspect-[16/9] overflow-hidden rounded-xl">
                   <Image
-                    src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/termoplenka.png'}
+                    src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/tshirt_hero.png'}
                     alt={galleryImages['tshirts.hero.main']?.altText || 'Брендированные футболки для команды'}
                     fill
                     className="object-cover"
