@@ -17,6 +17,7 @@ type SectionRenderState = {
 };
 
 type SectionBlockProps = {
+  id?: string;
   title: string;
   subtitle?: string;
   children: (state: SectionRenderState) => ReactNode;
@@ -126,11 +127,11 @@ function delayStyle(index: number, reduceMotion: boolean): CSSProperties {
   return reduceMotion ? {} : { transitionDelay: `${index * 70}ms` };
 }
 
-function SectionBlock({ title, subtitle, children }: SectionBlockProps) {
+function SectionBlock({ id, title, subtitle, children }: SectionBlockProps) {
   const reveal = useRevealOnScroll<HTMLDivElement>();
 
   return (
-    <section className="py-12 md:py-16">
+    <section id={id} className="scroll-mt-24 py-12 md:py-16">
       <div className="container">
         <div
           ref={reveal.ref}
@@ -329,7 +330,7 @@ export default function TshirtsLanding({
                 key={card.title}
                 index={index}
                 reveal={reveal}
-                className={`rounded-2xl border bg-white p-5 shadow-sm hover:-translate-y-1 hover:shadow-lg dark:bg-neutral-900 ${
+                className={`h-full rounded-2xl border bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:bg-neutral-900 ${
                   card.featured
                     ? 'border-red-300 ring-1 ring-red-200/70 dark:border-red-900 dark:ring-red-900/40'
                     : 'border-neutral-200 dark:border-neutral-800'
@@ -351,9 +352,9 @@ export default function TshirtsLanding({
         )}
       </SectionBlock>
 
-      <SectionBlock title="Примеры работ">
+      <SectionBlock id="examples" title="Примеры работ">
         {(reveal) => (
-          <div id="examples" className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {galleryCards.map((card, index) => (
               <AnimatedCard
                 key={card.title}

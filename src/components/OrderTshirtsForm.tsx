@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
@@ -48,6 +49,7 @@ type FormValues = {
   transferType: string;
   side: string;
   comment: string;
+  consent: boolean;
   website: string;
 };
 
@@ -63,6 +65,7 @@ const defaultValues: FormValues = {
   transferType: transferTypeOptions[0].value,
   side: '',
   comment: '',
+  consent: false,
   website: '',
 };
 
@@ -111,6 +114,9 @@ export default function OrderTshirtsForm() {
     if (!values.transferType.trim()) {
       nextErrors.transferType = 'Выберите тип переноса';
     }
+    if (!values.consent) {
+      nextErrors.consent = 'Необходимо согласие на обработку персональных данных';
+    }
 
     return nextErrors;
   };
@@ -137,6 +143,7 @@ export default function OrderTshirtsForm() {
       formData.set('transferType', values.transferType);
       formData.set('side', values.side);
       formData.set('comment', values.comment.trim());
+      formData.set('consent', values.consent ? 'true' : 'false');
       formData.set('website', values.website);
       if (file) formData.set('file', file, file.name);
 
@@ -281,6 +288,23 @@ export default function OrderTshirtsForm() {
           </div>
 
           <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
+
+          <label className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900/70 dark:text-neutral-200">
+            <input
+              type="checkbox"
+              checked={values.consent}
+              onChange={(e) => setValues((prev) => ({ ...prev, consent: e.target.checked }))}
+              className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500 dark:border-neutral-700"
+            />
+            <span>
+              Я согласен с{' '}
+              <Link href="/privacy" className="underline hover:no-underline">
+                политикой обработки персональных данных
+              </Link>
+              .
+            </span>
+          </label>
+          {errors.consent && <p className="text-xs text-red-600">{errors.consent}</p>}
 
           <button
             type="submit"
