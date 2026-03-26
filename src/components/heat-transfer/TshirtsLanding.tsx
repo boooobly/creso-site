@@ -17,6 +17,7 @@ type SectionRenderState = {
 };
 
 type SectionBlockProps = {
+  id?: string;
   title: string;
   subtitle?: string;
   children: (state: SectionRenderState) => ReactNode;
@@ -126,11 +127,11 @@ function delayStyle(index: number, reduceMotion: boolean): CSSProperties {
   return reduceMotion ? {} : { transitionDelay: `${index * 70}ms` };
 }
 
-function SectionBlock({ title, subtitle, children }: SectionBlockProps) {
+function SectionBlock({ id, title, subtitle, children }: SectionBlockProps) {
   const reveal = useRevealOnScroll<HTMLDivElement>();
 
   return (
-    <section className="py-12 md:py-16">
+    <section id={id} className="scroll-mt-24 py-12 md:py-16">
       <div className="container">
         <div
           ref={reveal.ref}
@@ -232,7 +233,7 @@ export default function TshirtsLanding({
             ref={heroReveal.ref}
             className={`rounded-3xl border border-neutral-200/90 bg-white p-5 shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-all duration-700 dark:border-neutral-800 dark:bg-neutral-900 md:p-8 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
           >
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,560px)_minmax(320px,420px)] lg:items-center lg:justify-between">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,540px)_minmax(360px,1fr)] lg:items-center lg:gap-8">
               <div className="max-w-[560px]">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600">Брендированная одежда</p>
                 <h1 className="mt-3 max-w-[16ch] text-3xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
@@ -269,19 +270,17 @@ export default function TshirtsLanding({
                 </div>
               </div>
 
-              <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100/70 p-3 dark:border-neutral-800 dark:bg-neutral-950">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
-                  <Image
-                    src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/termoplenka.png'}
-                    alt={galleryImages['tshirts.hero.main']?.altText || 'Брендированные футболки для команды'}
-                    fill
-                    className="object-cover"
-                    sizes="(min-width: 1280px) 420px, (min-width: 1024px) 34vw, 100vw"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3">
-                    <p className="text-sm font-semibold text-white">Печать для мерча, формы и промо</p>
-                    <p className="mt-0.5 text-xs text-white/85">Стабильная цветопередача и аккуратная посадка принта</p>
-                  </div>
+              <div className="relative min-h-[250px] overflow-hidden rounded-2xl shadow-[0_16px_36px_rgba(15,23,42,0.14)] sm:min-h-[320px] lg:min-h-[420px]">
+                <Image
+                  src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/tshirt_hero.png'}
+                  alt={galleryImages['tshirts.hero.main']?.altText || 'Брендированные футболки для команды'}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(min-width: 1280px) 540px, (min-width: 1024px) 44vw, 100vw"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-5 py-4">
+                  <p className="text-sm font-semibold text-white">Печать для мерча, формы и промо</p>
+                  <p className="mt-0.5 text-xs text-white/85">Стабильная цветопередача и аккуратная посадка принта</p>
                 </div>
               </div>
             </div>
@@ -331,7 +330,7 @@ export default function TshirtsLanding({
                 key={card.title}
                 index={index}
                 reveal={reveal}
-                className={`rounded-2xl border bg-white p-5 shadow-sm hover:-translate-y-1 hover:shadow-lg dark:bg-neutral-900 ${
+                className={`h-full rounded-2xl border bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:bg-neutral-900 ${
                   card.featured
                     ? 'border-red-300 ring-1 ring-red-200/70 dark:border-red-900 dark:ring-red-900/40'
                     : 'border-neutral-200 dark:border-neutral-800'
@@ -353,9 +352,9 @@ export default function TshirtsLanding({
         )}
       </SectionBlock>
 
-      <SectionBlock title="Примеры работ">
+      <SectionBlock id="examples" title="Примеры работ">
         {(reveal) => (
-          <div id="examples" className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {galleryCards.map((card, index) => (
               <AnimatedCard
                 key={card.title}

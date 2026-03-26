@@ -37,6 +37,7 @@ const tshirtsRequestSchema = z.object({
   transferType: z.enum(transferTypeValues),
   side: z.enum(sideValues).optional().or(z.literal('')),
   comment: z.string().trim().optional(),
+  consent: z.literal('true'),
   website: z.string().trim().optional(),
 });
 
@@ -197,6 +198,7 @@ export async function POST(request: NextRequest) {
       transferType: toText(formData.get('transferType')),
       side: toText(formData.get('side')),
       comment: toText(formData.get('comment')),
+      consent: toText(formData.get('consent')),
       website: toText(formData.get('website')),
     });
 
