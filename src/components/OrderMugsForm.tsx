@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { Upload } from 'lucide-react';
+import Link from 'next/link';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import {
@@ -42,6 +43,7 @@ type FormValues = {
   quantity: string;
   covering: string;
   comment: string;
+  consent: boolean;
   website: string;
 };
 
@@ -53,6 +55,7 @@ const defaultValues: FormValues = {
   quantity: '1',
   covering: MUGS_COVERING_OPTIONS[0]?.value ?? '',
   comment: '',
+  consent: false,
   website: '',
 };
 
@@ -89,6 +92,9 @@ export default function OrderMugsForm() {
     if (!values.covering.trim()) {
       nextErrors.covering = 'Выберите покрытие';
     }
+    if (!values.consent) {
+      nextErrors.consent = 'Необходимо согласие на обработку персональных данных';
+    }
 
     return nextErrors;
   };
@@ -111,6 +117,7 @@ export default function OrderMugsForm() {
       formData.set('quantity', values.quantity);
       formData.set('covering', values.covering);
       formData.set('comment', values.comment.trim());
+      formData.set('consent', values.consent ? 'true' : 'false');
       formData.set('website', values.website);
       formData.set('needsDesign', needsDesign ? 'true' : 'false');
       if (file) {
@@ -263,6 +270,23 @@ export default function OrderMugsForm() {
         </div>
 
         <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
+
+        <label className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-700">
+          <input
+            type="checkbox"
+            checked={values.consent}
+            onChange={(e) => setValues((prev) => ({ ...prev, consent: e.target.checked }))}
+            className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500"
+          />
+          <span>
+            Я согласен с{' '}
+            <Link href="/privacy" className="underline hover:no-underline">
+              политикой обработки персональных данных
+            </Link>
+            .
+          </span>
+        </label>
+        {errors.consent && <p className="-mt-3 text-xs text-red-600">{errors.consent}</p>}
 
         <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5">
           <button

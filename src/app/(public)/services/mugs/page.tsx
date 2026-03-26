@@ -2,6 +2,7 @@ import Image from 'next/image';
 import {
   BadgeCheck,
   CheckCircle2,
+  ChevronDown,
   Clock3,
   CupSoda,
   LayoutTemplate,
@@ -11,7 +12,69 @@ import {
 } from 'lucide-react';
 import Section from '@/components/Section';
 import OrderMugsForm from '@/components/OrderMugsForm';
-import { getSiteImage } from '@/lib/site-images';
+import { getSiteImages } from '@/lib/site-images';
+
+const quickBenefits = [
+  {
+    title: 'Печать по кругу',
+    description: 'Полноценный wrap на белых кружках 330 мл с аккуратной посадкой по ручке.',
+    icon: CupSoda,
+  },
+  {
+    title: 'Керамика AAA',
+    description: 'Используем белые кружки 330 мл для стабильной цветопередачи и аккуратного результата.',
+    icon: Sparkles,
+  },
+  {
+    title: 'Проверка макета',
+    description: 'До запуска в печать проверяем файл, даём рекомендации и согласуем финальную версию.',
+    icon: LayoutTemplate,
+  },
+  {
+    title: 'Скидки за тираж',
+    description: 'Чем больше партия, тем выгоднее стоимость. Суммарная скидка до 20%.',
+    icon: Tag,
+  },
+];
+
+const pricingCards = [
+  {
+    title: 'Базовая стоимость',
+    price: '450 ₽ / шт',
+    caption: 'Белая кружка 330 мл, полноцветная печать по кругу',
+    bullets: ['Белая керамика AAA', 'Покрытие: глянец или мат', 'Подходит для брендированных тиражей'],
+    icon: BadgeCheck,
+  },
+  {
+    title: 'Сроки производства',
+    price: '3–5 рабочих дней',
+    caption: 'Стандартный срок изготовления после согласования макета',
+    bullets: ['Срочное изготовление — по согласованию', 'Подтверждаем дедлайн перед запуском', 'Отправляем в работу сразу после утверждения'],
+    icon: Clock3,
+  },
+  {
+    title: 'Что включено',
+    price: 'Без доплат',
+    caption: 'В стандартный пакет уже включены подготовительные этапы',
+    bullets: ['2 варианта макета входят в стоимость', '2 правки 1-й категории включены', 'Проверка перед печатью и согласование'],
+    icon: PackageCheck,
+  },
+];
+
+const resultCards = [
+  {
+    title: 'Для корпоративных подарков',
+    description: 'Логотип, фирменные цвета, выдержанная подача — кружка выглядит как брендированный продукт, а не сувенир “на скорую руку”.',
+  },
+  {
+    title: 'Для розницы и маркетплейсов',
+    description: 'Собираем стабильный повторяемый тираж с аккуратной печатью и понятной себестоимостью под продажи.',
+  },
+  {
+    title: 'Для мероприятий и промо',
+    description: 'Делаем партии под акции, внутренние события и презентации — с понятными сроками и прозрачными условиями.',
+  },
+];
 
 const quickBenefits = [
   {
@@ -88,16 +151,32 @@ const faqItems = [
     question: 'Что если макет не подходит?',
     answer: 'Перед печатью мы проверяем макет и подсказываем, что исправить, чтобы избежать брака и потери качества.',
   },
+  {
+    question: 'Можно ли согласовать превью перед тиражом?',
+    answer: 'Да. Перед запуском подтверждаем финальный макет и только после согласования отправляем заказ в печать.',
+  },
+  {
+    question: 'Насколько стойкая печать в использовании?',
+    answer: 'При бережном уходе печать сохраняет вид долго. Рекомендуем избегать абразивов и очень агрессивной химии.',
+  },
+  {
+    question: 'Можно заказать небольшой тираж?',
+    answer: 'Да, изготавливаем как малые партии, так и объёмные корпоративные тиражи со скидкой.',
+  },
 ];
 
 export default async function MugsServicePage() {
-  const heroImage = await getSiteImage('mugs.hero.main');
+  const mugImages = await getSiteImages(['mugs.hero.main', 'mugs.result.main']);
+  const heroImage = mugImages['mugs.hero.main'];
+  const resultImage = mugImages['mugs.result.main'];
   const heroImageSrc = heroImage?.url ?? '/images/mug/mug-hero.jpg';
   const heroImageAlt = heroImage?.altText || 'Печать на кружках — пример готовой работы';
+  const resultImageSrc = resultImage?.url ?? '/images/mug/mug_eurochem.png';
+  const resultImageAlt = resultImage?.altText || 'Печать на кружках — пример корпоративного тиража';
 
   return (
     <div>
-      <Section className="pb-8 pt-8 sm:pt-10 lg:pb-10 lg:pt-12">
+      <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)]">
             <div className="grid gap-0 lg:grid-cols-[1.02fr_0.98fr]">
@@ -109,8 +188,8 @@ export default async function MugsServicePage() {
                 </p>
 
                 <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
-                  {['Белая керамика 330 мл', 'Полный wrap по кругу', 'Проверка макета перед печатью', 'Скидка до 20% за объём'].map((item) => (
-                    <div key={item} className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
+                  {['Белая керамика 330 мл', 'Полный wrap по кругу', 'Проверка макета бесплатно', 'Скидка до 20% за объём'].map((item) => (
+                    <div key={item} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
                       <CheckCircle2 className="h-4 w-4 text-red-600" aria-hidden="true" />
                       <span>{item}</span>
                     </div>
@@ -137,9 +216,9 @@ export default async function MugsServicePage() {
                   className="object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/40 bg-white/88 p-4 backdrop-blur-sm sm:bottom-6 sm:left-6 sm:right-6 sm:p-5">
-                  <p className="text-sm font-semibold text-neutral-900">Готовый результат: аккуратная полноцветная печать</p>
-                  <p className="mt-1 text-xs text-neutral-600 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
+                <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/30 bg-black/30 p-4 backdrop-blur-md sm:bottom-6 sm:left-6 sm:right-6 sm:p-5">
+                  <p className="text-sm font-semibold text-white">Готовый результат: аккуратная полноцветная печать</p>
+                  <p className="mt-1 text-xs text-white/90 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
                 </div>
               </div>
             </div>
@@ -147,7 +226,7 @@ export default async function MugsServicePage() {
         </div>
       </Section>
 
-      <Section className="pb-4 pt-0 sm:pb-6">
+      <Section className="pb-2 pt-0 sm:pb-3">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {quickBenefits.map((item) => {
@@ -166,7 +245,7 @@ export default async function MugsServicePage() {
         </div>
       </Section>
 
-      <Section id="mugs-prices" className="pb-8 pt-6 sm:pb-10 sm:pt-8 lg:pb-12">
+      <Section id="mugs-prices" className="pb-8 pt-4 sm:pb-10 sm:pt-5 lg:pb-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <p className="t-eyebrow">Цены и условия</p>
           <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Понятная стоимость и прозрачный процесс</h2>
@@ -224,14 +303,14 @@ export default async function MugsServicePage() {
             <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
               <div className="relative aspect-[4/5] w-full">
                 <Image
-                  src={heroImageSrc}
-                  alt="Печать на кружках — крупный план изделия"
+                  src={resultImageSrc}
+                  alt={resultImageAlt}
                   fill
                   sizes="(min-width: 1024px) 34vw, 100vw"
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/5" />
-                <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/30 bg-white/90 p-4 backdrop-blur-sm">
+                <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/70 bg-white/85 p-4 backdrop-blur-md">
                   <p className="text-sm font-semibold text-neutral-900">Премиальная подача результата</p>
                   <p className="mt-1 text-xs text-neutral-600">Чистая белая керамика, чёткая печать и стабильный вид во всём тираже.</p>
                 </div>
@@ -243,26 +322,26 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-order" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
         <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
-            <aside className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-7">
-              <p className="t-eyebrow">Оформление заказа</p>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900">Отправьте заявку за 1 минуту</h2>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-600">Заполните форму, приложите файл (если есть) и укажите детали тиража. Менеджер свяжется с вами, уточнит нюансы и подтвердит стоимость перед запуском.</p>
-
-              <ul className="mt-5 space-y-3 text-sm text-neutral-700">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-7">
+            <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="max-w-2xl">
+                <p className="t-eyebrow">Оформление заказа</p>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900">Отправьте заявку за 1 минуту</h2>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600">Заполните форму, приложите файл (если есть) и укажите детали тиража. Менеджер свяжется с вами, уточнит нюансы и подтвердит стоимость перед запуском.</p>
+              </div>
+              <ul className="grid gap-2 text-sm text-neutral-700 lg:min-w-[340px]">
                 {[
                   'Проверяем макет и предупреждаем о рисках по качеству',
                   'Согласовываем срок и итоговую стоимость до старта',
                   'Помогаем с подготовкой дизайна при необходимости',
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5">
+                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600" aria-hidden="true" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-            </aside>
-
+            </div>
             <OrderMugsForm />
           </div>
         </div>
@@ -277,8 +356,9 @@ export default async function MugsServicePage() {
             <div className="mt-5 space-y-3">
               {faqItems.map((item) => (
                 <details key={item.question} className="group rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 transition hover:border-neutral-300">
-                  <summary className="cursor-pointer list-none pr-6 text-sm font-semibold text-neutral-900 marker:hidden">
-                    {item.question}
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 pr-1 text-sm font-semibold text-neutral-900 marker:hidden">
+                    <span>{item.question}</span>
+                    <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180" aria-hidden="true" />
                   </summary>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-700">{item.answer}</p>
                 </details>

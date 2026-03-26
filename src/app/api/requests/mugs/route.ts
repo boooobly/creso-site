@@ -25,6 +25,7 @@ const mugsRequestSchema = z.object({
   phone: z.string().trim().min(1),
   quantity: z.coerce.number().int().min(1),
   covering: z.string().trim().min(1),
+  consent: z.boolean(),
   comment: z.string().trim().optional(),
   website: z.string().trim().optional(),
   rawImageDataUrl: z.string().optional().nullable(),
@@ -70,6 +71,7 @@ function buildMugsText(params: {
   phone: string;
   quantity: number;
   coveringLabel: string;
+  consent: boolean;
   comment?: string;
   needsDesign: boolean;
   rawAttached: boolean;
@@ -81,6 +83,7 @@ function buildMugsText(params: {
     `Количество: ${params.quantity || 1}`,
     `Покрытие: ${params.coveringLabel || '—'}`,
     `Комментарий: ${params.comment || '—'}`,
+    `Согласие на обработку данных: ${params.consent ? 'да' : 'нет'}`,
     `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`,
     `Исходник клиента: ${params.rawAttached ? 'прикреплен' : 'не прикреплен'}`,
   ].join('\n');
@@ -153,6 +156,7 @@ export async function POST(request: NextRequest) {
       phone: toText(formData.get('phone')),
       quantity: toText(formData.get('quantity')),
       covering: toText(formData.get('covering')),
+      consent: toBoolean(formData.get('consent')),
       comment: toText(formData.get('comment')),
       website: toText(formData.get('website')),
       rawImageDataUrl,
@@ -187,6 +191,7 @@ export async function POST(request: NextRequest) {
     const normalizedPhone = normalizePhone(parsed.data.phone);
     if (!normalizedPhone) return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
     if (!isKnownCovering(parsed.data.covering)) return NextResponse.json({ ok: false, error: 'Выберите корректное покрытие.' }, { status: 400 });
+    if (!parsed.data.consent) return NextResponse.json({ ok: false, error: 'Необходимо согласие на обработку персональных данных.' }, { status: 400 });
 
     const coveringLabel = getCoveringLabel(parsed.data.covering);
 
@@ -195,6 +200,7 @@ export async function POST(request: NextRequest) {
       phone: normalizedPhone,
       quantity: parsed.data.quantity,
       coveringLabel,
+      consent: parsed.data.consent,
       comment: parsed.data.comment,
       needsDesign,
       rawAttached: Boolean(rawImageDataUrl || file),
