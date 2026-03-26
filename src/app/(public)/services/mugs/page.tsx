@@ -1,79 +1,162 @@
-import Section from '@/components/Section';
 import Image from 'next/image';
+import {
+  BadgeCheck,
+  CheckCircle2,
+  ChevronDown,
+  Clock3,
+  CupSoda,
+  LayoutTemplate,
+  PackageCheck,
+  Sparkles,
+  Tag,
+} from 'lucide-react';
+import Section from '@/components/Section';
 import OrderMugsForm from '@/components/OrderMugsForm';
-import { getSiteImage } from '@/lib/site-images';
+import { getSiteImages } from '@/lib/site-images';
+
+const quickBenefits = [
+  {
+    title: 'Печать по кругу',
+    description: 'Полноценный wrap на белых кружках 330 мл с аккуратной посадкой по ручке.',
+    icon: CupSoda,
+  },
+  {
+    title: 'Керамика AAA',
+    description: 'Используем белые кружки 330 мл для стабильной цветопередачи и аккуратного результата.',
+    icon: Sparkles,
+  },
+  {
+    title: 'Проверка макета',
+    description: 'До запуска в печать проверяем файл, даём рекомендации и согласуем финальную версию.',
+    icon: LayoutTemplate,
+  },
+  {
+    title: 'Скидки за тираж',
+    description: 'Чем больше партия, тем выгоднее стоимость. Суммарная скидка до 20%.',
+    icon: Tag,
+  },
+];
+
+const pricingCards = [
+  {
+    title: 'Базовая стоимость',
+    price: '450 ₽ / шт',
+    caption: 'Белая кружка 330 мл, полноцветная печать по кругу',
+    bullets: ['Белая керамика AAA', 'Покрытие: глянец или мат', 'Подходит для брендированных тиражей'],
+    icon: BadgeCheck,
+  },
+  {
+    title: 'Сроки производства',
+    price: '3–5 рабочих дней',
+    caption: 'Стандартный срок изготовления после согласования макета',
+    bullets: ['Срочное изготовление — по согласованию', 'Подтверждаем дедлайн перед запуском', 'Отправляем в работу сразу после утверждения'],
+    icon: Clock3,
+  },
+  {
+    title: 'Что включено',
+    price: 'Без доплат',
+    caption: 'В стандартный пакет уже включены подготовительные этапы',
+    bullets: ['2 варианта макета входят в стоимость', '2 правки 1-й категории включены', 'Проверка перед печатью и согласование'],
+    icon: PackageCheck,
+  },
+];
+
+const resultCards = [
+  {
+    title: 'Для корпоративных подарков',
+    description: 'Логотип, фирменные цвета, выдержанная подача — кружка выглядит как брендированный продукт, а не сувенир “на скорую руку”.',
+  },
+  {
+    title: 'Для розницы и маркетплейсов',
+    description: 'Собираем стабильный повторяемый тираж с аккуратной печатью и понятной себестоимостью под продажи.',
+  },
+  {
+    title: 'Для мероприятий и промо',
+    description: 'Делаем партии под акции, внутренние события и презентации — с понятными сроками и прозрачными условиями.',
+  },
+];
 
 const faqItems = [
   {
     question: 'Сколько занимает изготовление?',
-    answer: 'Обычно 3–5 рабочих дней. Срочно - по согласованию.',
+    answer: 'Обычно 3–5 рабочих дней. Срочный запуск возможен по согласованию загрузки производства.',
   },
   {
     question: 'Можно ли напечатать по кругу?',
-    answer: 'Да, печать по кругу. Зона зависит от макета и ручки кружки.',
+    answer: 'Да, выполняем круговую печать. Полезная зона зависит от макета и расположения ручки кружки.',
   },
   {
-    question: 'Что если мой макет не подходит?',
-    answer: 'Мы проверим и подскажем, что исправить, перед запуском в печать.',
+    question: 'Что если макет не подходит?',
+    answer: 'Перед печатью мы проверяем макет и подсказываем, что исправить, чтобы избежать брака и потери качества.',
+  },
+  {
+    question: 'Можно ли согласовать превью перед тиражом?',
+    answer: 'Да. Перед запуском подтверждаем финальный макет и только после согласования отправляем заказ в печать.',
+  },
+  {
+    question: 'Насколько стойкая печать в использовании?',
+    answer: 'При бережном уходе печать сохраняет вид долго. Рекомендуем избегать абразивов и очень агрессивной химии.',
+  },
+  {
+    question: 'Можно заказать небольшой тираж?',
+    answer: 'Да, изготавливаем как малые партии, так и объёмные корпоративные тиражи со скидкой.',
   },
 ];
 
 export default async function MugsServicePage() {
-  const heroImage = await getSiteImage('mugs.hero.main');
+  const mugImages = await getSiteImages(['mugs.hero.main', 'mugs.result.main']);
+  const heroImage = mugImages['mugs.hero.main'];
+  const resultImage = mugImages['mugs.result.main'];
   const heroImageSrc = heroImage?.url ?? '/images/mug/mug-hero.jpg';
   const heroImageAlt = heroImage?.altText || 'Печать на кружках — пример готовой работы';
-  const heroBenefits = ['3–5 рабочих дней', '2 макета включены', 'Скидка до 20%', 'Проверка перед печатью'];
+  const resultImageSrc = resultImage?.url ?? '/images/mug/mug_eurochem.png';
+  const resultImageAlt = resultImage?.altText || 'Печать на кружках — пример корпоративного тиража';
 
   return (
     <div>
-      <Section className="bg-gradient-to-br from-white via-neutral-50 to-neutral-100 pb-6 pt-8 sm:pb-8 sm:pt-10 lg:pb-10 lg:pt-12">
+      <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 px-8 py-10 shadow-sm lg:px-12 lg:py-12">
-            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-red-600">СТУДИЙНЫЙ УРОВЕНЬ ПЕЧАТИ</p>
-                <h1 className="mt-3 text-4xl font-semibold tracking-tight lg:text-5xl">Печать на кружках</h1>
-                <p className="mt-4 max-w-[42ch] leading-relaxed text-neutral-600">Белые керамические кружки 330 мл. Класс AAA. Печать по кругу.</p>
+          <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)]">
+            <div className="grid gap-0 lg:grid-cols-[1.02fr_0.98fr]">
+              <div className="p-6 sm:p-8 lg:p-12">
+                <p className="t-eyebrow">Печать на кружках</p>
+                <h1 className="mt-3 text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">Брендированные кружки с печатью по кругу</h1>
+                <p className="mt-4 max-w-[52ch] text-sm leading-relaxed text-neutral-600 sm:text-base">
+                  Изготавливаем кружки на белой керамике 330 мл: от единичных экземпляров до тиражей для компаний и мероприятий. Проверяем макет перед запуском и согласуем результат заранее.
+                </p>
 
-                <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-700">
-                  {heroBenefits.map((item) => (
-                    <span key={item} className="inline-flex items-center gap-2">
-                      <span className="text-red-600">✓</span>
-                      {item}
-                    </span>
+                <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
+                  {['Белая керамика 330 мл', 'Полный wrap по кругу', 'Проверка макета бесплатно', 'Скидка до 20% за объём'].map((item) => (
+                    <div key={item} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
+                      <CheckCircle2 className="h-4 w-4 text-red-600" aria-hidden="true" />
+                      <span>{item}</span>
+                    </div>
                   ))}
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <a href="#mugs-order" className="inline-flex h-12 items-center rounded-xl bg-red-600 px-6 text-sm font-medium text-white shadow-sm transition hover:bg-red-700">
+                  <a href="#mugs-order" className="btn-primary no-underline">
                     Оставить заявку
+                  </a>
+                  <a href="#mugs-prices" className="btn-secondary no-underline">
+                    Цены и условия
                   </a>
                 </div>
               </div>
 
-              <div className="relative">
-                <div className="absolute -inset-6 -z-10 rounded-[32px] bg-red-500/10 blur-3xl" />
-                <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-xl">
-                  <div className="relative aspect-[4/3] w-full">
-                    <Image
-                      src={heroImageSrc}
-                      alt={heroImageAlt}
-                      fill
-                      sizes="(min-width: 1024px) 520px, 90vw"
-                      className="object-cover object-[55%_50%]"
-                      priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10" />
-                  </div>
-                  <div className="flex items-center justify-between gap-4 px-5 py-4">
-                    <div>
-                      <p className="text-sm font-medium text-neutral-900">Пример готовой кружки</p>
-                      <p className="text-xs text-neutral-500">Печать по кругу, белая керамика 330 мл</p>
-                    </div>
-                    <div className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-600">
-                      450 ₽ / шт
-                    </div>
-                  </div>
+              <div className="relative min-h-[320px] border-t border-neutral-200 bg-neutral-100/70 lg:min-h-full lg:border-l lg:border-t-0">
+                <Image
+                  src={heroImageSrc}
+                  alt={heroImageAlt}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/30 bg-black/30 p-4 backdrop-blur-md sm:bottom-6 sm:left-6 sm:right-6 sm:p-5">
+                  <p className="text-sm font-semibold text-white">Готовый результат: аккуратная полноцветная печать</p>
+                  <p className="mt-1 text-xs text-white/90 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
                 </div>
               </div>
             </div>
@@ -81,69 +164,144 @@ export default async function MugsServicePage() {
         </div>
       </Section>
 
-      <Section id="mugs-description" className="py-0">
+      <Section className="pb-2 pt-0 sm:pb-3">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-sm leading-relaxed text-neutral-700 sm:text-base">Печатаем на белых керамических кружках 330 мл. Прикрепите готовый файл макета или опишите задачу — подготовим всё к печати.</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {quickBenefits.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article key={item.title} className="h-full rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-300">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <h2 className="mt-3 text-base font-semibold text-neutral-900">{item.title}</h2>
+                  <p className="mt-1 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+                </article>
+              );
+            })}
           </div>
         </div>
       </Section>
 
-      <Section id="mugs-prices" className="pb-8 pt-8 sm:py-10 lg:py-12">
+      <Section id="mugs-prices" className="pb-8 pt-4 sm:pb-10 sm:pt-5 lg:pb-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Цены и условия</h2>
-          <p className="mt-2 text-sm text-neutral-600 sm:text-base">Прозрачно и без скрытых пунктов.</p>
+          <p className="t-eyebrow">Цены и условия</p>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Понятная стоимость и прозрачный процесс</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600 sm:text-base">Стоимость формируется без скрытых пунктов: вы заранее понимаете цену, сроки и что именно входит в заказ.</p>
 
-          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold">Стоимость</h3>
-              <p className="mt-4 text-4xl font-semibold">450 ₽</p>
-              <p className="text-sm text-neutral-500">за 1 шт, печать по кругу</p>
-              <ul className="mt-4 space-y-2 text-sm text-neutral-700">
-                <li>• Кружка белая</li>
-                <li>• Глянец или мат</li>
-                <li>• Макет проверим перед запуском</li>
-              </ul>
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            {pricingCards.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article key={item.title} className="premium-card h-full p-5 sm:p-6">
+                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-neutral-900">{item.title}</h3>
+                  <p className="mt-3 text-3xl font-bold tracking-tight text-neutral-900">{item.price}</p>
+                  <p className="mt-1 text-sm text-neutral-600">{item.caption}</p>
+                  <ul className="mt-4 space-y-2.5 text-sm text-neutral-700">
+                    {item.bullets.map((bullet) => (
+                      <li key={bullet} className="flex items-start gap-2.5">
+                        <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-red-100 bg-red-50/60 p-4 text-sm text-neutral-700 sm:p-5">
+            <span className="font-semibold text-neutral-900">Скидки за объём:</span> каждые 12 шт — минус 2,5%, максимальная суммарная скидка — 20%.
+          </div>
+        </div>
+      </Section>
+
+      <Section className="py-8 sm:py-10 lg:py-12">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
+              <p className="t-eyebrow">Что вы получаете</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">Кружка как готовый коммерческий продукт</h2>
+              <p className="mt-4 text-sm leading-relaxed text-neutral-600 sm:text-base">
+                Мы делаем не просто “нанесение на сувенир”, а готовое изделие для продаж, подарков и бренд-коммуникации. Важно, чтобы тираж выглядел единообразно и профессионально.
+              </p>
+              <div className="mt-6 grid gap-3">
+                {resultCards.map((item) => (
+                  <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4">
+                    <h3 className="text-base font-semibold text-neutral-900">{item.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+                  </article>
+                ))}
+              </div>
             </div>
 
-            <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold">Сроки и скидки</h3>
-              <ul className="mt-4 space-y-2 text-sm text-neutral-700">
-                <li>• Изготовление: 3–5 рабочих дней</li>
-                <li>• Скидка: каждые 12 шт — 2,5%, максимум 20%</li>
-                <li>• 2 макета входят в стоимость</li>
-                <li>• 2 правки 1-й категории включены</li>
-                <li>• Срочная печать по согласованию</li>
-              </ul>
+            <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
+              <div className="relative aspect-[4/5] w-full">
+                <Image
+                  src={resultImageSrc}
+                  alt={resultImageAlt}
+                  fill
+                  sizes="(min-width: 1024px) 34vw, 100vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/5" />
+                <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/70 bg-white/85 p-4 backdrop-blur-md">
+                  <p className="text-sm font-semibold text-neutral-900">Премиальная подача результата</p>
+                  <p className="mt-1 text-xs text-neutral-600">Чистая белая керамика, чёткая печать и стабильный вид во всём тираже.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </Section>
 
-      <Section id="mugs-order" className="pb-8 pt-8 sm:py-10 lg:py-12">
+      <Section id="mugs-order" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
         <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Оформление заказа</h2>
-          <p className="mt-2 text-sm text-neutral-600 sm:text-base">Прикрепите готовый файл макета или опишите задачу — мы подготовим всё к печати.</p>
-
-          <div className="mt-6">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-7">
+            <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="max-w-2xl">
+                <p className="t-eyebrow">Оформление заказа</p>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900">Отправьте заявку за 1 минуту</h2>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600">Заполните форму, приложите файл (если есть) и укажите детали тиража. Менеджер свяжется с вами, уточнит нюансы и подтвердит стоимость перед запуском.</p>
+              </div>
+              <ul className="grid gap-2 text-sm text-neutral-700 lg:min-w-[340px]">
+                {[
+                  'Проверяем макет и предупреждаем о рисках по качеству',
+                  'Согласовываем срок и итоговую стоимость до старта',
+                  'Помогаем с подготовкой дизайна при необходимости',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <OrderMugsForm />
           </div>
-          <p className="mt-3 text-xs text-neutral-500">Мы проверим макет перед печатью и напишем, если нужно что-то поправить.</p>
         </div>
       </Section>
 
-      <Section id="mugs-faq" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
+      <Section id="mugs-faq" className="pb-12 pt-0 lg:pb-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Вопросы</h2>
-          <p className="mt-2 text-sm text-neutral-600 sm:text-base">Коротко о сроках, печати и подготовке макета.</p>
+          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-2xl font-bold tracking-tight text-neutral-900">Частые вопросы</h2>
+            <p className="mt-2 text-sm text-neutral-600 sm:text-base">Коротко о сроках, макетах и процессе печати.</p>
 
-          <div className="mt-6 space-y-3">
-            {faqItems.map((item) => (
-              <details key={item.question} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
-                <summary className="cursor-pointer text-sm font-medium text-neutral-900">{item.question}</summary>
-                <p className="mt-2 text-sm text-neutral-700">{item.answer}</p>
-              </details>
-            ))}
+            <div className="mt-5 space-y-3">
+              {faqItems.map((item) => (
+                <details key={item.question} className="group rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 transition hover:border-neutral-300">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 pr-1 text-sm font-semibold text-neutral-900 marker:hidden">
+                    <span>{item.question}</span>
+                    <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180" aria-hidden="true" />
+                  </summary>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-700">{item.answer}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </div>
       </Section>

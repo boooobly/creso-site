@@ -326,6 +326,19 @@ const MUGS_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
     groupLabel: 'Другие страницы услуг',
     groupDescription: 'Ключевые картинки узкоспециализированных страниц услуг.',
   },
+  {
+    key: 'mugs.result.main',
+    label: 'Кружки — изображение результата',
+    pageTitle: 'Печать на кружках',
+    sectionLabel: 'Блок «Что вы получаете»',
+    usageLabel: 'Изображение результата в блоке «Что вы получаете» на странице печати кружек',
+    route: '/services/mugs',
+    fallbackUrl: '/images/mug/mug_eurochem.png',
+    fallbackAlt: 'Печать на кружках — корпоративный пример тиража',
+    groupKey: 'service-pages',
+    groupLabel: 'Другие страницы услуг',
+    groupDescription: 'Ключевые картинки узкоспециализированных страниц услуг.',
+  },
 ];
 
 export const PLOTTER_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
