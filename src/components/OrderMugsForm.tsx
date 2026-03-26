@@ -66,7 +66,7 @@ export default function OrderMugsForm() {
   const [needsDesign, setNeedsDesign] = useState(false);
 
   const inputClass = (name: keyof FormValues) => [
-    'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
+    'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30',
     errors[name] ? 'border-red-500 ring-2 ring-red-500/20' : '',
   ].join(' ');
 
@@ -144,13 +144,14 @@ export default function OrderMugsForm() {
   };
 
   return (
-    <div id="mug-order-form" className="card p-6 md:p-8">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold">Заявка на печать кружек</h2>
+    <div id="mug-order-form" className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_16px_45px_-40px_rgba(15,23,42,0.7)] sm:p-8 md:p-9">
+      <div className="mb-6 border-b border-neutral-200 pb-5">
+        <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">Заявка на печать кружек</h2>
+        <p className="mt-2 text-sm text-neutral-600">Укажите параметры заказа, и мы свяжемся с вами для подтверждения деталей.</p>
       </div>
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+      <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5">
           <label className="flex items-start gap-3">
             <input
               type="checkbox"
@@ -178,7 +179,7 @@ export default function OrderMugsForm() {
               ? 'mt-4 overflow-hidden transition-all duration-300 ease-out opacity-100 max-h-[2000px]'
               : 'mt-0 overflow-hidden transition-all duration-300 ease-out opacity-0 max-h-0 pointer-events-none'}
           >
-            <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4">
+            <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4 sm:p-5">
               <h3 className="text-xl font-semibold">Дизайн</h3>
               <p className="text-sm text-neutral-700">2 макета входит в стоимость.</p>
               <p className="text-sm text-neutral-700">К двум макетам включены 2 правки 1-й категории.</p>
@@ -263,13 +264,17 @@ export default function OrderMugsForm() {
 
         <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
 
-        <button
-          type="submit"
-          disabled={isSending}
-          className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all motion-reduce:transition-none hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
-        >
-          {isSending ? 'Отправка…' : 'Отправить заявку'}
-        </button>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5">
+          <button
+            type="submit"
+            disabled={isSending}
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all motion-reduce:transition-none hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[200px]"
+          >
+            {isSending ? 'Отправка…' : 'Отправить заявку'}
+          </button>
+
+          <p className="mt-3 text-xs text-neutral-500">Нажимая кнопку, вы соглашаетесь на обработку заявки для расчёта и обратной связи.</p>
+        </div>
 
         {formError && <p className="text-sm text-red-600">{formError}</p>}
         {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
