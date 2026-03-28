@@ -5,6 +5,7 @@ import { Upload } from 'lucide-react';
 import Link from 'next/link';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
@@ -68,10 +69,7 @@ export default function OrderMugsForm() {
   const [formError, setFormError] = useState('');
   const [needsDesign, setNeedsDesign] = useState(false);
 
-  const inputClass = (name: keyof FormValues) => [
-    'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30',
-    errors[name] ? 'border-red-500 ring-2 ring-red-500/20' : '',
-  ].join(' ');
+  const inputClass = (name: keyof FormValues) => publicInputClass(Boolean(errors[name]));
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -151,14 +149,14 @@ export default function OrderMugsForm() {
   };
 
   return (
-    <div id="mug-order-form" className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_16px_45px_-40px_rgba(15,23,42,0.7)] sm:p-8 md:p-9">
-      <div className="mb-6 border-b border-neutral-200 pb-5">
+    <div id="mug-order-form" className={`${publicFormStyles.shell} sm:p-8 md:p-9`}>
+      <div className={publicFormStyles.heading}>
         <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">Заявка на печать кружек</h2>
         <p className="mt-2 text-sm text-neutral-600">Укажите параметры заказа, и мы свяжемся с вами для подтверждения деталей.</p>
       </div>
 
-      <form className="space-y-6" onSubmit={handleSubmit} noValidate>
-        <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5">
+      <form className={`${publicFormStyles.fieldsStack} mt-6`} onSubmit={handleSubmit} noValidate>
+        <div className={`${publicFormStyles.summaryCard} sm:p-5`}>
           <label className="flex items-start gap-3">
             <input
               type="checkbox"
@@ -261,7 +259,7 @@ export default function OrderMugsForm() {
             allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
             invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
             maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
-            className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
+            className={publicFormStyles.uploadZone}
             helperTextClassName="mt-1 text-xs text-muted-foreground"
             icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
           />
@@ -271,7 +269,7 @@ export default function OrderMugsForm() {
 
         <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
 
-        <label className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-700">
+        <label className={publicFormStyles.consent}>
           <input
             type="checkbox"
             checked={values.consent}
@@ -292,7 +290,7 @@ export default function OrderMugsForm() {
           <button
             type="submit"
             disabled={isSending}
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all motion-reduce:transition-none hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[200px]"
+            className={`${publicFormStyles.submitButton} w-full motion-reduce:transition-none sm:w-auto`}
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>

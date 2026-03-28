@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { publicFormStyles } from '@/lib/public-form-styles';
 
 type FormState = {
   address: string;
@@ -120,13 +121,12 @@ export default function OutdoorLeadForm() {
 
   const inputClass = (field: keyof FormState) =>
     [
-      't-input px-4 outline-none transition',
-      'dark:border-neutral-700 dark:bg-neutral-900',
-      touched[field] && errors[field] ? 'border-red-500 focus:border-red-500' : 'border-neutral-300 focus:border-[var(--brand-red)]',
+      publicFormStyles.inputBase,
+      touched[field] && errors[field] ? publicFormStyles.inputInvalid : ''
     ].join(' ');
 
   return (
-    <form onSubmit={onSubmit} className="card space-y-4 p-6" id="outdoor-lead-form" noValidate>
+    <form onSubmit={onSubmit} className={`${publicFormStyles.shell} space-y-4`} id="outdoor-lead-form" noValidate>
       <label className="block space-y-2">
         <span className="t-label">Адрес объекта *</span>
         <input
@@ -179,7 +179,7 @@ export default function OutdoorLeadForm() {
         {touched.phone && errors.phone ? <p className="t-small text-red-500">{errors.phone}</p> : null}
       </label>
 
-      <label className="t-label flex items-start gap-3 text-neutral-700 dark:text-neutral-300">
+      <label className={publicFormStyles.consent}>
         <input
           required
           type="checkbox"
