@@ -2,6 +2,7 @@ import { getServices } from '@/lib/contentful';
 import servicesLocal from '@/data/services.json';
 import Section from '@/components/Section';
 import ServiceCard from '@/components/ServiceCard';
+import { HeroEyebrow, HeroLead, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getSiteImages } from '@/lib/site-images';
 import { SERVICE_CARD_IMAGE_SLOT_BY_ID } from '@/lib/site-service-image-slots';
 
@@ -48,13 +49,13 @@ export default async function ServicesPage() {
   return (
     <>
       <Section spacing="compact">
-        <div className="section-header-tight mb-0">
-          <p className="t-eyebrow">УСЛУГИ</p>
-          <h1 className="t-h2">Список услуг</h1>
-          <p className="t-body text-muted-foreground max-w-3xl">
+        <PageHero className="p-6 md:p-7 lg:p-8" contentClassName="space-y-4">
+          <HeroEyebrow>УСЛУГИ</HeroEyebrow>
+          <HeroTitle className="max-w-[20ch] text-[clamp(2rem,4vw,3rem)]">Список услуг</HeroTitle>
+          <HeroLead>
             Выполняем проекты по наружной рекламе, печати и производству под ключ: от расчёта и дизайна до монтажа и сдачи.
-          </p>
-        </div>
+          </HeroLead>
+        </PageHero>
       </Section>
 
       <Section spacing="compact" background="muted" fullBleed className="border-y border-neutral-200/70">

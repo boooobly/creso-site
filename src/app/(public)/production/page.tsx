@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import Section from '@/components/layout/Section';
+import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { ClipboardCheck, Cog, Factory, FileText, Frame, Lightbulb, PanelsTopLeft, PencilRuler, Printer, Ruler, ShieldCheck, Sparkles, Type, Wrench } from 'lucide-react';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getSiteImage, getSiteImages } from '@/lib/site-images';
@@ -140,54 +141,47 @@ export default async function ProductionPage() {
   return (
     <div>
       <Section>
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
-          <div className="max-w-[38.5rem] space-y-8 lg:pr-3">
-            <p className="inline-flex rounded-full border border-red-200/80 bg-red-50/60 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700">
-              СОБСТВЕННОЕ ПРОИЗВОДСТВО
-            </p>
-            <div className="space-y-4">
-              <h1 className="max-w-3xl text-3xl font-bold leading-[1.08] md:text-5xl">{heroTitle}</h1>
-              <p className="max-w-[33rem] text-base leading-relaxed text-neutral-700 md:text-[1.05rem] md:leading-relaxed">
-                Фрезеровка, печать, сборка и монтаж рекламных конструкций в собственном цеху. Без посредников, с
-                контролем качества на каждом этапе.
-              </p>
-            </div>
-
-            <div className="grid max-w-[34rem] grid-cols-1 gap-2.5 sm:grid-cols-2">
-              {capabilityBadges.map((badge) => (
-                <span
-                  key={badge}
-                  className="inline-flex h-11 items-center rounded-xl border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-700 shadow-[0_1px_2px_rgba(17,24,39,0.06)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900"
-                >
-                  {badge}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3.5 pt-1">
-              <Link
-                href="/contacts"
-                className={`${heroCtaBaseClass} border border-red-600 bg-red-600 text-white shadow-[0_8px_20px_rgba(220,38,38,0.24)] no-underline hover:border-red-700 hover:bg-red-700 hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]`}
-              >{heroPrimaryButtonText}</Link>
-              <a
-                href="#production-gallery"
-                className={`${heroCtaBaseClass} border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]`}
-              >
-                Смотреть производство
-              </a>
-            </div>
+        <PageHero
+          contentClassName="max-w-[38.5rem] space-y-6 lg:pr-3"
+          media={
+            <HeroMediaPanel className="bg-neutral-100">
+              <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
+                <Image src={heroImageSrc} alt={heroImageAlt} fill className="object-cover" priority />
+              </div>
+              <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/90 bg-white/95 px-4 py-3 backdrop-blur-lg shadow-[0_12px_30px_rgba(17,24,39,0.16)] md:bottom-5 md:left-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600">Собственный цех</p>
+                <p className="mt-1 text-sm font-bold text-neutral-950">Полный цикл производства</p>
+              </div>
+            </HeroMediaPanel>
+          }
+        >
+          <HeroEyebrow>СОБСТВЕННОЕ ПРОИЗВОДСТВО</HeroEyebrow>
+          <div className="space-y-4">
+            <HeroTitle className="max-w-3xl text-3xl leading-[1.08] md:text-5xl">{heroTitle}</HeroTitle>
+            <HeroLead className="max-w-[33rem] text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
           </div>
 
-          <div className="relative overflow-hidden rounded-[1.8rem] border border-neutral-200/90 bg-neutral-100 p-1.5 shadow-[0_20px_44px_rgba(17,24,39,0.12)]">
-            <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
-              <Image src={heroImageSrc} alt={heroImageAlt} fill className="object-cover" priority />
-            </div>
-            <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/90 bg-white/95 px-4 py-3 backdrop-blur-lg shadow-[0_12px_30px_rgba(17,24,39,0.16)] md:bottom-5 md:left-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600">Собственный цех</p>
-              <p className="mt-1 text-sm font-bold text-neutral-950">Полный цикл производства</p>
-            </div>
-          </div>
-        </div>
+          <HeroChipList className="max-w-[34rem] gap-2.5">
+            {capabilityBadges.map((badge) => (
+              <HeroChip key={badge} className="h-11 rounded-xl px-4 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
+                {badge}
+              </HeroChip>
+            ))}
+          </HeroChipList>
+
+          <HeroActions className="gap-3.5 pt-1">
+            <Link
+              href="/contacts"
+              className={`${heroCtaBaseClass} border border-red-600 bg-red-600 text-white shadow-[0_8px_20px_rgba(220,38,38,0.24)] no-underline hover:border-red-700 hover:bg-red-700 hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]`}
+            >{heroPrimaryButtonText}</Link>
+            <a
+              href="#production-gallery"
+              className={`${heroCtaBaseClass} border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]`}
+            >
+              Смотреть производство
+            </a>
+          </HeroActions>
+        </PageHero>
       </Section>
 
       <Section className="pt-0">
