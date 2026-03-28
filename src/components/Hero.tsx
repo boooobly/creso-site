@@ -12,7 +12,7 @@ export default function Hero({ t }: { t: SiteMessages }) {
     <div className="relative overflow-hidden">
       <div className="container grid gap-5 py-14 md:gap-6 md:py-24">
         <motion.h1
-          className="max-w-4xl text-3xl font-extrabold leading-tight tracking-tight md:text-5xl"
+          className="t-h1 max-w-4xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -21,7 +21,7 @@ export default function Hero({ t }: { t: SiteMessages }) {
         </motion.h1>
 
         <motion.p
-          className="max-w-2xl text-base text-neutral-700 dark:text-neutral-300 md:text-lg"
+          className="t-lead max-w-2xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}

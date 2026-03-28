@@ -50,6 +50,14 @@ a { @apply underline-offset-4; }
     @apply text-[clamp(1.25rem,2.1vw,1.5rem)] font-bold leading-[1.15] text-neutral-900;
   }
 
+  .t-h4 {
+    @apply text-[clamp(1.05rem,1.35vw,1.2rem)] font-semibold leading-[1.35] text-neutral-900;
+  }
+
+  .t-lead {
+    @apply text-[clamp(1rem,1.4vw,1.125rem)] font-normal leading-[1.6] text-neutral-700;
+  }
+
   .t-body {
     @apply text-[15px] font-normal leading-[1.58] text-neutral-600 md:text-base;
   }
@@ -60,6 +68,10 @@ a { @apply underline-offset-4; }
 
   .t-small {
     @apply text-[13px] leading-[1.5] md:text-sm;
+  }
+
+  .t-caption {
+    @apply text-[12px] font-medium uppercase tracking-[0.08em] text-neutral-500;
   }
 
   .text-muted-foreground {
@@ -74,14 +86,34 @@ a { @apply underline-offset-4; }
     @apply inline-flex items-center gap-2 text-sm font-semibold text-[var(--brand-red)] no-underline transition-colors hover:text-[#b52a2a];
   }
 
+  .t-button {
+    @apply text-sm font-semibold tracking-[0.01em];
+  }
+
+  .t-label {
+    @apply text-sm font-medium leading-5 text-neutral-800 dark:text-neutral-200;
+  }
+
+  .t-helper {
+    @apply t-small text-neutral-500 dark:text-neutral-400;
+  }
+
+  .t-value {
+    @apply text-[clamp(1.5rem,2.6vw,2.125rem)] font-bold leading-[1.1] tracking-[-0.02em] text-neutral-900;
+  }
+
+  .t-input {
+    @apply w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500;
+  }
+
   .t-faq {
     @apply text-base font-semibold leading-[1.4] tracking-normal text-neutral-900;
   }
 }
 
 
-.btn-primary { @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--brand-red)] px-5 py-3 text-white font-semibold tracking-normal transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--brand-red)] dark:focus:ring-offset-neutral-950; }
-.btn-secondary { @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-neutral-900 font-semibold hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800; }
+.btn-primary { @apply t-button inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--brand-red)] px-5 py-3 text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--brand-red)] dark:focus:ring-offset-neutral-950; }
+.btn-secondary { @apply t-button inline-flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-neutral-900 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800; }
 
 .card { @apply rounded-2xl border border-neutral-300 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900; }
 
