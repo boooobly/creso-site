@@ -111,6 +111,8 @@ export default async function MugsServicePage() {
   const heroImageAlt = heroImage?.altText || 'Печать на кружках — пример готовой работы';
   const resultImageSrc = resultImage?.url ?? '/images/mug/mug_eurochem.png';
   const resultImageAlt = resultImage?.altText || 'Печать на кружках — пример корпоративного тиража';
+  const glassOverlayClassName =
+    'absolute bottom-4 left-4 right-4 rounded-2xl border border-white/40 bg-white/86 p-4 shadow-[0_12px_30px_-22px_rgba(15,23,42,0.75)] backdrop-blur-sm sm:bottom-6 sm:left-6 sm:right-6 sm:p-5';
 
   return (
     <div>
@@ -154,9 +156,9 @@ export default async function MugsServicePage() {
                   className="object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/30 bg-black/30 p-4 backdrop-blur-md sm:bottom-6 sm:left-6 sm:right-6 sm:p-5">
-                  <p className="text-sm font-semibold text-white">Готовый результат: аккуратная полноцветная печать</p>
-                  <p className="mt-1 text-xs text-white/90 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
+                <div className={glassOverlayClassName}>
+                  <p className="text-sm font-semibold text-neutral-900">Готовый результат: аккуратная полноцветная печать</p>
+                  <p className="mt-1 text-xs text-neutral-600 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
                 </div>
               </div>
             </div>
@@ -238,17 +240,17 @@ export default async function MugsServicePage() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
-              <div className="relative aspect-[4/5] w-full">
+            <div className="overflow-hidden rounded-3xl border border-neutral-200 shadow-sm">
+              <div className="relative aspect-[4/5] w-full sm:aspect-[3/4] lg:aspect-auto lg:min-h-[560px]">
                 <Image
                   src={resultImageSrc}
                   alt={resultImageAlt}
                   fill
                   sizes="(min-width: 1024px) 34vw, 100vw"
-                  className="object-cover"
+                  className="object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/5" />
-                <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/70 bg-white/85 p-4 backdrop-blur-md">
+                <div className={glassOverlayClassName}>
                   <p className="text-sm font-semibold text-neutral-900">Премиальная подача результата</p>
                   <p className="mt-1 text-xs text-neutral-600">Чистая белая керамика, чёткая печать и стабильный вид во всём тираже.</p>
                 </div>
