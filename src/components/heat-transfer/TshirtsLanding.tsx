@@ -6,6 +6,7 @@ import { Brush, CheckCheck, ChevronDown, ClipboardCheck, FileUp, Palette, Shirt,
 import { CSSProperties, ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
 import FloatingTshirtsCTA from '@/components/heat-transfer/FloatingTshirtsCTA';
+import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { SiteImageRecord } from '@/lib/site-images';
 
@@ -231,30 +232,48 @@ export default function TshirtsLanding({
         <div className="container relative">
           <div
             ref={heroReveal.ref}
-            className={`rounded-3xl border border-neutral-200/90 bg-white p-5 shadow-[0_20px_55px_rgba(15,23,42,0.07)] transition-all duration-700 dark:border-neutral-800 dark:bg-neutral-900 md:p-8 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+            className={`transition-all duration-700 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
           >
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,540px)_minmax(360px,1fr)] lg:items-center lg:gap-8">
-              <div className="max-w-[560px]">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-600">Брендированная одежда</p>
-                <h1 className="mt-3 max-w-[16ch] text-3xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
-                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-base">
+            <PageHero
+              className="border-neutral-200/90 bg-white p-5 shadow-[0_20px_55px_rgba(15,23,42,0.07)] dark:border-neutral-800 dark:bg-neutral-900 md:p-8"
+              contentClassName="max-w-[560px]"
+              mediaClassName="lg:min-h-[420px]"
+              media={
+                <HeroMediaPanel className="relative min-h-[250px] p-0 shadow-[0_16px_36px_rgba(15,23,42,0.14)] sm:min-h-[320px] lg:min-h-[420px]">
+                  <Image
+                    src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/tshirt_hero.png'}
+                    alt={galleryImages['tshirts.hero.main']?.altText || 'Брендированные футболки для команды'}
+                    fill
+                    className="object-cover object-center"
+                    sizes="(min-width: 1280px) 540px, (min-width: 1024px) 44vw, 100vw"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-5 py-4">
+                    <p className="text-sm font-semibold text-white">Печать для мерча, формы и промо</p>
+                    <p className="mt-0.5 text-xs text-white/85">Стабильная цветопередача и аккуратная посадка принта</p>
+                  </div>
+                </HeroMediaPanel>
+              }
+            >
+              <HeroEyebrow className="text-xs tracking-[0.2em]">Брендированная одежда</HeroEyebrow>
+              <HeroTitle className="mt-3 max-w-[16ch] text-3xl leading-tight md:text-5xl">{heroTitle}</HeroTitle>
+              <HeroLead className="mt-4 max-w-2xl text-sm leading-relaxed dark:text-neutral-300 md:text-base">
                   {heroDescription} Печатаем для мерча, формы и брендированной одежды — от одной вещи до корпоративных партий.
-                </p>
+              </HeroLead>
 
-                <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
+                <HeroChipList className="mt-5 gap-2.5 sm:grid-cols-3">
                   {kpiChips.map((chip, index) => (
-                    <div
+                    <HeroChip
                       key={chip.title}
                       style={delayStyle(index, heroReveal.prefersReducedMotion)}
-                      className={`rounded-xl border border-neutral-200 bg-neutral-50/80 px-3 py-2.5 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900/70 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+                      className={`rounded-xl border-neutral-200 bg-neutral-50/80 px-3 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/70 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
                     >
                       <p className="text-xs font-semibold leading-snug text-neutral-900 dark:text-neutral-100">{chip.title}</p>
                       <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{chip.subtitle}</p>
-                    </div>
+                    </HeroChip>
                   ))}
-                </div>
+                </HeroChipList>
 
-                <div className="mt-7 flex flex-wrap items-center gap-3">
+                <HeroActions className="mt-7">
                   <Link
                     href="#tshirts-order"
                     className="inline-flex h-11 items-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none"
@@ -267,23 +286,8 @@ export default function TshirtsLanding({
                   >
                     {heroSecondaryButtonText}
                   </Link>
-                </div>
-              </div>
-
-              <div className="relative min-h-[250px] overflow-hidden rounded-2xl shadow-[0_16px_36px_rgba(15,23,42,0.14)] sm:min-h-[320px] lg:min-h-[420px]">
-                <Image
-                  src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/tshirt_hero.png'}
-                  alt={galleryImages['tshirts.hero.main']?.altText || 'Брендированные футболки для команды'}
-                  fill
-                  className="object-cover object-center"
-                  sizes="(min-width: 1280px) 540px, (min-width: 1024px) 44vw, 100vw"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-5 py-4">
-                  <p className="text-sm font-semibold text-white">Печать для мерча, формы и промо</p>
-                  <p className="mt-0.5 text-xs text-white/85">Стабильная цветопередача и аккуратная посадка принта</p>
-                </div>
-              </div>
-            </div>
+                </HeroActions>
+            </PageHero>
           </div>
         </div>{/* container relative */}
       </section>

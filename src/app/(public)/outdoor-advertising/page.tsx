@@ -7,6 +7,7 @@ import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import OutdoorFloatingCtas from '@/components/OutdoorFloatingCtas';
 import ProductionTrustBlock from '@/components/ProductionTrustBlock';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import { messages } from '@/lib/messages';
@@ -180,48 +181,47 @@ export default async function OutdoorAdvertisingPage() {
       <OutdoorFloatingCtas />
 
       <Section className="pb-6 md:pb-10" id="outdoor-hero" background="default">
-        <div className="card grid gap-8 bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-950 dark:to-neutral-900 md:p-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
-          <div className="flex h-full flex-col gap-6 md:gap-7">
-            <div className="space-y-4">
-              <h1 className="text-4xl font-bold leading-tight md:text-5xl">{heroTitle}</h1>
-              <p className="max-w-3xl text-lg text-neutral-700 dark:text-neutral-300">{heroDescription}</p>
-            </div>
-
-            <div className="flex flex-wrap gap-2.5">
-              {heroTrustBadges.map((badge) => (
-                <span
-                  key={badge}
-                  className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-700 shadow-sm dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200"
-                >
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
-                  {badge}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="#outdoor-form-section"
-                className="btn-primary no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
-              >{heroPrimaryButtonText}</Link>
-              <Link
-                href="#outdoor-portfolio"
-                className="btn-secondary no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-              >{heroSecondaryButtonText}</Link>
-            </div>
+        <PageHero
+          className="bg-gradient-to-b from-neutral-100 to-white dark:from-neutral-950 dark:to-neutral-900"
+          contentClassName="flex h-full flex-col gap-6 md:gap-7"
+          media={
+            <HeroMediaPanel className="min-h-[350px] rounded-xl p-0 shadow-md dark:border-neutral-700 dark:bg-neutral-900 md:min-h-[440px]">
+              <Image
+                src={heroImageSrc}
+                alt={heroImageAlt}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 1024px) 100vw, 46vw"
+              />
+            </HeroMediaPanel>
+          }
+        >
+          <div className="space-y-4">
+            <HeroTitle className="max-w-3xl text-4xl leading-tight md:text-5xl">{heroTitle}</HeroTitle>
+            <HeroLead className="max-w-3xl text-lg">{heroDescription}</HeroLead>
           </div>
 
-          <div className="relative min-h-[350px] overflow-hidden rounded-xl border border-neutral-200/80 bg-neutral-100 shadow-md dark:border-neutral-700 dark:bg-neutral-900 md:min-h-[440px]">
-            <Image
-              src={heroImageSrc}
-              alt={heroImageAlt}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 46vw"
-            />
-          </div>
-        </div>
+          <HeroChipList className="max-w-3xl gap-2.5">
+            {heroTrustBadges.map((badge) => (
+              <HeroChip key={badge} className="shadow-sm dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                {badge}
+              </HeroChip>
+            ))}
+          </HeroChipList>
+
+          <HeroActions>
+            <Link
+              href="#outdoor-form-section"
+              className="btn-primary no-underline ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+            >{heroPrimaryButtonText}</Link>
+            <Link
+              href="#outdoor-portfolio"
+              className="btn-secondary no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+            >{heroSecondaryButtonText}</Link>
+          </HeroActions>
+        </PageHero>
       </Section>
 
       <Section className="pt-0" id="outdoor-portfolio" background="muted">

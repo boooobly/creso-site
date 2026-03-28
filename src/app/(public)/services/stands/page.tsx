@@ -5,6 +5,7 @@ import LeadForm from '@/components/LeadForm';
 import Section from '@/components/Section';
 import StandPreviewCard from '@/components/services/StandPreviewCard';
 import RevealOnScroll from '@/components/RevealOnScroll';
+import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { messages } from '@/lib/messages';
 import { getSiteImages } from '@/lib/site-images';
 import { STANDS_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
@@ -68,35 +69,10 @@ export default async function StandsServicePage() {
   return (
     <div>
       <Section className="pb-8 pt-8 md:pb-10 md:pt-10" background="default" id="stands-hero">
-        <div className="card grid gap-8 rounded-3xl bg-gradient-to-br from-white to-neutral-50 p-6 md:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div>
-            <p className="t-eyebrow">Изготовление стендов</p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-5xl">Изготовление информационных стендов</h1>
-            <p className="mt-4 t-body max-w-2xl">
-              Производим стенды для школ, детских садов, организаций, офисов, предприятий и уличных пространств. Подбираем формат,
-              материалы и конструкцию под конкретную задачу.
-            </p>
-
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="#stands-lead-form" className="btn-primary no-underline">
-                Рассчитать стоимость
-              </Link>
-              <Link href="#stands-catalog" className="btn-secondary no-underline">
-                Смотреть варианты
-              </Link>
-            </div>
-
-            <div className="mt-5 grid max-w-xl grid-cols-2 gap-2.5">
-              {heroChips.map((chip) => (
-                <span key={chip} className="chip-elevated rounded-full px-3 py-1.5 text-xs font-semibold text-neutral-700">
-                  {chip}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="rounded-3xl border border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100/90 to-white p-5 md:p-6">
+        <PageHero
+          className="bg-gradient-to-br from-white to-neutral-50"
+          media={
+            <HeroMediaPanel className="rounded-3xl border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100/90 to-white p-5 md:p-6">
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-white/80">
                 <Image
                   src={heroImageSrc}
@@ -107,9 +83,33 @@ export default async function StandsServicePage() {
                   priority
                 />
               </div>
-            </div>
-          </div>
-        </div>
+            </HeroMediaPanel>
+          }
+        >
+          <HeroEyebrow>Изготовление стендов</HeroEyebrow>
+          <HeroTitle className="max-w-2xl text-3xl tracking-tight md:text-5xl">Изготовление информационных стендов</HeroTitle>
+          <HeroLead>
+            Производим стенды для школ, детских садов, организаций, офисов, предприятий и уличных пространств. Подбираем формат,
+            материалы и конструкцию под конкретную задачу.
+          </HeroLead>
+
+          <HeroActions className="mt-7">
+            <Link href="#stands-lead-form" className="btn-primary no-underline">
+              Рассчитать стоимость
+            </Link>
+            <Link href="#stands-catalog" className="btn-secondary no-underline">
+              Смотреть варианты
+            </Link>
+          </HeroActions>
+
+          <HeroChipList className="mt-5 max-w-xl gap-2.5">
+            {heroChips.map((chip) => (
+              <HeroChip key={chip} className="chip-elevated px-3 py-1.5 text-xs">
+                {chip}
+              </HeroChip>
+            ))}
+          </HeroChipList>
+        </PageHero>
       </Section>
 
       <Section id="stands-catalog" background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">

@@ -17,6 +17,7 @@ import {
 import Section from '@/components/layout/Section';
 import OrderMillingForm from '@/components/OrderMillingForm';
 import MillingMaterialsAccordion from '@/components/MillingMaterialsAccordion';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { MillingAdditionalServiceGroup, MillingMaterialGroup } from '@/lib/pricing-config/milling';
 
@@ -148,34 +149,36 @@ export default function MillingPageClient({
   return (
     <div>
       <Section className="pt-8 pb-6 md:pt-10 md:pb-8">
-        <div className={`card space-y-6 p-6 md:p-10 ${revealClass(heroVisible)}`}>
+        <PageHero className={`p-6 md:p-10 ${revealClass(heroVisible)}`}>
           <div className="space-y-3">
-            <h1 className="text-3xl font-bold md:text-5xl">Фрезеровка листовых материалов</h1>
-            <p className="max-w-3xl text-neutral-700 dark:text-neutral-300">
+            <HeroTitle className="max-w-3xl text-3xl md:text-5xl">Фрезеровка листовых материалов</HeroTitle>
+            <HeroLead className="max-w-3xl dark:text-neutral-300">
               Точная 2D-фрезеровка пластика, композита и древесных плит на производстве полного цикла. От единичных заказов до серий с контролем качества на каждом этапе.
-            </p>
+            </HeroLead>
           </div>
 
-          <div className="flex flex-wrap gap-2 md:gap-3">
+          <HeroChipList className="flex flex-wrap gap-2 md:gap-3">
             {heroKpi.map((item, index) => (
-              <span
+              <HeroChip
                 key={item}
-                className={`rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-semibold text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-100 ${revealClass(heroVisible)}`}
+                className={`border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-semibold text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-100 ${revealClass(heroVisible)}`}
                 style={{ transitionDelay: reduceMotion ? '0ms' : `${index * 120}ms` }}
               >
                 {item}
-              </span>
+              </HeroChip>
             ))}
-          </div>
+          </HeroChipList>
 
-          <button
-            type="button"
-            onClick={scrollToOrderSection}
-            className="inline-flex w-fit items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
-          >
-            Рассчитать заказ
-          </button>
-        </div>
+          <HeroActions>
+            <button
+              type="button"
+              onClick={scrollToOrderSection}
+              className="inline-flex w-fit items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+            >
+              Рассчитать заказ
+            </button>
+          </HeroActions>
+        </PageHero>
       </Section>
 
       <Section className="pt-2 md:pt-4">

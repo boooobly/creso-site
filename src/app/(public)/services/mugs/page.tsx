@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import Section from '@/components/Section';
 import OrderMugsForm from '@/components/OrderMugsForm';
+import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getSiteImages } from '@/lib/site-images';
 
 const quickBenefits = [
@@ -118,35 +119,11 @@ export default async function MugsServicePage() {
     <div>
       <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)]">
-            <div className="grid gap-0 lg:grid-cols-[1.02fr_0.98fr]">
-              <div className="p-6 sm:p-8 lg:p-12">
-                <p className="t-eyebrow">Печать на кружках</p>
-                <h1 className="mt-3 text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">Брендированные кружки с печатью по кругу</h1>
-                <p className="mt-4 max-w-[52ch] text-sm leading-relaxed text-neutral-600 sm:text-base">
-                  Изготавливаем кружки на белой керамике 330 мл: от единичных экземпляров до тиражей для компаний и мероприятий. Проверяем макет перед запуском и согласуем результат заранее.
-                </p>
-
-                <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
-                  {['Белая керамика 330 мл', 'Полный wrap по кругу', 'Проверка макета бесплатно', 'Скидка до 20% за объём'].map((item) => (
-                    <div key={item} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
-                      <CheckCircle2 className="h-4 w-4 text-red-600" aria-hidden="true" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <a href="#mugs-order" className="btn-primary no-underline">
-                    Оставить заявку
-                  </a>
-                  <a href="#mugs-prices" className="btn-secondary no-underline">
-                    Цены и условия
-                  </a>
-                </div>
-              </div>
-
-              <div className="relative min-h-[320px] border-t border-neutral-200 bg-neutral-100/70 lg:min-h-full lg:border-l lg:border-t-0">
+          <PageHero
+            className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:p-10"
+            mediaClassName="h-full"
+            media={
+              <HeroMediaPanel className="min-h-[320px] rounded-2xl border-neutral-200 bg-neutral-100/70 p-0 lg:min-h-full">
                 <Image
                   src={heroImageSrc}
                   alt={heroImageAlt}
@@ -160,9 +137,33 @@ export default async function MugsServicePage() {
                   <p className="text-sm font-semibold text-neutral-900">Готовый результат: аккуратная полноцветная печать</p>
                   <p className="mt-1 text-xs text-neutral-600 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
                 </div>
-              </div>
-            </div>
-          </div>
+              </HeroMediaPanel>
+            }
+          >
+            <HeroEyebrow>Печать на кружках</HeroEyebrow>
+            <HeroTitle className="max-w-[20ch] text-4xl tracking-tight sm:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
+            <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
+              Изготавливаем кружки на белой керамике 330 мл: от единичных экземпляров до тиражей для компаний и мероприятий. Проверяем макет перед запуском и согласуем результат заранее.
+            </HeroLead>
+
+            <HeroChipList className="mt-6 gap-2.5">
+              {['Белая керамика 330 мл', 'Полный wrap по кругу', 'Проверка макета бесплатно', 'Скидка до 20% за объём'].map((item) => (
+                <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
+                  <CheckCircle2 className="h-4 w-4 text-red-600" aria-hidden="true" />
+                  <span>{item}</span>
+                </HeroChip>
+              ))}
+            </HeroChipList>
+
+            <HeroActions className="mt-8">
+              <a href="#mugs-order" className="btn-primary no-underline">
+                Оставить заявку
+              </a>
+              <a href="#mugs-prices" className="btn-secondary no-underline">
+                Цены и условия
+              </a>
+            </HeroActions>
+          </PageHero>
         </div>
       </Section>
 
