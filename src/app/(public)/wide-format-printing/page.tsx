@@ -190,7 +190,7 @@ export default async function WideFormatPrintingPage() {
             </div>
           </div>
 
-          <section className="rounded-2xl border border-neutral-200/70 bg-muted/30 p-6 md:p-8">
+          <section className="card p-6 md:p-8">
             <h3 className="text-xl font-semibold tracking-tight md:text-2xl">Почему выбирают нас</h3>
             <WideFormatTrustCards features={features} />
           </section>

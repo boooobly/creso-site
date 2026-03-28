@@ -22,7 +22,7 @@ export default function ServiceCard({
         featured ? 'bg-[rgba(212,28,28,0.04)]' : 'bg-white'
       }`}
     >
-      <div className={`mb-5 overflow-hidden rounded-2xl border ${featured ? 'border-[var(--brand-red)]/20 bg-white/80' : 'border-neutral-200 bg-neutral-50/80'} p-3`}>
+      <div className={`card-structured mb-5 overflow-hidden ${featured ? 'border-[var(--brand-red)]/20 bg-white/80' : 'bg-neutral-50/80'} p-3`}>
         <div className={`relative h-20 overflow-hidden rounded-xl ${featured ? 'bg-gradient-to-r from-[var(--brand-red)]/20 to-transparent' : 'bg-gradient-to-r from-neutral-200 to-neutral-100'}`}>
           {imageSrc ? <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 20vw, (min-width: 768px) 35vw, 90vw" /> : null}
         </div>

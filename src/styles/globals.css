@@ -159,7 +159,33 @@ a { @apply underline-offset-4; }
 .btn-primary { @apply t-button inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--brand-red)] px-5 py-3 text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--brand-red)] dark:focus:ring-offset-neutral-950; }
 .btn-secondary { @apply t-button inline-flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-neutral-900 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800; }
 
-.card { @apply rounded-2xl border border-neutral-300 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900; }
+.card {
+  @apply rounded-2xl border border-neutral-200/85 bg-white shadow-[0_12px_34px_-28px_rgba(15,23,42,0.45)] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none;
+}
+
+.card-interactive {
+  @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_18px_38px_-26px_rgba(15,23,42,0.42)] dark:hover:border-neutral-700 dark:hover:shadow-none;
+}
+
+.card-info {
+  @apply rounded-2xl border border-neutral-200 bg-white/90 p-5 shadow-[0_10px_24px_-28px_rgba(15,23,42,0.5)] dark:border-neutral-800 dark:bg-neutral-900;
+}
+
+.card-structured {
+  @apply rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 dark:border-neutral-800 dark:bg-neutral-900/60 md:p-5;
+}
+
+.card-visual {
+  @apply overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_12px_30px_-24px_rgba(15,23,42,0.38)] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none;
+}
+
+.card-image-overlay {
+  @apply pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent;
+}
+
+.card-title-stack {
+  @apply space-y-2;
+}
 
 .premium-card {
   @apply relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_8px_24px_-22px_rgba(15,23,42,0.45)] transition-all duration-300;

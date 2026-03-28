@@ -27,7 +27,7 @@ export default function ProductionTrustBlock() {
   return (
     <section className="bg-neutral-50/70 py-12 md:py-20">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <RevealOnScroll className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm md:p-8">
+        <RevealOnScroll className="card p-6 md:p-8">
           <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8">
             <div className="space-y-6">
               <div>
@@ -48,7 +48,7 @@ export default function ProductionTrustBlock() {
 
               <div className="grid gap-3">
                 {guaranteeItems.map((item) => (
-                  <article key={item} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5">
+                  <article key={item} className="card-structured rounded-xl p-3.5">
                     <p className="t-body flex items-start gap-2.5 text-neutral-700">
                       <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                       <span>{item}</span>
@@ -62,7 +62,7 @@ export default function ProductionTrustBlock() {
               {productionPlaceholders.map((item) => (
                 <article
                   key={item.title}
-                  className="group rounded-xl border border-neutral-200 bg-neutral-50 p-3.5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-black/10"
+                  className="card-visual card-interactive group rounded-xl bg-neutral-50 p-3.5"
                 >
                   <h3 className="t-h4">{item.title}</h3>
                   <div className="relative mt-3 min-h-[220px] overflow-hidden rounded-lg md:min-h-[250px]">

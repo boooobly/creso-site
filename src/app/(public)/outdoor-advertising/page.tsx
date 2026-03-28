@@ -241,7 +241,7 @@ export default async function OutdoorAdvertisingPage() {
             {services.map((service) => (
               <article
                 key={service.title}
-                className={`card group relative overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-black/15 ${service.featured ? 'min-h-[240px] md:col-span-2 lg:col-span-3 lg:min-h-[300px]' : 'min-h-[180px]'}`}
+                className={`card-visual card-interactive group relative rounded-xl ${service.featured ? 'min-h-[240px] md:col-span-2 lg:col-span-3 lg:min-h-[300px]' : 'min-h-[180px]'}`}
               >
                 <Image
                   src={siteImages[service.slotKey]?.url ?? service.image}
@@ -250,7 +250,7 @@ export default async function OutdoorAdvertisingPage() {
                   className="object-cover transition-transform duration-500 group-hover:scale-[1.05]"
                   sizes={service.featured ? '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 95vw' : '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'}
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent" />
+                <div className="card-image-overlay" />
                 <div className="absolute inset-x-0 bottom-0 p-5">
                   <p className="text-base font-semibold leading-snug text-white md:text-lg">{service.title}</p>
                 </div>
@@ -270,7 +270,7 @@ export default async function OutdoorAdvertisingPage() {
               return (
                 <article
                   key={item.title}
-                  className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+                  className="card-info card-interactive h-full p-6"
                 >
                   <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
@@ -292,7 +292,7 @@ export default async function OutdoorAdvertisingPage() {
             {fullCycleItems.map((item, index) => (
               <li
                 key={item}
-                className="card list-none rounded-xl border border-neutral-200/90 p-4 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg hover:shadow-black/10"
+                className="card card-interactive list-none rounded-xl p-4"
               >
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Этап {index + 1}</p>
                 <p className="text-sm font-semibold leading-relaxed">{item}</p>
@@ -300,7 +300,7 @@ export default async function OutdoorAdvertisingPage() {
             ))}
           </ol>
 
-          <article className="card mt-4 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-5 md:p-6 dark:border-neutral-700 dark:bg-neutral-900/60">
+          <article className="card-structured mt-4 rounded-xl p-5 md:p-6">
             <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
               <div>
                 <h3 className="text-base font-semibold">Сервис и сопровождение</h3>
@@ -316,11 +316,11 @@ export default async function OutdoorAdvertisingPage() {
 
       <Section className="pt-0" background="muted">
         <RevealOnScroll>
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900 md:p-7">
+          <div className="card p-6 md:p-7">
             <h2 className="mb-5 text-2xl font-bold">Как мы работаем</h2>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               {steps.map((step, index) => (
-                <article key={step} className="rounded-xl border border-neutral-200/90 bg-neutral-50/70 p-4 dark:border-neutral-700 dark:bg-neutral-800/70">
+                <article key={step} className="card-structured rounded-xl p-4 dark:bg-neutral-800/70">
                   <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Шаг {index + 1}</p>
                   <p className="text-sm font-semibold">{step}</p>
                 </article>

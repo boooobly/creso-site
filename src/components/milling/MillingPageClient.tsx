@@ -200,7 +200,7 @@ export default function MillingPageClient({
               return (
                 <div
                   key={step.title}
-                  className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900"
+                  className="card-info card-interactive h-full p-6"
                 >
                   <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
@@ -263,7 +263,7 @@ export default function MillingPageClient({
                 const GroupIcon = group.id === 'urgency' ? Zap : group.id === 'preparation-and-complexity' ? Wrench : Truck;
 
                 return (
-                  <section key={group.id} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+                  <section key={group.id} className="card-structured rounded-xl bg-white p-4 dark:bg-neutral-900">
                     <h3 className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100">
                       <span className="rounded-lg bg-red-50 p-1.5 text-red-600 dark:bg-red-500/15 dark:text-red-300">
                         <GroupIcon className="h-4 w-4" aria-hidden="true" />
@@ -303,7 +303,7 @@ export default function MillingPageClient({
           <h2 className="mb-4 text-2xl font-semibold">Примеры материалов в работе</h2>
           <div className="grid gap-4 md:grid-cols-3">
             {galleryItems.map((item) => (
-              <article key={item.title} className="group overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
+              <article key={item.title} className="card-visual card-interactive group">
                 <div className="relative h-44 overflow-hidden">
                   <img
                     src={item.image}
