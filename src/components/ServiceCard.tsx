@@ -18,7 +18,7 @@ export default function ServiceCard({
   return (
     <Link
       href={href}
-      className={`premium-card group flex h-full flex-col p-5 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 md:p-6 ${
+      className={`premium-card card-pad group flex h-full flex-col no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 ${
         featured ? 'bg-[rgba(212,28,28,0.04)]' : 'bg-white'
       }`}
     >

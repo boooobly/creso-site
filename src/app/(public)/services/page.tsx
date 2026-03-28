@@ -47,8 +47,8 @@ export default async function ServicesPage() {
 
   return (
     <>
-      <Section className="pt-6 pb-6 md:pt-8 md:pb-7">
-        <div className="space-y-2">
+      <Section spacing="compact">
+        <div className="section-header-tight mb-0">
           <p className="t-eyebrow">УСЛУГИ</p>
           <h1 className="t-h2">Список услуг</h1>
           <p className="t-body text-muted-foreground max-w-3xl">
@@ -57,8 +57,8 @@ export default async function ServicesPage() {
         </div>
       </Section>
 
-      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-8 md:py-10">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Section spacing="compact" background="muted" fullBleed className="border-y border-neutral-200/70">
+        <div className="grid-cards md:grid-cols-2 lg:grid-cols-3">
           {services.map((s: any) => {
             const slotKey = SERVICE_CARD_IMAGE_SLOT_BY_ID[String(s.id)];
             const imageSrc = slotKey ? (serviceCardImages[slotKey]?.url ?? serviceImageById[s.id]) : serviceImageById[s.id];

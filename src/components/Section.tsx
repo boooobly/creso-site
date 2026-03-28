@@ -11,11 +11,19 @@ type SectionProps = PropsWithChildren<{
   id?: string;
   background?: 'default' | 'muted';
   fullBleed?: boolean;
+  spacing?: 'default' | 'tight' | 'compact' | 'hero';
 }>;
 
 const backgroundStyles: Record<NonNullable<SectionProps['background']>, string> = {
   default: 'bg-white',
   muted: 'bg-neutral-50/70',
+};
+
+const spacingStyles: Record<NonNullable<SectionProps['spacing']>, string> = {
+  default: 'section-rhythm',
+  tight: 'section-rhythm-tight',
+  compact: 'section-rhythm-compact',
+  hero: 'section-rhythm-hero',
 };
 
 export default function Section({
@@ -25,6 +33,7 @@ export default function Section({
   id,
   background = 'default',
   fullBleed = false,
+  spacing = 'default',
 }: SectionProps) {
   const shouldReduceMotion = useReducedMotion();
   const bleedClassName = fullBleed ? 'relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]' : '';
@@ -32,7 +41,7 @@ export default function Section({
   return (
     <motion.section
       id={id}
-      className={`py-12 md:py-20 ${bleedClassName} ${backgroundStyles[background]} ${className}`.trim()}
+      className={`${spacingStyles[spacing]} ${bleedClassName} ${backgroundStyles[background]} ${className}`.trim()}
       initial={shouldReduceMotion ? false : 'hidden'}
       whileInView={shouldReduceMotion ? undefined : 'show'}
       viewport={viewportOnce}

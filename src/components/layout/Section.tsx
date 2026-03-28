@@ -8,6 +8,13 @@ type SectionProps = {
   title?: ReactNode;
   subtitle?: ReactNode;
   children: ReactNode;
+  spacing?: 'default' | 'tight' | 'compact';
+};
+
+const spacingStyles: Record<NonNullable<SectionProps['spacing']>, string> = {
+  default: 'section-rhythm-tight',
+  tight: 'section-rhythm-compact',
+  compact: 'py-6 md:py-8 lg:py-10',
 };
 
 export default function Section({
@@ -17,12 +24,13 @@ export default function Section({
   title,
   subtitle,
   children,
+  spacing = 'default',
 }: SectionProps) {
   return (
-    <section id={id} className={`py-10 md:py-14 ${className}`.trim()}>
+    <section id={id} className={`${spacingStyles[spacing]} ${className}`.trim()}>
       <Container className={innerClassName}>
         {(title || subtitle) && (
-          <header className="mb-6 md:mb-8">
+          <header className="section-header">
             {title ? <h2 className="t-h2">{title}</h2> : null}
             {subtitle ? <p className="t-body text-muted-foreground mt-2">{subtitle}</p> : null}
           </header>

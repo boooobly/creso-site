@@ -109,6 +109,50 @@ a { @apply underline-offset-4; }
   .t-faq {
     @apply text-base font-semibold leading-[1.4] tracking-normal text-neutral-900;
   }
+
+  .section-rhythm {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  .section-rhythm-tight {
+    @apply py-10 md:py-14 lg:py-16;
+  }
+
+  .section-rhythm-compact {
+    @apply py-8 md:py-10 lg:py-12;
+  }
+
+  .section-rhythm-hero {
+    @apply pb-10 pt-4 md:pb-12 md:pt-6 lg:pb-14;
+  }
+
+  .section-header {
+    @apply mb-6 space-y-2 md:mb-8;
+  }
+
+  .section-header-tight {
+    @apply mb-5 space-y-2 md:mb-7;
+  }
+
+  .section-header-split {
+    @apply mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8;
+  }
+
+  .grid-cards {
+    @apply grid gap-4 md:gap-5;
+  }
+
+  .card-pad {
+    @apply p-5 md:p-6;
+  }
+
+  .cta-shell {
+    @apply rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-5 md:p-7;
+  }
+
+  .form-shell {
+    @apply rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5 md:p-6 lg:p-7;
+  }
 }
 
 
