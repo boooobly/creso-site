@@ -20,8 +20,15 @@ export default function FeatureCard({
       transition={{ duration: 0.22 }}
       className="premium-card group flex h-full flex-col overflow-hidden"
     >
-      <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-neutral-200/80 dark:border-neutral-800">
-        <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 768px) 33vw, 100vw" />
+      <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-neutral-200/80 bg-neutral-100 dark:border-neutral-800">
+        <Image
+          src={imageSrc}
+          alt={title}
+          fill
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          sizes="(min-width: 768px) 33vw, 100vw"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-900/22 via-transparent to-transparent opacity-85" />
       </div>
       <div className="card-title-stack flex flex-1 flex-col p-5">
         <h3 className="t-h3 line-clamp-2 leading-snug">{title}</h3>
