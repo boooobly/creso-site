@@ -4,6 +4,7 @@ import { FormEvent, useMemo, useState } from 'react';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
 
 type PrintSide = 'single' | 'double';
 
@@ -164,18 +165,16 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
     }
   };
 
-  const inputClass = (field: keyof FormValues) => `h-11 w-full rounded-xl border px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 focus:bg-white dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-red-500 dark:focus:ring-red-500/30 ${
-    errors[field] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-neutral-300 bg-neutral-50'
-  }`;
+  const inputClass = (field: keyof FormValues) => publicInputClass(Boolean(errors[field]));
 
   return (
-    <div id="business-cards-form" className="card rounded-2xl p-6 shadow-sm transition-all duration-300 md:p-8">
-      <div className="mb-5">
+    <div id="business-cards-form" className={publicFormStyles.shell}>
+      <div className={publicFormStyles.heading}>
         <h2 className="text-2xl font-bold">Отправить заявку</h2>
         <p className="mt-1.5 text-sm text-neutral-600">Оставьте контакты и приложите макет — менеджер подтвердит детали и сроки.</p>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+      <form className={`${publicFormStyles.fieldsStack} mt-5`} onSubmit={handleSubmit} noValidate>
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-1.5">
             <span className="text-sm font-medium">Имя *</span>
@@ -221,7 +220,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
               ]}
               allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
               invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
-              className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
+              className={publicFormStyles.uploadZone}
               helperTextClassName="mt-1 t-small text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
@@ -250,7 +249,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           <textarea className={`${inputClass('comment')} min-h-[110px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
         </label>
 
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900/60 space-y-0.5">
+        <div className={`${publicFormStyles.summaryCard} space-y-0.5`}>
           <p><b>Тираж:</b> {summary.quantity.toLocaleString('ru-RU')} шт.</p>
           <p><b>Печать:</b> {summary.printSide === 'single' ? 'Односторонняя' : 'Двусторонняя'}</p>
           <p><b>Ламинация:</b> {summary.lamination ? 'Да' : 'Нет'}</p>
@@ -271,7 +270,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           <button
             type="submit"
             disabled={isSending}
-            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-red-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[200px]"
+            className={publicFormStyles.submitButton}
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>

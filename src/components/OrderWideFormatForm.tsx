@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
 import ImageDropzone from '@/components/ImageDropzone';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 
@@ -199,18 +200,16 @@ export default function OrderWideFormatForm() {
     }
   };
 
-  const inputClass = (field: keyof FormValues) => `h-11 w-full rounded-xl border px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 focus:bg-white dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-red-500 dark:focus:ring-red-500/30 ${
-    errors[field] ? 'border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-neutral-300 bg-neutral-50'
-  }`;
+  const inputClass = (field: keyof FormValues) => publicInputClass(Boolean(errors[field]));
 
   return (
-    <div id="wide-format-form" className={`card border-neutral-200/85 p-6 shadow-sm shadow-neutral-200/45 transition-all duration-300 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
-      <div className="mb-6 space-y-2">
+    <div id="wide-format-form" className={`${publicFormStyles.shell} transition-all duration-300 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
+      <div className={publicFormStyles.heading}>
         <h2 id="wide-format-form-title" className="text-2xl font-semibold tracking-tight">Рассчитать стоимость</h2>
         <p className="text-sm leading-6 text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
       </div>
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className={`${publicFormStyles.fieldsStack} mt-6`} onSubmit={handleSubmit} noValidate>
         <div className="grid gap-4 md:grid-cols-2 md:items-start">
           <div className="space-y-4">
             <label className="space-y-2">
@@ -237,7 +236,7 @@ export default function OrderWideFormatForm() {
             </label>
           </div>
 
-          <div className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3 dark:border-neutral-800 dark:bg-neutral-900/50 md:p-3.5">
+          <div className={`${publicFormStyles.summaryCard} flex flex-col gap-2 p-3 md:p-3.5`}>
             <ImageDropzone
               value={file}
               onChange={setFile}
@@ -256,7 +255,7 @@ export default function OrderWideFormatForm() {
               ]}
               allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
               invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
-              className="rounded-xl border-2 border-dashed border-neutral-300 bg-white px-2.5 py-2 transition hover:border-red-400 dark:border-neutral-700 dark:bg-neutral-900 md:px-3 md:py-2.5"
+              className={`${publicFormStyles.uploadZone} bg-white px-2.5 py-2 md:px-3 md:py-2.5`}
               helperTextClassName="mt-0.5 text-xs text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
@@ -302,11 +301,11 @@ export default function OrderWideFormatForm() {
           aria-hidden="true"
         />
 
-        <div className="flex flex-col gap-3 border-t border-neutral-200/80 pt-2 md:flex-row md:items-center">
+        <div className={publicFormStyles.actionRow}>
           <button
             type="submit"
             disabled={isSending}
-            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[180px]"
+            className={`${publicFormStyles.submitButton} hover:opacity-90 md:min-w-[180px]`}
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>

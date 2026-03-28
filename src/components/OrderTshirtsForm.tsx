@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
@@ -77,10 +78,7 @@ export default function OrderTshirtsForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
 
-  const inputClass = (name: keyof FormValues) => [
-    'h-11 w-full rounded-xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 placeholder:text-neutral-400 hover:border-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
-    errors[name] ? 'border-red-500 ring-2 ring-red-500/20' : '',
-  ].join(' ');
+  const inputClass = (name: keyof FormValues) => publicInputClass(Boolean(errors[name]));
 
   const helperText = useMemo(
     () => `Растровые: PNG, JPG, JPEG, WEBP. Векторные: PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`,
@@ -171,14 +169,14 @@ export default function OrderTshirtsForm() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900 md:p-8">
+    <div className={`relative overflow-hidden ${publicFormStyles.shell}`}>
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(220,38,38,0.08),transparent_45%)]" aria-hidden="true" />
 
       <div className="relative">
         <h2 className="text-2xl font-bold md:text-3xl">Оставьте заявку</h2>
         <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Заполните форму — менеджер уточнит детали, стоимость и сроки после проверки макета.</p>
 
-        <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
+        <form className={`mt-6 ${publicFormStyles.fieldsStack}`} onSubmit={handleSubmit} noValidate>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
               <span className="text-sm font-semibold">Имя *</span>
@@ -268,7 +266,7 @@ export default function OrderTshirtsForm() {
             <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
           </label>
 
-          <div className="space-y-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-800">
+          <div className={`${publicFormStyles.summaryCard} space-y-2`}>
             <ImageDropzone
               value={file}
               onChange={setFile}
@@ -279,7 +277,7 @@ export default function OrderTshirtsForm() {
               allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
               invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
               maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
-              className="border-2 border-dashed rounded-xl p-3 md:p-4 bg-muted/30 hover:border-red-400 transition"
+              className={publicFormStyles.uploadZone}
               helperTextClassName="mt-1 text-xs text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
@@ -289,7 +287,7 @@ export default function OrderTshirtsForm() {
 
           <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
 
-          <label className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900/70 dark:text-neutral-200">
+          <label className={publicFormStyles.consent}>
             <input
               type="checkbox"
               checked={values.consent}
@@ -306,11 +304,7 @@ export default function OrderTshirtsForm() {
           </label>
           {errors.consent && <p className="text-xs text-red-600">{errors.consent}</p>}
 
-          <button
-            type="submit"
-            disabled={isSending}
-            className="inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 md:min-w-[200px]"
-          >
+          <button type="submit" disabled={isSending} className={`${publicFormStyles.submitButton} hover:scale-[1.02]`}>
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
 

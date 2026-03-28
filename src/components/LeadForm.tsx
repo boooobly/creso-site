@@ -9,6 +9,7 @@ import { trackEvent } from '@/lib/analytics';
 import { postJSON } from '@/lib/fetcher';
 import type { SiteMessages } from '@/lib/messages';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { publicFormStyles } from '@/lib/public-form-styles';
 
 const optionalEmailSchema = z.preprocess(
   (value) => {
@@ -159,7 +160,7 @@ export default function LeadForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className={publicFormStyles.fieldsStack}>
       {submitError && <p className="t-small text-red-500">{submitError}</p>}
 
       <input type="hidden" {...register('service')} />
@@ -175,7 +176,7 @@ export default function LeadForm({
 
       <div>
         <input
-          className="t-input"
+          className={publicFormStyles.inputBase}
           placeholder="Имя"
           {...register('name')}
         />
@@ -201,7 +202,7 @@ export default function LeadForm({
         </div>
         <div className="w-full">
           <input
-            className="t-input"
+            className={publicFormStyles.inputBase}
             placeholder="E-mail"
             {...register('email')}
           />
@@ -220,9 +221,9 @@ export default function LeadForm({
       ) : (
         <p className="t-helper">Укажите телефон или e-mail — как вам удобнее.</p>
       )}
-      <p className="t-helper rounded-lg border border-neutral-200 bg-white/80 px-3.5 py-2.5">Ответим в течение 30 минут. Без спама.</p>
+      <p className="t-helper rounded-xl border border-neutral-200/90 bg-neutral-50/80 px-3.5 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/70">Ответим в течение 30 минут. Без спама.</p>
 
-      <label className="t-label flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5">
+      <label className={publicFormStyles.consent}>
         <input type="checkbox" className="mt-1" {...register('consent')} />
         <span>
           Я согласен с <Link href="/privacy" className="underline hover:no-underline">политикой обработки персональных данных</Link>
@@ -232,7 +233,7 @@ export default function LeadForm({
 
       <button
         disabled={isSubmitting}
-        className="t-button w-full rounded-xl bg-[var(--brand-red)] px-5 py-3.5 text-white shadow-md transition hover:bg-[#b52a2a] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
+        className={`${publicFormStyles.submitButton} w-full md:min-w-0`}
         type="submit"
       >
         {isSubmitting ? 'Отправка...' : t.lead.submit}
