@@ -67,7 +67,7 @@ export default function PhoneInput({
   };
 
   const baseClassName = [
-    'w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500',
+    't-input transition-all duration-200',
     isValid ? 'ring-2 ring-green-500/20 border-green-500/40' : '',
     className || '',
   ].join(' ');
@@ -88,7 +88,7 @@ export default function PhoneInput({
         disabled={disabled}
         className={baseClassName}
       />
-      {isValid && <p className="text-xs text-emerald-600">Номер введён</p>}
+      {isValid && <p className="t-helper text-emerald-600">Номер введён</p>}
     </div>
   );
 }

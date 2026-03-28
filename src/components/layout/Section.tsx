@@ -23,8 +23,8 @@ export default function Section({
       <Container className={innerClassName}>
         {(title || subtitle) && (
           <header className="mb-6 md:mb-8">
-            {title ? <h2 className="text-2xl font-semibold md:text-3xl">{title}</h2> : null}
-            {subtitle ? <p className="mt-2 text-neutral-600 dark:text-neutral-300">{subtitle}</p> : null}
+            {title ? <h2 className="t-h2">{title}</h2> : null}
+            {subtitle ? <p className="t-body text-muted-foreground mt-2">{subtitle}</p> : null}
           </header>
         )}
         {children}

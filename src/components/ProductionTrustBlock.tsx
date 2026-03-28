@@ -31,15 +31,15 @@ export default function ProductionTrustBlock() {
           <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8">
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold leading-tight text-neutral-900 md:text-4xl">Производим сами. От проекта до монтажа.</h2>
-                <p className="mt-3 text-base text-neutral-600 md:text-lg">Собственная производственная база и монтажная команда.</p>
+                <h2 className="t-h2">Производим сами. От проекта до монтажа.</h2>
+                <p className="t-lead mt-3">Собственная производственная база и монтажная команда.</p>
               </div>
 
               <div className="flex flex-wrap gap-2.5">
                 {productionFeatures.map((feature) => (
                   <span
                     key={feature}
-                    className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm font-medium text-neutral-700"
+                    className="t-small rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 font-medium text-neutral-700"
                   >
                     {feature}
                   </span>
@@ -49,7 +49,7 @@ export default function ProductionTrustBlock() {
               <div className="grid gap-3">
                 {guaranteeItems.map((item) => (
                   <article key={item} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5">
-                    <p className="flex items-start gap-2.5 text-sm text-neutral-700 md:text-[15px]">
+                    <p className="t-body flex items-start gap-2.5 text-neutral-700">
                       <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                       <span>{item}</span>
                     </p>
@@ -64,7 +64,7 @@ export default function ProductionTrustBlock() {
                   key={item.title}
                   className="group rounded-xl border border-neutral-200 bg-neutral-50 p-3.5 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-xl hover:shadow-black/10"
                 >
-                  <h3 className="text-sm font-semibold text-neutral-900">{item.title}</h3>
+                  <h3 className="t-h4">{item.title}</h3>
                   <div className="relative mt-3 min-h-[220px] overflow-hidden rounded-lg md:min-h-[250px]">
                     <Image
                       src={item.imageSrc}
@@ -80,7 +80,7 @@ export default function ProductionTrustBlock() {
             </div>
           </div>
 
-          <p className="mt-6 border-t border-neutral-200 pt-4 text-sm font-medium text-neutral-700">Работаем по договору. Гарантия 5 лет.</p>
+          <p className="t-small mt-6 border-t border-neutral-200 pt-4 font-medium text-neutral-700">Работаем по договору. Гарантия 5 лет.</p>
         </RevealOnScroll>
       </div>
     </section>

@@ -155,7 +155,7 @@ export default function LeadForm({
   };
 
   if (isSubmitSuccessful) {
-    return <p className="text-green-700">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>;
+    return <p className="t-body text-green-700">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>;
   }
 
   return (
@@ -175,7 +175,7 @@ export default function LeadForm({
 
       <div>
         <input
-          className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+          className="t-input"
           placeholder="Имя"
           {...register('name')}
         />
@@ -201,7 +201,7 @@ export default function LeadForm({
         </div>
         <div className="w-full">
           <input
-            className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+            className="t-input"
             placeholder="E-mail"
             {...register('email')}
           />
@@ -212,17 +212,17 @@ export default function LeadForm({
       {showMessageField ? (
         <div>
           <textarea
-            className="min-h-[120px] w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]/40 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+            className="t-input min-h-[120px]"
             placeholder="Комментарий"
             {...register('message')}
           />
         </div>
       ) : (
-        <p className="t-small text-muted-foreground">Укажите телефон или e-mail — как вам удобнее.</p>
+        <p className="t-helper">Укажите телефон или e-mail — как вам удобнее.</p>
       )}
-      <p className="t-small rounded-lg border border-neutral-200 bg-white/80 px-3.5 py-2.5 text-muted-foreground">Ответим в течение 30 минут. Без спама.</p>
+      <p className="t-helper rounded-lg border border-neutral-200 bg-white/80 px-3.5 py-2.5">Ответим в течение 30 минут. Без спама.</p>
 
-      <label className="flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium">
+      <label className="t-label flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5">
         <input type="checkbox" className="mt-1" {...register('consent')} />
         <span>
           Я согласен с <Link href="/privacy" className="underline hover:no-underline">политикой обработки персональных данных</Link>
@@ -232,7 +232,7 @@ export default function LeadForm({
 
       <button
         disabled={isSubmitting}
-        className="w-full rounded-xl bg-[var(--brand-red)] px-5 py-3.5 font-semibold text-white shadow-md transition hover:bg-[#b52a2a] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
+        className="t-button w-full rounded-xl bg-[var(--brand-red)] px-5 py-3.5 text-white shadow-md transition hover:bg-[#b52a2a] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
         type="submit"
       >
         {isSubmitting ? 'Отправка...' : t.lead.submit}
