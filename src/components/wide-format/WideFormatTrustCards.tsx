@@ -37,7 +37,7 @@ export default function WideFormatTrustCards({ features }: WideFormatTrustCardsP
           <motion.div
             key={feature.title}
             variants={fadeUp(14)}
-            className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] md:p-6"
+            className="card-info card-interactive h-full md:p-6"
           >
             <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
               <Icon size={18} strokeWidth={1.9} aria-hidden="true" />

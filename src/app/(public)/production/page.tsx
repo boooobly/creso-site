@@ -199,7 +199,7 @@ export default async function ProductionPage() {
 
               return (
               <RevealOnScroll key={item.title}>
-                <article className="group relative isolate min-h-[248px] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-900 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-md">
+                <article className="card-visual card-interactive group relative isolate min-h-[248px] bg-neutral-900">
                   <div className="absolute -inset-px overflow-hidden rounded-[inherit]">
                     <div className="relative h-full w-full rounded-[inherit]">
                       <Image src={itemImage} alt={item.title} fill className="rounded-[inherit] object-cover" />
@@ -233,7 +233,7 @@ export default async function ProductionPage() {
                 <RevealOnScroll key={item.title}>
                   <article
                     style={{ transitionDelay: `${index * 55}ms` }}
-                    className="flex min-h-[204px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] md:p-7"
+                    className="card-info card-interactive flex min-h-[204px] flex-col p-6 md:p-7"
                   >
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
                       <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -256,7 +256,7 @@ export default async function ProductionPage() {
               {gallery.slice(0, 2).map((item) => (
                 <div
                   key={item.src}
-                  className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 shadow-[0_6px_18px_rgba(17,24,39,0.06)] ${item.className}`}
+                  className={`card-visual card-interactive group relative rounded-3xl bg-neutral-100 ${item.className}`}
                 >
                   <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5">
@@ -266,7 +266,7 @@ export default async function ProductionPage() {
               ))}
             </div>
 
-            <div className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 shadow-[0_6px_18px_rgba(17,24,39,0.06)] ${gallery[2].className}`}>
+            <div className={`card-visual card-interactive group relative rounded-3xl bg-neutral-100 ${gallery[2].className}`}>
               <Image
                 src={gallery[2].src}
                 alt={gallery[2].alt}
@@ -282,7 +282,7 @@ export default async function ProductionPage() {
               {gallery.slice(3).map((item) => (
                 <div
                   key={item.src}
-                  className={`group relative overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 shadow-[0_6px_18px_rgba(17,24,39,0.06)] ${item.className}`}
+                  className={`card-visual card-interactive group relative rounded-3xl bg-neutral-100 ${item.className}`}
                 >
                   <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5">
@@ -306,7 +306,7 @@ export default async function ProductionPage() {
                 <RevealOnScroll key={step.title}>
                   <article
                     style={{ transitionDelay: `${index * 70}ms` }}
-                    className="flex min-h-[232px] flex-col rounded-2xl border border-neutral-200 bg-white p-7 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+                    className="card-info card-interactive flex min-h-[232px] flex-col p-7"
                   >
                     <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
                       <Icon className="h-5 w-5" aria-hidden="true" />
@@ -336,7 +336,7 @@ export default async function ProductionPage() {
                   <RevealOnScroll key={item.title}>
                     <article
                       style={{ transitionDelay: `${index * 65}ms` }}
-                      className={`flex min-h-[184px] flex-col rounded-2xl border bg-white p-6 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] md:p-7 ${index === 0 ? 'border-neutral-300' : 'border-neutral-200'}`}
+                      className={`card-info card-interactive flex min-h-[184px] flex-col bg-white p-6 md:p-7 ${index === 0 ? 'border-neutral-300' : ''}`}
                     >
                       <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
                         <Icon className="h-[18px] w-[18px]" aria-hidden="true" />

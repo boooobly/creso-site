@@ -182,7 +182,7 @@ export default function HomePageContent({
               <motion.li
                 key={`${item.title}-${index}`}
                 variants={fadeUp(14)}
-                className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+                className="card-info card-interactive h-full p-6"
               >
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
@@ -242,7 +242,7 @@ export default function HomePageContent({
               <motion.li
                 key={`${step.title}-${index}`}
                 variants={fadeUp(16)}
-                className="relative h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+                className="card-info card-interactive relative h-full p-6"
               >
                 <span className="t-caption absolute right-5 top-5">0{index + 1}</span>
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
@@ -265,13 +265,13 @@ export default function HomePageContent({
           </div>
           <Link href="/contacts" className="t-button text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{faqLinkLabel}</Link>
         </div>
-        <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="rounded-2xl border border-neutral-200/70 bg-white/80 p-4 sm:p-5 md:p-6">
+        <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="card p-4 sm:p-5 md:p-6">
           <FAQ items={faq.slice(0, 4)} />
         </motion.div>
       </Section>
 
       <Section id="lead-form" spacing="tight">
-        <motion.div className="relative grid items-center gap-6 overflow-hidden rounded-[28px] border border-neutral-200 bg-white p-5 shadow-sm sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] p-5 sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-20 top-1/2 z-0 h-[19rem] w-[25rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.16)_0%,rgba(212,28,28,0.07)_34%,rgba(212,28,28,0.02)_58%,transparent_76%)] blur-3xl"

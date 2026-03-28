@@ -28,7 +28,7 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
   return (
     <button
       type="button"
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-900"
+      className="card-visual card-interactive group flex h-full flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
       onClick={() => onOpen({ ...image, src: currentSrc })}
       aria-label={`Открыть ${image.alt}`}
     >
