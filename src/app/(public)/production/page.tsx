@@ -136,15 +136,20 @@ export default async function ProductionPage() {
   const heroImageSrc = heroImage?.url ?? '/images/production/hero.png';
   const heroImageAlt = heroImage?.altText || 'Собственное производство рекламы';
   const heroCtaBaseClass =
-    'inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold leading-none transition-all duration-200';
+    'inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold leading-none transition-all duration-200';
+  const sectionTitleClassName = 't-h2';
+  const sectionIntroClassName = 't-body text-muted-foreground max-w-3xl';
+  const infoIconClassName =
+    'inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700';
 
   return (
     <div>
       <Section>
         <PageHero
+          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25"
           contentClassName="max-w-[38.5rem] space-y-6 lg:pr-3"
           media={
-            <HeroMediaPanel className="bg-neutral-100">
+            <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/95">
               <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
                 <Image src={heroImageSrc} alt={heroImageAlt} fill className="object-cover" priority />
               </div>
@@ -157,11 +162,11 @@ export default async function ProductionPage() {
         >
           <HeroEyebrow>СОБСТВЕННОЕ ПРОИЗВОДСТВО</HeroEyebrow>
           <div className="space-y-4">
-            <HeroTitle className="max-w-3xl text-3xl leading-[1.08] md:text-5xl">{heroTitle}</HeroTitle>
+            <HeroTitle className="max-w-[15ch] text-3xl leading-[1.06] md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[33rem] text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
           </div>
 
-          <HeroChipList className="max-w-[34rem] gap-2.5">
+          <HeroChipList className="max-w-[36rem] gap-2.5">
             {capabilityBadges.map((badge) => (
               <HeroChip key={badge} className="h-11 rounded-xl px-4 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
                 {badge}
@@ -185,8 +190,12 @@ export default async function ProductionPage() {
       </Section>
 
       <Section className="pt-0">
-        <div className="space-y-5">
-          <h2 className="text-2xl font-semibold md:text-3xl">Наше оборудование</h2>
+        <div className="space-y-6">
+          <div className="section-header">
+            <p className="t-eyebrow">ОБОРУДОВАНИЕ</p>
+            <h2 className={sectionTitleClassName}>Наше оборудование</h2>
+            <p className={sectionIntroClassName}>Собственная производственная база для стабильных сроков и точного результата по каждому проекту.</p>
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
             {equipment.map((item) => {
               const itemImage = equipmentImages[item.slotKey]?.url ?? item.image;
@@ -217,8 +226,11 @@ export default async function ProductionPage() {
       </Section>
 
       <Section className="pt-0">
-        <div className="space-y-5">
-          <h2 className="text-2xl font-semibold md:text-3xl">Что мы производим</h2>
+        <div className="space-y-6">
+          <div className="section-header">
+            <p className="t-eyebrow">ПРОДУКЦИЯ</p>
+            <h2 className={sectionTitleClassName}>Что мы производим</h2>
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((item, index) => {
               const Icon = item.icon;
@@ -229,11 +241,11 @@ export default async function ProductionPage() {
                     style={{ transitionDelay: `${index * 55}ms` }}
                     className="card-info card-interactive flex min-h-[204px] flex-col p-6 md:p-7"
                   >
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
+                    <span className={infoIconClassName}>
                       <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                     </span>
-                    <h3 className="mt-5 text-lg font-semibold leading-snug text-neutral-900">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-neutral-700 md:text-base">{item.text}</p>
+                    <h3 className="t-h4 mt-5 leading-snug">{item.title}</h3>
+                    <p className="t-body mt-3">{item.text}</p>
                   </article>
                 </RevealOnScroll>
               );
@@ -244,7 +256,10 @@ export default async function ProductionPage() {
 
       <Section id="production-gallery" className="pt-0">
         <div className="space-y-7">
-          <h2 className="text-2xl font-semibold md:text-3xl">Производство в работе</h2>
+          <div className="section-header">
+            <p className="t-eyebrow">ПРОИЗВОДСТВО</p>
+            <h2 className={sectionTitleClassName}>Производство в работе</h2>
+          </div>
           <div className="space-y-5">
             <div className="grid gap-5 sm:grid-cols-2">
               {gallery.slice(0, 2).map((item) => (
@@ -290,8 +305,11 @@ export default async function ProductionPage() {
       </Section>
 
       <Section className="pt-0">
-        <div className="space-y-5">
-          <h2 className="text-2xl font-semibold md:text-3xl">Как проходит работа</h2>
+        <div className="space-y-6">
+          <div className="section-header">
+            <p className="t-eyebrow">ПРОЦЕСС</p>
+            <h2 className={sectionTitleClassName}>Как проходит работа</h2>
+          </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {workSteps.map((step, index) => {
               const Icon = step.icon;
@@ -302,14 +320,14 @@ export default async function ProductionPage() {
                     style={{ transitionDelay: `${index * 70}ms` }}
                     className="card-info card-interactive flex min-h-[232px] flex-col p-7"
                   >
-                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
+                    <span className={`${infoIconClassName} h-11 w-11`}>
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </span>
                     <div className="mt-5 flex items-baseline gap-2">
                       <span className="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</span>
                     </div>
-                    <h3 className="mt-2 text-lg font-semibold text-neutral-900">{step.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-neutral-700 md:text-base">{step.text}</p>
+                    <h3 className="t-h4 mt-2">{step.title}</h3>
+                    <p className="t-body mt-3">{step.text}</p>
                   </article>
                 </RevealOnScroll>
               );
@@ -319,9 +337,12 @@ export default async function ProductionPage() {
       </Section>
 
       <Section className="pt-0">
-        <div className="rounded-3xl border border-neutral-300 bg-neutral-50 p-6 md:p-10">
+        <div className="rounded-3xl border border-neutral-200/90 bg-neutral-50/70 p-6 md:p-10">
           <div className="space-y-6">
-            <h2 className="text-2xl font-semibold md:text-3xl">Почему нам доверяют</h2>
+            <div className="section-header-tight mb-0">
+              <p className="t-eyebrow">НАДЁЖНОСТЬ</p>
+              <h2 className={sectionTitleClassName}>Почему нам доверяют</h2>
+            </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {trustPoints.map((item, index) => {
                 const Icon = item.icon;
@@ -332,11 +353,11 @@ export default async function ProductionPage() {
                       style={{ transitionDelay: `${index * 65}ms` }}
                       className={`card-info card-interactive flex min-h-[184px] flex-col bg-white p-6 md:p-7 ${index === 0 ? 'border-neutral-300' : ''}`}
                     >
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700">
+                      <span className={infoIconClassName}>
                         <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                       </span>
-                      <h3 className="mt-5 text-lg font-semibold text-neutral-900">{item.title}</h3>
-                      <p className="mt-3 text-sm leading-relaxed text-neutral-700">{item.text}</p>
+                      <h3 className="t-h4 mt-5">{item.title}</h3>
+                      <p className="t-body mt-3">{item.text}</p>
                     </article>
                   </RevealOnScroll>
                 );
@@ -347,12 +368,11 @@ export default async function ProductionPage() {
       </Section>
 
       <Section className="pt-0 pb-0">
-        <div className="card flex flex-col gap-6 p-7 md:flex-row md:items-center md:justify-between md:gap-8 md:p-10">
+        <div className="card flex flex-col gap-6 border-neutral-200/90 bg-gradient-to-br from-white via-white to-red-50/20 p-7 md:flex-row md:items-center md:justify-between md:gap-8 md:p-10">
           <div className="max-w-2xl space-y-3.5">
-            <h2 className="text-2xl font-semibold leading-tight md:text-3xl">{ctaTitle}</h2>
-            <p className="text-neutral-700 md:text-lg">
-              Подскажем по материалам, подготовим расчет и предложим оптимальное решение под ваш проект.
-            </p>
+            <p className="t-eyebrow">ЗАЯВКА НА ПРОЕКТ</p>
+            <h2 className="t-h2">{ctaTitle}</h2>
+            <p className="t-body md:text-lg">{ctaDescription}</p>
           </div>
           <Link href="/contacts" className="btn-primary inline-flex w-fit shrink-0 self-start no-underline md:self-center">
             Получить расчет
