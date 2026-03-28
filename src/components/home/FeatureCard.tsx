@@ -25,7 +25,7 @@ export default function FeatureCard({
       </div>
       <div className="flex flex-1 flex-col gap-3 p-5">
         <h3 className="t-h3 line-clamp-2 leading-snug">{title}</h3>
-        <p className="text-sm text-neutral-600">{description}</p>
+        <p className="t-body">{description}</p>
       </div>
     </motion.article>
   );

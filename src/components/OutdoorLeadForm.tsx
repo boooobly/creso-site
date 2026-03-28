@@ -120,7 +120,7 @@ export default function OutdoorLeadForm() {
 
   const inputClass = (field: keyof FormState) =>
     [
-      'w-full rounded-xl border bg-white px-4 py-3 outline-none transition',
+      't-input px-4 outline-none transition',
       'dark:border-neutral-700 dark:bg-neutral-900',
       touched[field] && errors[field] ? 'border-red-500 focus:border-red-500' : 'border-neutral-300 focus:border-[var(--brand-red)]',
     ].join(' ');
@@ -128,7 +128,7 @@ export default function OutdoorLeadForm() {
   return (
     <form onSubmit={onSubmit} className="card space-y-4 p-6" id="outdoor-lead-form" noValidate>
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Адрес объекта *</span>
+        <span className="t-label">Адрес объекта *</span>
         <input
           required
           type="text"
@@ -138,11 +138,11 @@ export default function OutdoorLeadForm() {
           className={inputClass('address')}
           placeholder="Например, г. Ставрополь, ул. Ленина, 15"
         />
-        {touched.address && errors.address ? <p className="text-xs text-red-500">{errors.address}</p> : null}
+        {touched.address && errors.address ? <p className="t-small text-red-500">{errors.address}</p> : null}
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Размеры *</span>
+        <span className="t-label">Размеры *</span>
         <input
           required
           type="text"
@@ -152,11 +152,11 @@ export default function OutdoorLeadForm() {
           className={inputClass('dimensions')}
           placeholder="Например, 3000 × 1200 мм"
         />
-        {touched.dimensions && errors.dimensions ? <p className="text-xs text-red-500">{errors.dimensions}</p> : null}
+        {touched.dimensions && errors.dimensions ? <p className="t-small text-red-500">{errors.dimensions}</p> : null}
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Бюджет</span>
+        <span className="t-label">Бюджет</span>
         <input
           type="text"
           value={form.budget}
@@ -167,7 +167,7 @@ export default function OutdoorLeadForm() {
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Телефон *</span>
+        <span className="t-label">Телефон *</span>
         <PhoneInput
           required
           value={form.phone}
@@ -176,10 +176,10 @@ export default function OutdoorLeadForm() {
           className={inputClass('phone')}
           placeholder="+7 (___) ___-__-__"
         />
-        {touched.phone && errors.phone ? <p className="text-xs text-red-500">{errors.phone}</p> : null}
+        {touched.phone && errors.phone ? <p className="t-small text-red-500">{errors.phone}</p> : null}
       </label>
 
-      <label className="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-300">
+      <label className="t-label flex items-start gap-3 text-neutral-700 dark:text-neutral-300">
         <input
           required
           type="checkbox"
@@ -190,17 +190,17 @@ export default function OutdoorLeadForm() {
         />
         <span>Согласен с политикой обработки персональных данных</span>
       </label>
-      {touched.agreed && errors.agreed ? <p className="-mt-2 text-xs text-red-500">{errors.agreed}</p> : null}
+      {touched.agreed && errors.agreed ? <p className="t-small -mt-2 text-red-500">{errors.agreed}</p> : null}
 
-      <p className="text-sm text-neutral-700 dark:text-neutral-200">Ответим и уточним детали в ближайшее время.</p>
-      <button type="submit" className="btn-primary w-full ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)]" disabled={isSubmitDisabled}>
+      <p className="t-body text-neutral-700 dark:text-neutral-200">Ответим и уточним детали в ближайшее время.</p>
+      <button type="submit" className="btn-primary t-button w-full ring-1 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.2)]" disabled={isSubmitDisabled}>
         {status === 'loading' ? 'Отправка...' : 'Получить расчет'}
       </button>
-      <p className="text-xs text-neutral-500 dark:text-neutral-400">Без спама. Только по заявке.</p>
+      <p className="t-helper">Без спама. Только по заявке.</p>
       {status === 'success' ? (
-        <p className="text-sm text-green-600">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>
+        <p className="t-body text-green-600">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>
       ) : null}
-      {status === 'error' ? <p className="text-sm text-red-600">{error}</p> : null}
+      {status === 'error' ? <p className="t-body text-red-600">{error}</p> : null}
     </form>
   );
 }

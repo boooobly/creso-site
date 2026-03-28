@@ -187,8 +187,8 @@ export default function HomePageContent({
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
-                <p className="text-sm font-semibold text-neutral-900">{item.title}</p>
-                <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+                <p className="t-h4">{item.title}</p>
+                <p className="t-body mt-2 leading-relaxed">{item.description}</p>
               </motion.li>
             );
           })}
@@ -217,7 +217,7 @@ export default function HomePageContent({
             <h2 className="t-h2">{portfolioBlockTitle}</h2>
             <p className="t-body text-muted-foreground max-w-2xl">{portfolioBlockDescription}</p>
           </div>
-          <Link href="/portfolio" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{portfolioLinkLabel}</Link>
+          <Link href="/portfolio" className="t-button text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{portfolioLinkLabel}</Link>
         </div>
         <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {featuredPortfolioItems.map((item) => (
@@ -244,7 +244,7 @@ export default function HomePageContent({
                 variants={fadeUp(16)}
                 className="relative h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
               >
-                <span className="absolute right-5 top-5 text-xs font-semibold text-neutral-400">0{index + 1}</span>
+                <span className="t-caption absolute right-5 top-5">0{index + 1}</span>
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
@@ -263,7 +263,7 @@ export default function HomePageContent({
             <h2 className="t-h2">{faqTitle}</h2>
             <p className="t-body text-muted-foreground max-w-2xl">{faqDescription}</p>
           </div>
-          <Link href="/contacts" className="text-sm font-semibold text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{faqLinkLabel}</Link>
+          <Link href="/contacts" className="t-button text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{faqLinkLabel}</Link>
         </div>
         <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="rounded-2xl border border-neutral-200/70 bg-white/80 p-4 sm:p-5 md:p-6">
           <FAQ items={faq.slice(0, 4)} />
@@ -288,7 +288,7 @@ export default function HomePageContent({
             </div>
             <ul className="space-y-2">
               {leadPoints.map((point, index) => (
-                <li key={`${point.label}-${index}`} className="flex items-start gap-2.5 text-sm text-neutral-700">
+                <li key={`${point.label}-${index}`} className="t-body flex items-start gap-2.5 text-neutral-700">
                   <CheckCircle2 className="mt-0.5 size-4 text-[var(--brand-red)]" />
                   <span>{point.label}</span>
                 </li>
