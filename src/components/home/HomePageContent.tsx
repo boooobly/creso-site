@@ -114,7 +114,7 @@ export default function HomePageContent({
 
   return (
     <div>
-      <Section className="relative overflow-hidden pb-10 pt-4 md:pb-12 md:pt-6">
+      <Section spacing="hero" className="relative overflow-hidden">
         <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
             <div className="space-y-5">
@@ -169,12 +169,12 @@ export default function HomePageContent({
         </div>
       </Section>
 
-      <Section className="border-y border-neutral-200/70 py-12 md:py-14" background="muted" fullBleed>
-        <div className="mb-6 space-y-2 md:mb-7">
+      <Section spacing="tight" className="border-y border-neutral-200/70" background="muted" fullBleed>
+        <div className="section-header-tight">
           <p className="t-eyebrow">{trustSectionEyebrow}</p>
           <h2 className="t-h2">{trustSectionTitle}</h2>
         </div>
-        <motion.ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.ul className="grid-cards md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {trustFeatureCards.map((item, index) => {
             const Icon = trustIcons[index % trustIcons.length];
 
@@ -195,13 +195,13 @@ export default function HomePageContent({
         </motion.ul>
       </Section>
 
-      <Section className="py-12 md:py-16">
-        <div className="mb-5 space-y-2 md:mb-8">
+      <Section spacing="tight">
+        <div className="section-header">
           <p className="t-eyebrow">УСЛУГИ</p>
           <h2 className="t-h2">Комплексные решения для рекламы и печати</h2>
           <p className="t-body text-muted-foreground max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
-        <motion.div className="grid items-stretch gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="grid-cards grid-cols-1 items-stretch md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {services.map((s) => (
             <motion.div key={s.id} variants={fadeUp(16)} className="h-full">
               <ServiceCard title={s.title} desc={s.description} href={s.href} imageSrc={s.imageSrc ?? serviceImageById[s.id]} />
@@ -210,8 +210,8 @@ export default function HomePageContent({
         </motion.div>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/60 py-12 md:py-16" fullBleed>
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-8">
+      <Section spacing="tight" background="muted" className="border-y border-neutral-200/60" fullBleed>
+        <div className="section-header-split">
           <div className="space-y-2">
             <p className="t-eyebrow">ПОРТФОЛИО</p>
             <h2 className="t-h2">{portfolioBlockTitle}</h2>
@@ -219,7 +219,7 @@ export default function HomePageContent({
           </div>
           <Link href="/portfolio" className="t-button text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{portfolioLinkLabel}</Link>
         </div>
-        <motion.div className="grid items-stretch gap-5 md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="grid-cards items-stretch md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {featuredPortfolioItems.map((item) => (
             <motion.div key={item.id} variants={fadeUp(18)} transition={{ duration: 0.2 }} className="h-full">
               <FeatureCard title={item.title} description={item.description} imageSrc={item.imageSrc} />
@@ -228,8 +228,8 @@ export default function HomePageContent({
         </motion.div>
       </Section>
 
-      <Section className="py-12 md:py-16">
-        <div className="mb-5 space-y-2 md:mb-8">
+      <Section spacing="tight">
+        <div className="section-header">
           <p className="t-eyebrow">{processEyebrow}</p>
           <h2 className="t-h2">{processTitle}</h2>
           <p className="t-body text-muted-foreground max-w-2xl">{processDescription}</p>
@@ -256,8 +256,8 @@ export default function HomePageContent({
         </motion.ol>
       </Section>
 
-      <Section background="muted" className="border-y border-neutral-200/60 py-12 md:py-16" fullBleed>
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-4 md:mb-8">
+      <Section spacing="tight" background="muted" className="border-y border-neutral-200/60" fullBleed>
+        <div className="section-header-split">
           <div className="space-y-2">
             <p className="t-eyebrow">{faqEyebrow}</p>
             <h2 className="t-h2">{faqTitle}</h2>
@@ -270,7 +270,7 @@ export default function HomePageContent({
         </motion.div>
       </Section>
 
-      <Section id="lead-form" className="py-12 md:py-14">
+      <Section id="lead-form" spacing="tight">
         <motion.div className="relative grid items-center gap-6 overflow-hidden rounded-[28px] border border-neutral-200 bg-white p-5 shadow-sm sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <div
             aria-hidden="true"
@@ -295,7 +295,7 @@ export default function HomePageContent({
               ))}
             </ul>
           </div>
-          <div className="relative z-10 h-full rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5 md:p-6 lg:p-7">
+          <div className="form-shell relative z-10 h-full">
             <LeadForm t={messages} showMessageField />
           </div>
         </motion.div>

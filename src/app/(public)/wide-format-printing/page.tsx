@@ -77,7 +77,7 @@ export default async function WideFormatPrintingPage() {
 
   return (
     <div>
-      <Section className="pt-5 pb-4 md:pt-8 md:pb-6">
+      <Section spacing="compact">
         <div className="card overflow-hidden border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/30 p-5 shadow-sm shadow-neutral-200/60 md:p-7 lg:p-9">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1.14fr)_minmax(280px,350px)] lg:gap-8 lg:items-stretch">
             <div className="flex h-full flex-col lg:min-h-[29rem]">
@@ -171,13 +171,13 @@ export default async function WideFormatPrintingPage() {
         </div>
       </Section>
 
-      <Section className="pt-4 pb-14 md:pt-6 md:pb-16">
-        <div className="space-y-10">
+      <Section spacing="tight">
+        <div className="space-y-8 md:space-y-10">
           <div id="wide-format-calculator" className="scroll-mt-24">
             <WideFormatPricingCalculator pricingConfig={pricing.config} />
           </div>
 
-          <div className="card border-neutral-200/80 bg-neutral-50/70 p-5 md:p-7">
+          <div className="cta-shell card">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="max-w-2xl space-y-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Связанная услуга</p>
@@ -190,7 +190,7 @@ export default async function WideFormatPrintingPage() {
             </div>
           </div>
 
-          <section className="mt-10 rounded-2xl border border-neutral-200/70 bg-muted/30 p-6 md:p-8">
+          <section className="rounded-2xl border border-neutral-200/70 bg-muted/30 p-6 md:p-8">
             <h3 className="text-xl font-semibold tracking-tight md:text-2xl">Почему выбирают нас</h3>
             <WideFormatTrustCards features={features} />
           </section>
