@@ -22,8 +22,8 @@ export default function ServiceCard({
         featured ? 'bg-[rgba(212,28,28,0.04)]' : 'bg-white'
       }`}
     >
-      <div className={`card-structured mb-5 overflow-hidden ${featured ? 'border-[var(--brand-red)]/20 bg-white/80' : 'bg-neutral-50/80'} p-3`}>
-        <div className={`relative h-20 overflow-hidden rounded-xl ${featured ? 'bg-gradient-to-r from-[var(--brand-red)]/20 to-transparent' : 'bg-gradient-to-r from-neutral-200 to-neutral-100'}`}>
+      <div className={`card-structured mb-5 overflow-hidden ${featured ? 'border-[var(--brand-red)]/20 bg-white/80' : 'bg-neutral-50/85'} p-3`}>
+        <div className={`relative h-20 overflow-hidden rounded-xl border border-white/70 ${featured ? 'bg-gradient-to-r from-[var(--brand-red)]/20 to-transparent' : 'bg-gradient-to-r from-neutral-200 to-neutral-100'}`}>
           {imageSrc ? <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 20vw, (min-width: 768px) 35vw, 90vw" /> : null}
         </div>
       </div>
@@ -37,7 +37,7 @@ export default function ServiceCard({
         <h3 className={`t-h3 leading-snug transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
       </div>
       <p className="t-body text-muted-foreground mt-3 line-clamp-3">{desc}</p>
-      <div className="t-link mt-auto pt-5">
+      <div className="t-link mt-auto pt-6">
         Подробнее <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
       </div>
     </Link>
