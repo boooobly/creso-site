@@ -111,21 +111,24 @@ export default function HomePageContent({
   heroImageAlt,
 }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
+  const splitCtaClassName =
+    'inline-flex min-h-11 items-center rounded-xl border border-neutral-300 bg-white px-4 py-2 t-button text-neutral-700 no-underline transition-colors hover:border-neutral-400 hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2';
 
   return (
-    <div>
-      <Section spacing="hero" className="relative overflow-hidden">
-        <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-12">
-          <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-7">
+    <div className="relative">
+      <Section spacing="hero" className="relative overflow-hidden border-b border-neutral-200/70">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent" />
+        <div className="relative z-10 grid items-center gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+          <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
             <div className="space-y-5">
-              <p className="t-eyebrow inline-flex rounded-full border border-[#efb9b9] bg-[#fff7f7] px-4 py-1.5 text-[var(--brand-red)]">
+              <p className="hero-eyebrow">
                 {heroEyebrow}
               </p>
-              <AnimatedBlurHeadline className="t-h1 max-w-[16ch]" text={heroTitle} breakAfterWord={1} />
-              <p className="t-body text-muted-foreground max-w-[40rem]">{heroDescription}</p>
+              <AnimatedBlurHeadline className="t-h1 max-w-[15ch]" text={heroTitle} breakAfterWord={1} />
+              <p className="t-lead max-w-[39rem] text-muted-foreground">{heroDescription}</p>
             </div>
 
-            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end">
+            <div className="hero-actions flex-col sm:flex-row sm:items-end">
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
                 <Link className="btn-primary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
                   {heroPrimaryButtonText}
@@ -138,7 +141,7 @@ export default function HomePageContent({
               </motion.div>
             </div>
 
-            <motion.ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4" initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+            <motion.ul className="hero-chip-list max-w-none gap-2.5 xl:grid-cols-4" initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
               {heroTrustBadges.map((badge, index) => (
                 <BadgeChip key={`${badge.label}-${index}`} label={badge.label} index={index} variants={heroChipVariants} />
               ))}
@@ -155,14 +158,15 @@ export default function HomePageContent({
               aria-hidden="true"
               className="pointer-events-none absolute inset-x-[12%] top-[16%] h-[58%] rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.14)_0%,rgba(212,28,28,0.06)_40%,transparent_75%)] blur-2xl"
             />
-            <div className="relative ml-2 sm:ml-6 lg:ml-10">
+            <div className="card-visual relative ml-1 overflow-visible rounded-[2rem] border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 p-3 sm:ml-5 sm:p-4 lg:ml-9">
+              <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[1.65rem] border border-white/70" />
               <Image
                 src={heroImageSrc}
                 alt={heroImageAlt}
                 width={980}
                 height={760}
                 priority
-                className="h-auto w-full object-contain drop-shadow-[0_30px_40px_rgba(15,23,42,0.24)]"
+                className="h-auto w-full rounded-[1.4rem] object-contain drop-shadow-[0_24px_30px_rgba(15,23,42,0.2)]"
               />
             </div>
           </motion.div>
@@ -170,7 +174,7 @@ export default function HomePageContent({
       </Section>
 
       <Section spacing="tight" className="border-y border-neutral-200/70" background="muted" fullBleed>
-        <div className="section-header-tight">
+        <div className="section-header">
           <p className="t-eyebrow">{trustSectionEyebrow}</p>
           <h2 className="t-h2">{trustSectionTitle}</h2>
         </div>
@@ -182,7 +186,7 @@ export default function HomePageContent({
               <motion.li
                 key={`${item.title}-${index}`}
                 variants={fadeUp(14)}
-                className="card-info card-interactive h-full p-6"
+                className="card-info card-interactive h-full border-neutral-200/90 p-6"
               >
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
@@ -217,7 +221,7 @@ export default function HomePageContent({
             <h2 className="t-h2">{portfolioBlockTitle}</h2>
             <p className="t-body text-muted-foreground max-w-2xl">{portfolioBlockDescription}</p>
           </div>
-          <Link href="/portfolio" className="t-button text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{portfolioLinkLabel}</Link>
+          <Link href="/portfolio" className={splitCtaClassName}>{portfolioLinkLabel}</Link>
         </div>
         <motion.div className="grid-cards items-stretch md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {featuredPortfolioItems.map((item) => (
@@ -242,9 +246,9 @@ export default function HomePageContent({
               <motion.li
                 key={`${step.title}-${index}`}
                 variants={fadeUp(16)}
-                className="card-info card-interactive relative h-full p-6"
+                className="card-info card-interactive relative h-full border-neutral-200/90 p-6"
               >
-                <span className="t-caption absolute right-5 top-5">0{index + 1}</span>
+                <span className="t-caption absolute right-5 top-5 rounded-full border border-neutral-200 bg-white/80 px-2.5 py-1">0{index + 1}</span>
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
@@ -263,7 +267,7 @@ export default function HomePageContent({
             <h2 className="t-h2">{faqTitle}</h2>
             <p className="t-body text-muted-foreground max-w-2xl">{faqDescription}</p>
           </div>
-          <Link href="/contacts" className="t-button text-neutral-700 no-underline hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2">{faqLinkLabel}</Link>
+          <Link href="/contacts" className={splitCtaClassName}>{faqLinkLabel}</Link>
         </div>
         <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="card p-4 sm:p-5 md:p-6">
           <FAQ items={faq.slice(0, 4)} />
@@ -271,7 +275,7 @@ export default function HomePageContent({
       </Section>
 
       <Section id="lead-form" spacing="tight">
-        <motion.div className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] p-5 sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-20 top-1/2 z-0 h-[19rem] w-[25rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.16)_0%,rgba(212,28,28,0.07)_34%,rgba(212,28,28,0.02)_58%,transparent_76%)] blur-3xl"
