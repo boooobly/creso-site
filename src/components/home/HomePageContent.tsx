@@ -269,7 +269,7 @@ export default function HomePageContent({
           <Link href="/contacts" className={splitCtaClassName}>{faqLinkLabel}</Link>
         </div>
         <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="card p-4 sm:p-5 md:p-6">
-          <FAQ items={faq.slice(0, 4)} />
+          <FAQ items={faq.slice(0, 5)} />
         </motion.div>
       </Section>
 
