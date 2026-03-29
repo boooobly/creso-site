@@ -8,13 +8,14 @@ type SectionProps = {
   title?: ReactNode;
   subtitle?: ReactNode;
   children: ReactNode;
-  spacing?: 'default' | 'tight' | 'compact';
+  spacing?: 'default' | 'tight' | 'compact' | 'hero';
 };
 
 const spacingStyles: Record<NonNullable<SectionProps['spacing']>, string> = {
   default: 'section-rhythm-tight',
   tight: 'section-rhythm-compact',
   compact: 'py-6 md:py-8 lg:py-10',
+  hero: 'section-rhythm-hero',
 };
 
 export default function Section({
