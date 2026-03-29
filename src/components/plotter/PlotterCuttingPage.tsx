@@ -496,9 +496,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               })}
             </div>
           </div>
-        </div>
-      </Section>
-
           <form onSubmit={onSubmit} className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
@@ -513,20 +510,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                 {nameError && <p className="text-sm text-red-600">{nameError}</p>}
               </div>
 
-              <div className="space-y-1.5">
-                <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
-                <PhoneInput
-                  id="phone"
-                  value={phone}
-                  onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
-                  onChange={setPhone}
-                  placeholder="+7 (___) ___-__-__"
-                />
-                {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
-              </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
                 <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
                 <PhoneInput
