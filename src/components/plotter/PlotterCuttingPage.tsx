@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { ArrowRight, CheckCircle2, Clock3, FileCheck2, Scissors } from 'lucide-react';
 import Section from '@/components/Section';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
@@ -54,6 +55,12 @@ const trustPoints = [
   'Помогаем выбрать тип резки и материал под задачу.',
   'Работаем с короткими и серийными тиражами без потери точности.',
   'Согласовываем сроки и стоимость до запуска в производство.',
+];
+
+const requestHighlights = [
+  { label: 'Проверка макета', icon: FileCheck2 },
+  { label: 'Помощь с контуром', icon: Scissors },
+  { label: 'Быстрый расчет', icon: Clock3 },
 ];
 
 const exampleCards = [
@@ -248,15 +255,32 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   Требования к макету
                   <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 group-hover:scale-x-100 motion-reduce:transition-none" />
                 </button>
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('plotter-examples')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="group relative text-sm font-medium text-neutral-700 transition-colors hover:text-red-700 dark:text-neutral-200 dark:hover:text-red-300"
+                >
+                  Смотреть примеры
+                  <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 group-hover:scale-x-100 motion-reduce:transition-none" />
+                </button>
               </div>
             </div>
 
             <div className={`rounded-2xl border border-neutral-200/90 bg-white/80 p-4 dark:border-neutral-700 dark:bg-neutral-900/60 md:p-5 ${revealBase}`} data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}>
-              <div className="relative overflow-hidden rounded-xl border border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100 via-white to-red-50/50 p-5 dark:border-neutral-700 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
-                <div className="absolute right-4 top-4 h-14 w-14 rounded-full bg-red-100/70 blur-xl dark:bg-red-500/15" aria-hidden="true" />
-                <div className="aspect-[4/3] rounded-lg border border-neutral-200/80 bg-white/70 p-5 dark:border-neutral-700 dark:bg-neutral-950/70">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Зона для фото услуги</p>
-                  <p className="mt-2 max-w-[22ch] text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Здесь будет размещено основное визуальное изображение плоттерной резки.</p>
+              <div className="relative overflow-hidden rounded-xl border border-neutral-200/80 bg-gradient-to-br from-neutral-100 via-white to-red-50/45 p-4 dark:border-neutral-700 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
+                <div className="pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" style={{ backgroundImage: 'linear-gradient(to right, rgba(115,115,115,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(115,115,115,0.14) 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
+                <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-red-100/80 blur-2xl dark:bg-red-500/20" aria-hidden="true" />
+                <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-white/90 blur-2xl dark:bg-neutral-700/40" aria-hidden="true" />
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-neutral-200/90 bg-white/75 dark:border-neutral-700 dark:bg-neutral-950/75">
+                  <div className="absolute inset-x-4 top-4 flex items-center justify-between">
+                    <span className="rounded-full border border-neutral-300/90 bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-600 dark:border-neutral-600 dark:bg-neutral-900/90 dark:text-neutral-300">Медиа зоны услуги</span>
+                    <span className="h-2 w-2 rounded-full bg-red-500/70" />
+                  </div>
+                  <div className="absolute inset-4 top-12 rounded-md border border-dashed border-neutral-300/80 dark:border-neutral-600/80" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-md border border-neutral-200/90 bg-white/85 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900/85">
+                    <p className="text-xs font-medium text-neutral-600 dark:text-neutral-300">Будущий визуал: производство и результат резки</p>
+                    <ArrowRight className="h-3.5 w-3.5 text-neutral-400" />
+                  </div>
                 </div>
                 <div className="mt-4 h-1.5 w-24 rounded-full bg-red-200/80 dark:bg-red-500/30" />
               </div>
@@ -266,7 +290,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       </Section>
 
       <Section className="pt-0">
-        <div ref={examplesReveal.ref} {...examplesReveal.revealProps} className={revealBase}>
+        <div id="plotter-examples" ref={examplesReveal.ref} {...examplesReveal.revealProps} className={revealBase}>
           <div className="section-header-tight mb-5">
             <p className="t-eyebrow">Применение</p>
             <h2 className="t-h3">Где чаще всего используют плоттерную резку</h2>
@@ -291,8 +315,8 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                     }}
                   />
                 </div>
-                <div className="flex items-center justify-between px-4 py-3">
-                  <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{item.title}</p>
+                <div className="flex min-h-[62px] items-center justify-between gap-3 px-4 py-3">
+                  <p className="text-sm font-medium leading-snug text-neutral-900 dark:text-neutral-100">{item.title}</p>
                   <span className="rounded-full border border-neutral-300 bg-white/80 px-2 py-0.5 text-[11px] text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300">{item.tag}</span>
                 </div>
               </article>
@@ -324,7 +348,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-6 lg:grid-cols-2">
             <div ref={pricingReveal.ref} {...pricingReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
               <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl">
@@ -369,7 +393,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             </div>
 
             <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`space-y-6 ${revealBase}`}>
-              <div className="card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+              <div className="card border border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50/90 to-red-50/30 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-8">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">Технические параметры</p>
                 <h2 className="mt-3 text-2xl font-semibold">Технические возможности</h2>
                 <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Ключевые ограничения производства для резки и работ по меткам.</p>
@@ -427,9 +451,15 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Поддержка</p>
           <h2 className="mt-2 text-2xl font-semibold">Поможем подготовить заказ без лишних итераций</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {trustPoints.map((item) => (
+            {trustPoints.map((item, index) => (
               <div key={item} className="rounded-xl border border-neutral-200/90 bg-neutral-50/70 px-4 py-3 text-sm leading-relaxed text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
-                {item}
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-300" />
+                  <p>
+                    <span className="mr-1 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">{`0${index + 1}`}</span>
+                    {item}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
@@ -437,12 +467,16 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       </Section>
 
       <Section className="pt-0">
-        <div className="card flex flex-col gap-4 border border-neutral-200 p-6 dark:border-neutral-800 md:flex-row md:items-center md:justify-between md:p-8">
+        <div className="card flex flex-col gap-4 border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 p-6 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 md:flex-row md:items-center md:justify-between md:p-8">
           <div>
-            <h2 className="text-2xl font-semibold">Нужна печать перед резкой?</h2>
-            <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем выполним контурную резку по меткам.</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">Смежная услуга</p>
+            <h2 className="mt-1 text-2xl font-semibold">Нужна печать перед резкой?</h2>
+            <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем выполним контурную резку по меткам в одном производственном цикле.</p>
           </div>
-          <Link href="/wide-format-printing" className="btn-primary w-full text-center no-underline md:w-auto">Перейти к широкоформатной печати</Link>
+          <Link href="/wide-format-printing" className="btn-primary inline-flex w-full items-center justify-center gap-2 text-center no-underline md:w-auto">
+            Перейти к широкоформатной печати
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </Section>
 
@@ -452,7 +486,20 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             <p className="t-eyebrow">Заявка</p>
             <h2 className="t-h3">Отправьте заявку на плоттерную резку</h2>
             <p className="t-body text-muted-foreground max-w-3xl">Проверим макет, уточним тип резки и подготовим расчёт без скрытых доплат.</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {requestHighlights.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <span key={item.label} className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200">
+                    <Icon className="h-3.5 w-3.5 text-red-600 dark:text-red-300" />
+                    {item.label}
+                  </span>
+                );
+              })}
+            </div>
           </div>
+        </div>
+      </Section>
 
           <form onSubmit={onSubmit} className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
@@ -483,6 +530,20 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
+                <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
+                <PhoneInput
+                  id="phone"
+                  value={phone}
+                  onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
+                  onChange={setPhone}
+                  placeholder="+7 (___) ___-__-__"
+                />
+                {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1.5">
                 <label htmlFor="serviceType" className="text-sm font-medium">Тип услуги</label>
                 <select
                   id="serviceType"
@@ -498,16 +559,18 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
 
               <div className="space-y-1.5">
                 <label htmlFor="files" className="text-sm font-medium">Файл (опционально)</label>
-                <input
-                  id="files"
-                  type="file"
-                  ref={fileInputRef}
-                  multiple
-                  accept={acceptedAttr}
-                  onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-                />
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Можно приложить макет в векторном или растровом формате.</p>
+                <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 p-3 dark:border-neutral-700 dark:bg-neutral-900/50">
+                  <input
+                    id="files"
+                    type="file"
+                    ref={fileInputRef}
+                    multiple
+                    accept={acceptedAttr}
+                    onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
+                    className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+                  />
+                  <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Можно приложить макет в векторном или растровом формате.</p>
+                </div>
               </div>
             </div>
 
@@ -531,7 +594,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             )}
 
             <div className="flex flex-col gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-800 md:flex-row md:items-center md:justify-between">
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Менеджер уточнит длину реза и сложность бесплатно.</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">Менеджер уточнит длину реза и сложность бесплатно. Ответим в рабочее время максимально быстро.</p>
               <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center py-3 text-[15px] tracking-[0.01em] disabled:opacity-60 md:w-auto md:px-7">
                 {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
               </button>
