@@ -70,9 +70,10 @@ export default async function StandsServicePage() {
     <div>
       <Section className="pb-8 pt-8 md:pb-10 md:pt-10" background="default" id="stands-hero">
         <PageHero
-          className="bg-gradient-to-br from-white to-neutral-50"
+          className="border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/[0.14]"
+          contentClassName="space-y-6 lg:pr-4"
           media={
-            <HeroMediaPanel className="rounded-3xl border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100/90 to-white p-5 md:p-6">
+            <HeroMediaPanel className="rounded-3xl border-neutral-200/90 bg-neutral-100/90 p-4 md:p-5">
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-white/80">
                 <Image
                   src={heroImageSrc}
@@ -83,12 +84,16 @@ export default async function StandsServicePage() {
                   priority
                 />
               </div>
+              <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/90 bg-white/95 px-4 py-3 backdrop-blur-md shadow-[0_12px_30px_rgba(17,24,39,0.14)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">Собственное производство</p>
+                <p className="mt-1 text-sm font-semibold text-neutral-900">Под задачи бизнеса и учреждений</p>
+              </div>
             </HeroMediaPanel>
           }
         >
-          <HeroEyebrow>Изготовление стендов</HeroEyebrow>
-          <HeroTitle className="max-w-2xl text-3xl tracking-tight md:text-5xl">Изготовление информационных стендов</HeroTitle>
-          <HeroLead>
+          <HeroEyebrow>ИЗГОТОВЛЕНИЕ СТЕНДОВ</HeroEyebrow>
+          <HeroTitle className="max-w-[16ch] text-3xl tracking-tight md:text-5xl">Изготовление информационных стендов</HeroTitle>
+          <HeroLead className="max-w-[34rem] text-base md:leading-relaxed">
             Производим стенды для школ, детских садов, организаций, офисов, предприятий и уличных пространств. Подбираем формат,
             материалы и конструкцию под конкретную задачу.
           </HeroLead>
@@ -102,9 +107,9 @@ export default async function StandsServicePage() {
             </Link>
           </HeroActions>
 
-          <HeroChipList className="mt-5 max-w-xl gap-2.5">
+          <HeroChipList className="mt-5 max-w-2xl gap-2.5">
             {heroChips.map((chip) => (
-              <HeroChip key={chip} className="chip-elevated px-3 py-1.5 text-xs">
+              <HeroChip key={chip} className="chip-elevated min-h-9 border-neutral-200/80 bg-white/85 px-3.5 py-1.5 text-xs">
                 {chip}
               </HeroChip>
             ))}
@@ -113,12 +118,13 @@ export default async function StandsServicePage() {
       </Section>
 
       <Section id="stands-catalog" background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
-        <div className="space-y-3">
+        <div className="section-header space-y-3">
+          <p className="t-eyebrow">КАТАЛОГ</p>
           <h2 className="t-h2">Стенды для помещений</h2>
-          <p className="t-body max-w-3xl">Базовые и специализированные стенды для ежедневной работы, инструктажей и внутренней коммуникации.</p>
+          <p className="t-body max-w-3xl text-neutral-600">Базовые и специализированные стенды для ежедневной работы, инструктажей и внутренней коммуникации.</p>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {indoorStands.map((item) => (
             <StandPreviewCard
               key={item.title}
@@ -133,9 +139,10 @@ export default async function StandsServicePage() {
       </Section>
 
       <Section background="default" className="py-12 md:py-16">
-        <div className="space-y-3">
+        <div className="section-header space-y-3">
+          <p className="t-eyebrow">ВАРИАНТЫ ДЛЯ УЛИЦЫ</p>
           <h2 className="t-h2">Уличные стенды</h2>
-          <p className="t-body max-w-3xl">Решения для размещения на фасадах, территориях учреждений и общественных площадках.</p>
+          <p className="t-body max-w-3xl text-neutral-600">Решения для размещения на фасадах, территориях учреждений и общественных площадках.</p>
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-3">
@@ -154,20 +161,24 @@ export default async function StandsServicePage() {
       </Section>
 
       <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
-        <div className="space-y-3">
+        <div className="section-header space-y-3">
+          <p className="t-eyebrow">ПРОЦЕСС И МАТЕРИАЛЫ</p>
           <h2 className="t-h2">Как изготавливаем стенды</h2>
-          <p className="t-body max-w-3xl">Подбираем конструкцию с учётом места установки, условий эксплуатации и частоты обновления информации.</p>
+          <p className="t-body max-w-3xl text-neutral-600">Подбираем конструкцию с учётом места установки, условий эксплуатации и частоты обновления информации.</p>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {materials.map((item) => (
+          {materials.map((item, index) => (
             <RevealOnScroll key={item.title} className="h-full">
-              <article className="group h-full rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]">
-                <span className="inline-flex size-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
-                  <item.icon className="size-4" aria-hidden="true" />
-                </span>
-                <h3 className="mt-3 text-base font-semibold">{item.title}</h3>
-                <p className="mt-2 text-sm text-neutral-600">{item.description}</p>
+              <article className="card-info card-interactive group h-full p-5 md:p-6">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <span className="inline-flex size-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/80 text-red-700 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
+                    <item.icon className="size-4" aria-hidden="true" />
+                  </span>
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">0{index + 1}</span>
+                </div>
+                <h3 className="text-base font-semibold tracking-tight text-neutral-900">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-neutral-600">{item.description}</p>
               </article>
             </RevealOnScroll>
           ))}
@@ -175,37 +186,37 @@ export default async function StandsServicePage() {
       </Section>
 
       <Section className="py-12 md:py-16">
-        <div className="space-y-3">
+        <div className="section-header space-y-3">
+          <p className="t-eyebrow">ОБЛАСТИ ПРИМЕНЕНИЯ</p>
           <h2 className="t-h2">Для кого подойдут стенды</h2>
-          <p className="t-body max-w-3xl">Изготавливаем стенды под требования учреждений, бизнеса и производственных площадок.</p>
+          <p className="t-body max-w-3xl text-neutral-600">Изготавливаем стенды под требования учреждений, бизнеса и производственных площадок.</p>
         </div>
 
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {audiences.map((item) => (
-            <article key={item} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex size-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-600">
-                  {item.includes('Школ') || item.includes('сады') ? <School className="size-4" aria-hidden="true" /> : <Building2 className="size-4" aria-hidden="true" />}
-                </span>
-                <p className="text-sm font-semibold text-neutral-800">{item}</p>
-              </div>
+            <article key={item} className="card-info flex items-center gap-3 p-4">
+              <span className="inline-flex size-9 items-center justify-center rounded-xl border border-neutral-200 bg-neutral-100/85 text-neutral-600">
+                {item.includes('Школ') || item.includes('сады') ? <School className="size-4" aria-hidden="true" /> : <Building2 className="size-4" aria-hidden="true" />}
+              </span>
+              <p className="text-sm font-semibold leading-6 text-neutral-800">{item}</p>
             </article>
           ))}
         </div>
       </Section>
 
       <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
-        <div className="space-y-3">
+        <div className="section-header space-y-3">
+          <p className="t-eyebrow">ПРЕИМУЩЕСТВА</p>
           <h2 className="t-h2">Почему заказывают у нас</h2>
-          <p className="t-body max-w-3xl">Работаем в привычном для клиентов формате: от идеи и макета до готовой поставки и монтажа.</p>
+          <p className="t-body max-w-3xl text-neutral-600">Работаем в привычном для клиентов формате: от идеи и макета до готовой поставки и монтажа.</p>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {advantages.map((item, index) => (
             <RevealOnScroll key={item} className={getRevealDelayClass(index)}>
-              <article className="group flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]">
+              <article className="card-info card-interactive group flex h-full min-h-[96px] items-center p-5">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
+                  <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-red-100 bg-red-50 text-red-700 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
                     <ShieldCheck className="size-4" aria-hidden="true" />
                   </span>
                   <p className="text-sm font-semibold leading-relaxed text-neutral-800">{item}</p>
@@ -217,25 +228,36 @@ export default async function StandsServicePage() {
       </Section>
 
       <Section className="py-12 md:py-16">
-        <div className="rounded-2xl bg-neutral-900 px-6 py-8 text-white md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-6 md:px-8">
-          <div>
-            <h2 className="text-3xl font-bold">Нужен стенд под вашу задачу?</h2>
-            <p className="mt-2 max-w-2xl text-sm text-neutral-200 md:text-base">
-              Подскажем размеры, материалы, количество карманов и формат крепления, рассчитаем стоимость изготовления, доставки и монтажа.
-            </p>
+        <div className="cta-shell border-neutral-800/80 bg-neutral-900 px-6 py-8 text-white md:px-8">
+          <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center md:gap-6">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">Консультация по проекту</p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Нужен стенд под вашу задачу?</h2>
+              <p className="mt-2 max-w-2xl text-sm text-neutral-200 md:text-base">
+                Подскажем размеры, материалы, количество карманов и формат крепления, рассчитаем стоимость изготовления, доставки и монтажа.
+              </p>
+            </div>
+            <Link href="#stands-lead-form" className="btn-primary w-full no-underline md:w-auto">
+              Получить консультацию
+            </Link>
           </div>
-          <Link href="#stands-lead-form" className="btn-primary mt-5 w-full no-underline md:mt-0 md:w-auto">
-            Получить консультацию
-          </Link>
         </div>
       </Section>
 
       <Section id="stands-lead-form" background="muted" fullBleed className="pt-0">
-        <div className="card rounded-2xl border border-neutral-200/80 bg-white p-6 md:p-8">
-          <h2 className="text-2xl font-bold">Рассчитать стоимость стенда</h2>
-          <p className="mt-2 text-sm text-neutral-600 md:text-base">
-            Опишите, какой стенд нужен, где он будет размещаться и требуются ли карманы, стойки или монтаж — подготовим расчёт и варианты.
-          </p>
+        <div className="card rounded-3xl border border-neutral-200/85 bg-white p-6 md:p-8">
+          <div className="space-y-3">
+            <p className="t-eyebrow">Заявка на расчёт</p>
+            <h2 className="text-2xl font-bold tracking-tight">Рассчитать стоимость стенда</h2>
+            <p className="text-sm text-neutral-600 md:text-base">
+              Опишите, какой стенд нужен, где он будет размещаться и требуются ли карманы, стойки или монтаж — подготовим расчёт и варианты.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-600">Расчёт под задачу</span>
+              <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-600">Материалы и комплектация</span>
+              <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-600">Доставка и монтаж</span>
+            </div>
+          </div>
           <div className="mt-5">
             <LeadForm
               t={messages}
