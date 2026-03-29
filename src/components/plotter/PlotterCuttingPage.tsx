@@ -42,6 +42,20 @@ const processSteps = [
   },
 ];
 
+const technicalStats = [
+  { key: '600 мм', label: 'макс. ширина резки' },
+  { key: '570 мм', label: 'ширина резки по меткам' },
+  { key: '1500 мм', label: 'длина резки по меткам' },
+  { key: '+20%', label: 'припуск к печати под резку' },
+];
+
+const trustPoints = [
+  'Проверяем файл перед запуском и подсказываем правки.',
+  'Помогаем выбрать тип резки и материал под задачу.',
+  'Работаем с короткими и серийными тиражами без потери точности.',
+  'Согласовываем сроки и стоимость до запуска в производство.',
+];
+
 const exampleCards = [
   { title: 'Стикерпак для бренда', tag: 'наклейки', image: '/images/plotter/plotter_labels.png', slotKey: 'plotter.examples.labels' },
   { title: 'Оформление витрины', tag: 'витрина', image: '/images/plotter/plotter_window.png', slotKey: 'plotter.examples.window' },
@@ -198,7 +212,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
     <div className="pb-16 md:pb-20">
       <Section className="pb-0 pt-12 md:pt-16">
         <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/35 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-10 ${revealBase}`}>
-          <div className="grid gap-7 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
+          <div className="grid gap-7 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Производственная услуга</p>
               <h1 className="mt-3 max-w-4xl text-[2.35rem] font-bold leading-tight md:text-[3.75rem] md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
@@ -237,25 +251,14 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
             </div>
 
-            <div className="card-structured rounded-2xl border border-neutral-200/90 bg-white/85 p-4 dark:border-neutral-700 dark:bg-neutral-900/70 md:p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Технический профиль</p>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                {[
-                  { key: '600', label: 'макс. ширина резки, мм' },
-                  { key: '570', label: 'макс. ширина по меткам, мм' },
-                  { key: '1500', label: 'макс. длина по меткам, мм' },
-                  { key: '+20%', label: 'к печати под резку' },
-                ].map((item, index) => (
-                  <article
-                    key={item.label}
-                    style={heroReveal.getStaggerStyle((index + 1) * 110)}
-                    data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}
-                    className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5 ${revealBase}`}
-                  >
-                    <p className="text-[1.6rem] font-bold leading-none text-neutral-900 dark:text-neutral-100">{item.key}</p>
-                    <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{item.label}</p>
-                  </article>
-                ))}
+            <div className={`rounded-2xl border border-neutral-200/90 bg-white/80 p-4 dark:border-neutral-700 dark:bg-neutral-900/60 md:p-5 ${revealBase}`} data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}>
+              <div className="relative overflow-hidden rounded-xl border border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100 via-white to-red-50/50 p-5 dark:border-neutral-700 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
+                <div className="absolute right-4 top-4 h-14 w-14 rounded-full bg-red-100/70 blur-xl dark:bg-red-500/15" aria-hidden="true" />
+                <div className="aspect-[4/3] rounded-lg border border-neutral-200/80 bg-white/70 p-5 dark:border-neutral-700 dark:bg-neutral-950/70">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Зона для фото услуги</p>
+                  <p className="mt-2 max-w-[22ch] text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Здесь будет размещено основное визуальное изображение плоттерной резки.</p>
+                </div>
+                <div className="mt-4 h-1.5 w-24 rounded-full bg-red-200/80 dark:bg-red-500/30" />
               </div>
             </div>
           </div>
@@ -299,29 +302,29 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       </Section>
 
       <Section className="pt-0">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-8">
-          <div className="space-y-6">
-            <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
-              <div className="section-header-tight mb-5">
-                <p className="t-eyebrow">Процесс</p>
-                <h2 className="t-h3">Как проходит заказ</h2>
-              </div>
-              <div className="grid gap-3 md:grid-cols-3">
-                {processSteps.map((step, index) => (
-                  <article
-                    key={step.title}
-                    style={specsReveal.getStaggerStyle(index * 100)}
-                    data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
-                    className={`card-info card-interactive h-full p-5 ${revealBase}`}
-                  >
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
-                    <h3 className="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
-                  </article>
-                ))}
-              </div>
+        <div className="space-y-6">
+          <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
+            <div className="section-header-tight mb-5">
+              <p className="t-eyebrow">Процесс</p>
+              <h2 className="t-h3">Как проходит заказ</h2>
             </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {processSteps.map((step, index) => (
+                <article
+                  key={step.title}
+                  style={specsReveal.getStaggerStyle(index * 100)}
+                  data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
+                  className={`card-info card-interactive h-full p-5 ${revealBase}`}
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
+                  <h3 className="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
 
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div ref={pricingReveal.ref} {...pricingReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
               <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl">
@@ -365,78 +368,120 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
             </div>
 
-            <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
-              <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
-                <div className="max-w-2xl">
-                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">Факторы расчёта</span>
-                  <h2 className="mt-3 text-2xl font-semibold">Что влияет на цену</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Чем сложнее контур, плотнее рез и больше ручной постобработки, тем выше итоговая стоимость. Ниже — ключевые параметры, которые менеджер оценивает в первую очередь.</p>
+            <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`space-y-6 ${revealBase}`}>
+              <div className="card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">Технические параметры</p>
+                <h2 className="mt-3 text-2xl font-semibold">Технические возможности</h2>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Ключевые ограничения производства для резки и работ по меткам.</p>
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  {technicalStats.map((item, index) => (
+                    <article
+                      key={item.label}
+                      style={factorsReveal.getStaggerStyle(index * 80)}
+                      data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
+                      className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5 ${revealBase}`}
+                    >
+                      <p className="text-[1.4rem] font-bold leading-none text-neutral-900 dark:text-neutral-100">{item.key}</p>
+                      <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{item.label}</p>
+                    </article>
+                  ))}
                 </div>
-                <p className="max-w-[220px] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">Эти пункты помогают быстро понять, из чего складывается смета ещё до финальной проверки файла.</p>
               </div>
 
-              <ul className="mt-5 grid gap-3 md:grid-cols-2">
-                {priceFactors.map((factor, index) => (
-                  <li
-                    key={factor}
-                    style={factorsReveal.getStaggerStyle(index * 80)}
-                    data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
-                    className={`rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:shadow-none ${revealBase}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-sm font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{String(index + 1).padStart(2, '0')}</span>
-                      <div>
-                        <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor}</p>
-                        <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Влияет на время подготовки, точность и объём резки.' : 'Учитывается при расчёте ручных операций и общего времени производства.'}</p>
+              <div className="card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+                <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
+                  <div className="max-w-2xl">
+                    <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">Факторы расчёта</span>
+                    <h2 className="mt-3 text-2xl font-semibold">Что влияет на цену</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Чем сложнее контур, плотнее рез и больше ручной постобработки, тем выше итоговая стоимость. Ниже — ключевые параметры, которые менеджер оценивает в первую очередь.</p>
+                  </div>
+                  <p className="max-w-[220px] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">Эти пункты помогают быстро понять, из чего складывается смета ещё до финальной проверки файла.</p>
+                </div>
+
+                <ul className="mt-5 grid gap-3 md:grid-cols-2">
+                  {priceFactors.map((factor, index) => (
+                    <li
+                      key={factor}
+                      style={factorsReveal.getStaggerStyle((index + 4) * 80)}
+                      data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
+                      className={`rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:shadow-none ${revealBase}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-sm font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{String(index + 1).padStart(2, '0')}</span>
+                        <div>
+                          <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Влияет на время подготовки, точность и объём резки.' : 'Учитывается при расчёте ручных операций и общего времени производства.'}</p>
+                        </div>
                       </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="card flex flex-col gap-4 border border-neutral-200 p-6 dark:border-neutral-800 md:flex-row md:items-center md:justify-between md:p-8">
-              <div>
-                <h2 className="text-2xl font-semibold">Нужна печать перед резкой?</h2>
-                <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем выполним контурную резку по меткам.</p>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <Link href="/wide-format-printing" className="btn-primary w-full text-center no-underline md:w-auto">Перейти к широкоформатной печати</Link>
             </div>
           </div>
+        </div>
+      </Section>
 
-          <aside className="lg:sticky lg:top-24 lg:h-fit">
-            <form onSubmit={onSubmit} className="card space-y-6 border border-neutral-200 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:shadow-none md:p-7" id="plotter-request">
-              <div>
-                <h2 className="text-2xl font-semibold">Заявка на плоттерную резку</h2>
-                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Стоимость подтверждает менеджер после проверки макета. Без скрытых доплат.</p>
+      <Section className="pt-0">
+        <div className="card border border-neutral-200/90 bg-white/95 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Поддержка</p>
+          <h2 className="mt-2 text-2xl font-semibold">Поможем подготовить заказ без лишних итераций</h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {trustPoints.map((item) => (
+              <div key={item} className="rounded-xl border border-neutral-200/90 bg-neutral-50/70 px-4 py-3 text-sm leading-relaxed text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div className="card flex flex-col gap-4 border border-neutral-200 p-6 dark:border-neutral-800 md:flex-row md:items-center md:justify-between md:p-8">
+          <div>
+            <h2 className="text-2xl font-semibold">Нужна печать перед резкой?</h2>
+            <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем выполним контурную резку по меткам.</p>
+          </div>
+          <Link href="/wide-format-printing" className="btn-primary w-full text-center no-underline md:w-auto">Перейти к широкоформатной печати</Link>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div id="plotter-request" className="card border border-neutral-200/90 bg-white/95 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+          <div className="section-header-tight mb-6">
+            <p className="t-eyebrow">Заявка</p>
+            <h2 className="t-h3">Отправьте заявку на плоттерную резку</h2>
+            <p className="t-body text-muted-foreground max-w-3xl">Проверим макет, уточним тип резки и подготовим расчёт без скрытых доплат.</p>
+          </div>
+
+          <form onSubmit={onSubmit} className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="text-sm font-medium">Имя *</label>
+                <input
+                  id="name"
+                  value={name}
+                  onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
+                  onChange={(event) => setName(event.target.value)}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+                />
+                {nameError && <p className="text-sm text-red-600">{nameError}</p>}
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-                <div className="space-y-1.5">
-                  <label htmlFor="name" className="text-sm font-medium">Имя *</label>
-                  <input
-                    id="name"
-                    value={name}
-                    onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
-                    onChange={(event) => setName(event.target.value)}
-                    className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
-                  />
-                  {nameError && <p className="text-sm text-red-600">{nameError}</p>}
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
-                  <PhoneInput
-                    id="phone"
-                    value={phone}
-                    onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
-                    onChange={setPhone}
-                    placeholder="+7 (___) ___-__-__"
-                  />
-                  {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
-                </div>
+              <div className="space-y-1.5">
+                <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
+                <PhoneInput
+                  id="phone"
+                  value={phone}
+                  onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
+                  onChange={setPhone}
+                  placeholder="+7 (___) ___-__-__"
+                />
+                {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
               </div>
+            </div>
 
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
                 <label htmlFor="serviceType" className="text-sm font-medium">Тип услуги</label>
                 <select
@@ -452,17 +497,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="comment" className="text-sm font-medium">Комментарий</label>
-                <textarea
-                  id="comment"
-                  value={comment}
-                  onChange={(event) => setComment(event.target.value)}
-                  rows={4}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <label htmlFor="files" className="text-sm font-medium">Файл (опционально)</label>
                 <input
                   id="files"
@@ -474,25 +508,37 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900"
                 />
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">Можно приложить макет в векторном или растровом формате.</p>
-                {files.length > 0 && (
-                  <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-600 dark:text-neutral-300">
-                    {files.map((file) => (
-                      <li key={`${file.name}-${file.size}`}>{file.name}</li>
-                    ))}
-                  </ul>
-                )}
               </div>
+            </div>
 
-              <div className="flex flex-col gap-3">
-                <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center py-3 text-[15px] tracking-[0.01em] disabled:opacity-60">
-                  {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
-                </button>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Менеджер уточнит длину реза и сложность бесплатно.</p>
-                {submitError && <p className="text-sm text-red-600">{submitError}</p>}
-                {submitSuccess && <p className="text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
-              </div>
-            </form>
-          </aside>
+            <div className="space-y-1.5">
+              <label htmlFor="comment" className="text-sm font-medium">Комментарий</label>
+              <textarea
+                id="comment"
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                rows={4}
+                className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+              />
+            </div>
+
+            {files.length > 0 && (
+              <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-600 dark:text-neutral-300">
+                {files.map((file) => (
+                  <li key={`${file.name}-${file.size}`}>{file.name}</li>
+                ))}
+              </ul>
+            )}
+
+            <div className="flex flex-col gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-800 md:flex-row md:items-center md:justify-between">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">Менеджер уточнит длину реза и сложность бесплатно.</p>
+              <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center py-3 text-[15px] tracking-[0.01em] disabled:opacity-60 md:w-auto md:px-7">
+                {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
+              </button>
+            </div>
+            {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+            {submitSuccess && <p className="text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
+          </form>
         </div>
       </Section>
 
