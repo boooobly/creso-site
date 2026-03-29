@@ -27,6 +27,21 @@ const priceFactors = [
   'формат изделия',
 ];
 
+const processSteps = [
+  {
+    title: 'Получаем макет и задачу',
+    description: 'Принимаем файл, уточняем тип резки (обычная или по меткам), тираж и сроки.',
+  },
+  {
+    title: 'Проверяем и согласовываем',
+    description: 'Проверяем геометрию макета, подтверждаем стоимость и предлагаем корректировки, если нужно.',
+  },
+  {
+    title: 'Режем и подготавливаем к монтажу',
+    description: 'Выполняем резку, выборку и, при необходимости, наносим монтажную плёнку или переносим на деталь.',
+  },
+];
+
 const exampleCards = [
   { title: 'Стикерпак для бренда', tag: 'наклейки', image: '/images/plotter/plotter_labels.png', slotKey: 'plotter.examples.labels' },
   { title: 'Оформление витрины', tag: 'витрина', image: '/images/plotter/plotter_window.png', slotKey: 'plotter.examples.window' },
@@ -182,16 +197,15 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   return (
     <div className="pb-16 md:pb-20">
       <Section className="pb-0 pt-12 md:pt-16">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-12">
-          <div className="space-y-10 md:space-y-12">
-            <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/40 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-11 ${revealBase}`}>
-              <div className="space-y-5">
-                <h1 className="max-w-4xl text-[2.65rem] font-bold leading-tight md:text-[4.25rem] md:leading-[1.02]">Плоттерная резка самоклеящейся пленки и оракала</h1>
-                <p className="max-w-2xl text-base text-neutral-700 dark:text-neutral-300 md:text-lg">Точная контурная резка, выборка, монтаж.</p>
-              </div>
-              <p className="mt-3 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Работаем с короткими и серийными тиражами. Точная геометрия линии реза.</p>
+        <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/35 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-10 ${revealBase}`}>
+          <div className="grid gap-7 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Производственная услуга</p>
+              <h1 className="mt-3 max-w-4xl text-[2.35rem] font-bold leading-tight md:text-[3.75rem] md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
+              <p className="mt-4 max-w-2xl text-base text-neutral-700 dark:text-neutral-300 md:text-lg">Точная контурная резка, выборка и подготовка к монтажу для единичных и серийных заказов.</p>
+              <p className="mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Работаем по векторным файлам и по меткам, помогаем быстро оценить задачу и запустить заказ в производство.</p>
 
-              <div className="mt-7 flex flex-wrap gap-2.5">
+              <div className="mt-6 flex flex-wrap gap-2.5">
                 {heroBadges.map((badge, index) => (
                   <span
                     key={badge}
@@ -210,7 +224,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   onClick={() => document.getElementById('plotter-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className="btn-primary px-5 py-3"
                 >
-                  Оставить заявку
+                  Рассчитать заказ
                 </button>
                 <button
                   type="button"
@@ -223,30 +237,88 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
             </div>
 
-            <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200 border-l-4 border-l-red-500 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:border-l-red-500 dark:shadow-none md:p-8 ${revealBase}`}>
-              <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
-                <div>
-                  <h2 className="text-2xl font-semibold">Технические возможности</h2>
-                  <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Производственный паспорт по ключевым параметрам резки и работе по меткам.</p>
+            <div className="card-structured rounded-2xl border border-neutral-200/90 bg-white/85 p-4 dark:border-neutral-700 dark:bg-neutral-900/70 md:p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Технический профиль</p>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                {[
+                  { key: '600', label: 'макс. ширина резки, мм' },
+                  { key: '570', label: 'макс. ширина по меткам, мм' },
+                  { key: '1500', label: 'макс. длина по меткам, мм' },
+                  { key: '+20%', label: 'к печати под резку' },
+                ].map((item, index) => (
+                  <article
+                    key={item.label}
+                    style={heroReveal.getStaggerStyle((index + 1) * 110)}
+                    data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}
+                    className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5 ${revealBase}`}
+                  >
+                    <p className="text-[1.6rem] font-bold leading-none text-neutral-900 dark:text-neutral-100">{item.key}</p>
+                    <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{item.label}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div ref={examplesReveal.ref} {...examplesReveal.revealProps} className={revealBase}>
+          <div className="section-header-tight mb-5">
+            <p className="t-eyebrow">Применение</p>
+            <h2 className="t-h3">Где чаще всего используют плоттерную резку</h2>
+            <p className="t-body text-muted-foreground max-w-3xl">Типовые сценарии, в которых важны аккуратный контур, чистая выборка и стабильная повторяемость в тираже.</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {exampleCards.map((item, index) => (
+              <article
+                key={item.title}
+                style={examplesReveal.getStaggerStyle(index * 100)}
+                data-reveal={examplesReveal.isVisible || examplesReveal.prefersReducedMotion ? 'in' : 'out'}
+                className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+                  <img
+                    src={siteImages[item.slotKey]?.url ?? item.image}
+                    alt={siteImages[item.slotKey]?.altText || item.title}
+                    loading="lazy"
+                    className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { key: '600', label: 'макс. ширина резки, мм' },
-                    { key: '570', label: 'макс. ширина по меткам, мм' },
-                    { key: '1500', label: 'макс. длина по меткам, мм' },
-                    { key: '+20%', label: 'к печати под резку' },
-                  ].map((item, index) => (
-                    <article
-                      key={item.label}
-                      style={specsReveal.getStaggerStyle(index * 90)}
-                      data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
-                      className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5 ${revealBase}`}
-                    >
-                      <p className="text-[1.9rem] font-bold leading-none text-neutral-900 dark:text-neutral-100">{item.key}</p>
-                      <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{item.label}</p>
-                    </article>
-                  ))}
+                <div className="flex items-center justify-between px-4 py-3">
+                  <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{item.title}</p>
+                  <span className="rounded-full border border-neutral-300 bg-white/80 px-2 py-0.5 text-[11px] text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300">{item.tag}</span>
                 </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-8">
+          <div className="space-y-6">
+            <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
+              <div className="section-header-tight mb-5">
+                <p className="t-eyebrow">Процесс</p>
+                <h2 className="t-h3">Как проходит заказ</h2>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                {processSteps.map((step, index) => (
+                  <article
+                    key={step.title}
+                    style={specsReveal.getStaggerStyle(index * 100)}
+                    data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
+                    className={`card-info card-interactive h-full p-5 ${revealBase}`}
+                  >
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
+                    <h3 className="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
+                  </article>
+                ))}
               </div>
             </div>
 
@@ -321,37 +393,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   </li>
                 ))}
               </ul>
-            </div>
-
-            <div ref={examplesReveal.ref} {...examplesReveal.revealProps} className={revealBase}>
-              <h2 className="text-2xl font-semibold">Примеры</h2>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Типовые сценарии, в которых важны аккуратный контур и стабильная повторяемость.</p>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                {exampleCards.map((item, index) => (
-                  <article
-                    key={item.title}
-                    style={examplesReveal.getStaggerStyle(index * 100)}
-                    data-reveal={examplesReveal.isVisible || examplesReveal.prefersReducedMotion ? 'in' : 'out'}
-                    className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
-                      <img
-                        src={siteImages[item.slotKey]?.url ?? item.image}
-                        alt={siteImages[item.slotKey]?.altText || item.title}
-                        loading="lazy"
-                        className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
-                        onError={(event) => {
-                          event.currentTarget.style.display = "none";
-                        }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between px-4 py-3">
-                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{item.title}</p>
-                      <span className="rounded-full border border-neutral-300 bg-white/80 px-2 py-0.5 text-[11px] text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300">{item.tag}</span>
-                    </div>
-                  </article>
-                ))}
-              </div>
             </div>
 
             <div className="card flex flex-col gap-4 border border-neutral-200 p-6 dark:border-neutral-800 md:flex-row md:items-center md:justify-between md:p-8">
