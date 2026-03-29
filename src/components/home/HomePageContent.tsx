@@ -116,7 +116,7 @@ export default function HomePageContent({
 
   return (
     <div className="relative">
-      <Section spacing="hero" className="relative overflow-hidden border-b border-neutral-200/70">
+      <Section spacing="hero" fullBleed className="relative overflow-hidden border-b border-neutral-200/70">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent" />
         <div className="relative z-10 grid items-center gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
@@ -124,7 +124,7 @@ export default function HomePageContent({
               <p className="hero-eyebrow">
                 {heroEyebrow}
               </p>
-              <AnimatedBlurHeadline className="t-h1 max-w-[15ch]" text={heroTitle} breakAfterWord={1} />
+              <AnimatedBlurHeadline className="t-h1 max-w-[20ch] md:max-w-none" text={heroTitle} breakAfterWord={2} />
               <p className="t-lead max-w-[39rem] text-muted-foreground">{heroDescription}</p>
             </div>
 
@@ -158,15 +158,14 @@ export default function HomePageContent({
               aria-hidden="true"
               className="pointer-events-none absolute inset-x-[12%] top-[16%] h-[58%] rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.14)_0%,rgba(212,28,28,0.06)_40%,transparent_75%)] blur-2xl"
             />
-            <div className="card-visual relative ml-1 overflow-visible rounded-[2rem] border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 p-3 sm:ml-5 sm:p-4 lg:ml-9">
-              <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[1.65rem] border border-white/70" />
+            <div className="relative ml-1 px-2 sm:ml-5 sm:px-3 lg:ml-9 lg:px-4">
               <Image
                 src={heroImageSrc}
                 alt={heroImageAlt}
                 width={980}
                 height={760}
                 priority
-                className="h-auto w-full rounded-[1.4rem] object-contain drop-shadow-[0_24px_30px_rgba(15,23,42,0.2)]"
+                className="h-auto w-full object-contain drop-shadow-[0_30px_38px_rgba(15,23,42,0.24)]"
               />
             </div>
           </motion.div>
