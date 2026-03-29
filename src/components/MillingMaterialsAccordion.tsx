@@ -57,7 +57,7 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
         return (
           <div
             key={group.id}
-            className={`overflow-hidden rounded-xl border bg-white shadow-sm transition-colors dark:bg-neutral-900 ${isHighlighted ? 'border-red-400 ring-2 ring-red-500/25' : 'border-neutral-300 dark:border-neutral-700'}`}
+            className={`overflow-hidden rounded-2xl border bg-white shadow-[0_16px_34px_-32px_rgba(15,23,42,0.62)] transition-colors dark:bg-neutral-900 ${isHighlighted ? 'border-red-400 ring-2 ring-red-500/25' : 'border-neutral-200/90 dark:border-neutral-700'}`}
           >
             <h3>
               <button
@@ -66,7 +66,7 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => setOpenId((prev) => (prev === group.id ? null : group.id))}
-                className="flex min-h-16 w-full items-center justify-between gap-4 border-b border-transparent bg-neutral-50 px-5 py-4 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:bg-neutral-800/70 dark:hover:border-neutral-600 dark:hover:bg-neutral-800"
+                className="flex min-h-16 w-full items-center justify-between gap-4 border-b border-transparent bg-neutral-50/80 px-5 py-4 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:bg-neutral-800/70 dark:hover:border-neutral-600 dark:hover:bg-neutral-800"
               >
                 <span className="text-base font-semibold md:text-lg">{group.title}</span>
                 <ChevronDown
@@ -83,9 +83,9 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
               className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
             >
               <div className="overflow-hidden">
-                <div className="border-t border-neutral-300 p-4 dark:border-neutral-700">
+                <div className="border-t border-neutral-200/90 p-4 dark:border-neutral-700">
                   <p className="text-sm text-neutral-600 dark:text-neutral-300">{group.description}</p>
-                  <div className="mt-4 overflow-hidden rounded-lg border border-zinc-300 dark:border-neutral-800">
+                  <div className="mt-4 overflow-hidden rounded-xl border border-zinc-200/90 dark:border-neutral-800">
                     <table className="w-full table-fixed text-left text-sm">
                       <thead className="bg-neutral-50 dark:bg-neutral-800/60">
                         <tr>

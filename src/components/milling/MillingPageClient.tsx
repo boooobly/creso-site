@@ -17,7 +17,7 @@ import {
 import Section from '@/components/layout/Section';
 import OrderMillingForm from '@/components/OrderMillingForm';
 import MillingMaterialsAccordion from '@/components/MillingMaterialsAccordion';
-import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { MillingAdditionalServiceGroup, MillingMaterialGroup } from '@/lib/pricing-config/milling';
 
@@ -64,6 +64,24 @@ const whyChooseUs = [
   { title: 'Помогаем подготовить макет', icon: Sparkles },
   { title: 'Работаем с материалом клиента', icon: Truck },
   { title: 'Контроль качества на каждом этапе', icon: ShieldCheck },
+];
+
+const heroHighlights = [
+  {
+    title: 'Точность обработки',
+    description: 'Стабильная геометрия и аккуратная кромка на серийных и штучных заказах.',
+    icon: Cog,
+  },
+  {
+    title: 'Рабочее поле 2×4 м',
+    description: 'Обрабатываем крупные листовые материалы без дробления макета.',
+    icon: Maximize,
+  },
+  {
+    title: 'Поддержка инженера',
+    description: 'Проверяем векторный файл и согласовываем запуск перед производством.',
+    icon: ClipboardCheck,
+  },
 ];
 
 const revealBase =
@@ -149,8 +167,40 @@ export default function MillingPageClient({
   return (
     <div>
       <Section className="pt-8 pb-6 md:pt-10 md:pb-8">
-        <PageHero className={`p-6 md:p-10 ${revealClass(heroVisible)}`}>
-          <div className="space-y-3">
+        <PageHero
+          className={`border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 p-6 shadow-sm shadow-neutral-200/60 md:p-8 lg:p-10 ${revealClass(heroVisible)}`}
+          contentClassName="space-y-6 lg:pr-2"
+          media={
+            <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/90 p-4 md:p-5">
+              <div className="mb-4 flex items-center justify-between border-b border-neutral-200/80 pb-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">Технический профиль</p>
+                <span className="inline-flex size-8 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-300">
+                  <Cog className="h-4 w-4" aria-hidden="true" />
+                </span>
+              </div>
+              <div className="space-y-3">
+                {heroHighlights.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <article key={item.title} className="card-structured rounded-xl border-neutral-200/90 bg-white/80 p-3.5 dark:bg-neutral-900/70">
+                      <div className="flex gap-3">
+                        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                          <Icon className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <div>
+                          <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
+                          <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </HeroMediaPanel>
+          }
+        >
+          <div className="space-y-4">
+            <HeroEyebrow>Фрезеровка</HeroEyebrow>
             <HeroTitle className="max-w-3xl text-3xl md:text-5xl">Фрезеровка листовых материалов</HeroTitle>
             <HeroLead className="max-w-3xl dark:text-neutral-300">
               Точная 2D-фрезеровка пластика, композита и древесных плит на производстве полного цикла. От единичных заказов до серий с контролем качества на каждом этапе.
@@ -183,21 +233,30 @@ export default function MillingPageClient({
 
       <Section className="pt-2 md:pt-4">
         <div id="milling-prices" className="card p-6 md:p-8 scroll-mt-24">
+          <div className="section-header-tight mb-4">
+            <p className="t-eyebrow">Прайс и материалы</p>
+            <h2 className="t-h3">Прайс по материалам</h2>
+            <p className="t-body text-muted-foreground max-w-3xl">
+              Стоимость указана за погонный метр фрезеровки. Итоговая сумма зависит от толщины, сложности и дополнительных операций.
+            </p>
+          </div>
           <div className="mb-4 flex flex-wrap gap-2">
             {quickInfo.map((item) => (
-              <span key={item} className="rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-200">{item}</span>
+              <span key={item} className="inline-flex items-center rounded-full border border-neutral-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-200">{item}</span>
             ))}
           </div>
-          <h2 className="mb-5 text-2xl font-semibold">Прайс по материалам</h2>
           <MillingMaterialsAccordion groups={materialGroups} />
         </div>
       </Section>
 
       <Section className="pt-0">
         <div ref={howReveal.ref} className={`card p-6 md:p-8 ${revealClass(howReveal.isVisible)}`}>
-          <h2 className="mb-6 text-2xl font-semibold">Как проходит заказ</h2>
+          <div className="section-header-tight mb-6">
+            <p className="t-eyebrow">Процесс</p>
+            <h2 className="t-h3">Как проходит заказ</h2>
+          </div>
           <div className="grid gap-4 md:grid-cols-3">
-            {steps.map((step) => {
+            {steps.map((step, index) => {
               const Icon = step.icon;
 
               return (
@@ -208,6 +267,7 @@ export default function MillingPageClient({
                   <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                   </div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
                   <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
                 </div>
@@ -221,6 +281,7 @@ export default function MillingPageClient({
         <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
           <aside className="lg:sticky lg:top-[120px] lg:self-start">
             <div className="card p-6 md:p-8">
+              <p className="t-eyebrow mb-3">Условия</p>
               <section>
                 <h2 className="text-xl font-semibold">Условия работы</h2>
                 <ul className="mt-4 space-y-3.5 text-sm text-neutral-700 dark:text-neutral-300">
@@ -260,7 +321,10 @@ export default function MillingPageClient({
           </aside>
 
           <div ref={servicesReveal.ref} className={`card p-6 md:p-8 ${revealClass(servicesReveal.isVisible)}`}>
-            <h2 className="mb-4 text-2xl font-semibold">Дополнительные услуги</h2>
+            <div className="section-header-tight mb-4">
+              <p className="t-eyebrow">Дополнительно</p>
+              <h2 className="t-h3">Дополнительные услуги</h2>
+            </div>
             <div className="space-y-4">
               {additionalServiceGroups.map((group) => {
                 const GroupIcon = group.id === 'urgency' ? Zap : group.id === 'preparation-and-complexity' ? Wrench : Truck;
@@ -303,7 +367,10 @@ export default function MillingPageClient({
 
       <Section className="pt-0">
         <div ref={galleryReveal.ref} className={revealClass(galleryReveal.isVisible)}>
-          <h2 className="mb-4 text-2xl font-semibold">Примеры материалов в работе</h2>
+          <div className="section-header-tight mb-4">
+            <p className="t-eyebrow">Материалы</p>
+            <h2 className="t-h3">Примеры материалов в работе</h2>
+          </div>
           <div className="grid gap-4 md:grid-cols-3">
             {galleryItems.map((item) => (
               <article key={item.title} className="card-visual card-interactive group">
@@ -315,8 +382,9 @@ export default function MillingPageClient({
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
                   />
                 </div>
-                <div className="px-4 py-3">
-                  <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">{item.title}</p>
+                <div className="px-4 py-3.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Материал</p>
+                  <p className="mt-1 text-sm font-semibold text-neutral-800 dark:text-neutral-100">{item.title}</p>
                 </div>
               </article>
             ))}
