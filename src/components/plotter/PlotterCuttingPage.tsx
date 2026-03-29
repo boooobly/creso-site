@@ -111,13 +111,11 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   const nameError = touched.name && !name.trim() ? 'Введите имя.' : '';
   const phoneError = touched.phone && !phoneValid ? 'Введите телефон в формате +7 (999) 999-99-99.' : '';
 
-
-
   useEffect(() => {
     let ignore = false;
 
     fetch('/api/pricing/plotter-cutting')
-      .then((response) => response.ok ? response.json() : null)
+      .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (ignore || !data?.ok || !data?.config) return;
         const config = data.config as {
