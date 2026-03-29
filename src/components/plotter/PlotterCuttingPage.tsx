@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { ArrowRight, CheckCircle2, Clock3, FileCheck2, Scissors } from 'lucide-react';
 import Section from '@/components/Section';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
@@ -25,6 +26,41 @@ const priceFactors = [
   'выборка',
   'срочность',
   'формат изделия',
+];
+
+const processSteps = [
+  {
+    title: 'Получаем макет и задачу',
+    description: 'Принимаем файл, уточняем тип резки (обычная или по меткам), тираж и сроки.',
+  },
+  {
+    title: 'Проверяем и согласовываем',
+    description: 'Проверяем геометрию макета, подтверждаем стоимость и предлагаем корректировки, если нужно.',
+  },
+  {
+    title: 'Режем и подготавливаем к монтажу',
+    description: 'Выполняем резку, выборку и, при необходимости, наносим монтажную плёнку или переносим на деталь.',
+  },
+];
+
+const technicalStats = [
+  { key: '600 мм', label: 'макс. ширина резки' },
+  { key: '570 мм', label: 'ширина резки по меткам' },
+  { key: '1500 мм', label: 'длина резки по меткам' },
+  { key: '+20%', label: 'припуск к печати под резку' },
+];
+
+const trustPoints = [
+  'Проверяем файл перед запуском и подсказываем правки.',
+  'Помогаем выбрать тип резки и материал под задачу.',
+  'Работаем с короткими и серийными тиражами без потери точности.',
+  'Согласовываем сроки и стоимость до запуска в производство.',
+];
+
+const requestHighlights = [
+  { label: 'Проверка макета', icon: FileCheck2 },
+  { label: 'Помощь с контуром', icon: Scissors },
+  { label: 'Быстрый расчет', icon: Clock3 },
 ];
 
 const exampleCards = [
@@ -182,16 +218,15 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   return (
     <div className="pb-16 md:pb-20">
       <Section className="pb-0 pt-12 md:pt-16">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-12">
-          <div className="space-y-10 md:space-y-12">
-            <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/40 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-11 ${revealBase}`}>
-              <div className="space-y-5">
-                <h1 className="max-w-4xl text-[2.65rem] font-bold leading-tight md:text-[4.25rem] md:leading-[1.02]">Плоттерная резка самоклеящейся пленки и оракала</h1>
-                <p className="max-w-2xl text-base text-neutral-700 dark:text-neutral-300 md:text-lg">Точная контурная резка, выборка, монтаж.</p>
-              </div>
-              <p className="mt-3 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Работаем с короткими и серийными тиражами. Точная геометрия линии реза.</p>
+        <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/35 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-10 ${revealBase}`}>
+          <div className="grid gap-7 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Производственная услуга</p>
+              <h1 className="mt-3 max-w-4xl text-[2.35rem] font-bold leading-tight md:text-[3.75rem] md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
+              <p className="mt-4 max-w-2xl text-base text-neutral-700 dark:text-neutral-300 md:text-lg">Точная контурная резка, выборка и подготовка к монтажу для единичных и серийных заказов.</p>
+              <p className="mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Работаем по векторным файлам и по меткам, помогаем быстро оценить задачу и запустить заказ в производство.</p>
 
-              <div className="mt-7 flex flex-wrap gap-2.5">
+              <div className="mt-6 flex flex-wrap gap-2.5">
                 {heroBadges.map((badge, index) => (
                   <span
                     key={badge}
@@ -210,7 +245,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   onClick={() => document.getElementById('plotter-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className="btn-primary px-5 py-3"
                 >
-                  Оставить заявку
+                  Рассчитать заказ
                 </button>
                 <button
                   type="button"
@@ -220,36 +255,99 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   Требования к макету
                   <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 group-hover:scale-x-100 motion-reduce:transition-none" />
                 </button>
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('plotter-examples')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="group relative text-sm font-medium text-neutral-700 transition-colors hover:text-red-700 dark:text-neutral-200 dark:hover:text-red-300"
+                >
+                  Смотреть примеры
+                  <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 group-hover:scale-x-100 motion-reduce:transition-none" />
+                </button>
               </div>
             </div>
 
-            <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200 border-l-4 border-l-red-500 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:border-l-red-500 dark:shadow-none md:p-8 ${revealBase}`}>
-              <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
-                <div>
-                  <h2 className="text-2xl font-semibold">Технические возможности</h2>
-                  <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Производственный паспорт по ключевым параметрам резки и работе по меткам.</p>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { key: '600', label: 'макс. ширина резки, мм' },
-                    { key: '570', label: 'макс. ширина по меткам, мм' },
-                    { key: '1500', label: 'макс. длина по меткам, мм' },
-                    { key: '+20%', label: 'к печати под резку' },
-                  ].map((item, index) => (
-                    <article
-                      key={item.label}
-                      style={specsReveal.getStaggerStyle(index * 90)}
-                      data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
-                      className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5 ${revealBase}`}
-                    >
-                      <p className="text-[1.9rem] font-bold leading-none text-neutral-900 dark:text-neutral-100">{item.key}</p>
-                      <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{item.label}</p>
-                    </article>
-                  ))}
+            <div className={`rounded-2xl border border-neutral-200/90 bg-white/80 p-4 dark:border-neutral-700 dark:bg-neutral-900/60 md:p-5 ${revealBase}`} data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}>
+              <div className="relative overflow-hidden rounded-xl border border-neutral-200/80 bg-gradient-to-br from-neutral-100 via-white to-red-50/45 p-4 dark:border-neutral-700 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
+                <div className="pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" style={{ backgroundImage: 'linear-gradient(to right, rgba(115,115,115,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(115,115,115,0.14) 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
+                <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-red-100/80 blur-2xl dark:bg-red-500/20" aria-hidden="true" />
+                <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-white/90 blur-2xl dark:bg-neutral-700/40" aria-hidden="true" />
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-neutral-200/90 bg-white/75 dark:border-neutral-700 dark:bg-neutral-950/75">
+                  <div className="absolute inset-x-4 top-4 flex items-center justify-between">
+                    <span className="rounded-full border border-neutral-300/90 bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-600 dark:border-neutral-600 dark:bg-neutral-900/90 dark:text-neutral-300">Медиа зоны услуги</span>
+                    <span className="h-2 w-2 rounded-full bg-red-500/70" />
+                  </div>
+                  <div className="absolute inset-4 top-12 rounded-md border border-dashed border-neutral-300/80 dark:border-neutral-600/80" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-md border border-neutral-200/90 bg-white/85 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900/85">
+                    <p className="text-xs font-medium text-neutral-600 dark:text-neutral-300">Будущий визуал: производство и результат резки</p>
+                    <ArrowRight className="h-3.5 w-3.5 text-neutral-400" />
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </Section>
 
+      <Section className="pt-0">
+        <div id="plotter-examples" ref={examplesReveal.ref} {...examplesReveal.revealProps} className={revealBase}>
+          <div className="section-header-tight mb-5">
+            <p className="t-eyebrow">Применение</p>
+            <h2 className="t-h3">Где чаще всего используют плоттерную резку</h2>
+            <p className="t-body text-muted-foreground max-w-3xl">Типовые сценарии, в которых важны аккуратный контур, чистая выборка и стабильная повторяемость в тираже.</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {exampleCards.map((item, index) => (
+              <article
+                key={item.title}
+                style={examplesReveal.getStaggerStyle(index * 100)}
+                data-reveal={examplesReveal.isVisible || examplesReveal.prefersReducedMotion ? 'in' : 'out'}
+                className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+                  <img
+                    src={siteImages[item.slotKey]?.url ?? item.image}
+                    alt={siteImages[item.slotKey]?.altText || item.title}
+                    loading="lazy"
+                    className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
+                </div>
+                <div className="flex min-h-[62px] items-center justify-between gap-3 px-4 py-3">
+                  <p className="text-sm font-medium leading-snug text-neutral-900 dark:text-neutral-100">{item.title}</p>
+                  <span className="rounded-full border border-neutral-300 bg-white/80 px-2 py-0.5 text-[11px] text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300">{item.tag}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div className="space-y-6">
+          <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
+            <div className="section-header-tight mb-5">
+              <p className="t-eyebrow">Процесс</p>
+              <h2 className="t-h3">Как проходит заказ</h2>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {processSteps.map((step, index) => (
+                <article
+                  key={step.title}
+                  style={specsReveal.getStaggerStyle(index * 100)}
+                  data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
+                  className={`card-info card-interactive h-full p-5 ${revealBase}`}
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
+                  <h3 className="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
             <div ref={pricingReveal.ref} {...pricingReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
               <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl">
@@ -293,109 +391,141 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
             </div>
 
-            <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
-              <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
-                <div className="max-w-2xl">
-                  <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">Факторы расчёта</span>
-                  <h2 className="mt-3 text-2xl font-semibold">Что влияет на цену</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Чем сложнее контур, плотнее рез и больше ручной постобработки, тем выше итоговая стоимость. Ниже — ключевые параметры, которые менеджер оценивает в первую очередь.</p>
+            <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`space-y-6 ${revealBase}`}>
+              <div className="card border border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50/90 to-red-50/30 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-8">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">Технические параметры</p>
+                <h2 className="mt-3 text-2xl font-semibold">Технические возможности</h2>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Ключевые ограничения производства для резки и работ по меткам.</p>
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  {technicalStats.map((item, index) => (
+                    <article
+                      key={item.label}
+                      style={factorsReveal.getStaggerStyle(index * 80)}
+                      data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
+                      className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5 ${revealBase}`}
+                    >
+                      <p className="text-[1.4rem] font-bold leading-none text-neutral-900 dark:text-neutral-100">{item.key}</p>
+                      <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{item.label}</p>
+                    </article>
+                  ))}
                 </div>
-                <p className="max-w-[220px] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">Эти пункты помогают быстро понять, из чего складывается смета ещё до финальной проверки файла.</p>
               </div>
 
-              <ul className="mt-5 grid gap-3 md:grid-cols-2">
-                {priceFactors.map((factor, index) => (
-                  <li
-                    key={factor}
-                    style={factorsReveal.getStaggerStyle(index * 80)}
-                    data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
-                    className={`rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:shadow-none ${revealBase}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-sm font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{String(index + 1).padStart(2, '0')}</span>
-                      <div>
-                        <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor}</p>
-                        <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Влияет на время подготовки, точность и объём резки.' : 'Учитывается при расчёте ручных операций и общего времени производства.'}</p>
+              <div className="card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+                <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
+                  <div className="max-w-2xl">
+                    <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">Факторы расчёта</span>
+                    <h2 className="mt-3 text-2xl font-semibold">Что влияет на цену</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Чем сложнее контур, плотнее рез и больше ручной постобработки, тем выше итоговая стоимость. Ниже — ключевые параметры, которые менеджер оценивает в первую очередь.</p>
+                  </div>
+                  <p className="max-w-[220px] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">Эти пункты помогают быстро понять, из чего складывается смета ещё до финальной проверки файла.</p>
+                </div>
+
+                <ul className="mt-5 grid gap-3 md:grid-cols-2">
+                  {priceFactors.map((factor, index) => (
+                    <li
+                      key={factor}
+                      style={factorsReveal.getStaggerStyle((index + 4) * 80)}
+                      data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
+                      className={`rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:shadow-none ${revealBase}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-sm font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{String(index + 1).padStart(2, '0')}</span>
+                        <div>
+                          <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Влияет на время подготовки, точность и объём резки.' : 'Учитывается при расчёте ручных операций и общего времени производства.'}</p>
+                        </div>
                       </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div ref={examplesReveal.ref} {...examplesReveal.revealProps} className={revealBase}>
-              <h2 className="text-2xl font-semibold">Примеры</h2>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Типовые сценарии, в которых важны аккуратный контур и стабильная повторяемость.</p>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                {exampleCards.map((item, index) => (
-                  <article
-                    key={item.title}
-                    style={examplesReveal.getStaggerStyle(index * 100)}
-                    data-reveal={examplesReveal.isVisible || examplesReveal.prefersReducedMotion ? 'in' : 'out'}
-                    className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
-                      <img
-                        src={siteImages[item.slotKey]?.url ?? item.image}
-                        alt={siteImages[item.slotKey]?.altText || item.title}
-                        loading="lazy"
-                        className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
-                        onError={(event) => {
-                          event.currentTarget.style.display = "none";
-                        }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between px-4 py-3">
-                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{item.title}</p>
-                      <span className="rounded-full border border-neutral-300 bg-white/80 px-2 py-0.5 text-[11px] text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300">{item.tag}</span>
-                    </div>
-                  </article>
-                ))}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
+          </div>
+        </div>
+      </Section>
 
-            <div className="card flex flex-col gap-4 border border-neutral-200 p-6 dark:border-neutral-800 md:flex-row md:items-center md:justify-between md:p-8">
-              <div>
-                <h2 className="text-2xl font-semibold">Нужна печать перед резкой?</h2>
-                <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем выполним контурную резку по меткам.</p>
+      <Section className="pt-0">
+        <div className="card border border-neutral-200/90 bg-white/95 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Поддержка</p>
+          <h2 className="mt-2 text-2xl font-semibold">Поможем подготовить заказ без лишних итераций</h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {trustPoints.map((item, index) => (
+              <div key={item} className="rounded-xl border border-neutral-200/90 bg-neutral-50/70 px-4 py-3 text-sm leading-relaxed text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-300" />
+                  <p>
+                    <span className="mr-1 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">{`0${index + 1}`}</span>
+                    {item}
+                  </p>
+                </div>
               </div>
-              <Link href="/wide-format-printing" className="btn-primary w-full text-center no-underline md:w-auto">Перейти к широкоформатной печати</Link>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div className="card flex flex-col gap-4 border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 p-6 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 md:flex-row md:items-center md:justify-between md:p-8">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">Смежная услуга</p>
+            <h2 className="mt-1 text-2xl font-semibold">Нужна печать перед резкой?</h2>
+            <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем выполним контурную резку по меткам в одном производственном цикле.</p>
+          </div>
+          <Link href="/wide-format-printing" className="btn-primary inline-flex w-full items-center justify-center gap-2 text-center no-underline md:w-auto">
+            Перейти к широкоформатной печати
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div id="plotter-request" className="card border border-neutral-200/90 bg-white/95 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+          <div className="section-header-tight mb-6">
+            <p className="t-eyebrow">Заявка</p>
+            <h2 className="t-h3">Отправьте заявку на плоттерную резку</h2>
+            <p className="t-body text-muted-foreground max-w-3xl">Проверим макет, уточним тип резки и подготовим расчёт без скрытых доплат.</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {requestHighlights.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <span key={item.label} className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200">
+                    <Icon className="h-3.5 w-3.5 text-red-600 dark:text-red-300" />
+                    {item.label}
+                  </span>
+                );
+              })}
             </div>
           </div>
 
-          <aside className="lg:sticky lg:top-24 lg:h-fit">
-            <form onSubmit={onSubmit} className="card space-y-6 border border-neutral-200 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:shadow-none md:p-7" id="plotter-request">
-              <div>
-                <h2 className="text-2xl font-semibold">Заявка на плоттерную резку</h2>
-                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Стоимость подтверждает менеджер после проверки макета. Без скрытых доплат.</p>
+          <form onSubmit={onSubmit} className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="text-sm font-medium">Имя *</label>
+                <input
+                  id="name"
+                  value={name}
+                  onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
+                  onChange={(event) => setName(event.target.value)}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+                />
+                {nameError && <p className="text-sm text-red-600">{nameError}</p>}
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-                <div className="space-y-1.5">
-                  <label htmlFor="name" className="text-sm font-medium">Имя *</label>
-                  <input
-                    id="name"
-                    value={name}
-                    onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
-                    onChange={(event) => setName(event.target.value)}
-                    className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
-                  />
-                  {nameError && <p className="text-sm text-red-600">{nameError}</p>}
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
-                  <PhoneInput
-                    id="phone"
-                    value={phone}
-                    onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
-                    onChange={setPhone}
-                    placeholder="+7 (___) ___-__-__"
-                  />
-                  {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
-                </div>
+              <div className="space-y-1.5">
+                <label htmlFor="phone" className="text-sm font-medium">Телефон *</label>
+                <PhoneInput
+                  id="phone"
+                  value={phone}
+                  onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
+                  onChange={setPhone}
+                  placeholder="+7 (___) ___-__-__"
+                />
+                {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
               </div>
+            </div>
 
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
                 <label htmlFor="serviceType" className="text-sm font-medium">Тип услуги</label>
                 <select
@@ -411,47 +541,50 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="comment" className="text-sm font-medium">Комментарий</label>
-                <textarea
-                  id="comment"
-                  value={comment}
-                  onChange={(event) => setComment(event.target.value)}
-                  rows={4}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <label htmlFor="files" className="text-sm font-medium">Файл (опционально)</label>
-                <input
-                  id="files"
-                  type="file"
-                  ref={fileInputRef}
-                  multiple
-                  accept={acceptedAttr}
-                  onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-                />
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Можно приложить макет в векторном или растровом формате.</p>
-                {files.length > 0 && (
-                  <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-600 dark:text-neutral-300">
-                    {files.map((file) => (
-                      <li key={`${file.name}-${file.size}`}>{file.name}</li>
-                    ))}
-                  </ul>
-                )}
+                <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 p-3 dark:border-neutral-700 dark:bg-neutral-900/50">
+                  <input
+                    id="files"
+                    type="file"
+                    ref={fileInputRef}
+                    multiple
+                    accept={acceptedAttr}
+                    onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
+                    className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+                  />
+                  <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Можно приложить макет в векторном или растровом формате.</p>
+                </div>
               </div>
+            </div>
 
-              <div className="flex flex-col gap-3">
-                <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center py-3 text-[15px] tracking-[0.01em] disabled:opacity-60">
-                  {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
-                </button>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Менеджер уточнит длину реза и сложность бесплатно.</p>
-                {submitError && <p className="text-sm text-red-600">{submitError}</p>}
-                {submitSuccess && <p className="text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
-              </div>
-            </form>
-          </aside>
+            <div className="space-y-1.5">
+              <label htmlFor="comment" className="text-sm font-medium">Комментарий</label>
+              <textarea
+                id="comment"
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                rows={4}
+                className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+              />
+            </div>
+
+            {files.length > 0 && (
+              <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-600 dark:text-neutral-300">
+                {files.map((file) => (
+                  <li key={`${file.name}-${file.size}`}>{file.name}</li>
+                ))}
+              </ul>
+            )}
+
+            <div className="flex flex-col gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-800 md:flex-row md:items-center md:justify-between">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">Менеджер уточнит длину реза и сложность бесплатно. Ответим в рабочее время максимально быстро.</p>
+              <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center py-3 text-[15px] tracking-[0.01em] disabled:opacity-60 md:w-auto md:px-7">
+                {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
+              </button>
+            </div>
+            {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+            {submitSuccess && <p className="text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
+          </form>
         </div>
       </Section>
 
