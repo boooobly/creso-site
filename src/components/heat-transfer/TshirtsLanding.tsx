@@ -2,11 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Brush, CheckCheck, ChevronDown, ClipboardCheck, FileUp, Palette, Shirt, Sparkles, Truck, UploadCloud } from 'lucide-react';
+import { ArrowRight, Brush, CheckCheck, ChevronDown, ClipboardCheck, FileUp, Palette, Shirt, Sparkles, Truck, UploadCloud } from 'lucide-react';
 import { CSSProperties, ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
 import FloatingTshirtsCTA from '@/components/heat-transfer/FloatingTshirtsCTA';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import Section from '@/components/layout/Section';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { SiteImageRecord } from '@/lib/site-images';
 
@@ -19,6 +20,7 @@ type SectionRenderState = {
 
 type SectionBlockProps = {
   id?: string;
+  eyebrow?: string;
   title: string;
   subtitle?: string;
   children: (state: SectionRenderState) => ReactNode;
@@ -128,24 +130,23 @@ function delayStyle(index: number, reduceMotion: boolean): CSSProperties {
   return reduceMotion ? {} : { transitionDelay: `${index * 70}ms` };
 }
 
-function SectionBlock({ id, title, subtitle, children }: SectionBlockProps) {
+function SectionBlock({ id, eyebrow, title, subtitle, children }: SectionBlockProps) {
   const reveal = useRevealOnScroll<HTMLDivElement>();
 
   return (
-    <section id={id} className="scroll-mt-24 py-12 md:py-16">
-      <div className="container">
-        <div
-          ref={reveal.ref}
-          className={`transition-all duration-700 ease-out motion-reduce:transition-none ${revealClass(reveal.isVisible, reveal.prefersReducedMotion)}`}
-        >
-          <div className="mb-6 md:mb-8">
-            <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
-            {subtitle && <p className="mt-2 max-w-3xl text-sm text-neutral-600 dark:text-neutral-300 md:text-base">{subtitle}</p>}
-          </div>
-          {children({ isVisible: reveal.isVisible, prefersReducedMotion: reveal.prefersReducedMotion })}
+    <Section id={id} spacing="tight" className="scroll-mt-24">
+      <div
+        ref={reveal.ref}
+        className={`transition-all duration-700 ease-out motion-reduce:transition-none ${revealClass(reveal.isVisible, reveal.prefersReducedMotion)}`}
+      >
+        <div className="section-header">
+          {eyebrow && <p className="t-eyebrow">{eyebrow}</p>}
+          <h2 className="t-h2">{title}</h2>
+          {subtitle && <p className="max-w-3xl t-body">{subtitle}</p>}
         </div>
+        {children({ isVisible: reveal.isVisible, prefersReducedMotion: reveal.prefersReducedMotion })}
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -199,9 +200,10 @@ function ExampleMockup({ title, description, imageSrc }: { title: string; descri
   return (
     <div className="relative aspect-[16/10] overflow-hidden">
       <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent" />
+      <div className="card-image-overlay" />
       <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 text-white">
-        <h3 className="max-w-[26ch] text-[1.1rem] font-semibold leading-snug text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.45)] sm:text-[1.2rem]">{title}</h3>
+        <p className="inline-flex rounded-full border border-white/35 bg-black/25 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/90">Пример работ</p>
+        <h3 className="mt-2 max-w-[26ch] text-[1.1rem] font-semibold leading-snug text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.45)] sm:text-[1.2rem]">{title}</h3>
         <p className="mt-2 max-w-[34ch] text-xs leading-relaxed text-white/90 [text-shadow:0_1px_2px_rgba(0,0,0,0.35)] sm:text-sm">{description}</p>
       </div>
     </div>
@@ -228,14 +230,14 @@ export default function TshirtsLanding({
 
   return (
     <div className="bg-white pb-10 dark:bg-neutral-950">
-      <section id="tshirts-hero" className="relative overflow-hidden py-10 md:py-14">
-        <div className="container relative">
+      <Section id="tshirts-hero" spacing="hero" className="relative overflow-hidden">
+        <div className="relative">
           <div
             ref={heroReveal.ref}
             className={`transition-all duration-700 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
           >
             <PageHero
-              className="border-neutral-200/90 bg-white p-5 shadow-[0_20px_55px_rgba(15,23,42,0.07)] dark:border-neutral-800 dark:bg-neutral-900 md:p-8"
+              className="border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50 to-red-50/15 p-5 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:bg-neutral-900 md:p-8"
               contentClassName="max-w-[560px]"
               mediaClassName="lg:min-h-[420px]"
               media={
@@ -276,23 +278,28 @@ export default function TshirtsLanding({
                 <HeroActions className="mt-7">
                   <Link
                     href="#tshirts-order"
-                    className="inline-flex h-11 items-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white no-underline transition hover:-translate-y-0.5 hover:bg-red-700 motion-reduce:transition-none"
+                    className="btn-primary h-11 px-6 text-sm no-underline"
                   >
                     {heroPrimaryButtonText}
+                    <ArrowRight size={16} className="ml-2" aria-hidden="true" />
                   </Link>
                   <Link
                     href="#examples"
-                    className="inline-flex h-11 items-center rounded-xl border border-neutral-300 px-5 text-sm font-semibold text-neutral-700 no-underline transition hover:border-neutral-400 hover:text-neutral-950 motion-reduce:transition-none dark:border-neutral-700 dark:text-neutral-100 dark:hover:border-neutral-500"
+                    className="btn-secondary h-11 border-neutral-300 bg-white/90 px-5 text-sm text-neutral-700 no-underline"
                   >
                     {heroSecondaryButtonText}
                   </Link>
                 </HeroActions>
             </PageHero>
           </div>
-        </div>{/* container relative */}
-      </section>
+        </div>
+      </Section>
 
-      <SectionBlock title="Технологии печати" subtitle="Две рабочие технологии под разные задачи: подскажем оптимальный вариант по ткани, макету и тиражу.">
+      <SectionBlock
+        eyebrow="Технологии"
+        title="Технологии печати"
+        subtitle="Две рабочие технологии под разные задачи: подскажем оптимальный вариант по ткани, макету и тиражу."
+      >
         {(reveal) => (
           <div className="grid gap-4 lg:grid-cols-2">
             {printTechnologyCards.map((card, index) => (
@@ -326,7 +333,11 @@ export default function TshirtsLanding({
         )}
       </SectionBlock>
 
-      <SectionBlock title="Тарифы" subtitle="Прозрачные условия без скрытых доплат. Для нестандартных задач менеджер подтвердит расчёт перед печатью.">
+      <SectionBlock
+        eyebrow="Стоимость"
+        title="Тарифы"
+        subtitle="Прозрачные условия без скрытых доплат. Для нестандартных задач менеджер подтвердит расчёт перед печатью."
+      >
         {(reveal) => (
           <div className="grid gap-4 md:grid-cols-3">
             {pricingCards.map((card, index) => (
@@ -356,7 +367,7 @@ export default function TshirtsLanding({
         )}
       </SectionBlock>
 
-      <SectionBlock id="examples" title="Примеры работ">
+      <SectionBlock id="examples" eyebrow="Портфолио" title="Примеры работ" subtitle="Нанесение для команды, промо и корпоративного мерча — с акцентом на аккуратный вид и стойкость принта.">
         {(reveal) => (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {galleryCards.map((card, index) => (
@@ -377,7 +388,7 @@ export default function TshirtsLanding({
         )}
       </SectionBlock>
 
-      <SectionBlock title="Как это работает">
+      <SectionBlock eyebrow="Процесс" title="Как это работает">
         {(reveal) => (
           <div className="grid gap-4 md:grid-cols-3">
             {steps.map((step, index) => {
@@ -393,6 +404,7 @@ export default function TshirtsLanding({
                   <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                   </div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
                   <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
                 </AnimatedCard>
@@ -402,7 +414,7 @@ export default function TshirtsLanding({
         )}
       </SectionBlock>
 
-      <SectionBlock title="Почему выбирают нас">
+      <SectionBlock eyebrow="Преимущества" title="Почему выбирают нас">
         {(reveal) => (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {advantages.map((item, index) => {
@@ -413,7 +425,7 @@ export default function TshirtsLanding({
                 key={item.text}
                 index={index}
                 reveal={reveal}
-                className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm hover:-translate-y-1 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
+                className="card-info card-interactive rounded-2xl p-4"
               >
                 <div className="flex items-center gap-3">
                   <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-300">
@@ -428,18 +440,20 @@ export default function TshirtsLanding({
         )}
       </SectionBlock>
 
-      <SectionBlock title="FAQ" subtitle="Коротко ответили на частые вопросы о печати на футболках.">
+      <SectionBlock eyebrow="FAQ" title="Частые вопросы" subtitle="Коротко ответили на частые вопросы о печати на футболках.">
         {() => <FaqAccordion />}
       </SectionBlock>
 
       <FloatingTshirtsCTA />
 
-      <section id="tshirts-order" className="py-12 md:py-16">
-        <div className="container">
-          <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Менеджер уточнит детали и подтвердит стоимость перед печатью.</p>
-          <OrderTshirtsForm />
+      <Section id="tshirts-order" spacing="tight" className="scroll-mt-24">
+        <div className="cta-shell mb-6 md:mb-7">
+          <p className="t-eyebrow">Заявка на печать</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">Отправьте параметры заказа</h2>
+          <p className="mt-2 max-w-3xl t-body">Менеджер уточнит детали, проверит макет и подтвердит стоимость перед запуском в работу.</p>
         </div>
-      </section>
+        <OrderTshirtsForm />
+      </Section>
     </div>
   );
 }
