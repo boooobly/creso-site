@@ -325,8 +325,12 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-stretch">
-      <section className="card flex h-full flex-col space-y-6 border-neutral-200/85 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
-        <h2 className="text-xl font-semibold tracking-tight">Параметры заказа</h2>
+      <section className="card flex h-full flex-col space-y-6 border-neutral-200/85 bg-white/90 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
+        <header className="space-y-2 border-b border-neutral-200/75 pb-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Параметры</p>
+          <h2 className="text-xl font-semibold tracking-tight">Параметры заказа</h2>
+          <p className="text-sm leading-6 text-neutral-600">Выберите материал и характеристики, чтобы получить стоимость с учётом доп. операций.</p>
+        </header>
 
         {visibleCategoryOptions.length === 0 ? (
           <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -472,8 +476,12 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
         )}
       </section>
 
-      <aside className="card flex h-full flex-col space-y-5 border-neutral-200/85 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
-        <h2 className="text-xl font-semibold tracking-tight">Расчёт</h2>
+      <aside className="card flex h-full flex-col space-y-5 border-neutral-200/85 bg-white/90 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
+        <header className="space-y-2 border-b border-neutral-200/75 pb-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Стоимость</p>
+          <h2 className="text-xl font-semibold tracking-tight">Расчёт</h2>
+          <p className="text-sm leading-6 text-neutral-600">Структура цены обновляется автоматически по выбранным параметрам.</p>
+        </header>
         <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3.5 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
           <SummaryRow label="Фактическая площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
           <SummaryRow label="Тарифицируемая площадь" value={quote.parsedValuesValid ? `${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
@@ -514,6 +522,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
         </div>
 
         <div className="rounded-2xl border border-red-500/25 bg-gradient-to-b from-red-50/35 via-white to-white p-5 shadow-[0_20px_36px_-30px_rgba(220,38,38,0.5)] dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-900">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-red-500/90">Итог по заказу</p>
           <div className="space-y-2 border-t border-neutral-200 pt-3 dark:border-neutral-700">
             <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
             <p className={`text-[2.55rem] font-semibold leading-none tracking-tight text-neutral-900 transition-transform duration-300 dark:text-neutral-50 ${pricePulse ? 'scale-[1.02]' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>

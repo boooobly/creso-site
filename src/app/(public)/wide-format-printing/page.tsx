@@ -75,11 +75,16 @@ export default async function WideFormatPrintingPage() {
       icon: 'file',
     },
   ] as const;
+  const calculatorMarkers = [
+    'Расчёт в реальном времени',
+    'Площадь и постобработка в одном блоке',
+    'Переход к заявке без повторного ввода',
+  ] as const;
 
   return (
-    <div>
+    <div className="pb-8 md:pb-12">
       <Section spacing="compact">
-        <PageHero className="border-neutral-200/80 p-5 shadow-sm shadow-neutral-200/60 md:p-7 lg:p-9" contentClassName="flex h-full flex-col lg:min-h-[29rem]" mediaClassName="h-full" media={
+        <PageHero className="border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50/65 to-red-50/[0.16] p-5 shadow-sm shadow-neutral-200/60 md:p-7 lg:p-9" contentClassName="flex h-full flex-col lg:min-h-[29rem]" mediaClassName="h-full" media={
           <HeroMediaPanel className="h-full p-4 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm md:p-5">
             <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3.5">
               <div>
@@ -164,10 +169,27 @@ export default async function WideFormatPrintingPage() {
       <Section spacing="tight">
         <div className="space-y-8 md:space-y-10">
           <div id="wide-format-calculator" className="scroll-mt-24">
+            <div className="mb-4 space-y-3 md:mb-5">
+              <p className="t-eyebrow">Калькулятор</p>
+              <h2 className="t-h2">Технический расчёт стоимости</h2>
+              <p className="max-w-3xl text-sm leading-6 text-neutral-600 md:text-base">
+                Укажите материал, размеры и тираж, чтобы получить предварительную стоимость и сразу передать параметры в форму заявки.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {calculatorMarkers.map((marker) => (
+                  <span
+                    key={marker}
+                    className="inline-flex items-center rounded-full border border-neutral-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-neutral-600"
+                  >
+                    {marker}
+                  </span>
+                ))}
+              </div>
+            </div>
             <WideFormatPricingCalculator pricingConfig={pricing.config} />
           </div>
 
-          <div className="cta-shell card">
+          <div className="cta-shell card border-neutral-200/85">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="max-w-2xl space-y-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Связанная услуга</p>
@@ -181,7 +203,10 @@ export default async function WideFormatPrintingPage() {
           </div>
 
           <section className="card p-6 md:p-8">
-            <h3 className="text-xl font-semibold tracking-tight md:text-2xl">Почему выбирают нас</h3>
+            <div className="space-y-2">
+              <p className="t-eyebrow">Преимущества</p>
+              <h3 className="text-xl font-semibold tracking-tight md:text-2xl">Почему выбирают нас</h3>
+            </div>
             <WideFormatTrustCards features={features} />
           </section>
 
