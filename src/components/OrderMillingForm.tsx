@@ -199,7 +199,7 @@ export default function OrderMillingForm() {
 
   return (
     <div id="milling-request" className={publicFormStyles.shell}>
-      <div className="mb-6">
+      <div className={`${publicFormStyles.heading} mb-6`}>
         <h2 className="text-2xl font-semibold">Заявка на фрезеровку</h2>
         <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Принимаем только векторные файлы: PDF, CDR, AI, EPS, DXF, SVG.</p>
         <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Максимальный размер заготовки: 2×4 м.</p>
@@ -299,16 +299,20 @@ export default function OrderMillingForm() {
 
         <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
 
-        <button
-          type="submit"
-          disabled={isSending}
-          className={`${publicFormStyles.submitButton} hover:scale-[1.02] md:min-w-[180px]`}
-        >
-          {isSending ? 'Отправка…' : 'Отправить заявку'}
-        </button>
+        <div className={publicFormStyles.actionRow}>
+          <button
+            type="submit"
+            disabled={isSending}
+            className={`${publicFormStyles.submitButton} hover:scale-[1.02] md:min-w-[180px]`}
+          >
+            {isSending ? 'Отправка…' : 'Отправить заявку'}
+          </button>
 
-        {formError && <p className="text-sm text-red-600">{formError}</p>}
-        {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
+          <div className="space-y-1">
+            {formError && <p className="text-sm text-red-600">{formError}</p>}
+            {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
+          </div>
+        </div>
       </form>
 
       {isRequirementsOpen && (
