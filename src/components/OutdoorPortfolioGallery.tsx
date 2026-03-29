@@ -37,7 +37,7 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
           src={currentSrc}
           alt={image.alt}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
           sizes="(max-width: 1024px) 100vw, 33vw"
           onError={() => {
             if (image.fallbackSrc && currentSrc !== image.fallbackSrc) {
@@ -45,11 +45,12 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
             }
           }}
         />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
       </div>
 
-      <div className="flex flex-1 flex-col justify-between gap-2 p-4">
-        <p className="text-sm font-semibold leading-relaxed text-neutral-900 dark:text-neutral-100">{image.title}</p>
-        {image.category ? <p className="text-xs text-neutral-600 dark:text-neutral-300">{image.category}</p> : null}
+      <div className="flex flex-1 flex-col justify-between gap-2 p-4 md:p-5">
+        <p className="t-h4 !text-base leading-snug">{image.title}</p>
+        {image.category ? <p className="t-small text-muted-foreground">{image.category}</p> : null}
       </div>
     </button>
   );
@@ -81,8 +82,8 @@ export default function OutdoorPortfolioGallery({ projects }: OutdoorPortfolioGa
       <div className="space-y-7">
         {projects.map((project) => (
           <div key={project.id} className="space-y-3">
-            <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">{project.label}</p>
-            <div className="grid gap-4 md:grid-cols-3">
+            <p className="t-caption text-neutral-600 dark:text-neutral-300">{project.label}</p>
+            <div className="grid-cards md:grid-cols-3">
               {project.images.map((image) => (
                 <PortfolioCard key={image.src} image={image} onOpen={setActiveImage} />
               ))}
