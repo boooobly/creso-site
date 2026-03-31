@@ -327,7 +327,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-stretch">
       <section className="card flex h-full flex-col space-y-6 border-neutral-200/85 bg-white/90 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
         <header className="space-y-2 border-b border-neutral-200/75 pb-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Параметры</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Конфигурация</p>
           <h2 className="text-xl font-semibold tracking-tight">Параметры заказа</h2>
           <p className="text-sm leading-6 text-neutral-600">Выберите материал и характеристики, чтобы получить стоимость с учётом доп. операций.</p>
         </header>
@@ -478,25 +478,11 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
 
       <aside className="card flex h-full flex-col space-y-5 border-neutral-200/85 bg-white/90 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
         <header className="space-y-2 border-b border-neutral-200/75 pb-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Стоимость</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Стоимость</p>
           <h2 className="text-xl font-semibold tracking-tight">Расчёт</h2>
           <p className="text-sm leading-6 text-neutral-600">Структура цены обновляется автоматически по выбранным параметрам.</p>
         </header>
-        <div className="space-y-2 rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-3.5 text-sm dark:border-neutral-800 dark:bg-neutral-900/60">
-          <SummaryRow label="Фактическая площадь" value={quote.parsedValuesValid ? `${(quote.areaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
-          <SummaryRow label="Тарифицируемая площадь" value={quote.parsedValuesValid ? `${(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м²` : '—'} />
-        </div>
         <div className="space-y-2.5 text-sm">
-          <div className="rounded-xl border border-neutral-200/80 bg-white p-3.5 dark:border-neutral-800 dark:bg-neutral-900/60">
-            <p className="text-sm font-medium text-neutral-900">Материал</p>
-            <p className="text-xs text-neutral-600 dark:text-neutral-400">({(quote.billableAreaPerUnit * quote.quantity).toFixed(2)} м² × {pricePerM2 ? formatRubles(pricePerM2) : '—'})</p>
-            <p className="mt-1 text-sm font-semibold text-neutral-900">= {formatRubles(quote.regularMaterialCost)}</p>
-            {pricePerM2 && (
-              <p className="text-right text-xs text-neutral-500 dark:text-neutral-400">
-                {formatRubles(pricePerM2)} / м²
-              </p>
-            )}
-          </div>
           {quote.extrasCost > 0 && (
             <div className="rounded-xl border border-neutral-200/80 bg-white p-3.5 dark:border-neutral-800 dark:bg-neutral-900/60">
               <p className="text-sm font-medium text-neutral-900">Доп. услуги</p>
