@@ -260,7 +260,7 @@ export default function OrderWideFormatForm() {
               helperTextClassName="mt-0.5 text-xs text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
-            <p className="text-xs leading-relaxed text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">Подтвердим параметры заказа после получения файла.</p>
           </div>
         </div>
 
