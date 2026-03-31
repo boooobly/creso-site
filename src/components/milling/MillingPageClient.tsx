@@ -169,8 +169,8 @@ export default function MillingPageClient({
             <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/90 p-4 md:p-5">
               <div className="mb-4 flex items-center justify-between border-b border-neutral-200/80 pb-3">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-red-600 dark:text-red-300">Технический профиль</p>
-                <span className="inline-flex size-8 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-300">
-                  <Cog className="h-4 w-4" aria-hidden="true" />
+                <span className="inline-flex size-9 items-center justify-center rounded-xl border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                  <Wrench size={18} strokeWidth={1.9} aria-hidden="true" />
                 </span>
               </div>
               <div className="space-y-3">
@@ -179,8 +179,8 @@ export default function MillingPageClient({
                   return (
                     <article key={item.title} className="card-structured rounded-xl border-neutral-200/90 bg-white/80 p-3.5 dark:bg-neutral-900/70">
                       <div className="flex gap-3">
-                        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
-                          <Icon className="h-4 w-4" aria-hidden="true" />
+                        <span className="inline-flex h-[2.25rem] w-[2.25rem] shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                          <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
                         </span>
                         <div>
                           <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
@@ -195,7 +195,7 @@ export default function MillingPageClient({
           }
         >
           <div className="space-y-4">
-            <HeroEyebrow>Фрезеровка</HeroEyebrow>
+            <HeroEyebrow>Фрезеровка ЧПУ</HeroEyebrow>
             <HeroTitle className="max-w-3xl text-3xl md:text-5xl">Фрезеровка листовых материалов</HeroTitle>
             <HeroLead className="max-w-3xl dark:text-neutral-300">
               Точная 3D-фрезеровка пластика, композита и древесных плит на производстве полного цикла. От единичных заказов до серий с контролем качества на каждом этапе.
@@ -209,6 +209,7 @@ export default function MillingPageClient({
                 className={`border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-semibold text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-100 ${revealClass(heroVisible)}`}
                 style={{ transitionDelay: reduceMotion ? '0ms' : `${index * 120}ms` }}
               >
+                <span className="card-dot h-1.5 w-1.5" aria-hidden="true" />
                 {item}
               </HeroChip>
             ))}
@@ -220,7 +221,7 @@ export default function MillingPageClient({
               onClick={scrollToOrderSection}
               className="inline-flex w-fit items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
             >
-              Рассчитать заказ
+              Рассчитать стоимость
             </button>
           </HeroActions>
         </PageHero>
@@ -312,7 +313,7 @@ export default function MillingPageClient({
 
           <div ref={servicesReveal.ref} className={`card p-6 md:p-8 ${revealClass(servicesReveal.isVisible)}`}>
             <div className="section-header-tight mb-4">
-              <p className="t-eyebrow">Дополнительно</p>
+              <p className="t-eyebrow">Опции</p>
               <h2 className="t-h3">Дополнительные услуги</h2>
             </div>
             <div className="space-y-4">
@@ -320,16 +321,16 @@ export default function MillingPageClient({
                 const GroupIcon = group.id === 'urgency' ? Zap : group.id === 'preparation-and-complexity' ? Wrench : Truck;
 
                 return (
-                  <section key={group.id} className="card-structured rounded-xl bg-white p-4 dark:bg-neutral-900">
+                  <section key={group.id} className="rounded-xl border border-neutral-200/80 bg-white/70 p-4 dark:border-neutral-800 dark:bg-neutral-900/50">
                     <h3 className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100">
                       <span className="rounded-lg bg-red-50 p-1.5 text-red-600 dark:bg-red-500/15 dark:text-red-300">
                         <GroupIcon className="h-4 w-4" aria-hidden="true" />
                       </span>
-                      {group.title}
+                      {group.title === 'Материал заказчика, логистика и хранение' ? 'Материал, логистика и хранение' : group.title}
                     </h3>
-                    <ul className="mt-3 divide-y divide-neutral-200/80 rounded-lg border border-neutral-200/70 bg-neutral-50 dark:divide-neutral-700/80 dark:border-neutral-700 dark:bg-neutral-800/50">
+                    <ul className="mt-3 divide-y divide-neutral-200/80 dark:divide-neutral-700/80">
                       {group.items.map((item) => (
-                        <li key={item.label} className="p-3">
+                        <li key={item.label} className="py-3 first:pt-0 last:pb-0">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                             <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200 sm:max-w-[62%]">{item.label}</p>
                             <div className="flex flex-wrap items-center gap-2 sm:justify-end">
