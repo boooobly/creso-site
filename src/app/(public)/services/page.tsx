@@ -47,7 +47,7 @@ export default async function ServicesPage() {
   };
 
   return (
-    <>
+    <div className="-mt-8">
       <Section spacing="compact" background="muted" fullBleed className="border-y border-neutral-200/70">
         <div className="section-header">
           <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>
@@ -76,6 +76,6 @@ export default async function ServicesPage() {
           </div>
         </div>
       </Section>
-    </>
+    </div>
   );
 }
