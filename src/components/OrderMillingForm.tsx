@@ -205,8 +205,6 @@ export default function OrderMillingForm() {
     <div id="milling-request" className={publicFormStyles.shell}>
       <div className={`${publicFormStyles.heading} mb-6`}>
         <h2 className="text-2xl font-semibold">Заявка на фрезеровку</h2>
-        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Принимаем только векторные файлы: PDF, CDR, AI, EPS, DXF, SVG.</p>
-        <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Максимальный размер заготовки: 2×4 м.</p>
       </div>
 
       <form className={publicFormStyles.fieldsStack} onSubmit={handleSubmit} noValidate>

@@ -101,12 +101,6 @@ export default function MillingPageClient({
   const servicesReveal = useRevealOnScroll<HTMLDivElement>();
   const galleryReveal = useRevealOnScroll<HTMLDivElement>();
 
-  const quickInfo = [
-    `Минимальный заказ - ${formatNumber(minimumOrderTotal)} ₽`,
-    'Цены без учета материала',
-    'По вашим векторным файлам',
-  ];
-
   const heroKpi = [
     'от 30 ₽/м.п.',
     'Максимальный размер 2×4 м',
@@ -174,7 +168,7 @@ export default function MillingPageClient({
           media={
             <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/90 p-4 md:p-5">
               <div className="mb-4 flex items-center justify-between border-b border-neutral-200/80 pb-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">Технический профиль</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-red-600 dark:text-red-300">Технический профиль</p>
                 <span className="inline-flex size-8 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-300">
                   <Cog className="h-4 w-4" aria-hidden="true" />
                 </span>
@@ -241,11 +235,6 @@ export default function MillingPageClient({
               Стоимость указана за погонный метр фрезеровки. Итоговая сумма зависит от толщины, сложности и дополнительных операций.
             </p>
           </div>
-          <div className="mb-4 flex flex-wrap gap-2">
-            {quickInfo.map((item) => (
-              <span key={item} className="inline-flex items-center rounded-full border border-neutral-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-200">{item}</span>
-            ))}
-          </div>
           <MillingMaterialsAccordion groups={materialGroups} />
         </div>
       </Section>
@@ -265,7 +254,7 @@ export default function MillingPageClient({
                   key={step.title}
                   className="card-info card-interactive h-full p-6"
                 >
-                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                   </div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
@@ -282,7 +271,7 @@ export default function MillingPageClient({
         <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
           <aside className="lg:sticky lg:top-[120px] lg:self-start">
             <div className="card p-6 md:p-8">
-              <p className="t-eyebrow mb-3">Условия</p>
+              <p className="t-eyebrow mb-3">Детали</p>
               <section>
                 <h2 className="text-xl font-semibold">Условия работы</h2>
                 <ul className="mt-4 space-y-3.5 text-sm text-neutral-700 dark:text-neutral-300">
@@ -338,9 +327,9 @@ export default function MillingPageClient({
                       </span>
                       {group.title}
                     </h3>
-                    <ul className="mt-3 space-y-3">
+                    <ul className="mt-3 divide-y divide-neutral-200/80 rounded-lg border border-neutral-200/70 bg-neutral-50 dark:divide-neutral-700/80 dark:border-neutral-700 dark:bg-neutral-800/50">
                       {group.items.map((item) => (
-                        <li key={item.label} className="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-800/50">
+                        <li key={item.label} className="p-3">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                             <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200 sm:max-w-[62%]">{item.label}</p>
                             <div className="flex flex-wrap items-center gap-2 sm:justify-end">
