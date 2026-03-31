@@ -3,7 +3,6 @@ import servicesLocal from '@/data/services.json';
 import Section from '@/components/Section';
 import ServiceCard from '@/components/ServiceCard';
 import Link from 'next/link';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getSiteImages } from '@/lib/site-images';
 import { SERVICE_CARD_IMAGE_SLOT_BY_ID } from '@/lib/site-service-image-slots';
 
@@ -25,7 +24,6 @@ export default async function ServicesPage() {
     getSiteImages(Object.values(SERVICE_CARD_IMAGE_SLOT_BY_ID)),
   ]);
   const services = sCMS ?? (servicesLocal as any[]);
-  const heroBadges = ['Полный цикл работ', 'Собственное производство', 'Монтаж и сопровождение'] as const;
 
   const resolveServiceHref = (service: any) => {
     const isPrintService = service?.id === 'polygraphy' || service?.title === 'Визитки и флаеры';
@@ -49,52 +47,7 @@ export default async function ServicesPage() {
   };
 
   return (
-    <>
-      <Section spacing="compact">
-        <PageHero
-          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25"
-          contentClassName="max-w-[38rem] space-y-6"
-          media={
-            <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/95">
-              <div className="grid grid-cols-2 gap-3 p-2">
-                {services.slice(0, 4).map((service: any) => {
-                  return (
-                    <article key={`hero-${service.id}`} className="card-structured rounded-xl border-neutral-200/90 bg-white/85 p-3">
-                      <p className="t-caption line-clamp-2 min-h-10 text-neutral-700">{service.title}</p>
-                      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-neutral-200/80">
-                        <div className="h-full w-1/2 rounded-full bg-[var(--brand-red)]/75" />
-                      </div>
-                      <p className="t-caption mt-2 text-neutral-500">Популярное направление</p>
-                    </article>
-                  );
-                })}
-              </div>
-            </HeroMediaPanel>
-          }
-        >
-          <HeroEyebrow>УСЛУГИ</HeroEyebrow>
-          <HeroTitle className="max-w-[15ch] text-3xl leading-[1.06] md:text-5xl">Все услуги в одном каталоге</HeroTitle>
-          <HeroLead className="max-w-[35rem] text-base md:text-[1.05rem] md:leading-relaxed">
-            Выполняем проекты по наружной рекламе, печати и производству под ключ: от расчёта и дизайна до монтажа и сдачи.
-          </HeroLead>
-          <HeroChipList className="max-w-[36rem] gap-2.5">
-            {heroBadges.map((badge) => (
-              <HeroChip key={badge} className="h-11 rounded-xl px-4 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
-                {badge}
-              </HeroChip>
-            ))}
-          </HeroChipList>
-          <HeroActions className="gap-3.5 pt-1">
-            <Link href="/#lead-form" className="btn-primary px-5 no-underline shadow-[0_8px_20px_rgba(220,38,38,0.24)] hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]">
-              Рассчитать стоимость
-            </Link>
-            <Link href="/portfolio" className="btn-secondary px-5 no-underline shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]">
-              Смотреть кейсы
-            </Link>
-          </HeroActions>
-        </PageHero>
-      </Section>
-
+    <div className="-mt-8">
       <Section spacing="compact" background="muted" fullBleed className="border-y border-neutral-200/70">
         <div className="section-header">
           <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>
@@ -123,6 +76,6 @@ export default async function ServicesPage() {
           </div>
         </div>
       </Section>
-    </>
+    </div>
   );
 }
