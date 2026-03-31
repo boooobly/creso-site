@@ -39,7 +39,7 @@ export default function WideFormatTrustCards({ features }: WideFormatTrustCardsP
             variants={fadeUp(14)}
             className="card-info card-interactive h-full md:p-6"
           >
-            <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+            <div className="mb-3 inline-flex h-[2.25rem] w-[2.25rem] items-center justify-center rounded-xl border border-red-200/70 bg-red-50 text-red-600">
               <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-neutral-900">{feature.title}</h3>

@@ -44,7 +44,7 @@ export default async function WideFormatPrintingPage() {
     },
     {
       title: 'Проверка макета',
-      description: 'Проверяем файл и подсказываем материал и постобработку.',
+      description: 'Проверяем технические требования файла перед печатью.',
       icon: ClipboardCheck,
     },
     {
@@ -60,8 +60,8 @@ export default async function WideFormatPrintingPage() {
       icon: 'building',
     },
     {
-      title: 'Проверка макета',
-      description: 'Проверяем файл перед запуском в печать.',
+      title: 'Технический контроль',
+      description: 'Проверяем параметры заказа и ведём его по этапам производства.',
       icon: 'check',
     },
     {
@@ -89,7 +89,6 @@ export default async function WideFormatPrintingPage() {
             <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3.5">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Производственный профиль</p>
-                <p className="mt-1 text-sm leading-5 text-neutral-500">Ключевые параметры услуги.</p>
               </div>
               <div className="inline-flex size-9 items-center justify-center rounded-xl border border-red-200/70 bg-red-50 text-[var(--brand-red)]">
                 <Droplets size={18} strokeWidth={1.9} aria-hidden="true" />
@@ -124,14 +123,14 @@ export default async function WideFormatPrintingPage() {
             <HeroEyebrow>Экосольвентная печать</HeroEyebrow>
             <HeroTitle className="max-w-3xl text-3xl md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[41rem] text-sm leading-6 md:text-[1.05rem] md:leading-7">
-              {heroDescription} Поможем быстро согласовать материал, формат и запуск в нужный срок.
+              {heroDescription} Поможем согласовать материал, формат и постобработку под вашу задачу.
             </HeroLead>
           </div>
 
           <div className="mt-7 flex flex-1 flex-col justify-end gap-4 lg:pt-7">
-            <div className="space-y-3 border-t border-neutral-200/80 pt-4">
-              <p className="max-w-lg text-sm leading-6 text-neutral-500">
-                Подскажем по материалам, подготовке макета и постобработке до запуска в печать.
+            <div className="space-y-4 border-t border-neutral-200/80 pt-4">
+              <p className="max-w-xl text-sm leading-6 text-neutral-500">
+                Подскажем по материалам, постобработке и требованиям к файлу перед печатью.
               </p>
               <div className="flex flex-wrap items-center gap-2.5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Подходит для</p>
@@ -191,7 +190,7 @@ export default async function WideFormatPrintingPage() {
           <div className="cta-shell card border-neutral-200/85">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="max-w-2xl space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Связанная услуга</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Связанная услуга</p>
                 <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">{ctaTitle}</h2>
                 <p className="text-sm leading-6 text-neutral-600 md:text-base">{ctaDescription}</p>
               </div>
