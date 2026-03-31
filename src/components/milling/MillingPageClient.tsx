@@ -108,9 +108,10 @@ export default function MillingPageClient({
   ];
 
   const heroKpi = [
-    `от ${formatNumber(startingPricePerMeter)} ₽/м.п.`,
+    'от 30 ₽/м.п.',
     'Максимальный размер 2×4 м',
-    'Работаем с материалом заказчика',
+    'Широкий выбор материалов',
+    'Трёхосевой станок',
   ];
 
   const workConditions = [
@@ -203,7 +204,7 @@ export default function MillingPageClient({
             <HeroEyebrow>Фрезеровка</HeroEyebrow>
             <HeroTitle className="max-w-3xl text-3xl md:text-5xl">Фрезеровка листовых материалов</HeroTitle>
             <HeroLead className="max-w-3xl dark:text-neutral-300">
-              Точная 2D-фрезеровка пластика, композита и древесных плит на производстве полного цикла. От единичных заказов до серий с контролем качества на каждом этапе.
+              Точная 3D-фрезеровка пластика, композита и древесных плит на производстве полного цикла. От единичных заказов до серий с контролем качества на каждом этапе.
             </HeroLead>
           </div>
 
@@ -234,7 +235,7 @@ export default function MillingPageClient({
       <Section className="pt-2 md:pt-4">
         <div id="milling-prices" className="card p-6 md:p-8 scroll-mt-24">
           <div className="section-header-tight mb-4">
-            <p className="t-eyebrow">Прайс и материалы</p>
+            <p className="t-eyebrow">Стоимость фрезеровки</p>
             <h2 className="t-h3">Прайс по материалам</h2>
             <p className="t-body text-muted-foreground max-w-3xl">
               Стоимость указана за погонный метр фрезеровки. Итоговая сумма зависит от толщины, сложности и дополнительных операций.
@@ -343,14 +344,6 @@ export default function MillingPageClient({
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                             <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200 sm:max-w-[62%]">{item.label}</p>
                             <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                              {item.badges?.map((badge) => (
-                                <span
-                                  key={badge}
-                                  className="rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300"
-                                >
-                                  {badge}
-                                </span>
-                              ))}
                               <span className="text-sm font-medium text-neutral-800 dark:text-neutral-100">{item.details}</span>
                             </div>
                           </div>
