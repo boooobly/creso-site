@@ -342,6 +342,19 @@ const MUGS_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
 ];
 
 export const PLOTTER_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
+  {
+    key: 'plotter.hero.main',
+    label: 'Плоттерная резка — главный экран',
+    pageTitle: 'Плоттерная резка',
+    sectionLabel: 'Первый экран',
+    usageLabel: 'Главное изображение страницы услуги «Плоттерная резка»',
+    route: '/plotter-cutting',
+    fallbackUrl: '/images/plotter/plotter_hero.png',
+    fallbackAlt: 'Плоттерная резка самоклеящейся пленки',
+    groupKey: 'plotter',
+    groupLabel: 'Плоттерная резка',
+    groupDescription: 'Изображения страницы плоттерной резки: примеры типовых работ.',
+  },
   { key: 'plotter.examples.labels', label: 'Плоттерная резка — пример: стикерпак', pageTitle: 'Плоттерная резка', sectionLabel: 'Примеры', usageLabel: 'Карточка «Стикерпак для бренда»', route: '/plotter-cutting', fallbackUrl: '/images/plotter/plotter_labels.png', fallbackAlt: 'Стикерпак для бренда', groupKey: 'plotter', groupLabel: 'Плоттерная резка', groupDescription: 'Изображения страницы плоттерной резки: примеры типовых работ.' },
   { key: 'plotter.examples.window', label: 'Плоттерная резка — пример: витрина', pageTitle: 'Плоттерная резка', sectionLabel: 'Примеры', usageLabel: 'Карточка «Оформление витрины»', route: '/plotter-cutting', fallbackUrl: '/images/plotter/plotter_window.png', fallbackAlt: 'Оформление витрины', groupKey: 'plotter', groupLabel: 'Плоттерная резка', groupDescription: 'Изображения страницы плоттерной резки: примеры типовых работ.' },
   { key: 'plotter.examples.stickers', label: 'Плоттерная резка — пример: резка по меткам', pageTitle: 'Плоттерная резка', sectionLabel: 'Примеры', usageLabel: 'Карточка «Резка по меткам»', route: '/plotter-cutting', fallbackUrl: '/images/plotter/plotter_stickers.png', fallbackAlt: 'Резка по меткам', groupKey: 'plotter', groupLabel: 'Плоттерная резка', groupDescription: 'Изображения страницы плоттерной резки: примеры типовых работ.' },

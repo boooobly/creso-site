@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Clock3, FileCheck2, Scissors } from 'lucide-react';
 import Section from '@/components/Section';
@@ -103,6 +104,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [touched, setTouched] = useState({ name: false, phone: false });
+  const heroImage = siteImages['plotter.hero.main'];
 
   const acceptedAttr = useMemo(() => allowedExtensions.map((ext) => `.${ext}`).join(','), []);
   const phoneDigits = useMemo(() => getPhoneDigits(phone), [phone]);
@@ -264,23 +266,19 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
             </div>
 
-            <div className={`rounded-2xl border border-neutral-200/90 bg-white/80 p-4 dark:border-neutral-700 dark:bg-neutral-900/60 md:p-5 ${revealBase}`} data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}>
-              <div className="relative overflow-hidden rounded-xl border border-neutral-200/80 bg-gradient-to-br from-neutral-100 via-white to-red-50/45 p-4 dark:border-neutral-700 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
-                <div className="pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" style={{ backgroundImage: 'linear-gradient(to right, rgba(115,115,115,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(115,115,115,0.14) 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
-                <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-red-100/80 blur-2xl dark:bg-red-500/20" aria-hidden="true" />
-                <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-white/90 blur-2xl dark:bg-neutral-700/40" aria-hidden="true" />
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-neutral-200/90 bg-white/75 dark:border-neutral-700 dark:bg-neutral-950/75">
-                  <div className="absolute inset-x-4 top-4 flex items-center justify-between">
-                    <span className="rounded-full border border-neutral-300/90 bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-600 dark:border-neutral-600 dark:bg-neutral-900/90 dark:text-neutral-300">Медиа зоны услуги</span>
-                    <span className="h-2 w-2 rounded-full bg-red-500/70" />
-                  </div>
-                  <div className="absolute inset-4 top-12 rounded-md border border-dashed border-neutral-300/80 dark:border-neutral-600/80" />
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-md border border-neutral-200/90 bg-white/85 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900/85">
-                    <p className="text-xs font-medium text-neutral-600 dark:text-neutral-300">Будущий визуал: производство и результат резки</p>
-                    <ArrowRight className="h-3.5 w-3.5 text-neutral-400" />
-                  </div>
+            <div className={`rounded-2xl border border-neutral-200/90 bg-white/75 p-3 shadow-[0_12px_30px_rgba(15,23,42,0.1)] dark:border-neutral-700 dark:bg-neutral-900/60 dark:shadow-none md:p-4 ${revealBase}`} data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}>
+              <div className="relative min-h-[250px] overflow-hidden rounded-xl sm:min-h-[320px] lg:min-h-[390px]">
+                <Image
+                  src={heroImage?.url ?? '/images/plotter/plotter_hero.png'}
+                  alt={heroImage?.altText || 'Плоттерная резка самоклеящейся пленки'}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(min-width: 1280px) 520px, (min-width: 1024px) 40vw, 100vw"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-5 py-4">
+                  <p className="text-sm font-semibold text-white">Резка наклеек, витрин и маркировки</p>
+                  <p className="mt-1 text-xs text-white/85">Точная выборка, чистый контур и аккуратная подготовка к монтажу</p>
                 </div>
-                <div className="mt-4 h-1.5 w-24 rounded-full bg-red-200/80 dark:bg-red-500/30" />
               </div>
             </div>
           </div>
