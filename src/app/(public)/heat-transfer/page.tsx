@@ -16,7 +16,7 @@ export default async function HeatTransferPage() {
         contentMap,
         'hero',
         'description',
-        'Полноцвет A4 — 250 ₽ за 1 сторону. Работаем на ваших или наших футболках.'
+        'Печать на футболках для команд, брендов и мероприятий. Подбираем технологию под задачу и выдаём изделие, готовое к использованию.'
       )}
       heroPrimaryButtonText={getPageContentValue(contentMap, 'hero', 'primaryButtonText', 'Оставить заявку')}
       heroSecondaryButtonText={getPageContentValue(contentMap, 'hero', 'secondaryButtonText', 'Смотреть примеры')}

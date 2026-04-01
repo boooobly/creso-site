@@ -81,7 +81,7 @@ export default function OrderTshirtsForm() {
   const inputClass = (name: keyof FormValues) => publicInputClass(Boolean(errors[name]));
 
   const helperText = useMemo(
-    () => `Растровые: PNG, JPG, JPEG, WEBP. Векторные: PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`,
+    () => `PNG, JPG, JPEG, WEBP, PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`,
     [],
   );
 
@@ -173,10 +173,11 @@ export default function OrderTshirtsForm() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(220,38,38,0.08),transparent_45%)]" aria-hidden="true" />
 
       <div className="relative">
-        <h2 className="text-2xl font-bold md:text-3xl">Оставьте заявку</h2>
-        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Заполните форму — менеджер уточнит детали, стоимость и сроки после проверки макета.</p>
+        <p className="t-eyebrow">Заявка на печать</p>
+        <h2 className="mt-2 text-2xl font-bold md:text-3xl">Оставьте заявку</h2>
+        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Уточним детали, согласуем стоимость и сроки перед запуском.</p>
 
-        <form className={`mt-6 ${publicFormStyles.fieldsStack}`} onSubmit={handleSubmit} noValidate>
+        <form className={`mt-6 space-y-5 ${publicFormStyles.fieldsStack}`} onSubmit={handleSubmit} noValidate>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
               <span className="text-sm font-semibold">Имя *</span>
@@ -266,7 +267,7 @@ export default function OrderTshirtsForm() {
             <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
           </label>
 
-          <div className={`${publicFormStyles.summaryCard} space-y-2`}>
+          <div className={`${publicFormStyles.summaryCard} space-y-2.5`}>
             <ImageDropzone
               value={file}
               onChange={setFile}
@@ -282,7 +283,7 @@ export default function OrderTshirtsForm() {
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
             {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Файл не обязателен — можно описать задачу в комментарии.</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">Файл не обязателен: задачу можно описать в комментарии.</p>
           </div>
 
           <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
@@ -312,8 +313,7 @@ export default function OrderTshirtsForm() {
           {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
 
           <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 px-4 py-3 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/70 dark:text-neutral-300">
-            <p>Технология печати подбирается в зависимости от типа ткани.</p>
-            <p className="mt-1">Это позволяет сохранить яркость цвета и долговечность изображения.</p>
+            Технологию нанесения подбираем по ткани и задаче, чтобы сохранить цвет и стойкость принта.
           </div>
         </form>
       </div>
