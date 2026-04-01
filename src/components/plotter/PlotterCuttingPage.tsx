@@ -55,10 +55,10 @@ const technicalStats = [
 ];
 
 const trustPoints = [
-  { text: 'Подсказываем, как подготовить макет, чтобы избежать переделок на старте.', icon: FileCheck2 },
-  { text: 'Подбираем вариант исполнения: только резка, выборка или подготовка к монтажу.', icon: Scissors },
-  { text: 'Стабильно режем и единичные заказы, и серии с повторяемым результатом.', icon: CheckCircle2 },
-  { text: 'Согласовываем срок и формат передачи, чтобы вам было удобно принять работу.', icon: Clock3 },
+  { text: 'Проверяем макет перед запуском и заранее отмечаем, что лучше поправить.', icon: FileCheck2 },
+  { text: 'Объясняем, какой формат передачи выбрать: листами, с выборкой или с монтажной плёнкой.', icon: Scissors },
+  { text: 'Подсказываем по материалу и техпараметрам, чтобы резка прошла без лишних рисков.', icon: CheckCircle2 },
+  { text: 'Согласовываем срок и удобный способ передачи, чтобы вы спокойно приняли заказ.', icon: Clock3 },
 ];
 
 const exampleCards = [
@@ -223,8 +223,8 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             <div>
               <p className="inline-flex items-center rounded-full border border-red-200/90 bg-red-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Фигурная резка плёнок</p>
               <h1 className="mt-3 max-w-4xl text-3xl font-extrabold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-700 dark:text-neutral-300 md:text-[1.05rem] md:leading-7">Делаем точную контурную резку винила и плёнок для наклеек, витрин, маркировки и навигации.</p>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">На выходе вы получаете аккуратно вырезанные элементы: с выборкой, с монтажной плёнкой или полностью готовые к переносу.</p>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-700 dark:text-neutral-300 md:text-[1.05rem] md:leading-7">Услуга плоттерной резки для самоклеящихся плёнок: от простых надписей до сложных контуров для наклеек, витрин и навигации.</p>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">Вы получаете комплект в нужном виде для монтажа: ровный рез, чистая выборка и удобная передача без лишней доработки.</p>
 
               <div className="mt-6 grid max-w-[30rem] grid-cols-2 gap-2">
                 {heroBadges.map((badge, index) => (
@@ -441,7 +441,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       <Section className="pt-0">
         <div className="card border border-neutral-200/90 bg-white/95 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 dark:text-red-300">Поддержка</p>
-          <h2 className="mt-2 text-2xl font-semibold">Сопровождаем заказ до готового результата</h2>
+          <h2 className="mt-2 text-2xl font-semibold">Спокойно проведём через подготовку и передачу</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {trustPoints.map((item) => (
               <div key={item.text} className="rounded-xl border border-neutral-200/90 bg-neutral-50/70 px-4 py-3 text-sm leading-relaxed text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
