@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { BadgeCheck, ChevronDown, ClipboardCheck, FileUp, Palette, ShieldCheck, Shirt, Timer, Truck } from 'lucide-react';
+import { BadgeCheck, ChevronDown, ClipboardCheck, FileImage, FileUp, Layers, Palette, ShieldCheck, Shirt, Timer, Truck } from 'lucide-react';
 import { CSSProperties, ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
@@ -25,23 +25,20 @@ type SectionBlockProps = {
   children: (state: SectionRenderState) => ReactNode;
 };
 
-const kpiChips = [
-  { title: 'От 1 изделия', subtitle: 'Тиражи под задачу без лишних ограничений' },
-  { title: 'Для бизнеса и команд', subtitle: 'Мерч, форма и одежда для мероприятий' },
-  { title: 'Аккуратный принт', subtitle: 'Ровная посадка и стабильная цветопередача' },
-  { title: 'Согласование до запуска', subtitle: 'Подтверждаем детали и стоимость заранее' },
-];
+const kpiChips = ['От 1 изделия', 'Для бизнеса и команд', 'Аккуратный принт', 'Согласование до запуска'] as const;
 
 const pricingCards = [
   {
     title: 'Полноцвет A4',
+    icon: FileImage,
     price: '250 ₽/сторона',
     lines: ['Перед, спина или рукав', 'Проверка макета перед стартом'],
     featured: true,
   },
-  { title: 'Футболки', price: 'от 500 ₽', lines: ['Размеры 32–60', 'Можно печатать на наших или ваших'], featured: false },
+  { title: 'Футболки', icon: Shirt, price: 'от 500 ₽', lines: ['Размеры 32–60', 'Можно печатать на наших или ваших'], featured: false },
   {
     title: 'Термоплёнка',
+    icon: Layers,
     price: 'Расчёт менеджером',
     lines: ['Печать + резка + перенос', 'Цветная и флуор плёнка'],
     featured: false,
@@ -266,20 +263,20 @@ export default function TshirtsLanding({
                 {heroDescription}
               </HeroLead>
 
-                <HeroChipList className="mt-6 gap-2.5 sm:grid-cols-2">
+                <p className="mt-6 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
+                  Работаем с тиражами от 1 изделия: подойдёт для мерча, формы и корпоративных запусков.
+                </p>
+                <HeroChipList className="mt-3 gap-2 sm:grid-cols-2">
                   {kpiChips.map((chip, index) => (
                     <HeroChip
-                      key={chip.title}
+                      key={chip}
                       style={delayStyle(index, heroReveal.prefersReducedMotion)}
-                      className={`card-structured rounded-xl border-neutral-200/90 bg-white/85 px-3.5 py-3 dark:border-neutral-800 dark:bg-neutral-900/75 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+                      className={`rounded-xl border border-neutral-200 bg-white px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
                     >
-                      <p className="flex items-center gap-2 text-xs font-semibold leading-snug text-neutral-900 dark:text-neutral-100">
-                        <span className="inline-flex size-4 items-center justify-center rounded-full bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-300" aria-hidden="true">
-                          <span className="size-1.5 rounded-full bg-current" />
-                        </span>
-                        {chip.title}
+                      <p className="flex items-center gap-2 text-xs font-semibold leading-none text-neutral-900 dark:text-neutral-100">
+                        <span className="size-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
+                        {chip}
                       </p>
-                      <p className="mt-1.5 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{chip.subtitle}</p>
                     </HeroChip>
                   ))}
                 </HeroChipList>
@@ -359,6 +356,9 @@ export default function TshirtsLanding({
                     : 'border-neutral-200 dark:border-neutral-800'
                 }`}
               >
+                <div className="mb-3 inline-flex size-8 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                  <card.icon size={16} strokeWidth={1.9} aria-hidden="true" />
+                </div>
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-base font-semibold md:text-lg">{card.title}</h3>
                 </div>
