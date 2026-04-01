@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Clock3, FileCheck2, Scissors } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ClipboardCheck, Clock3, FileCheck2, Scissors } from 'lucide-react';
 import Section from '@/components/Section';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
@@ -33,14 +33,17 @@ const processSteps = [
   {
     title: 'Получаем макет и задачу',
     description: 'Принимаем файл, уточняем тип резки (обычная или по меткам), тираж и сроки.',
+    icon: FileCheck2,
   },
   {
     title: 'Проверяем и согласовываем',
     description: 'Проверяем геометрию макета, подтверждаем стоимость и предлагаем корректировки, если нужно.',
+    icon: ClipboardCheck,
   },
   {
     title: 'Режем и подготавливаем к монтажу',
     description: 'Выполняем резку, выборку и, при необходимости, наносим монтажную плёнку или переносим на деталь.',
+    icon: Scissors,
   },
 ];
 
@@ -52,16 +55,10 @@ const technicalStats = [
 ];
 
 const trustPoints = [
-  'Проверяем файл перед запуском и подсказываем правки.',
-  'Помогаем выбрать тип резки и материал под задачу.',
-  'Работаем с короткими и серийными тиражами без потери точности.',
-  'Согласовываем сроки и стоимость до запуска в производство.',
-];
-
-const requestHighlights = [
-  { label: 'Проверка макета', icon: FileCheck2 },
-  { label: 'Помощь с контуром', icon: Scissors },
-  { label: 'Быстрый расчет', icon: Clock3 },
+  { text: 'Проверяем файл перед запуском и подсказываем правки.', icon: FileCheck2 },
+  { text: 'Помогаем выбрать тип резки и материал под задачу.', icon: Scissors },
+  { text: 'Работаем с короткими и серийными тиражами без потери точности.', icon: CheckCircle2 },
+  { text: 'Согласовываем сроки и стоимость до запуска в производство.', icon: Clock3 },
 ];
 
 const exampleCards = [
@@ -99,11 +96,12 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   const [serviceType, setServiceType] = useState<ServiceType>('обычная');
   const [comment, setComment] = useState('');
   const [files, setFiles] = useState<File[]>([]);
+  const [privacyConsent, setPrivacyConsent] = useState(false);
 
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [touched, setTouched] = useState({ name: false, phone: false });
+  const [touched, setTouched] = useState({ name: false, phone: false, privacyConsent: false });
   const heroImage = siteImages['plotter.hero.main'];
 
   const acceptedAttr = useMemo(() => allowedExtensions.map((ext) => `.${ext}`).join(','), []);
@@ -112,6 +110,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
 
   const nameError = touched.name && !name.trim() ? 'Введите имя.' : '';
   const phoneError = touched.phone && !phoneValid ? 'Введите телефон в формате +7 (999) 999-99-99.' : '';
+  const privacyConsentError = touched.privacyConsent && !privacyConsent ? 'Необходимо согласие на обработку персональных данных.' : '';
 
   useEffect(() => {
     let ignore = false;
@@ -168,11 +167,11 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setTouched({ name: true, phone: true });
+    setTouched({ name: true, phone: true, privacyConsent: true });
     setSubmitError('');
     setSubmitSuccess('');
 
-    if (!name.trim() || !phoneValid) {
+    if (!name.trim() || !phoneValid || !privacyConsent) {
       setSubmitError('Проверьте обязательные поля формы.');
       return;
     }
@@ -189,6 +188,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       formData.set('extras', JSON.stringify({
         service: 'Плоттерная резка',
         serviceType,
+        privacyConsent,
       }));
       files.forEach((file) => {
         formData.append('files', file, file.name);
@@ -231,9 +231,10 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   <span
                     key={badge}
                     style={heroReveal.getStaggerStyle(index * 90)}
-                    className={`inline-flex min-h-8 items-center rounded-xl border border-neutral-200/90 bg-white/80 px-3 py-1.5 text-[11px] font-medium text-neutral-700 backdrop-blur-sm transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 md:text-xs ${revealBase}`}
+                    className={`inline-flex min-h-8 items-center gap-1.5 rounded-xl border border-neutral-200/80 bg-white/75 px-3 py-1.5 text-[11px] font-medium text-neutral-700 backdrop-blur-sm transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 md:text-xs ${revealBase}`}
                     data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}
                   >
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
                     {badge}
                   </span>
                 ))}
@@ -328,8 +329,13 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
                   className={`card-info card-interactive h-full p-5 ${revealBase}`}
                 >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
-                  <h3 className="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                      <step.icon size={17} strokeWidth={1.9} aria-hidden="true" />
+                    </span>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
+                  </div>
+                  <h3 className="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
                 </article>
               ))}
@@ -403,7 +409,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               <div className="card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
                 <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
                   <div className="max-w-2xl">
-                    <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">Факторы расчёта</span>
+                    <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Факторы расчёта</span>
                     <h2 className="mt-3 text-2xl font-semibold">Что влияет на цену</h2>
                     <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Чем сложнее контур, плотнее рез и больше ручной постобработки, тем выше итоговая стоимость. Ниже — ключевые параметры, которые менеджер оценивает в первую очередь.</p>
                   </div>
@@ -436,17 +442,16 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
 
       <Section className="pt-0">
         <div className="card border border-neutral-200/90 bg-white/95 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Поддержка</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 dark:text-red-300">Поддержка</p>
           <h2 className="mt-2 text-2xl font-semibold">Поможем подготовить заказ без лишних итераций</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {trustPoints.map((item, index) => (
-              <div key={item} className="rounded-xl border border-neutral-200/90 bg-neutral-50/70 px-4 py-3 text-sm leading-relaxed text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
+            {trustPoints.map((item) => (
+              <div key={item.text} className="rounded-xl border border-neutral-200/90 bg-neutral-50/70 px-4 py-3 text-sm leading-relaxed text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
                 <div className="flex items-start gap-2.5">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-300" />
-                  <p>
-                    <span className="mr-1 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">{`0${index + 1}`}</span>
-                    {item}
-                  </p>
+                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                    <item.icon className="h-4 w-4" />
+                  </span>
+                  <p>{item.text}</p>
                 </div>
               </div>
             ))}
@@ -457,7 +462,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       <Section className="pt-0">
         <div className="card flex flex-col gap-4 border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 p-6 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 md:flex-row md:items-center md:justify-between md:p-8">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">Смежная услуга</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-red-700 dark:text-red-300">Смежная услуга</p>
             <h2 className="mt-1 text-2xl font-semibold">Нужна печать перед резкой?</h2>
             <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем выполним контурную резку по меткам в одном производственном цикле.</p>
           </div>
@@ -474,17 +479,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             <p className="t-eyebrow">Заявка</p>
             <h2 className="t-h3">Отправьте заявку на плоттерную резку</h2>
             <p className="t-body text-muted-foreground max-w-3xl">Проверим макет, уточним тип резки и подготовим расчёт без скрытых доплат.</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {requestHighlights.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <span key={item.label} className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200">
-                    <Icon className="h-3.5 w-3.5 text-red-600 dark:text-red-300" />
-                    {item.label}
-                  </span>
-                );
-              })}
-            </div>
           </div>
           <form onSubmit={onSubmit} className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
@@ -554,6 +548,27 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                 rows={4}
                 className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
               />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="inline-flex items-start gap-2.5 text-sm text-neutral-700 dark:text-neutral-300">
+                <input
+                  type="checkbox"
+                  checked={privacyConsent}
+                  onChange={(event) => setPrivacyConsent(event.target.checked)}
+                  onBlur={() => setTouched((prev) => ({ ...prev, privacyConsent: true }))}
+                  className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500 dark:border-neutral-600 dark:bg-neutral-900"
+                  required
+                />
+                <span>
+                  Я согласен с обработкой персональных данных в соответствии с{' '}
+                  <Link href="/privacy" className="underline hover:no-underline">
+                    политикой конфиденциальности
+                  </Link>
+                  .
+                </span>
+              </label>
+              {privacyConsentError && <p className="text-xs text-red-600">{privacyConsentError}</p>}
             </div>
 
             {files.length > 0 && (
