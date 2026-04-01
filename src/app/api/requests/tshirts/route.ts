@@ -17,25 +17,12 @@ import { normalizePhone } from '@/lib/utils/phone';
 
 export const runtime = 'nodejs';
 
-const tshirtSourceValues = ['ours', 'client'] as const;
-const fabricValues = ['synthetic', 'cotton'] as const;
-const colorValues = ['white', 'colored'] as const;
-const transferTypeValues = ['a4', 'film'] as const;
-const sideValues = ['front', 'back', 'sleeve'] as const;
-const sizes = Array.from({ length: 29 }, (_, index) => String(index + 32));
-
 const allowedExtensionsSet = new Set<string>(MUGS_ALLOWED_EXTENSIONS);
 const allowedMimeTypesSet = new Set<string>(MUGS_ALLOWED_MIME_TYPES);
 
 const tshirtsRequestSchema = z.object({
   name: z.string().trim().min(1),
   phone: z.string().trim().min(1),
-  size: z.string().trim().optional(),
-  tshirtSource: z.enum(tshirtSourceValues),
-  fabric: z.enum(fabricValues).optional().or(z.literal('')),
-  color: z.enum(colorValues).optional().or(z.literal('')),
-  transferType: z.enum(transferTypeValues),
-  side: z.enum(sideValues).optional().or(z.literal('')),
   comment: z.string().trim().optional(),
   consent: z.literal('true'),
   website: z.string().trim().optional(),
@@ -49,42 +36,9 @@ function formatFileSize(size: number): string {
   return `${(size / 1024 / 1024).toFixed(2)} МБ`;
 }
 
-function tshirtSourceLabel(value: (typeof tshirtSourceValues)[number]): string {
-  return value === 'client' ? 'Ваша' : 'Наша';
-}
-
-function fabricLabel(value: (typeof fabricValues)[number] | ''): string {
-  if (value === 'synthetic') return 'Синтетика';
-  if (value === 'cotton') return 'ХБ';
-  return '—';
-}
-
-function colorLabel(value: (typeof colorValues)[number] | ''): string {
-  if (value === 'white') return 'Белая';
-  if (value === 'colored') return 'Цветная';
-  return '—';
-}
-
-function transferTypeLabel(value: (typeof transferTypeValues)[number]): string {
-  return value === 'a4' ? 'Полноцвет A4 (250 ₽/сторона)' : 'Термоплёнка (расчёт менеджером)';
-}
-
-function sideLabel(value: (typeof sideValues)[number] | ''): string {
-  if (value === 'front') return 'Перед';
-  if (value === 'back') return 'Спина';
-  if (value === 'sleeve') return 'Рукав';
-  return '—';
-}
-
 function buildTshirtsText(params: {
   name: string;
   phone: string;
-  size?: string;
-  tshirtSource: (typeof tshirtSourceValues)[number];
-  fabric: (typeof fabricValues)[number] | '';
-  color: (typeof colorValues)[number] | '';
-  transferType: (typeof transferTypeValues)[number];
-  side: (typeof sideValues)[number] | '';
   comment?: string;
   file: File | null;
   referer: string;
@@ -95,12 +49,6 @@ function buildTshirtsText(params: {
     'Услуга: Печать на футболках',
     `Имя: ${params.name}`,
     `Телефон: ${params.phone}`,
-    `Размер: ${params.size || '—'}`,
-    `Футболка: ${tshirtSourceLabel(params.tshirtSource)}`,
-    `Тип ткани: ${fabricLabel(params.fabric)}`,
-    `Цвет ткани: ${colorLabel(params.color)}`,
-    `Тип переноса: ${transferTypeLabel(params.transferType)}`,
-    `Сторона: ${sideLabel(params.side)}`,
     `Комментарий: ${params.comment || '—'}`,
     `Файл: ${params.file ? `${params.file.name} (${formatFileSize(params.file.size)})` : 'не прикреплён'}`,
     `Страница: ${params.referer || '—'}`,
@@ -113,12 +61,6 @@ async function sendTshirtsTelegramNotification(params: {
   referer: string;
   name: string;
   phone: string;
-  size?: string;
-  tshirtSource: (typeof tshirtSourceValues)[number];
-  fabric: (typeof fabricValues)[number] | '';
-  color: (typeof colorValues)[number] | '';
-  transferType: (typeof transferTypeValues)[number];
-  side: (typeof sideValues)[number] | '';
   comment?: string;
 }): Promise<boolean> {
   const env = getServerEnv();
@@ -147,12 +89,6 @@ async function sendTshirtsTelegramNotification(params: {
     'Услуга: Печать на футболках',
     `Имя: ${params.name}`,
     `Телефон: ${params.phone}`,
-    `Размер: ${params.size || '—'}`,
-    `Футболка: ${tshirtSourceLabel(params.tshirtSource)}`,
-    `Тип ткани: ${fabricLabel(params.fabric)}`,
-    `Цвет ткани: ${colorLabel(params.color)}`,
-    `Тип переноса: ${transferTypeLabel(params.transferType)}`,
-    `Сторона: ${sideLabel(params.side)}`,
     `Комментарий: ${params.comment || '—'}`,
     `Страница: ${params.referer || '—'}`,
   ].join('\n');
@@ -191,12 +127,6 @@ export async function POST(request: NextRequest) {
     const parsed = tshirtsRequestSchema.safeParse({
       name: toText(formData.get('name')),
       phone: toText(formData.get('phone')),
-      size: toText(formData.get('size')),
-      tshirtSource: toText(formData.get('tshirtSource')),
-      fabric: toText(formData.get('fabric')),
-      color: toText(formData.get('color')),
-      transferType: toText(formData.get('transferType')),
-      side: toText(formData.get('side')),
       comment: toText(formData.get('comment')),
       consent: toText(formData.get('consent')),
       website: toText(formData.get('website')),
@@ -230,19 +160,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
     }
 
-    if (parsed.data.size && !sizes.includes(parsed.data.size)) {
-      return NextResponse.json({ ok: false, error: 'Выберите корректный размер (32–60).' }, { status: 400 });
-    }
-
     const text = buildTshirtsText({
       name: parsed.data.name,
       phone: normalizedPhone,
-      size: parsed.data.size || '',
-      tshirtSource: parsed.data.tshirtSource,
-      fabric: parsed.data.fabric || '',
-      color: parsed.data.color || '',
-      transferType: parsed.data.transferType,
-      side: parsed.data.side || '',
       comment: parsed.data.comment,
       file,
       referer: request.headers.get('referer') || request.headers.get('origin') || '',
@@ -255,12 +175,6 @@ export async function POST(request: NextRequest) {
         referer: request.headers.get('referer') || request.headers.get('origin') || '',
         name: parsed.data.name,
         phone: normalizedPhone,
-        size: parsed.data.size || '',
-        tshirtSource: parsed.data.tshirtSource,
-        fabric: parsed.data.fabric || '',
-        color: parsed.data.color || '',
-        transferType: parsed.data.transferType,
-        side: parsed.data.side || '',
         comment: parsed.data.comment,
       }),
       sendEmailLead({

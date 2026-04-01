@@ -142,7 +142,11 @@ function SectionBlock({ id, eyebrow, title, subtitle, children }: SectionBlockPr
         <div className="section-header">
           {eyebrow && <p className="t-eyebrow">{eyebrow}</p>}
           <h2 className="t-h2">{title}</h2>
-          {subtitle && <p className="max-w-3xl t-body">{subtitle}</p>}
+          {subtitle && (
+            <p className={`t-body ${id === 'examples' ? 'max-w-5xl lg:whitespace-nowrap' : 'max-w-3xl'}`}>
+              {subtitle}
+            </p>
+          )}
         </div>
         {children({ isVisible: reveal.isVisible, prefersReducedMotion: reveal.prefersReducedMotion })}
       </div>
@@ -267,13 +271,15 @@ export default function TshirtsLanding({
                     <HeroChip
                       key={chip.title}
                       style={delayStyle(index, heroReveal.prefersReducedMotion)}
-                      className={`rounded-xl border-neutral-200/90 bg-white/80 px-3.5 py-3 dark:border-neutral-800 dark:bg-neutral-900/70 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+                      className={`card-structured rounded-xl border-neutral-200/90 bg-white/85 px-3.5 py-3 dark:border-neutral-800 dark:bg-neutral-900/75 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
                     >
                       <p className="flex items-center gap-2 text-xs font-semibold leading-snug text-neutral-900 dark:text-neutral-100">
-                        <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                        <span className="inline-flex size-4 items-center justify-center rounded-full bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-300" aria-hidden="true">
+                          <span className="size-1.5 rounded-full bg-current" />
+                        </span>
                         {chip.title}
                       </p>
-                      <p className="mt-1 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{chip.subtitle}</p>
+                      <p className="mt-1.5 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{chip.subtitle}</p>
                     </HeroChip>
                   ))}
                 </HeroChipList>
@@ -336,7 +342,7 @@ export default function TshirtsLanding({
       </SectionBlock>
 
       <SectionBlock
-        eyebrow="Стоимость"
+        eyebrow="Ориентиры по цене"
         title="Стоимость"
         subtitle="Прозрачные условия без скрытых доплат. Для нестандартных задач менеджер подтвердит расчёт перед печатью."
       >
@@ -347,19 +353,22 @@ export default function TshirtsLanding({
                 key={card.title}
                 index={index}
                 reveal={reveal}
-                className={`h-full rounded-2xl border bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:bg-neutral-900 ${
+                className={`card-info card-interactive h-full rounded-2xl border bg-white/95 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:bg-neutral-900 ${
                   card.featured
                     ? 'border-red-300 ring-1 ring-red-200/70 dark:border-red-900 dark:ring-red-900/40'
                     : 'border-neutral-200 dark:border-neutral-800'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-lg font-semibold">{card.title}</h3>
+                  <h3 className="text-base font-semibold md:text-lg">{card.title}</h3>
                 </div>
-                <p className="mt-4 text-right text-2xl font-bold text-neutral-900 dark:text-neutral-50">{card.price}</p>
+                <p className="mt-3 border-t border-neutral-200/80 pt-3 text-2xl font-bold text-neutral-900 dark:border-neutral-800 dark:text-neutral-50">{card.price}</p>
                 <ul className="mt-4 space-y-2 text-sm text-neutral-600 dark:text-neutral-300">
                   {card.lines.map((line) => (
-                    <li key={line}>• {line}</li>
+                    <li key={line} className="flex items-start gap-2">
+                      <span className="mt-[7px] size-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
+                      <span>{line}</span>
+                    </li>
                   ))}
                 </ul>
               </AnimatedCard>
@@ -402,7 +411,7 @@ export default function TshirtsLanding({
                   reveal={reveal}
                   className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900"
                 >
-                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                   </div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
