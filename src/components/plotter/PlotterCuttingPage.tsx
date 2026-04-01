@@ -32,17 +32,17 @@ const priceFactors = [
 const processSteps = [
   {
     title: 'Получаем макет и задачу',
-    description: 'Принимаем файл, уточняем тип резки (обычная или по меткам), тираж и сроки.',
+    description: 'Принимаем файл, фиксируем задачу, материал, тираж и желаемый срок.',
     icon: FileCheck2,
   },
   {
     title: 'Проверяем и согласовываем',
-    description: 'Проверяем геометрию макета, подтверждаем стоимость и предлагаем корректировки, если нужно.',
+    description: 'Проверяем контур и техпараметры, после чего подтверждаем стоимость и сроки.',
     icon: ClipboardCheck,
   },
   {
     title: 'Режем и подготавливаем к монтажу',
-    description: 'Выполняем резку, выборку и, при необходимости, наносим монтажную плёнку или переносим на деталь.',
+    description: 'Выполняем резку, выборку и передаём элементы в формате, удобном для монтажа.',
     icon: Scissors,
   },
 ];
@@ -55,10 +55,10 @@ const technicalStats = [
 ];
 
 const trustPoints = [
-  { text: 'Проверяем файл перед запуском и подсказываем правки.', icon: FileCheck2 },
-  { text: 'Помогаем выбрать тип резки и материал под задачу.', icon: Scissors },
-  { text: 'Работаем с короткими и серийными тиражами без потери точности.', icon: CheckCircle2 },
-  { text: 'Согласовываем сроки и стоимость до запуска в производство.', icon: Clock3 },
+  { text: 'Подсказываем, как подготовить макет, чтобы избежать переделок на старте.', icon: FileCheck2 },
+  { text: 'Подбираем вариант исполнения: только резка, выборка или подготовка к монтажу.', icon: Scissors },
+  { text: 'Стабильно режем и единичные заказы, и серии с повторяемым результатом.', icon: CheckCircle2 },
+  { text: 'Согласовываем срок и формат передачи, чтобы вам было удобно принять работу.', icon: Clock3 },
 ];
 
 const exampleCards = [
@@ -223,8 +223,8 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             <div>
               <p className="inline-flex items-center rounded-full border border-red-200/90 bg-red-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Фигурная резка плёнок</p>
               <h1 className="mt-3 max-w-4xl text-3xl font-bold leading-tight md:text-5xl md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-700 dark:text-neutral-300 md:text-[1.05rem] md:leading-7">Точная контурная резка, выборка и подготовка к монтажу для единичных и серийных заказов.</p>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">Работаем по векторным файлам и по меткам, помогаем быстро оценить задачу и запустить заказ в производство.</p>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-700 dark:text-neutral-300 md:text-[1.05rem] md:leading-7">Делаем точную контурную резку винила и плёнок для наклеек, витрин, маркировки и навигации.</p>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">На выходе вы получаете аккуратно вырезанные элементы: с выборкой, с монтажной плёнкой или полностью готовые к переносу.</p>
 
               <div className="mt-6 grid max-w-[30rem] grid-cols-2 gap-2">
                 {heroBadges.map((badge, index) => (
@@ -269,8 +269,8 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   sizes="(min-width: 1280px) 520px, (min-width: 1024px) 40vw, 100vw"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-5 py-4">
-                  <p className="text-sm font-semibold text-white">Резка наклеек, витрин и маркировки</p>
-                  <p className="mt-1 text-xs text-white/85">Точная выборка, чистый контур и аккуратная подготовка к монтажу</p>
+                  <p className="text-sm font-semibold text-white">Для наклеек, витрин, навигации и брендирования</p>
+                  <p className="mt-1 text-xs text-white/85">Ровный контур, чистая выборка и предсказуемый результат на монтаже</p>
                 </div>
               </div>
             </div>
@@ -319,7 +319,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
           <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
             <div className="section-header-tight mb-5">
               <p className="t-eyebrow">Процесс</p>
-              <h2 className="t-h3">Как проходит заказ</h2>
+              <h2 className="t-h3">Как проходит работа</h2>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {processSteps.map((step, index) => (
@@ -348,7 +348,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                 <div className="max-w-2xl">
                   <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">Ориентиры по стоимости</span>
                   <h2 className="mt-3 text-2xl font-semibold">Стоимость услуг</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Финальная сумма зависит от файла и сложности, но базовые ориентиры по работам и допуслугам остаются понятными уже на этапе запроса.</p>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Ниже — базовые цены на резку и допуслуги. Итог считаем по макету, тиражу и объёму ручной подготовки.</p>
                 </div>
                 <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900/80 md:max-w-[220px]">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Минимальный заказ</p>
@@ -376,7 +376,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                       >
                         <div>
                           <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 md:text-[15px]">{item.label}</p>
-                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{isMinimum ? 'Фиксированный порог для небольших заказов и тестовых запусков.' : 'Актуально для типовых задач; точная оценка зависит от макета и объёма.'}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{isMinimum ? 'Порог для небольших заказов и пробных запусков.' : 'Ориентир для типовых задач; точную сумму подтверждаем после просмотра макета.'}</p>
                         </div>
                         <span className={`rounded-full px-3 py-1.5 text-right text-sm font-semibold md:text-[15px] ${isMinimum ? 'bg-white text-red-700 dark:bg-neutral-950 dark:text-red-300' : 'bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100'}`}>{item.value}</span>
                       </div>
@@ -388,9 +388,9 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
 
             <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`space-y-6 ${revealBase}`}>
               <div className="card border border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50/90 to-red-50/30 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-8">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">Технические параметры</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">Технические пределы</p>
                 <h2 className="mt-3 text-2xl font-semibold">Технические возможности</h2>
-                <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Ключевые ограничения производства для резки и работ по меткам.</p>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Измеримые ограничения по ширине, длине и допускам для запуска в работу.</p>
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   {technicalStats.map((item, index) => (
                     <article
@@ -411,9 +411,9 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   <div className="max-w-2xl">
                     <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Факторы расчёта</span>
                     <h2 className="mt-3 text-2xl font-semibold">Что влияет на цену</h2>
-                    <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Чем сложнее контур, плотнее рез и больше ручной постобработки, тем выше итоговая стоимость. Ниже — ключевые параметры, которые менеджер оценивает в первую очередь.</p>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Цена меняется от сложности реза и объёма ручной доработки. Вот что влияет на смету в первую очередь.</p>
                   </div>
-                  <p className="max-w-[220px] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">Эти пункты помогают быстро понять, из чего складывается смета ещё до финальной проверки файла.</p>
+                  <p className="max-w-[220px] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">По этим пунктам можно заранее понять, почему одинаковая площадь может стоить по-разному.</p>
                 </div>
 
                 <ul className="mt-5 grid gap-3 md:grid-cols-2">
@@ -428,7 +428,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                         <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-sm font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{String(index + 1).padStart(2, '0')}</span>
                         <div>
                           <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor}</p>
-                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Влияет на время подготовки, точность и объём резки.' : 'Учитывается при расчёте ручных операций и общего времени производства.'}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Чем сложнее этот параметр, тем больше времени уходит на резку и подготовку.' : 'Этот параметр добавляет ручные операции, поэтому итоговая стоимость выше.'}</p>
                         </div>
                       </div>
                     </li>
@@ -443,7 +443,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       <Section className="pt-0">
         <div className="card border border-neutral-200/90 bg-white/95 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 dark:text-red-300">Поддержка</p>
-          <h2 className="mt-2 text-2xl font-semibold">Поможем подготовить заказ без лишних итераций</h2>
+          <h2 className="mt-2 text-2xl font-semibold">Сопровождаем заказ до готового результата</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {trustPoints.map((item) => (
               <div key={item.text} className="rounded-xl border border-neutral-200/90 bg-neutral-50/70 px-4 py-3 text-sm leading-relaxed text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
@@ -464,7 +464,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-red-700 dark:text-red-300">Смежная услуга</p>
             <h2 className="mt-1 text-2xl font-semibold">Нужна печать перед резкой?</h2>
-            <p className="text-neutral-700 dark:text-neutral-300">Сначала напечатаем макет, затем выполним контурную резку по меткам в одном производственном цикле.</p>
+            <p className="text-neutral-700 dark:text-neutral-300">Если сначала нужна печать, выполним её и сразу передадим в контурную резку по меткам без лишних этапов.</p>
           </div>
           <Link href="/wide-format-printing" className="btn-primary inline-flex w-full items-center justify-center gap-2 text-center no-underline md:w-auto">
             Перейти к широкоформатной печати
@@ -478,7 +478,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
           <div className="section-header-tight mb-6">
             <p className="t-eyebrow">Заявка</p>
             <h2 className="t-h3">Отправьте заявку на плоттерную резку</h2>
-            <p className="t-body text-muted-foreground max-w-3xl">Проверим макет, уточним тип резки и подготовим расчёт без скрытых доплат.</p>
+            <p className="t-body text-muted-foreground max-w-3xl">Оставьте параметры заказа — вернёмся с понятным расчётом и сроками.</p>
           </div>
           <form onSubmit={onSubmit} className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
@@ -509,17 +509,17 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
-                <label htmlFor="serviceType" className="text-sm font-medium">Тип услуги</label>
+                <label htmlFor="serviceType" className="text-sm font-medium">Тип резки</label>
                 <select
                   id="serviceType"
                   value={serviceType}
                   onChange={(event) => setServiceType(event.target.value as ServiceType)}
                   className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
                 >
-                  <option value="обычная">обычная</option>
-                  <option value="по меткам">по меткам</option>
+                  <option value="обычная">Обычная (резка по векторному контуру)</option>
+                  <option value="по меткам">По меткам (печать + точная контурная резка)</option>
                 </select>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Выберите тип резки, чтобы менеджер быстрее уточнил технологию.</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">Обычная — когда есть контур для резки. По меткам — когда сначала печатаем, затем режем по позиционным меткам.</p>
               </div>
 
               <div className="space-y-1.5">
@@ -580,7 +580,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             )}
 
             <div className="flex flex-col gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-800 md:flex-row md:items-center md:justify-between">
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Менеджер уточнит длину реза и сложность бесплатно. Ответим в рабочее время максимально быстро.</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">Уточним детали по макету и вернёмся с расчётом в рабочее время.</p>
               <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center py-3 text-[15px] tracking-[0.01em] disabled:opacity-60 md:w-auto md:px-7">
                 {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
               </button>
