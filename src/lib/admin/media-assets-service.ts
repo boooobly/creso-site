@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+import { SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
 import { listQuerySchema, mediaAssetSchema } from './validation';
 
 type MediaFilters = {
@@ -9,7 +10,43 @@ type MediaFilters = {
   search?: string;
 };
 
+async function ensureDefaultSiteSlotAssets() {
+  const slotKeys = SITE_IMAGE_SLOTS.map((slot) => slot.key);
+
+  const existing = await prisma.mediaAsset.findMany({
+    where: {
+      scope: 'site',
+      kind: 'image',
+      fileName: { in: slotKeys },
+    },
+    select: { fileName: true },
+  });
+
+  const existingKeys = new Set(existing.map((item) => item.fileName).filter((fileName): fileName is string => Boolean(fileName)));
+
+  const missingSlots = SITE_IMAGE_SLOTS.filter((slot) => !existingKeys.has(slot.key));
+
+  if (missingSlots.length === 0) return;
+
+  await prisma.mediaAsset.createMany({
+    data: missingSlots.map((slot, index) => ({
+      title: slot.label,
+      kind: 'image',
+      scope: 'site',
+      url: slot.fallbackUrl,
+      fileName: slot.key,
+      altText: slot.fallbackAlt,
+      isActive: true,
+      sortOrder: 5000 + index,
+    })),
+  });
+}
+
 export async function listMediaAssets(filters: MediaFilters = {}) {
+  if (filters.scope === 'site') {
+    await ensureDefaultSiteSlotAssets();
+  }
+
   const pagination = listQuerySchema.parse(filters);
   const search = filters.search?.trim();
 
