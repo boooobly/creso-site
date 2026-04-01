@@ -9,7 +9,7 @@ import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { SiteImageRecord } from '@/lib/site-images';
 
-const heroBadges = ['Макс. ширина 600 мм', 'Резка по меткам', 'Срочные заказы'];
+const heroBadges = ['Ширина до 600 мм', 'Резка по меткам', 'Срочные заказы', 'Чистая выборка'];
 
 const defaultPricingRows = [
   { label: 'Базовая резка', value: 'от 30 ₽ / м.п.' },
@@ -221,17 +221,17 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
         <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/35 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-10 ${revealBase}`}>
           <div className="grid gap-7 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Производственная услуга</p>
-              <h1 className="mt-3 max-w-4xl text-[2.35rem] font-bold leading-tight md:text-[3.75rem] md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
-              <p className="mt-4 max-w-2xl text-base text-neutral-700 dark:text-neutral-300 md:text-lg">Точная контурная резка, выборка и подготовка к монтажу для единичных и серийных заказов.</p>
-              <p className="mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Работаем по векторным файлам и по меткам, помогаем быстро оценить задачу и запустить заказ в производство.</p>
+              <p className="inline-flex items-center rounded-full border border-red-200/90 bg-red-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Фигурная резка плёнок</p>
+              <h1 className="mt-3 max-w-4xl text-3xl font-bold leading-tight md:text-5xl md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-700 dark:text-neutral-300 md:text-[1.05rem] md:leading-7">Точная контурная резка, выборка и подготовка к монтажу для единичных и серийных заказов.</p>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">Работаем по векторным файлам и по меткам, помогаем быстро оценить задачу и запустить заказ в производство.</p>
 
-              <div className="mt-6 flex flex-wrap gap-2.5">
+              <div className="mt-6 grid max-w-[30rem] grid-cols-2 gap-2">
                 {heroBadges.map((badge, index) => (
                   <span
                     key={badge}
                     style={heroReveal.getStaggerStyle(index * 90)}
-                    className={`rounded-full border border-neutral-300 bg-white/85 px-3.5 py-1.5 text-xs font-semibold text-neutral-700 backdrop-blur-sm transition-colors hover:border-red-300 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 ${revealBase}`}
+                    className={`inline-flex min-h-8 items-center rounded-xl border border-neutral-200/90 bg-white/80 px-3 py-1.5 text-[11px] font-medium text-neutral-700 backdrop-blur-sm transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 md:text-xs ${revealBase}`}
                     data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}
                   >
                     {badge}
@@ -245,7 +245,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   onClick={() => document.getElementById('plotter-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className="btn-primary px-5 py-3"
                 >
-                  Рассчитать заказ
+                  Рассчитать стоимость
                 </button>
                 <button
                   type="button"
@@ -255,19 +255,11 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   Требования к макету
                   <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 group-hover:scale-x-100 motion-reduce:transition-none" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('plotter-examples')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                  className="group relative text-sm font-medium text-neutral-700 transition-colors hover:text-red-700 dark:text-neutral-200 dark:hover:text-red-300"
-                >
-                  Смотреть примеры
-                  <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 group-hover:scale-x-100 motion-reduce:transition-none" />
-                </button>
               </div>
             </div>
 
-            <div className={`rounded-2xl border border-neutral-200/90 bg-white/75 p-3 shadow-[0_12px_30px_rgba(15,23,42,0.1)] dark:border-neutral-700 dark:bg-neutral-900/60 dark:shadow-none md:p-4 ${revealBase}`} data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}>
-              <div className="relative min-h-[250px] overflow-hidden rounded-xl sm:min-h-[320px] lg:min-h-[390px]">
+            <div className={revealBase} data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}>
+              <div className="relative min-h-[260px] overflow-hidden rounded-2xl sm:min-h-[330px] lg:min-h-[420px]">
                 <Image
                   src={heroImage?.url ?? '/images/plotter/plotter_hero.png'}
                   alt={heroImage?.altText || 'Плоттерная резка самоклеящейся пленки'}
