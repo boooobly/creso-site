@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, ClipboardCheck, Clock3, FileCheck2, Scissors } from 'lucide-react';
+import { AlarmClock, ArrowRight, CheckCircle2, ClipboardCheck, Clock3, FileCheck2, Ruler, Scissors, ScanSearch, Shapes, Spline, Sticker } from 'lucide-react';
 import Section from '@/components/Section';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
@@ -21,12 +21,12 @@ const defaultPricingRows = [
 ];
 
 const priceFactors = [
-  'длина реза',
-  'количество мелких элементов',
-  'плотность контура',
-  'выборка',
-  'срочность',
-  'формат изделия',
+  { label: 'длина реза', icon: Ruler },
+  { label: 'количество мелких элементов', icon: Shapes },
+  { label: 'плотность контура', icon: Spline },
+  { label: 'выборка', icon: Sticker },
+  { label: 'срочность', icon: AlarmClock },
+  { label: 'формат изделия', icon: ScanSearch },
 ];
 
 const processSteps = [
@@ -222,7 +222,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
           <div className="grid gap-7 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
               <p className="inline-flex items-center rounded-full border border-red-200/90 bg-red-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Фигурная резка плёнок</p>
-              <h1 className="mt-3 max-w-4xl text-3xl font-bold leading-tight md:text-5xl md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
+              <h1 className="mt-3 max-w-4xl text-3xl font-extrabold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-700 dark:text-neutral-300 md:text-[1.05rem] md:leading-7">Делаем точную контурную резку винила и плёнок для наклеек, витрин, маркировки и навигации.</p>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">На выходе вы получаете аккуратно вырезанные элементы: с выборкой, с монтажной плёнкой или полностью готовые к переносу.</p>
 
@@ -231,7 +231,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   <span
                     key={badge}
                     style={heroReveal.getStaggerStyle(index * 90)}
-                    className={`inline-flex min-h-8 items-center gap-1.5 rounded-xl border border-neutral-200/80 bg-white/75 px-3 py-1.5 text-[11px] font-medium text-neutral-700 backdrop-blur-sm transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 md:text-xs ${revealBase}`}
+                    className={`chip-elevated inline-flex min-h-8 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-white/75 px-3.5 py-1.5 text-[11px] font-semibold text-neutral-700 backdrop-blur-sm shadow-none transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 md:text-xs ${revealBase}`}
                     data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
@@ -350,10 +350,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   <h2 className="mt-3 text-2xl font-semibold">Стоимость услуг</h2>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Ниже — базовые цены на резку и допуслуги. Итог считаем по макету, тиражу и объёму ручной подготовки.</p>
                 </div>
-                <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900/80 md:max-w-[220px]">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">Минимальный заказ</p>
-                  <p className="mt-1 text-lg font-semibold text-neutral-900 dark:text-neutral-100">{pricingRows[pricingRows.length - 1]?.value}</p>
-                </div>
               </div>
 
               <div className="mt-5 rounded-[1.75rem] border border-neutral-200/90 bg-neutral-50/70 p-2 dark:border-neutral-800 dark:bg-neutral-900/50">
@@ -388,7 +384,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
 
             <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`space-y-6 ${revealBase}`}>
               <div className="card border border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50/90 to-red-50/30 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-8">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">Технические пределы</p>
+                <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Технические пределы</span>
                 <h2 className="mt-3 text-2xl font-semibold">Технические возможности</h2>
                 <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Измеримые ограничения по ширине, длине и допускам для запуска в работу.</p>
                 <div className="mt-5 grid grid-cols-2 gap-3">
@@ -419,15 +415,17 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                 <ul className="mt-5 grid gap-3 md:grid-cols-2">
                   {priceFactors.map((factor, index) => (
                     <li
-                      key={factor}
+                      key={factor.label}
                       style={factorsReveal.getStaggerStyle((index + 4) * 80)}
                       data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
                       className={`rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:shadow-none ${revealBase}`}
                     >
                       <div className="flex items-start gap-3">
-                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-sm font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{String(index + 1).padStart(2, '0')}</span>
+                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
+                          <factor.icon size={16} strokeWidth={2} aria-hidden="true" />
+                        </span>
                         <div>
-                          <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor}</p>
+                          <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor.label}</p>
                           <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Чем сложнее этот параметр, тем больше времени уходит на резку и подготовку.' : 'Этот параметр добавляет ручные операции, поэтому итоговая стоимость выше.'}</p>
                         </div>
                       </div>
