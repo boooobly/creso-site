@@ -152,7 +152,7 @@ export default function OrderMugsForm() {
     <div id="mug-order-form" className={`${publicFormStyles.shell} sm:p-8 md:p-9`}>
       <div className={publicFormStyles.heading}>
         <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">Заявка на печать кружек</h2>
-        <p className="mt-2 text-sm text-neutral-600">Заполните поля формы — этого достаточно для предварительного расчёта.</p>
+        <p className="mt-2 text-sm text-neutral-600">Заполните поля формы для предварительного расчёта.</p>
       </div>
 
       <form className={`${publicFormStyles.fieldsStack} mt-6`} onSubmit={handleSubmit} noValidate>

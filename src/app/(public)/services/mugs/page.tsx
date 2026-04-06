@@ -32,8 +32,8 @@ const quickBenefits = [
     icon: LayoutTemplate,
   },
   {
-    title: 'Ровная подача партии',
-    description: 'Кружки выглядят как цельный брендированный набор для выдачи или продаж.',
+    title: 'Единый вид тиража',
+    description: 'Вся партия выглядит цельно: без визуального разброса по тону и посадке.',
     icon: Tag,
   },
 ];
@@ -43,7 +43,7 @@ const pricingCards = [
     title: 'Как формируется цена',
     price: '450 ₽ / шт',
     caption: 'Базовая стоимость за кружку с полноцветной печатью',
-    bullets: ['Итог зависит от объёма партии', 'Покрытие (глянец/мат) влияет на расчёт', 'Финальную сумму фиксируем перед запуском'],
+    bullets: ['Итог зависит от объёма партии', 'Покрытие (глянец/мат) влияет на расчёт', 'Полноцветная печать по кругу включена в базу'],
     icon: BadgeCheck,
   },
   {
@@ -99,8 +99,8 @@ const faqItems = [
     answer: 'При бережном уходе печать сохраняет вид долго. Рекомендуем избегать абразивов и очень агрессивной химии.',
   },
   {
-    question: 'Можно заказать небольшой тираж?',
-    answer: 'Да, можно начать даже с небольшого количества и затем повторить заказ большим объёмом.',
+    question: 'Можно повторить тираж позже?',
+    answer: 'Да, можно дозаказать партию позже и сохранить единый стиль для новых кружек.',
   },
 ];
 
@@ -147,7 +147,7 @@ export default async function MugsServicePage() {
             </HeroLead>
 
             <HeroChipList className="mt-6 gap-2.5">
-              {['Стандартный срок: 3–5 рабочих дней', '2 варианта макета включены', 'Финал согласуем до запуска', 'Прозрачная цена без скрытых пунктов'].map((item) => (
+              {['Белая керамика AAA', 'Глянец или мат', 'Тираж от 1 шт', 'Логотипы и фото'].map((item) => (
                 <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
                   <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
                   <span>{item}</span>
@@ -189,7 +189,7 @@ export default async function MugsServicePage() {
       <Section id="mugs-prices" className="pb-8 pt-4 sm:pb-10 sm:pt-5 lg:pb-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <p className="t-eyebrow">Цены и условия</p>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Понятная стоимость и прозрачный процесс</h2>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Понятная стоимость без скрытых доплат</h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600 sm:text-base">Стоимость формируется без скрытых пунктов: вы заранее понимаете цену, сроки и что именно входит в заказ.</p>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
@@ -274,7 +274,7 @@ export default async function MugsServicePage() {
                 {[
                   'Укажите тираж и покрытие',
                   'Приложите макет или кратко опишите задачу',
-                  'Получите расчёт, срок и следующий шаг',
+                  'Получите расчёт и следующий шаг',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600" aria-hidden="true" />
