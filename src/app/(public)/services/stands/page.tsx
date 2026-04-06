@@ -39,11 +39,11 @@ const materials = [
 const audiences = ['Школы', 'Детские сады', 'Магазины и офисы', 'Производственные предприятия', 'Управляющие компании', 'Муниципальные учреждения'] as const;
 
 const advantages = [
-  'Собственное производство',
-  'Изготовление по ТЗ и размерам',
-  'Разработка макета',
+  'Разработка макета под ваш бренд',
+  'Согласование конструкции под место установки',
   'Карманы, стойки и рамки под задачу',
-  'Доставка и монтаж',
+  'Контроль читаемости и долговечности материалов',
+  'Понятные сроки и сопровождение заказа',
   'Работаем с единичными и тиражными заказами',
 ] as const;
 
@@ -72,8 +72,8 @@ export default async function StandsServicePage() {
         <PageHero
           className="bg-gradient-to-br from-white to-neutral-50"
           media={
-            <HeroMediaPanel className="rounded-3xl border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100/90 to-white p-5 md:p-6">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-white/80">
+            <HeroMediaPanel className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-0">
+              <div className="relative aspect-[5/4] min-h-[320px] overflow-hidden rounded-3xl">
                 <Image
                   src={heroImageSrc}
                   alt={heroImageAlt}
@@ -93,6 +93,15 @@ export default async function StandsServicePage() {
             материалы и конструкцию под конкретную задачу.
           </HeroLead>
 
+          <HeroChipList className="mt-5 max-w-xl gap-2.5">
+            {heroChips.map((chip) => (
+              <HeroChip key={chip} className="chip-elevated gap-2 px-3 py-1.5 text-xs">
+                <span className="size-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                <span>{chip}</span>
+              </HeroChip>
+            ))}
+          </HeroChipList>
+
           <HeroActions className="mt-7">
             <Link href="#stands-lead-form" className="btn-primary no-underline">
               Рассчитать стоимость
@@ -101,14 +110,6 @@ export default async function StandsServicePage() {
               Смотреть варианты
             </Link>
           </HeroActions>
-
-          <HeroChipList className="mt-5 max-w-xl gap-2.5">
-            {heroChips.map((chip) => (
-              <HeroChip key={chip} className="chip-elevated px-3 py-1.5 text-xs">
-                {chip}
-              </HeroChip>
-            ))}
-          </HeroChipList>
         </PageHero>
       </Section>
 
@@ -216,25 +217,11 @@ export default async function StandsServicePage() {
         </div>
       </Section>
 
-      <Section className="py-12 md:py-16">
-        <div className="rounded-2xl bg-neutral-900 px-6 py-8 text-white md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-6 md:px-8">
-          <div>
-            <h2 className="text-3xl font-bold">Нужен стенд под вашу задачу?</h2>
-            <p className="mt-2 max-w-2xl text-sm text-neutral-200 md:text-base">
-              Подскажем размеры, материалы, количество карманов и формат крепления, рассчитаем стоимость изготовления, доставки и монтажа.
-            </p>
-          </div>
-          <Link href="#stands-lead-form" className="btn-primary mt-5 w-full no-underline md:mt-0 md:w-auto">
-            Получить консультацию
-          </Link>
-        </div>
-      </Section>
-
       <Section id="stands-lead-form" background="muted" fullBleed className="pt-0">
         <div className="card rounded-2xl border border-neutral-200/80 bg-white p-6 md:p-8">
           <h2 className="text-2xl font-bold">Рассчитать стоимость стенда</h2>
           <p className="mt-2 text-sm text-neutral-600 md:text-base">
-            Опишите, какой стенд нужен, где он будет размещаться и требуются ли карманы, стойки или монтаж — подготовим расчёт и варианты.
+            Подскажем оптимальный формат и материалы под вашу задачу, поможем выбрать конструкцию и рассчитаем стоимость изготовления.
           </p>
           <div className="mt-5">
             <LeadForm
