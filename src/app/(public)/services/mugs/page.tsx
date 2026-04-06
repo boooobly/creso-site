@@ -113,7 +113,7 @@ export default async function MugsServicePage() {
   const resultImageSrc = resultImage?.url ?? '/images/mug/mug_eurochem.png';
   const resultImageAlt = resultImage?.altText || 'Печать на кружках — пример корпоративного тиража';
   const glassOverlayClassName =
-    'absolute bottom-4 left-4 right-4 rounded-2xl border border-white/40 bg-white/86 p-4 shadow-[0_12px_30px_-22px_rgba(15,23,42,0.75)] backdrop-blur-sm sm:bottom-6 sm:left-6 sm:right-6 sm:p-5';
+    'absolute bottom-4 left-4 right-4 rounded-2xl border border-white/35 bg-black/34 p-4 shadow-[0_14px_34px_-24px_rgba(2,6,23,0.9)] backdrop-blur-sm sm:bottom-6 sm:left-6 sm:right-6 sm:p-5';
 
   return (
     <div>
@@ -132,10 +132,10 @@ export default async function MugsServicePage() {
                   sizes="(min-width: 1024px) 50vw, 100vw"
                   className="object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
                 <div className={glassOverlayClassName}>
-                  <p className="text-sm font-semibold text-neutral-900">Готовый результат: аккуратная полноцветная печать</p>
-                  <p className="mt-1 text-xs text-neutral-600 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
+                  <p className="text-sm font-semibold text-white">Готовый результат: аккуратная полноцветная печать</p>
+                  <p className="mt-1 text-xs text-white/80 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
                 </div>
               </HeroMediaPanel>
             }
@@ -147,9 +147,9 @@ export default async function MugsServicePage() {
             </HeroLead>
 
             <HeroChipList className="mt-6 gap-2.5">
-              {['Белая керамика 330 мл', 'Полный wrap по кругу', 'Проверка макета бесплатно', 'Скидка до 20% за объём'].map((item) => (
+              {['Стандартный срок: 3–5 рабочих дней', '2 варианта макета включены', 'Финал согласуем до запуска', 'Прозрачная цена без скрытых пунктов'].map((item) => (
                 <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
-                  <CheckCircle2 className="h-4 w-4 text-red-600" aria-hidden="true" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
                   <span>{item}</span>
                 </HeroChip>
               ))}
@@ -242,7 +242,7 @@ export default async function MugsServicePage() {
             </div>
 
             <div className="overflow-hidden rounded-3xl border border-neutral-200 shadow-sm">
-              <div className="relative aspect-[4/5] w-full sm:aspect-[3/4] lg:aspect-auto lg:min-h-[560px]">
+              <div className="relative h-full min-h-[420px] w-full sm:min-h-[520px] lg:min-h-[560px]">
                 <Image
                   src={resultImageSrc}
                   alt={resultImageAlt}
@@ -252,8 +252,8 @@ export default async function MugsServicePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/5" />
                 <div className={glassOverlayClassName}>
-                  <p className="text-sm font-semibold text-neutral-900">Премиальная подача результата</p>
-                  <p className="mt-1 text-xs text-neutral-600">Чистая белая керамика, чёткая печать и стабильный вид во всём тираже.</p>
+                  <p className="text-sm font-semibold text-white">Премиальная подача результата</p>
+                  <p className="mt-1 text-xs text-white/80">Чистая белая керамика, чёткая печать и стабильный вид во всём тираже.</p>
                 </div>
               </div>
             </div>
