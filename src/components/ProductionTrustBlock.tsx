@@ -35,11 +35,11 @@ export default function ProductionTrustBlock() {
                 <p className="t-lead mt-3">Этот блок — подтверждение, что ключевые этапы выполняем своей командой.</p>
               </div>
 
-              <div className="flex flex-wrap gap-2.5">
+              <div className="grid max-w-sm grid-cols-2 gap-2.5">
                 {productionFeatures.map((feature) => (
                   <span
                     key={feature}
-                    className="t-small rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 font-medium text-neutral-700"
+                    className="t-small inline-flex min-h-9 items-center justify-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-center font-medium text-neutral-700"
                   >
                     {feature}
                   </span>
@@ -64,15 +64,17 @@ export default function ProductionTrustBlock() {
                   key={item.title}
                   className="card-visual card-interactive group relative isolate min-h-[250px] overflow-hidden bg-neutral-900"
                 >
-                  <Image
-                    src={item.imageSrc}
-                    alt={item.imageAlt}
-                    fill
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                    sizes="(max-width: 1024px) 100vw, 500px"
-                  />
-                  <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/80 via-black/45 to-black/15" />
-                  <div className="absolute inset-x-4 bottom-4 z-10 rounded-xl border border-white/30 bg-black/35 px-3.5 py-2.5 backdrop-blur-sm md:inset-x-5 md:bottom-5">
+                  <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.imageAlt}
+                      fill
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      sizes="(max-width: 1024px) 100vw, 500px"
+                    />
+                  </div>
+                  <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/68 via-black/32 to-black/10" />
+                  <div className="absolute inset-x-4 bottom-4 z-10 md:inset-x-5 md:bottom-5">
                     <h3 className="t-h4 !text-base text-white">{item.title}</h3>
                   </div>
                 </article>

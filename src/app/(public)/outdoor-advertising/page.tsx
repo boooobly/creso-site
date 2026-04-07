@@ -7,7 +7,7 @@ import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import OutdoorFloatingCtas from '@/components/OutdoorFloatingCtas';
 import ProductionTrustBlock from '@/components/ProductionTrustBlock';
-import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import { messages } from '@/lib/messages';
@@ -98,7 +98,9 @@ const steps = [
   { title: 'Принимаете результат', detail: 'После монтажа передаём объект и закрывающие документы.' },
 ] as const;
 
-const cities = ['Краснодаре', 'Ростове-на-Дону', 'Ставрополе', 'Пятигорске', 'Минеральных Водах', 'Сочи'];
+const stepRevealDelays = ['', 'delay-75', 'delay-150', 'delay-200'] as const;
+
+const cities = ['Краснодаре', 'Ростове-на-Дону', 'Ставрополе', 'Пятигорске', 'Минеральных Водах', 'Черкесске', 'Кисловодске'];
 
 const portfolioProjects = [
   {
@@ -196,13 +198,13 @@ export default async function OutdoorAdvertisingPage() {
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25"
           contentClassName="flex h-full max-w-[38.5rem] flex-col gap-6 md:gap-7 lg:pr-3"
           media={
-            <HeroMediaPanel className="overflow-hidden rounded-[1.4rem] border-neutral-200/85 bg-neutral-100/80 p-0">
-              <div className="relative aspect-[6/5] w-full overflow-hidden">
+            <HeroMediaPanel className="overflow-hidden rounded-[1.4rem] border-neutral-200/85 bg-neutral-900 p-0">
+              <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[inherit]">
                 <Image
                   src={heroImageSrc}
                   alt={heroImageAlt}
                   fill
-                  className="object-cover"
+                  className="h-full w-full object-cover"
                   priority
                   sizes="(max-width: 1024px) 100vw, 46vw"
                 />
@@ -214,12 +216,15 @@ export default async function OutdoorAdvertisingPage() {
             </HeroMediaPanel>
           }
         >
-          <div className="space-y-4">
+          <div className="space-y-4.5 md:space-y-5">
+            <HeroEyebrow className="w-fit rounded-full border border-[var(--brand-red)]/55 px-3 py-1 text-[var(--brand-red)]">
+              Наружная реклама
+            </HeroEyebrow>
             <HeroTitle className="max-w-[15ch] text-3xl leading-[1.06] md:text-5xl">{heroTitle}</HeroTitle>
-            <HeroLead className="max-w-[35rem] text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
+            <HeroLead className="max-w-[35rem] pt-1 text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
           </div>
 
-          <HeroChipList className="max-w-[38rem] gap-2.5">
+          <HeroChipList className="max-w-[38rem] gap-2.5 pt-1">
             {heroTrustBadges.map((badge) => (
               <HeroChip key={badge} className="h-11 whitespace-nowrap rounded-xl px-3.5 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
@@ -343,14 +348,15 @@ export default async function OutdoorAdvertisingPage() {
             </div>
             <div className="grid-cards md:grid-cols-2 lg:grid-cols-4">
               {steps.map((step, index) => (
-                <article key={step.title} className="card-structured p-4 dark:bg-neutral-800/70">
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Шаг {index + 1}</p>
-                  <p className="t-h4 !text-base">{step.title}</p>
-                  <p className="t-small mt-2 text-neutral-600 dark:text-neutral-300">{step.detail}</p>
-                </article>
+                <RevealOnScroll key={step.title} className={stepRevealDelays[index]}>
+                  <article className="card-structured h-full p-4 dark:bg-neutral-800/70">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Шаг {index + 1}</p>
+                    <p className="t-h4 !text-base">{step.title}</p>
+                    <p className="t-small mt-2 text-neutral-600 dark:text-neutral-300">{step.detail}</p>
+                  </article>
+                </RevealOnScroll>
               ))}
             </div>
-            <p className="t-body mt-4">По Ставрополю замер бесплатный. Для городов ЮФО заранее согласуем дату выезда и логистику.</p>
           </div>
         </RevealOnScroll>
       </Section>
@@ -368,10 +374,18 @@ export default async function OutdoorAdvertisingPage() {
             <ul className="grid gap-x-4 gap-y-2 rounded-2xl border border-neutral-200/80 bg-white/70 p-4 text-sm md:grid-cols-2">
               {cities.map((city) => (
                 <li key={city} className="text-neutral-700 dark:text-neutral-300">
-                  • {city}
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                    {city}
+                  </span>
                 </li>
               ))}
-              <li className="text-neutral-700 dark:text-neutral-300">• и других городах ЮФО</li>
+              <li className="text-neutral-700 dark:text-neutral-300">
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                  и других городах ЮФО
+                </span>
+              </li>
             </ul>
             <div className="card-structured !rounded-2xl !p-5">
               <p className="t-body text-neutral-700 dark:text-neutral-200">Для объектов вне Ставрополя считаем выезд отдельно и заранее бронируем технику под дату монтажа.</p>
