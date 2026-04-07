@@ -79,7 +79,7 @@ export default function ProductionTrustBlock() {
                     </div>
                     <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                     <div className="absolute inset-x-4 bottom-4 z-10 md:inset-x-5 md:bottom-5">
-                      <h3 className="t-h4 !text-base text-white">{item.title}</h3>
+                      <h3 className="t-h4 !text-base !text-white">{item.title}</h3>
                     </div>
                   </article>
                 </RevealOnScroll>
