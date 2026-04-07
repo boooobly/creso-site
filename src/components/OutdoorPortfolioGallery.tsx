@@ -46,10 +46,10 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
           }}
         />
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/58 via-black/22 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/52 via-black/18 to-transparent" />
       <div className="pointer-events-none absolute inset-x-3 bottom-3 md:inset-x-4 md:bottom-4">
         <p className="t-h4 !text-base leading-snug text-white">{image.title}</p>
-        {image.category ? <p className="t-small mt-1 text-white/80">{image.category}</p> : null}
+        {image.category ? <p className="t-small mt-1 text-white">{image.category}</p> : null}
       </div>
     </button>
   );
