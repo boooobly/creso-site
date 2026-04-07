@@ -22,6 +22,8 @@ const productionPlaceholders = [
     imageAlt: 'Монтаж наружной рекламы',
   },
 ] as const;
+const guaranteeRevealDelays = ['', 'delay-75', 'delay-150', 'delay-200'] as const;
+const productionImageRevealDelays = ['', 'delay-150'] as const;
 
 export default function ProductionTrustBlock() {
   return (
@@ -50,7 +52,7 @@ export default function ProductionTrustBlock() {
 
               <div className="grid gap-3">
                 {guaranteeItems.map((item, index) => (
-                  <RevealOnScroll key={item} className={index > 0 ? 'delay-75' : undefined}>
+                  <RevealOnScroll key={item} className={guaranteeRevealDelays[index]}>
                     <article className="card-structured rounded-xl p-3.5">
                       <p className="t-body flex items-start gap-2.5 text-neutral-700">
                         <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
@@ -64,7 +66,7 @@ export default function ProductionTrustBlock() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               {productionPlaceholders.map((item, index) => (
-                <RevealOnScroll key={item.title} className={index > 0 ? 'delay-75' : undefined}>
+                <RevealOnScroll key={item.title} className={productionImageRevealDelays[index]}>
                   <article className="card-visual card-interactive group relative isolate min-h-[250px] overflow-hidden bg-neutral-900">
                     <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
                       <Image
@@ -75,7 +77,7 @@ export default function ProductionTrustBlock() {
                         sizes="(max-width: 1024px) 100vw, 500px"
                       />
                     </div>
-                    <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/54 via-black/20 to-transparent" />
+                    <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                     <div className="absolute inset-x-4 bottom-4 z-10 md:inset-x-5 md:bottom-5">
                       <h3 className="t-h4 !text-base text-white">{item.title}</h3>
                     </div>
