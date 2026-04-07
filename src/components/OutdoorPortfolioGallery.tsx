@@ -32,20 +32,22 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
       onClick={() => onOpen({ ...image, src: currentSrc })}
       aria-label={`Открыть ${image.alt}`}
     >
-      <Image
-        src={currentSrc}
-        alt={image.alt}
-        fill
-        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-        sizes="(max-width: 1024px) 100vw, 33vw"
-        onError={() => {
-          if (image.fallbackSrc && currentSrc !== image.fallbackSrc) {
-            setCurrentSrc(image.fallbackSrc);
-          }
-        }}
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-xl border border-white/30 bg-black/35 p-3 backdrop-blur-sm shadow-[0_14px_34px_-24px_rgba(2,6,23,0.9)] md:inset-x-4 md:bottom-4">
+      <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+        <Image
+          src={currentSrc}
+          alt={image.alt}
+          fill
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          sizes="(max-width: 1024px) 100vw, 33vw"
+          onError={() => {
+            if (image.fallbackSrc && currentSrc !== image.fallbackSrc) {
+              setCurrentSrc(image.fallbackSrc);
+            }
+          }}
+        />
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/58 via-black/22 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-3 bottom-3 md:inset-x-4 md:bottom-4">
         <p className="t-h4 !text-base leading-snug text-white">{image.title}</p>
         {image.category ? <p className="t-small mt-1 text-white/80">{image.category}</p> : null}
       </div>
@@ -78,8 +80,7 @@ export default function OutdoorPortfolioGallery({ projects }: OutdoorPortfolioGa
     <>
       <div className="space-y-7">
         {projects.map((project) => (
-          <div key={project.id} className="space-y-3">
-            <p className="t-caption text-neutral-600 dark:text-neutral-300">{project.label}</p>
+          <div key={project.id}>
             <div className="grid-cards md:grid-cols-3">
               {project.images.map((image) => (
                 <PortfolioCard key={image.src} image={image} onOpen={setActiveImage} />
