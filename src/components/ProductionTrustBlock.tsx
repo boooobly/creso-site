@@ -4,10 +4,10 @@ import Image from 'next/image';
 const productionFeatures = ['ЧПУ 2×4 м', 'Печать 3.2 м', 'Сварка и покраска', 'Монтажная бригада'];
 
 const guaranteeItems = [
-  'Прозрачные сроки и этапы производства в договоре.',
-  'Контроль качества на каждом этапе: от проекта до монтажа.',
-  'Собственная команда без передачи подрядчикам.',
-  'Гарантийная поддержка и оперативный выезд при необходимости.',
+  'Показываем этапы производства и фото готовности до выезда на монтаж.',
+  'Проверяем свет, крепёж и геометрию конструкции перед отгрузкой.',
+  'Монтаж выполняет штатная команда, знакомая с нашими техрешениями.',
+  'После сдачи остаёмся на связи по гарантийным и сервисным обращениям.',
 ];
 
 const productionPlaceholders = [
@@ -25,14 +25,14 @@ const productionPlaceholders = [
 
 export default function ProductionTrustBlock() {
   return (
-    <section className="bg-neutral-50/70 py-12 md:py-20">
+    <section className="relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] bg-neutral-50/70 py-12 md:py-20">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <RevealOnScroll className="card p-6 md:p-8">
           <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8">
             <div className="space-y-6">
               <div>
                 <h2 className="t-h2">Производим сами. От проекта до монтажа.</h2>
-                <p className="t-lead mt-3">Собственная производственная база и монтажная команда.</p>
+                <p className="t-lead mt-3">Этот блок — подтверждение, что ключевые этапы выполняем своей командой.</p>
               </div>
 
               <div className="flex flex-wrap gap-2.5">
@@ -62,18 +62,18 @@ export default function ProductionTrustBlock() {
               {productionPlaceholders.map((item) => (
                 <article
                   key={item.title}
-                  className="card-visual card-interactive group rounded-xl bg-neutral-50 p-3.5"
+                  className="card-visual card-interactive group relative isolate min-h-[250px] overflow-hidden bg-neutral-900"
                 >
-                  <h3 className="t-h4">{item.title}</h3>
-                  <div className="relative mt-3 min-h-[220px] overflow-hidden rounded-lg md:min-h-[250px]">
-                    <Image
-                      src={item.imageSrc}
-                      alt={item.imageAlt}
-                      fill
-                      className="h-full w-full object-cover transition-transform duration-[400ms] group-hover:scale-105"
-                      sizes="(max-width: 1024px) 100vw, 500px"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <Image
+                    src={item.imageSrc}
+                    alt={item.imageAlt}
+                    fill
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    sizes="(max-width: 1024px) 100vw, 500px"
+                  />
+                  <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/80 via-black/45 to-black/15" />
+                  <div className="absolute inset-x-4 bottom-4 z-10 rounded-xl border border-white/30 bg-black/35 px-3.5 py-2.5 backdrop-blur-sm md:inset-x-5 md:bottom-5">
+                    <h3 className="t-h4 !text-base text-white">{item.title}</h3>
                   </div>
                 </article>
               ))}

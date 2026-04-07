@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
-import { BadgeCheck, Building2, Clock3, FileCheck2, HardHat, ShieldCheck, Truck, Users } from 'lucide-react';
+import { BadgeCheck, Building2, Clock3, Construction, FileCheck2, ShieldCheck, Truck, Users } from 'lucide-react';
 import Section from '@/components/Section';
 import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
@@ -29,65 +29,76 @@ const services: Array<{ title: string; image: string; slotKey: string; featured?
 
 const strengths: Array<{ title: string; description: string; icon: LucideIcon }> = [
   {
-    title: 'Собственное производство',
-    description: 'Контролируем качество и сроки без посредников.',
-    icon: Building2,
-  },
-  {
-    title: 'Монтажная бригада',
-    description: 'Доставка и установка силами собственной команды.',
-    icon: Users,
-  },
-  {
-    title: 'Автовышка',
-    description: 'Работаем с высотными объектами и сложным монтажом.',
-    icon: HardHat,
-  },
-  {
-    title: 'Работа на высоте',
-    description: 'Выполняем монтажные работы на фасадах и крышах.',
-    icon: ShieldCheck,
-  },
-  {
-    title: 'Доставка по краю',
-    description: 'Работаем по Ставропольскому краю и ближайшим городам.',
-    icon: Truck,
-  },
-  {
-    title: 'Заключаем договор',
-    description: 'Фиксируем условия, этапы и стоимость работ.',
+    title: 'Договор и прозрачная смета',
+    description: 'Фиксируем стоимость, сроки и этапы до старта работ.',
     icon: FileCheck2,
   },
   {
+    title: 'Ответственный менеджер проекта',
+    description: 'Один контакт ведёт проект от брифа до сдачи объекта.',
+    icon: Users,
+  },
+  {
+    title: 'Технический контроль монтажа',
+    description: 'Проверяем крепления, электрику и безопасность на объекте.',
+    icon: ShieldCheck,
+  },
+  {
+    title: 'Оснащение для сложных точек',
+    description: 'Используем автовышку и спецоснастку для высотных фасадов.',
+    icon: Construction,
+  },
+  {
+    title: 'Плановый выезд по ЮФО',
+    description: 'Согласуем логистику и дату монтажа под график вашей точки.',
+    icon: Truck,
+  },
+  {
+    title: 'Контроль качества на базе',
+    description: 'Проверяем узлы и подсветку до отправки на монтаж.',
+    icon: Building2,
+  },
+  {
     title: 'Гарантия 5 лет',
-    description: 'Сопровождаем проект и после установки.',
+    description: 'Оперативно выезжаем по гарантийным обращениям.',
     icon: BadgeCheck,
   },
   {
-    title: 'Более 15 лет на рынке',
-    description: 'Опыт в изготовлении и монтаже рекламных конструкций.',
+    title: 'Опыт 15+ лет',
+    description: 'Работаем с объектами разного масштаба и сложности.',
     icon: Clock3,
   },
 ];
 
 const fullCycleItems = [
-  'Дизайн и визуализация',
-  'Технический расчет',
-  'Проектирование',
-  'Изготовление',
-  'Монтаж',
+  {
+    title: 'Аудит объекта',
+    description: 'Снимаем размеры, нагрузки и требования к размещению.',
+  },
+  {
+    title: 'Проектная подготовка',
+    description: 'Готовим макет, техрешение и комплект согласований.',
+  },
+  {
+    title: 'Изготовление',
+    description: 'Производим конструкцию, подсветку и крепёж на собственной базе.',
+  },
+  {
+    title: 'Монтаж и пуск',
+    description: 'Устанавливаем на объекте, проверяем и сдаем в работу.',
+  },
 ] as const;
 
-const heroTrustBadges = [
-  'Работаем по ЮФО',
-  'Гарантия до 5 лет',
-  'Пожизненное сервисное обслуживание',
-  'Собственное производство',
+const heroTrustBadges = ['Под задачи объекта', 'Заметно днём и ночью', 'Расчёт по фото и размерам', 'Старт без лишних согласований'] as const;
+
+const steps = [
+  { title: 'Оставляете заявку', detail: 'Отправляете адрес, фото фасада и желаемый формат.' },
+  { title: 'Получаете расчёт', detail: 'Даём смету, сроки и варианты исполнения под бюджет.' },
+  { title: 'Согласуете макет', detail: 'Утверждаем финальный вариант и подписываем договор.' },
+  { title: 'Принимаете результат', detail: 'После монтажа передаём объект и закрывающие документы.' },
 ] as const;
 
-const steps = ['Заявка', 'Замер (бесплатно по городу)', 'Производство', 'Монтаж'];
-
-const cities = ['Невинномысске', 'Ставрополе', 'Пятигорске', 'Минеральных Водах', 'Кисловодске', 'Ессентуках'];
+const cities = ['Краснодаре', 'Ростове-на-Дону', 'Ставрополе', 'Пятигорске', 'Минеральных Водах', 'Сочи'];
 
 const portfolioProjects = [
   {
@@ -157,13 +168,10 @@ export default async function OutdoorAdvertisingPage() {
     getPageContentMap('outdoor'),
     getSiteImages(OUTDOOR_SITE_IMAGE_SLOTS.map((slot) => slot.key)),
   ]);
-  const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Наружная реклама под ключ в Ставропольском крае');
-  const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Проектирование, производство и монтаж рекламных конструкций любой сложности по ЮФО.');
+  const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Наружная реклама для фасадов, входных групп и коммерческих объектов');
+  const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Помогаем выделить точку на улице и упростить навигацию для клиентов: от вывесок до сложных рекламных конструкций.');
   const heroPrimaryButtonText = getPageContentValue(contentMap, 'hero', 'primaryButtonText', 'Получить бесплатный расчет');
   const heroSecondaryButtonText = getPageContentValue(contentMap, 'hero', 'secondaryButtonText', 'Смотреть примеры работ');
-  const ctaTitle = getPageContentValue(contentMap, 'cta', 'title', 'Нужна срочная установка?');
-  const ctaDescription = getPageContentValue(contentMap, 'cta', 'description', 'Изготавливаем и монтируем конструкции в сжатые сроки.');
-  const ctaButtonText = getPageContentValue(contentMap, 'cta', 'buttonText', 'Получить расчет');
 
   const heroImageSrc = siteImages['outdoor.hero.main']?.url ?? '/images/outdoor_advertising/manufacturing.png';
   const heroImageAlt = siteImages['outdoor.hero.main']?.altText || 'Производство наружной рекламы';
@@ -188,8 +196,8 @@ export default async function OutdoorAdvertisingPage() {
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25"
           contentClassName="flex h-full max-w-[38.5rem] flex-col gap-6 md:gap-7 lg:pr-3"
           media={
-            <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/95 p-2">
-              <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.35rem]">
+            <HeroMediaPanel className="overflow-hidden rounded-[1.4rem] border-neutral-200/85 bg-neutral-100/80 p-0">
+              <div className="relative aspect-[6/5] w-full overflow-hidden">
                 <Image
                   src={heroImageSrc}
                   alt={heroImageAlt}
@@ -199,9 +207,9 @@ export default async function OutdoorAdvertisingPage() {
                   sizes="(max-width: 1024px) 100vw, 46vw"
                 />
               </div>
-              <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/90 bg-white/95 px-4 py-3 backdrop-blur-lg shadow-[0_12px_30px_rgba(17,24,39,0.16)] md:bottom-5 md:left-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600">Наружная реклама</p>
-                <p className="mt-1 text-sm font-bold text-neutral-950">Проектируем, производим и монтируем</p>
+              <div className="pointer-events-none absolute bottom-4 left-4 right-4 rounded-2xl border border-white/30 bg-black/35 px-4 py-3 backdrop-blur-sm shadow-[0_14px_34px_-24px_rgba(2,6,23,0.9)] md:bottom-5 md:left-5 md:right-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/80">Наружная реклама под ключ</p>
+                <p className="mt-1 text-sm font-semibold text-white">От заметной идеи до готового монтажа на объекте</p>
               </div>
             </HeroMediaPanel>
           }
@@ -211,9 +219,9 @@ export default async function OutdoorAdvertisingPage() {
             <HeroLead className="max-w-[35rem] text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
           </div>
 
-          <HeroChipList className="max-w-[36rem] gap-2.5">
+          <HeroChipList className="max-w-[38rem] gap-2.5">
             {heroTrustBadges.map((badge) => (
-              <HeroChip key={badge} className="h-11 rounded-xl px-4 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
+              <HeroChip key={badge} className="h-11 whitespace-nowrap rounded-xl px-3.5 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                 {badge}
               </HeroChip>
@@ -233,15 +241,15 @@ export default async function OutdoorAdvertisingPage() {
         </PageHero>
       </Section>
 
-      <Section className="pt-0" id="outdoor-portfolio" background="muted">
+      <Section className="pt-0" id="outdoor-portfolio" background="muted" fullBleed>
         <RevealOnScroll>
           <div className="section-header-split">
             <div className="space-y-2">
               <p className="t-eyebrow">ПОРТФОЛИО</p>
               <h2 className={sectionTitleClassName}>Реализованные проекты</h2>
-              <p className={sectionIntroClassName}>Примеры наружной рекламы, которые мы спроектировали, изготовили и смонтировали в регионе.</p>
+              <p className={sectionIntroClassName}>Реальные объекты, которые уже установлены и работают на точках наших клиентов.</p>
             </div>
-            <p className="t-small text-muted-foreground max-w-xs text-right">Фасадные решения, объёмные буквы и подсветка в коммерческих проектах</p>
+            <p className="t-small text-muted-foreground max-w-xs text-right">До/после, крупные планы и ночной режим подсветки</p>
           </div>
           <OutdoorPortfolioGallery projects={resolvedPortfolioProjects} />
         </RevealOnScroll>
@@ -252,7 +260,7 @@ export default async function OutdoorAdvertisingPage() {
           <div className="section-header">
             <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>
             <h2 className={sectionTitleClassName}>Что изготавливаем</h2>
-            <p className={sectionIntroClassName}>Изготавливаем вывески и конструкции под формат объекта, бюджет и требования к визуальному эффекту.</p>
+            <p className={sectionIntroClassName}>Форматы наружной рекламы, которые мы производим для коммерческих объектов.</p>
           </div>
           <div className="grid-cards grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
@@ -278,12 +286,12 @@ export default async function OutdoorAdvertisingPage() {
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0" background="muted">
+      <Section className="pt-0" background="muted" fullBleed>
         <RevealOnScroll>
           <div className="section-header">
             <p className="t-eyebrow">ПРЕИМУЩЕСТВА</p>
             <h2 className={sectionTitleClassName}>Почему выбирают нас</h2>
-            <p className={sectionIntroClassName}>Закрываем проект наружной рекламы под ключ: от производства и монтажа до сервисного сопровождения.</p>
+            <p className={sectionIntroClassName}>Параметры работы, по которым клиенту проще контролировать сроки, качество и результат.</p>
           </div>
           <div className="grid-cards auto-rows-fr sm:grid-cols-2 xl:grid-cols-4">
             {strengths.map((item) => {
@@ -311,35 +319,22 @@ export default async function OutdoorAdvertisingPage() {
           <div className="section-header">
             <p className="t-eyebrow">ПОЛНЫЙ ЦИКЛ</p>
             <h2 className={sectionTitleClassName}>Полный цикл работ</h2>
+            <p className={sectionIntroClassName}>Что мы закрываем внутри проекта: от технической подготовки до запуска конструкции на объекте.</p>
           </div>
 
-          <ol className="grid-cards md:grid-cols-5">
+          <ol className="grid-cards md:grid-cols-2">
             {fullCycleItems.map((item, index) => (
-              <li
-                key={item}
-                className="card card-interactive list-none p-4"
-              >
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Этап {index + 1}</p>
-                <p className="text-sm font-semibold leading-relaxed">{item}</p>
+              <li key={item.title} className="card-info card-interactive list-none p-5 md:p-6">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Этап {index + 1}</p>
+                <p className="t-h4 !text-base">{item.title}</p>
+                <p className="t-body mt-2">{item.description}</p>
               </li>
             ))}
           </ol>
-
-          <article className="card-structured mt-5 p-5 md:p-6">
-            <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-              <div>
-                <h3 className="t-h4 !text-base">Сервис и сопровождение</h3>
-                <p className="t-body mt-2">
-                  Диагностика и обслуживание, реставрация и обновление, постгарантийная поддержка.
-                </p>
-              </div>
-              <p className="t-body font-medium">Сопровождаем вывески на всем сроке эксплуатации.</p>
-            </div>
-          </article>
         </RevealOnScroll>
       </Section>
 
-      <Section className="pt-0" background="muted">
+      <Section className="pt-0" background="muted" fullBleed>
         <RevealOnScroll>
           <div className="card p-6 md:p-7">
             <div className="section-header-tight">
@@ -348,55 +343,39 @@ export default async function OutdoorAdvertisingPage() {
             </div>
             <div className="grid-cards md:grid-cols-2 lg:grid-cols-4">
               {steps.map((step, index) => (
-                <article key={step} className="card-structured p-4 dark:bg-neutral-800/70">
+                <article key={step.title} className="card-structured p-4 dark:bg-neutral-800/70">
                   <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Шаг {index + 1}</p>
-                  <p className="t-h4 !text-base">{step}</p>
+                  <p className="t-h4 !text-base">{step.title}</p>
+                  <p className="t-small mt-2 text-neutral-600 dark:text-neutral-300">{step.detail}</p>
                 </article>
               ))}
             </div>
-            <p className="t-body mt-4">
-              Выезд в другие города — платный. <br />Возможен заказ по размерам клиента.
-            </p>
+            <p className="t-body mt-4">По Ставрополю замер бесплатный. Для городов ЮФО заранее согласуем дату выезда и логистику.</p>
           </div>
         </RevealOnScroll>
       </Section>
 
       <ProductionTrustBlock />
 
-      <Section className="pt-0" background="default">
-        <div className="grid items-center gap-5 rounded-2xl border border-neutral-800/70 bg-neutral-900 px-6 py-7 text-white shadow-[0_22px_54px_-32px_rgba(15,23,42,0.8)] dark:bg-neutral-800 md:grid-cols-[1fr_auto] md:gap-6 md:px-8">
-          <div>
-            <p className="t-eyebrow !text-red-200">СРОЧНЫЙ ПРОЕКТ</p>
-            <h2 className="mt-2 text-3xl font-bold">{ctaTitle}</h2>
-            <p className="t-body mt-2.5 max-w-2xl !text-neutral-200">{ctaDescription}</p>
-          </div>
-          <Link
-            href="#outdoor-form-section"
-            className="btn-primary w-full no-underline shadow-[0_8px_20px_rgba(220,38,38,0.24)] hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)] md:w-auto"
-          >{ctaButtonText}</Link>
-        </div>
-      </Section>
-
-      <Section className="pt-0" background="muted">
-        <div className="card p-6 md:p-8">
+      <Section className="pt-0" background="muted" fullBleed>
+        <div className="card overflow-hidden p-6 md:p-8">
           <div className="section-header-tight">
             <p className="t-eyebrow">ГЕОГРАФИЯ РАБОТ</p>
-            <h2 className={sectionTitleClassName}>Работаем по всему Ставропольскому краю</h2>
-            <p className={sectionIntroClassName}>Изготавливаем и монтируем наружную рекламу в:</p>
+            <h2 className={sectionTitleClassName}>Работаем по всему ЮФО</h2>
+            <p className={sectionIntroClassName}>Работаем по городам ЮФО и заранее обозначаем, как логистика влияет на сроки монтажа.</p>
           </div>
-          <div className="mt-5 grid gap-6 md:grid-cols-[1.15fr_1fr]">
-            <ul className="grid gap-x-4 gap-y-2 text-sm md:grid-cols-2">
+          <div className="mt-5 grid gap-6 md:grid-cols-[1.1fr_1fr]">
+            <ul className="grid gap-x-4 gap-y-2 rounded-2xl border border-neutral-200/80 bg-white/70 p-4 text-sm md:grid-cols-2">
               {cities.map((city) => (
                 <li key={city} className="text-neutral-700 dark:text-neutral-300">
                   • {city}
                 </li>
               ))}
-              <li className="text-neutral-700 dark:text-neutral-300">• и других городах региона</li>
+              <li className="text-neutral-700 dark:text-neutral-300">• и других городах ЮФО</li>
             </ul>
-            <div className="card-structured !rounded-xl !p-4">
-              <p className="t-body text-neutral-700 dark:text-neutral-200">
-                Собственная бригада, выезд на замер и доставка конструкций позволяют запускать проекты быстро и в удобные сроки.
-              </p>
+            <div className="card-structured !rounded-2xl !p-5">
+              <p className="t-body text-neutral-700 dark:text-neutral-200">Для объектов вне Ставрополя считаем выезд отдельно и заранее бронируем технику под дату монтажа.</p>
+              <p className="t-small mt-3 font-medium text-neutral-700 dark:text-neutral-200">После согласования адреса и доступа на объект сразу фиксируем календарный план работ.</p>
             </div>
           </div>
         </div>
@@ -408,7 +387,7 @@ export default async function OutdoorAdvertisingPage() {
             <div className="section-header-tight">
               <p className="t-eyebrow">ЗАЯВКА НА РАСЧЁТ</p>
               <h2 className={sectionTitleClassName}>Получить бесплатный расчет наружной рекламы</h2>
-              <p className={sectionIntroClassName}>Ответим по стоимости, срокам и предложим оптимальный формат изготовления.</p>
+              <p className={sectionIntroClassName}>Укажите адрес, размеры и фото места монтажа — в ответ пришлём расчёт, сроки и план следующих шагов.</p>
             </div>
             <div className="mt-5 [&_label]:text-neutral-700 [&_label]:dark:text-neutral-300 [&_label>span]:leading-relaxed [&_p]:text-neutral-600 [&_p]:dark:text-neutral-300">
               <LeadForm
