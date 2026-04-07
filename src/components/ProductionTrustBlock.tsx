@@ -30,52 +30,57 @@ export default function ProductionTrustBlock() {
         <RevealOnScroll className="card p-6 md:p-8">
           <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8">
             <div className="space-y-6">
-              <div>
+              <RevealOnScroll>
                 <h2 className="t-h2">Производим сами. От проекта до монтажа.</h2>
                 <p className="t-lead mt-3">Этот блок — подтверждение, что ключевые этапы выполняем своей командой.</p>
-              </div>
+              </RevealOnScroll>
 
-              <div className="flex flex-wrap gap-2.5">
+              <RevealOnScroll className="delay-75">
+                <div className="grid max-w-sm grid-cols-2 gap-2.5">
                 {productionFeatures.map((feature) => (
                   <span
                     key={feature}
-                    className="t-small rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 font-medium text-neutral-700"
+                    className="t-small inline-flex min-h-9 items-center justify-center rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-center font-medium text-neutral-700"
                   >
                     {feature}
                   </span>
                 ))}
-              </div>
+                </div>
+              </RevealOnScroll>
 
               <div className="grid gap-3">
-                {guaranteeItems.map((item) => (
-                  <article key={item} className="card-structured rounded-xl p-3.5">
-                    <p className="t-body flex items-start gap-2.5 text-neutral-700">
-                      <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
-                      <span>{item}</span>
-                    </p>
-                  </article>
+                {guaranteeItems.map((item, index) => (
+                  <RevealOnScroll key={item} className={index > 0 ? 'delay-75' : undefined}>
+                    <article className="card-structured rounded-xl p-3.5">
+                      <p className="t-body flex items-start gap-2.5 text-neutral-700">
+                        <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                        <span>{item}</span>
+                      </p>
+                    </article>
+                  </RevealOnScroll>
                 ))}
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-              {productionPlaceholders.map((item) => (
-                <article
-                  key={item.title}
-                  className="card-visual card-interactive group relative isolate min-h-[250px] overflow-hidden bg-neutral-900"
-                >
-                  <Image
-                    src={item.imageSrc}
-                    alt={item.imageAlt}
-                    fill
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                    sizes="(max-width: 1024px) 100vw, 500px"
-                  />
-                  <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/80 via-black/45 to-black/15" />
-                  <div className="absolute inset-x-4 bottom-4 z-10 rounded-xl border border-white/30 bg-black/35 px-3.5 py-2.5 backdrop-blur-sm md:inset-x-5 md:bottom-5">
-                    <h3 className="t-h4 !text-base text-white">{item.title}</h3>
-                  </div>
-                </article>
+              {productionPlaceholders.map((item, index) => (
+                <RevealOnScroll key={item.title} className={index > 0 ? 'delay-75' : undefined}>
+                  <article className="card-visual card-interactive group relative isolate min-h-[250px] overflow-hidden bg-neutral-900">
+                    <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+                      <Image
+                        src={item.imageSrc}
+                        alt={item.imageAlt}
+                        fill
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                        sizes="(max-width: 1024px) 100vw, 500px"
+                      />
+                    </div>
+                    <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/54 via-black/20 to-transparent" />
+                    <div className="absolute inset-x-4 bottom-4 z-10 md:inset-x-5 md:bottom-5">
+                      <h3 className="t-h4 !text-base text-white">{item.title}</h3>
+                    </div>
+                  </article>
+                </RevealOnScroll>
               ))}
             </div>
           </div>
