@@ -28,29 +28,26 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
   return (
     <button
       type="button"
-      className="card-visual card-interactive group flex h-full flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
+      className="card-visual card-interactive group relative block h-full min-h-[250px] overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
       onClick={() => onOpen({ ...image, src: currentSrc })}
       aria-label={`Открыть ${image.alt}`}
     >
-      <div className="relative h-56 w-full overflow-hidden bg-neutral-100">
-        <Image
-          src={currentSrc}
-          alt={image.alt}
-          fill
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-          sizes="(max-width: 1024px) 100vw, 33vw"
-          onError={() => {
-            if (image.fallbackSrc && currentSrc !== image.fallbackSrc) {
-              setCurrentSrc(image.fallbackSrc);
-            }
-          }}
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
-      </div>
-
-      <div className="flex flex-1 flex-col justify-between gap-2 p-4 md:p-5">
-        <p className="t-h4 !text-base leading-snug">{image.title}</p>
-        {image.category ? <p className="t-small text-muted-foreground">{image.category}</p> : null}
+      <Image
+        src={currentSrc}
+        alt={image.alt}
+        fill
+        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+        sizes="(max-width: 1024px) 100vw, 33vw"
+        onError={() => {
+          if (image.fallbackSrc && currentSrc !== image.fallbackSrc) {
+            setCurrentSrc(image.fallbackSrc);
+          }
+        }}
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-xl border border-white/30 bg-black/35 p-3 backdrop-blur-sm shadow-[0_14px_34px_-24px_rgba(2,6,23,0.9)] md:inset-x-4 md:bottom-4">
+        <p className="t-h4 !text-base leading-snug text-white">{image.title}</p>
+        {image.category ? <p className="t-small mt-1 text-white/80">{image.category}</p> : null}
       </div>
     </button>
   );
