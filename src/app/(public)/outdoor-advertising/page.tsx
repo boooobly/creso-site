@@ -281,7 +281,6 @@ export default async function OutdoorAdvertisingPage() {
                   sizes={service.featured ? '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 95vw' : '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'}
                 />
                 <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/80 via-black/45 to-black/15" />
-                <div className="absolute -inset-px rounded-[inherit] bg-gradient-to-t from-black/85 via-black/55 to-black/20 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100" />
                 <div className="absolute inset-x-4 bottom-4 z-10 md:inset-x-5 md:bottom-5">
                   <p className="text-lg font-semibold leading-snug text-white md:text-xl">{service.title}</p>
                 </div>
