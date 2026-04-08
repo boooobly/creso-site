@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import {
   BadgeCheck,
   CheckCircle2,
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import Section from '@/components/Section';
 import OrderMugsForm from '@/components/OrderMugsForm';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getSiteImages } from '@/lib/site-images';
 
@@ -124,7 +124,7 @@ export default async function MugsServicePage() {
             mediaClassName="h-full"
             media={
               <HeroMediaPanel className="min-h-[320px] rounded-2xl border-neutral-200 bg-neutral-100/70 p-0 lg:min-h-full">
-                <Image
+                <ProtectedImage
                   src={heroImageSrc}
                   alt={heroImageAlt}
                   fill
@@ -243,7 +243,7 @@ export default async function MugsServicePage() {
 
             <div className="overflow-hidden rounded-3xl border border-neutral-200 shadow-sm">
               <div className="relative h-full min-h-[420px] w-full sm:min-h-[520px] lg:min-h-[560px]">
-                <Image
+                <ProtectedImage
                   src={resultImageSrc}
                   alt={resultImageAlt}
                   fill

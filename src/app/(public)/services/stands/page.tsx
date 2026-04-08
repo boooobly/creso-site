@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Building2, CheckCircle2, ClipboardList, PackageCheck, Ruler, School, ShieldCheck, Sparkles, Wrench } from 'lucide-react';
 import LeadForm from '@/components/LeadForm';
 import Section from '@/components/Section';
 import StandPreviewCard from '@/components/services/StandPreviewCard';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 import { messages } from '@/lib/messages';
 import { getSiteImages } from '@/lib/site-images';
 import { STANDS_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
@@ -74,7 +74,7 @@ export default async function StandsServicePage() {
           media={
             <HeroMediaPanel className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-0">
               <div className="relative aspect-[5/4] min-h-[320px] overflow-hidden rounded-3xl">
-                <Image
+                <ProtectedImage
                   src={heroImageSrc}
                   alt={heroImageAlt}
                   fill

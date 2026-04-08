@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 
 export default function ServiceCard({
   title,
@@ -24,7 +24,7 @@ export default function ServiceCard({
     >
       <div className="mb-4 overflow-hidden rounded-xl border border-neutral-200/80 transition-colors duration-300 group-hover:border-neutral-300">
         <div className="relative aspect-[16/5] w-full overflow-hidden rounded-xl">
-          {imageSrc ? <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 20vw, (min-width: 768px) 35vw, 90vw" /> : null}
+          {imageSrc ? <ProtectedImage src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 20vw, (min-width: 768px) 35vw, 90vw" /> : null}
           <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-45 transition-opacity duration-300 group-hover:opacity-20" />
         </div>
       </div>
