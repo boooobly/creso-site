@@ -231,10 +231,10 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   <span
                     key={badge}
                     style={heroReveal.getStaggerStyle(index * 90)}
-                    className={`inline-flex min-h-8 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-white px-3.5 py-1.5 text-[11px] font-semibold text-neutral-700 backdrop-blur-sm shadow-none transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 md:text-xs ${revealBase}`}
+                    className={`inline-flex min-h-10 items-center gap-2 rounded-full border border-neutral-200 bg-white/90 px-4 py-2 text-xs font-semibold leading-none text-neutral-700 backdrop-blur-sm shadow-none transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 ${revealBase}`}
                     data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
                     {badge}
                   </span>
                 ))}
