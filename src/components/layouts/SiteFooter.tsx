@@ -9,8 +9,9 @@ const navItems = [
   { label: 'Портфолио', href: '/portfolio' },
   { label: 'Отзывы', href: '/reviews' },
   { label: 'Контакты', href: '/contacts' },
-  { label: 'Политика конфиденциальности', href: '/privacy' },
 ];
+
+const trustPoints = ['Собственное производство и монтаж', 'Работа по договору и прозрачная смета', 'Соблюдение согласованных сроков'];
 
 function toExternalLink(value: string, type: 'telegram' | 'whatsapp') {
   const trimmed = value.trim();
@@ -28,54 +29,117 @@ function toExternalLink(value: string, type: 'telegram' | 'whatsapp') {
 export default async function SiteFooter() {
   const settings = await getPublicSiteSettings();
   const telegramHref = toExternalLink(settings.telegram, 'telegram');
+  const whatsappHref = toExternalLink(settings.whatsapp, 'whatsapp');
 
   return (
     <footer className="mt-16 border-t border-neutral-200 bg-neutral-100 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-300">
       <div className="container py-12 md:py-14">
-        <div className="grid gap-10 md:grid-cols-[1.1fr_1fr_1fr] md:gap-8 lg:gap-12">
-          <div className="space-y-2.5 text-sm">
-            <Link href="/" className="inline-flex no-underline">
-              <Image src="/images/logo-light.png" alt="CredoMir logo" width={180} height={64} className="block h-12 w-auto dark:hidden" />
-              <Image src="/images/logo-dark.png" alt="CredoMir logo" width={180} height={64} className="hidden h-12 w-auto dark:block" />
-            </Link>
-            <p>{settings.address}</p>
-            <p>
-              Telegram:{' '}
-              <a className="underline" href={telegramHref} target="_blank" rel="noreferrer">
-                {settings.telegram}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_0.9fr] lg:gap-8">
+          <section className="card-structured space-y-5 md:p-6" aria-labelledby="footer-contacts">
+            <div className="space-y-3">
+              <Link href="/" className="inline-flex no-underline" aria-label="На главную">
+                <Image src="/images/logo-light.png" alt="CredoMir logo" width={204} height={72} className="block h-12 w-auto dark:hidden" />
+                <Image src="/images/logo-dark.png" alt="CredoMir logo" width={204} height={72} className="hidden h-12 w-auto dark:block" />
+              </Link>
+              <p className="t-small text-neutral-600 dark:text-neutral-400">{settings.address}</p>
+            </div>
+
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              <a
+                href={`tel:${settings.phoneHref}`}
+                className="group rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-semibold no-underline transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
+              >
+                <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red)]/90 dark:text-neutral-400">
+                  Телефон
+                </span>
+                <span className="mt-0.5 block">{settings.phone}</span>
               </a>
-            </p>
-            <p>WhatsApp: {settings.whatsapp}</p>
-            <p>Телефон: {settings.phone}</p>
-            <p>Email: {settings.email}</p>
-          </div>
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noreferrer"
+                className="group rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-semibold no-underline transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
+              >
+                <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red)]/90 dark:text-neutral-400">
+                  WhatsApp
+                </span>
+                <span className="mt-0.5 block">{settings.whatsapp}</span>
+              </a>
+              <a
+                href={telegramHref}
+                target="_blank"
+                rel="noreferrer"
+                className="group rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-semibold no-underline transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
+              >
+                <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red)]/90 dark:text-neutral-400">
+                  Telegram
+                </span>
+                <span className="mt-0.5 block">{settings.telegram}</span>
+              </a>
+              <a
+                href={`mailto:${settings.email}`}
+                className="group rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-semibold no-underline transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
+              >
+                <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red)]/90 dark:text-neutral-400">
+                  Email
+                </span>
+                <span className="mt-0.5 block">{settings.email}</span>
+              </a>
+            </div>
+          </section>
 
-          <div className="space-y-2.5 text-sm">
-            <h3 className="text-base font-semibold">О компании</h3>
-            <p>{settings.companyName}</p>
-            <p>{settings.companyShortInfo}</p>
-            <p>Режим работы: {settings.workingHours}</p>
-            {settings.vkLink ? (
-              <p>
-                VK: <a className="underline" href={settings.vkLink} target="_blank" rel="noreferrer">Ссылка</a>
-              </p>
-            ) : null}
-          </div>
+          <section className="card-structured space-y-4 md:p-6" aria-labelledby="footer-company">
+            <h3 id="footer-company" className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+              О компании
+            </h3>
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{settings.companyName}</p>
+              <p className="t-small text-neutral-600 dark:text-neutral-400">{settings.companyShortInfo}</p>
+            </div>
+            <div className="space-y-2 border-t border-neutral-200 pt-3 dark:border-neutral-800">
+              <p className="t-small text-neutral-600 dark:text-neutral-400">Режим работы: {settings.workingHours}</p>
+              {settings.vkLink ? (
+                <p className="t-small text-neutral-600 dark:text-neutral-400">
+                  VK:{' '}
+                  <a className="font-medium text-neutral-800 underline decoration-neutral-400/80 transition-colors hover:text-[var(--brand-red)] dark:text-neutral-200" href={settings.vkLink} target="_blank" rel="noreferrer">
+                    Официальная страница
+                  </a>
+                </p>
+              ) : null}
+            </div>
+            <ul className="space-y-1.5 border-t border-neutral-200 pt-3 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
+              {trustPoints.map((point) => (
+                <li key={point} className="flex items-start gap-2">
+                  <span className="card-dot mt-1.5" aria-hidden="true" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
 
-          <div className="space-y-2.5 text-sm">
-            <h3 className="text-base font-semibold">Навигация</h3>
-            <nav className="mt-2 flex flex-col gap-2.5">
+          <section className="card-structured space-y-4 md:col-span-2 md:p-6 lg:col-span-1" aria-labelledby="footer-navigation">
+            <h3 id="footer-navigation" className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+              Навигация
+            </h3>
+            <nav aria-label="Навигация по сайту" className="grid gap-1.5 text-sm">
               {navItems.map((item) => (
-                <Link key={item.href} href={item.href} className="no-underline hover:text-[var(--brand-red)]">
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-md px-2 py-1.5 no-underline transition-colors hover:bg-white hover:text-[var(--brand-red)] dark:hover:bg-neutral-900"
+                >
                   {item.label}
                 </Link>
               ))}
             </nav>
-          </div>
+          </section>
         </div>
 
-        <div className="mt-10 border-t border-neutral-200 pt-5 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
-          {settings.footerText}
+        <div className="mt-8 flex flex-col gap-3 border-t border-neutral-200 pt-5 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400 md:flex-row md:items-center md:justify-between">
+          <p>{settings.footerText}</p>
+          <Link href="/privacy" className="w-fit font-medium no-underline transition-colors hover:text-[var(--brand-red)]">
+            Политика конфиденциальности
+          </Link>
         </div>
       </div>
     </footer>
