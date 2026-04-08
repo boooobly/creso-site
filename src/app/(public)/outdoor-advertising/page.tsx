@@ -349,10 +349,10 @@ export default async function OutdoorAdvertisingPage() {
             <div className="grid-cards md:grid-cols-2 lg:grid-cols-4">
               {steps.map((step, index) => (
                 <RevealOnScroll key={step.title} className={stepRevealDelays[index]}>
-                  <article className="card-structured h-full p-4 dark:bg-neutral-800/70">
+                  <article className="card-info card-interactive h-full p-5 md:p-6">
                     <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Шаг {index + 1}</p>
                     <p className="t-h4 !text-base">{step.title}</p>
-                    <p className="t-small mt-2 text-neutral-600 dark:text-neutral-300">{step.detail}</p>
+                    <p className="t-body mt-2">{step.detail}</p>
                   </article>
                 </RevealOnScroll>
               ))}
@@ -388,8 +388,8 @@ export default async function OutdoorAdvertisingPage() {
               </li>
             </ul>
             <div className="card-structured !rounded-2xl !p-5">
-              <p className="t-body text-neutral-700 dark:text-neutral-200">Для объектов вне Ставрополя считаем выезд отдельно и заранее бронируем технику под дату монтажа.</p>
-              <p className="t-small mt-3 font-medium text-neutral-700 dark:text-neutral-200">После согласования адреса и доступа на объект сразу фиксируем календарный план работ.</p>
+              <p className="t-body text-neutral-700 dark:text-neutral-200">Для объектов вне Невинномысска считаем выезд отдельно и заранее бронируем технику под дату монтажа.</p>
+              <p className="t-body mt-3 font-medium text-neutral-700 dark:text-neutral-200">После согласования адреса и доступа на объект сразу фиксируем календарный план работ.</p>
             </div>
           </div>
         </div>
