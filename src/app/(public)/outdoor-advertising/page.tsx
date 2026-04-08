@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import { BadgeCheck, Building2, Clock3, Construction, FileCheck2, ShieldCheck, Truck, Users } from 'lucide-react';
@@ -10,6 +9,7 @@ import ProductionTrustBlock from '@/components/ProductionTrustBlock';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 import { messages } from '@/lib/messages';
 import { getSiteImages } from '@/lib/site-images';
 import { OUTDOOR_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
@@ -200,7 +200,7 @@ export default async function OutdoorAdvertisingPage() {
           media={
             <HeroMediaPanel className="overflow-hidden rounded-[1.4rem] border-neutral-200/85 bg-neutral-900 p-0">
               <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[inherit]">
-                <Image
+                <ProtectedImage
                   src={heroImageSrc}
                   alt={heroImageAlt}
                   fill
@@ -273,7 +273,7 @@ export default async function OutdoorAdvertisingPage() {
                 key={service.title}
                 className={`card-visual card-interactive group relative isolate bg-neutral-900 ${service.featured ? 'min-h-[250px] md:col-span-2 lg:col-span-3 lg:min-h-[320px]' : 'min-h-[205px]'}`}
               >
-                <Image
+                <ProtectedImage
                   src={siteImages[service.slotKey]?.url ?? service.image}
                   alt={service.title}
                   fill

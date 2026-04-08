@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle2, ClipboardList, Clock3, Cog, KeyRound, PencilRuler, Search, Truck, Wallet } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -11,6 +10,7 @@ import LeadForm from '@/components/LeadForm';
 import BadgeChip from '@/components/home/BadgeChip';
 import FeatureCard from '@/components/home/FeatureCard';
 import AnimatedBlurHeadline from '@/components/home/AnimatedBlurHeadline';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 import type { SiteMessages } from '@/lib/messages';
 import { fadeUp, staggerContainer, viewportOnce } from '@/lib/motion';
 
@@ -159,7 +159,7 @@ export default function HomePageContent({
               className="pointer-events-none absolute inset-x-[12%] top-[16%] h-[58%] rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.14)_0%,rgba(212,28,28,0.06)_40%,transparent_75%)] blur-2xl"
             />
             <div className="relative ml-1 px-2 sm:ml-5 sm:px-3 lg:ml-9 lg:px-4">
-              <Image
+              <ProtectedImage
                 src={heroImageSrc}
                 alt={heroImageAlt}
                 width={980}

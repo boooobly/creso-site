@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 
 type PortfolioImage = {
   src: string;
@@ -28,12 +28,12 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
   return (
     <button
       type="button"
-      className="card-visual card-interactive group relative block h-full min-h-[250px] overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
+      className="card-visual card-interactive group relative block h-full min-h-[250px] overflow-hidden text-left select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
       onClick={() => onOpen({ ...image, src: currentSrc })}
       aria-label={`Открыть ${image.alt}`}
     >
       <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
-        <Image
+        <ProtectedImage
           src={currentSrc}
           alt={image.alt}
           fill
@@ -98,7 +98,7 @@ export default function OutdoorPortfolioGallery({ projects }: OutdoorPortfolioGa
           onClick={() => setActiveImage(null)}
         >
           <div className="relative w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>
-            <Image
+            <ProtectedImage
               src={activeImage.src}
               alt={activeImage.alt}
               width={1600}

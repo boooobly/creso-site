@@ -1,5 +1,5 @@
 import RevealOnScroll from '@/components/RevealOnScroll';
-import Image from 'next/image';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 
 const productionFeatures = ['ЧПУ 2×4 м', 'Печать 3.2 м', 'Сварка и покраска', 'Монтажная бригада'];
 
@@ -69,9 +69,9 @@ export default function ProductionTrustBlock() {
             <div className="grid gap-4 self-center sm:grid-cols-2 lg:grid-cols-1">
               {productionPlaceholders.map((item, index) => (
                 <RevealOnScroll key={item.title} className={productionImageRevealDelays[index]}>
-                  <article className="card-visual card-interactive group relative isolate min-h-[250px] overflow-hidden bg-neutral-900">
+                  <article className="card-visual card-interactive group relative isolate min-h-[250px] overflow-hidden bg-neutral-900 select-none">
                     <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
-                      <Image
+                      <ProtectedImage
                         src={item.imageSrc}
                         alt={item.imageAlt}
                         fill
