@@ -7,7 +7,7 @@ const navItems = [
   { label: 'Услуги', href: '/services' },
   { label: 'Производство', href: '/production' },
   { label: 'Портфолио', href: '/portfolio' },
-  { label: 'Блог', href: '/blog' },
+  { label: 'Отзывы', href: '/reviews' },
   { label: 'Контакты', href: '/contacts' },
   { label: 'Политика конфиденциальности', href: '/privacy' },
 ];
