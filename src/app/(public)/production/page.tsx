@@ -153,9 +153,9 @@ export default async function ProductionPage() {
               <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
                 <Image src={heroImageSrc} alt={heroImageAlt} fill className="object-cover" priority />
               </div>
-              <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/90 bg-white/95 px-4 py-3 backdrop-blur-lg shadow-[0_12px_30px_rgba(17,24,39,0.16)] md:bottom-5 md:left-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600">Собственный цех</p>
-                <p className="mt-1 text-sm font-bold text-neutral-950">Полный цикл производства</p>
+              <div className="pointer-events-none absolute bottom-4 left-4 right-4 rounded-2xl border border-white/30 bg-black/35 px-4 py-3 backdrop-blur-sm shadow-[0_14px_34px_-24px_rgba(2,6,23,0.9)] md:bottom-5 md:left-5 md:right-auto">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/80">Собственный цех</p>
+                <p className="mt-1 text-sm font-semibold text-white">Полный цикл производства</p>
               </div>
             </HeroMediaPanel>
           }
@@ -233,7 +233,7 @@ export default async function ProductionPage() {
             <h2 className={sectionTitleClassName}>Что мы производим</h2>
             <p className={sectionIntroClassName}>Выпускаем рекламные конструкции и печатные изделия под задачи фасада, интерьера и торговой точки.</p>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:auto-rows-fr lg:grid-cols-3">
             {products.map((item, index) => {
               const Icon = item.icon;
 
@@ -241,13 +241,13 @@ export default async function ProductionPage() {
                 <RevealOnScroll key={item.title}>
                   <article
                     style={{ transitionDelay: `${index * 55}ms` }}
-                    className="card-info card-interactive flex min-h-[204px] flex-col p-6 md:p-7"
+                    className="card-info card-interactive flex h-full min-h-[196px] flex-col p-5 md:p-6"
                   >
-                    <span className={infoIconClassName}>
+                    <span className={`${infoIconClassName} h-9 w-9 rounded-lg`}>
                       <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                     </span>
-                    <h3 className="t-h4 mt-5 leading-snug">{item.title}</h3>
-                    <p className="t-body mt-3">{item.text}</p>
+                    <h3 className="mt-4 min-h-12 text-lg font-semibold leading-6 tracking-tight text-neutral-900">{item.title}</h3>
+                    <p className="mt-2.5 text-sm leading-6 text-neutral-600 md:text-base">{item.text}</p>
                   </article>
                 </RevealOnScroll>
               );
@@ -314,7 +314,7 @@ export default async function ProductionPage() {
             <h2 className={sectionTitleClassName}>Как проходит работа</h2>
             <p className={sectionIntroClassName}>Синхронизируем этапы с задачей объекта, чтобы выдержать сроки и сохранить качество исполнения.</p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 md:auto-rows-fr lg:grid-cols-4">
             {workSteps.map((step, index) => {
               const Icon = step.icon;
 
@@ -322,16 +322,13 @@ export default async function ProductionPage() {
                 <RevealOnScroll key={step.title}>
                   <article
                     style={{ transitionDelay: `${index * 70}ms` }}
-                    className="card-info card-interactive flex min-h-[232px] flex-col p-7"
+                    className="card-info card-interactive flex h-full min-h-[208px] flex-col p-5 md:p-6"
                   >
-                    <span className={`${infoIconClassName} h-11 w-11`}>
-                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    <span className={`${infoIconClassName} h-9 w-9 rounded-lg`}>
+                      <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                     </span>
-                    <div className="mt-5 flex items-baseline gap-2">
-                      <span className="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</span>
-                    </div>
-                    <h3 className="t-h4 mt-2">{step.title}</h3>
-                    <p className="t-body mt-3">{step.text}</p>
+                    <h3 className="mt-4 text-lg font-semibold leading-6 tracking-tight text-neutral-900">{step.title}</h3>
+                    <p className="mt-2.5 text-sm leading-6 text-neutral-600 md:text-base">{step.text}</p>
                   </article>
                 </RevealOnScroll>
               );
