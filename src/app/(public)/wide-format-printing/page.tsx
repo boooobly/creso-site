@@ -104,7 +104,7 @@ export default async function WideFormatPrintingPage() {
                     key={item.title}
                     className="card-structured rounded-xl border-neutral-200/90 bg-white/80 p-4 transition-colors duration-200 hover:border-neutral-300 hover:bg-white/90 dark:bg-neutral-900/70"
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-center gap-3">
                       <span className="inline-flex h-[2.25rem] w-[2.25rem] shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
                         <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
                       </span>
