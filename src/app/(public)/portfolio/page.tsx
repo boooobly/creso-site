@@ -1,7 +1,7 @@
 import Section from '@/components/Section';
 import PortfolioGrid from '@/components/PortfolioGrid';
 import ProtectedImage from '@/components/ui/ProtectedImage';
-import { HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import localItems from '@/data/portfolio.json';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getPublicPortfolioItems } from '@/lib/public-portfolio';
@@ -40,6 +40,7 @@ export default async function PortfolioPage() {
 
   const items = rawItems.map(normalizeItem);
   const featuredItem = items.find((item) => item.featured);
+  const showcaseItems = items.slice(0, 3);
 
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Портфолио');
   const heroDescription = getPageContentValue(
@@ -50,27 +51,88 @@ export default async function PortfolioPage() {
   );
 
   const uniqueCategoriesCount = new Set(items.map((item) => item.category)).size;
-  const heroFacts = [
-    `Опубликованных проектов: ${items.length}`,
-    `Категорий: ${uniqueCategoriesCount}`,
-    featuredItem ? 'Есть выделенный кейс' : 'Все кейсы из админки',
+  const heroContextChips = [
+    `Кейсы по ${uniqueCategoriesCount || 1} направлениям`,
+    `${items.length} опубликованных работ в открытом доступе`,
+    featuredItem ? 'Вверху страницы — выделенный кейс из админки' : 'Показываем свежие опубликованные кейсы без ручной витрины',
   ];
 
   return (
     <div className="pb-8 md:pb-12">
       <Section spacing="compact">
-        <PageHero className="border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/70 to-red-50/[0.16] p-5 shadow-sm shadow-neutral-200/60 md:p-7 lg:p-8">
+        <PageHero
+          className="border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/70 to-red-50/[0.2] p-5 shadow-[0_18px_45px_-38px_rgba(15,23,42,0.45)] md:p-7 lg:p-9"
+          contentClassName="flex h-full flex-col justify-between gap-6"
+          mediaClassName="h-full"
+          media={
+            featuredItem ? (
+              <HeroMediaPanel className="group flex h-full flex-col overflow-hidden border-neutral-200/85 bg-neutral-100/90 p-2 md:p-3">
+                <div className="relative min-h-[250px] flex-1 overflow-hidden rounded-2xl md:min-h-[300px]">
+                  <ProtectedImage
+                    src={featuredItem.image}
+                    alt={featuredItem.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 42vw"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent" />
+                  <div className="absolute inset-x-4 bottom-4 space-y-2 md:inset-x-5 md:bottom-5">
+                    <span className="inline-flex items-center rounded-full border border-white/30 bg-black/35 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.11em] text-white/95 backdrop-blur-sm">
+                      Выделенный кейс
+                    </span>
+                    <h2 className="text-xl font-semibold leading-tight text-white md:text-2xl">{featuredItem.title}</h2>
+                    <p className="line-clamp-2 max-w-[42ch] text-sm leading-6 text-white/85">
+                      {featuredItem.shortDescription || 'Проект опубликован в портфолио и доступен для просмотра в каталоге ниже.'}
+                    </p>
+                    <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/70">{featuredItem.category}</p>
+                  </div>
+                </div>
+              </HeroMediaPanel>
+            ) : (
+              <HeroMediaPanel className="h-full border-neutral-200/85 bg-neutral-100/85 p-3 md:p-4">
+                <div className="grid h-full min-h-[260px] grid-cols-2 gap-3 md:min-h-[300px]">
+                  {showcaseItems.length > 0 ? (
+                    showcaseItems.map((item, index) => (
+                      <article
+                        key={item.id}
+                        className={`relative overflow-hidden rounded-xl border border-neutral-200/75 bg-white ${index === 0 ? 'col-span-2' : ''}`}
+                      >
+                        <ProtectedImage
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 28vw"
+                          className="h-full w-full object-cover"
+                        />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+                        <div className="absolute inset-x-3 bottom-3">
+                          <p className="line-clamp-1 text-sm font-semibold text-white">{item.title}</p>
+                        </div>
+                      </article>
+                    ))
+                  ) : (
+                    <div className="col-span-2 flex items-center justify-center rounded-xl border border-dashed border-neutral-300/80 bg-white/60 p-5 text-center text-sm leading-6 text-neutral-500">
+                      После публикации работ в админке здесь появится превью портфолио.
+                    </div>
+                  )}
+                </div>
+              </HeroMediaPanel>
+            )
+          }
+        >
           <div className="space-y-4">
-            <HeroEyebrow>Реальные кейсы производства</HeroEyebrow>
-            <HeroTitle className="max-w-4xl text-3xl md:text-5xl">{heroTitle}</HeroTitle>
-            <HeroLead className="max-w-[44rem] text-sm leading-6 md:text-[1.02rem] md:leading-7">{heroDescription}</HeroLead>
+            <HeroEyebrow>Портфолио реализованных проектов</HeroEyebrow>
+            <HeroTitle className="max-w-3xl text-3xl leading-[1.07] md:text-[3rem]">{heroTitle}</HeroTitle>
+            <HeroLead className="max-w-[41rem] text-sm leading-6 md:text-base md:leading-7">{heroDescription}</HeroLead>
           </div>
 
-          <div className="mt-6 border-t border-neutral-200/80 pt-4 md:pt-5">
-            <HeroChipList className="gap-2">
-              {heroFacts.map((fact) => (
-                <HeroChip key={fact} className="chip-elevated min-h-8 border-neutral-200/85 bg-white/75 px-3 py-1.5 text-[11px] shadow-none md:text-xs">
-                  {fact}
+          <div className="space-y-3 border-t border-neutral-200/85 pt-4 md:pt-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Портфолио как рабочая витрина</p>
+            <HeroChipList className="max-w-[38rem] gap-2 sm:grid-cols-1">
+              {heroContextChips.map((chip) => (
+                <HeroChip key={chip} className="chip-elevated min-h-9 justify-start rounded-xl border-neutral-200/85 bg-white/80 px-3.5 py-2 text-[12px] font-medium text-neutral-700 shadow-none">
+                  <span className="card-dot" aria-hidden="true" />
+                  {chip}
                 </HeroChip>
               ))}
             </HeroChipList>
