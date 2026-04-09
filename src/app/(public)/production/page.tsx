@@ -83,25 +83,25 @@ const gallery = [
   {
     src: '/images/outdoor_advertising/installation.png',
     alt: 'Сборка рекламной конструкции',
-    caption: 'Монтаж вывески',
+    caption: 'Монтаж вывески на объекте',
     className: 'aspect-[4/3]',
   },
   {
     src: '/images/outdoor_examples/lightbox.png',
     alt: 'Световой короб на этапе изготовления',
-    caption: 'Контражурная вывеска',
+    caption: 'Готовый световой короб',
     className: 'aspect-[16/7] sm:aspect-[16/6]',
   },
   {
     src: '/images/outdoor_examples/dimensional_letters.png',
     alt: 'Производство объемных букв',
-    caption: 'Объемные буквы',
+    caption: 'Готовые объемные буквы',
     className: 'aspect-[4/3]',
   },
   {
     src: '/images/outdoor_examples/stela.png',
     alt: 'Изготовление стелы',
-    caption: 'Стела',
+    caption: 'Готовая стела',
     className: 'aspect-[4/3]',
   },
 ] as const;
@@ -160,7 +160,7 @@ export default async function ProductionPage() {
             </HeroMediaPanel>
           }
         >
-          <HeroEyebrow>СОБСТВЕННОЕ ПРОИЗВОДСТВО</HeroEyebrow>
+          <HeroEyebrow>ПРОИЗВОДСТВЕННАЯ БАЗА</HeroEyebrow>
           <div className="space-y-4">
             <HeroTitle className="max-w-[15ch] text-3xl leading-[1.06] md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[33rem] text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
@@ -169,6 +169,7 @@ export default async function ProductionPage() {
           <HeroChipList className="max-w-[36rem] gap-2.5">
             {capabilityBadges.map((badge) => (
               <HeroChip key={badge} className="h-11 rounded-xl px-4 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                 {badge}
               </HeroChip>
             ))}
@@ -180,16 +181,16 @@ export default async function ProductionPage() {
               className={`${heroCtaBaseClass} border border-red-600 bg-red-600 text-white shadow-[0_8px_20px_rgba(220,38,38,0.24)] no-underline hover:border-red-700 hover:bg-red-700 hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]`}
             >{heroPrimaryButtonText}</Link>
             <a
-              href="#production-gallery"
+              href="#production-equipment"
               className={`${heroCtaBaseClass} border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]`}
             >
-              Смотреть производство
+              {heroSecondaryButtonText}
             </a>
           </HeroActions>
         </PageHero>
       </Section>
 
-      <Section className="pt-0">
+      <Section id="production-equipment" className="pt-0 scroll-mt-24">
         <div className="space-y-6">
           <div className="section-header">
             <p className="t-eyebrow">ОБОРУДОВАНИЕ</p>
@@ -230,6 +231,7 @@ export default async function ProductionPage() {
           <div className="section-header">
             <p className="t-eyebrow">ПРОДУКЦИЯ</p>
             <h2 className={sectionTitleClassName}>Что мы производим</h2>
+            <p className={sectionIntroClassName}>Выпускаем рекламные конструкции и печатные изделия под задачи фасада, интерьера и торговой точки.</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((item, index) => {
@@ -257,8 +259,9 @@ export default async function ProductionPage() {
       <Section id="production-gallery" className="pt-0">
         <div className="space-y-7">
           <div className="section-header">
-            <p className="t-eyebrow">ПРОИЗВОДСТВО</p>
-            <h2 className={sectionTitleClassName}>Производство в работе</h2>
+            <p className="t-eyebrow">ПРОЦЕСС И РЕЗУЛЬТАТ</p>
+            <h2 className={sectionTitleClassName}>Как проект проходит через производство</h2>
+            <p className={sectionIntroClassName}>Показываем ключевые этапы: цех, сборка, монтаж и готовые рекламные конструкции на объекте.</p>
           </div>
           <div className="space-y-5">
             <div className="grid gap-5 sm:grid-cols-2">
@@ -269,7 +272,7 @@ export default async function ProductionPage() {
                 >
                   <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5">
-                    <p className="text-sm font-semibold tracking-[0.01em] text-white">{item.caption}</p>
+                    <p className="text-sm font-medium tracking-[0.01em] text-white md:text-base">{item.caption}</p>
                   </div>
                 </div>
               ))}
@@ -283,7 +286,7 @@ export default async function ProductionPage() {
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
               />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5">
-                <p className="text-sm font-semibold tracking-[0.01em] text-white">{gallery[2].caption}</p>
+                <p className="text-sm font-medium tracking-[0.01em] text-white md:text-base">{gallery[2].caption}</p>
               </div>
             </div>
 
@@ -295,7 +298,7 @@ export default async function ProductionPage() {
                 >
                   <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5">
-                    <p className="text-sm font-semibold tracking-[0.01em] text-white">{item.caption}</p>
+                    <p className="text-sm font-medium tracking-[0.01em] text-white md:text-base">{item.caption}</p>
                   </div>
                 </div>
               ))}
@@ -309,6 +312,7 @@ export default async function ProductionPage() {
           <div className="section-header">
             <p className="t-eyebrow">ПРОЦЕСС</p>
             <h2 className={sectionTitleClassName}>Как проходит работа</h2>
+            <p className={sectionIntroClassName}>Синхронизируем этапы с задачей объекта, чтобы выдержать сроки и сохранить качество исполнения.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {workSteps.map((step, index) => {
@@ -342,6 +346,7 @@ export default async function ProductionPage() {
             <div className="section-header-tight mb-0">
               <p className="t-eyebrow">НАДЁЖНОСТЬ</p>
               <h2 className={sectionTitleClassName}>Почему нам доверяют</h2>
+              <p className={sectionIntroClassName}>Работаем прозрачно по договору и сопровождаем проект от согласования до гарантийного обслуживания.</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {trustPoints.map((item, index) => {
