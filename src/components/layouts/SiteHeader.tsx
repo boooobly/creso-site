@@ -37,6 +37,7 @@ const nav: NavItem[] = [
 export default function SiteHeader() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isServicesMenuOpen, setIsServicesMenuOpen] = useState(false);
 
   useEffect(() => {
     let rafId: number | null = null;
@@ -74,6 +75,10 @@ export default function SiteHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    setIsServicesMenuOpen(false);
+  }, [pathname]);
+
   return (
     <header
       className={`sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-black/70 ${
@@ -104,19 +109,39 @@ export default function SiteHeader() {
                 const isServicesActive = pathname === '/services' || serviceDropdownItems.some((item) => pathname === item.href);
 
                 return (
-                  <li key={n.href} className="group relative">
+                  <li
+                    key={n.href}
+                    className="group relative"
+                    onMouseEnter={() => setIsServicesMenuOpen(true)}
+                    onMouseLeave={() => setIsServicesMenuOpen(false)}
+                    onFocus={() => setIsServicesMenuOpen(true)}
+                    onBlur={(event) => {
+                      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        setIsServicesMenuOpen(false);
+                      }
+                    }}
+                  >
                     <Link
                       href={n.href}
+                      onClick={() => setIsServicesMenuOpen(false)}
                       className={
                         'inline-flex items-center gap-1 no-underline text-sm font-medium transition-colors hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:text-[var(--brand-red)] ' +
                         (isServicesActive ? 'text-[var(--brand-red)]' : 'text-neutral-700 dark:text-neutral-300')
                       }
                       aria-haspopup="menu"
+                      aria-expanded={isServicesMenuOpen}
                     >
                       <span>{n.label}</span>
-                      <ChevronDown className="size-3.5 transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true" />
+                      <ChevronDown
+                        className={`size-3.5 transition-transform duration-150 ${isServicesMenuOpen ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                      />
                     </Link>
-                    <div className="pointer-events-none absolute left-1/2 top-full z-50 w-[320px] -translate-x-1/2 pt-2 opacity-0 transition duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+                    <div
+                      className={`absolute left-1/2 top-full z-50 w-[320px] -translate-x-1/2 pt-2 transition duration-150 ${
+                        isServicesMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+                      }`}
+                    >
                       <ul
                         className="rounded-xl border border-neutral-200/80 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/95"
                         role="menu"
@@ -129,6 +154,7 @@ export default function SiteHeader() {
                             <li key={item.href} role="none">
                               <Link
                                 href={item.href}
+                                onClick={() => setIsServicesMenuOpen(false)}
                                 role="menuitem"
                                 className={
                                   'block rounded-lg px-3 py-2 text-sm no-underline transition-colors focus-visible:outline-none ' +
