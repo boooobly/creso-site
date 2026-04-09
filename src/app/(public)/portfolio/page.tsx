@@ -16,7 +16,19 @@ function normalizeItem(item: any, index: number): PortfolioItem {
   const image = String(item?.image ?? '').trim() || PLACEHOLDER_IMAGE;
 
   const galleryImages = Array.isArray(item?.galleryImages)
-    ? item.galleryImages.map((entry: unknown) => String(entry ?? '').trim()).filter(Boolean)
+    ? item.galleryImages
+        .map((entry: unknown) => {
+          if (typeof entry === 'string') {
+            return entry.trim();
+          }
+
+          if (!entry || typeof entry !== 'object') {
+            return '';
+          }
+
+          return String((entry as { url?: unknown }).url ?? '').trim();
+        })
+        .filter(Boolean)
     : [];
 
   return {

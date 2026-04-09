@@ -34,7 +34,17 @@ function parseGalleryImages(value: Prisma.JsonValue): string[] {
   }
 
   return value
-    .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
+    .map((entry) => {
+      if (typeof entry === 'string') {
+        return entry.trim();
+      }
+
+      if (!entry || typeof entry !== 'object') {
+        return '';
+      }
+
+      return String((entry as { url?: unknown }).url ?? '').trim();
+    })
     .filter((entry) => Boolean(entry));
 }
 

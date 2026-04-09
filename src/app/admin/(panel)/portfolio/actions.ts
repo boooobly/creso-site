@@ -33,12 +33,45 @@ function parseBoolean(value: FormDataEntryValue | null) {
 }
 
 function parseGalleryImages(value: FormDataEntryValue | null) {
+  const normalizeEntry = (entry: { url: string; assetId?: string }) => ({
+    url: entry.url,
+    ...(entry.assetId ? { assetId: entry.assetId } : {})
+  });
+
   if (typeof value !== 'string') return [];
 
-  return value
-    .split(/[\n,]/)
-    .map((item) => item.trim())
-    .filter(Boolean);
+  const raw = value.trim();
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((entry) => {
+        if (typeof entry === 'string') {
+          const url = entry.trim();
+          return url ? { url } : null;
+        }
+
+        if (!entry || typeof entry !== 'object') {
+          return null;
+        }
+
+        const url = String((entry as { url?: unknown }).url ?? '').trim();
+        const assetId = String((entry as { assetId?: unknown }).assetId ?? '').trim();
+
+        if (!url) return null;
+        return normalizeEntry({ url, assetId: assetId || undefined });
+      })
+      .filter((entry): entry is { url: string; assetId?: string } => Boolean(entry));
+  } catch {
+    return raw
+      .split(/[\n,]/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((url) => normalizeEntry({ url }));
+  }
 }
 
 function getFileNameFromUrl(url: string) {
@@ -55,15 +88,17 @@ function getFileNameFromUrl(url: string) {
 function formDataToPayload(formData: FormData) {
   const title = String(formData.get('title') ?? '').trim();
   const slugInput = String(formData.get('slug') ?? '').trim();
+  const galleryImages = parseGalleryImages(formData.get('galleryImages'));
+  const coverImageFromGallery = galleryImages[0]?.url;
 
   return {
     title,
     slug: slugInput || slugify(title),
     category: String(formData.get('category') ?? '').trim(),
     shortDescription: String(formData.get('shortDescription') ?? '').trim() || undefined,
-    coverImage: String(formData.get('coverImage') ?? '').trim() || undefined,
+    coverImage: String(formData.get('coverImage') ?? '').trim() || coverImageFromGallery || undefined,
     coverImageAssetId: String(formData.get('coverImageAssetId') ?? '').trim() || undefined,
-    galleryImages: parseGalleryImages(formData.get('galleryImages')),
+    galleryImages,
     featured: parseBoolean(formData.get('featured')),
     published: parseBoolean(formData.get('published')),
     sortOrder: Number(formData.get('sortOrder') ?? 0)
@@ -89,7 +124,10 @@ async function ensureCoverImageAsset(payload: PortfolioPayload) {
   return {
     payload: {
       ...payload,
-      coverImageAssetId: created.id
+      coverImageAssetId: created.id,
+      galleryImages: payload.galleryImages.map((image, index) =>
+        index === 0 || image.url === payload.coverImage ? { ...image, assetId: image.assetId ?? created.id } : image
+      )
     },
     createdAssetId: created.id
   };

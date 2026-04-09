@@ -40,7 +40,25 @@ export default async function AdminPortfolioEditPage({ params }: AdminPortfolioE
           shortDescription: item.shortDescription ?? '',
           coverImage: item.coverImage ?? '',
           coverImageAssetId: item.coverImageAssetId ?? '',
-          galleryImages: Array.isArray(item.galleryImages) ? item.galleryImages.join('\n') : '',
+          galleryImages: Array.isArray(item.galleryImages)
+            ? item.galleryImages
+                .map((entry) => {
+                  if (typeof entry === 'string') {
+                    return { url: entry };
+                  }
+
+                  if (!entry || typeof entry !== 'object') {
+                    return null;
+                  }
+
+                  const url = String((entry as { url?: unknown }).url ?? '').trim();
+                  const assetId = String((entry as { assetId?: unknown }).assetId ?? '').trim();
+                  if (!url) return null;
+
+                  return { url, assetId: assetId || undefined };
+                })
+                .filter((entry): entry is { url: string; assetId?: string } => Boolean(entry))
+            : [],
           featured: item.featured,
           published: item.published,
           sortOrder: item.sortOrder
