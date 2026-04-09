@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
+import type { Prisma } from '@prisma/client';
 
 export type PublicPortfolioItem = {
   id: string;
@@ -7,10 +8,13 @@ export type PublicPortfolioItem = {
   category: string;
   shortDescription: string;
   image: string;
+  featured: boolean;
   sortOrder: number;
+  galleryImages: string[];
 };
 
 const PORTFOLIO_PLACEHOLDER_IMAGE = '/og-image.png';
+const UNCATEGORIZED_LABEL = 'Без категории';
 
 function resolvePortfolioImage(item: {
   coverImage: string | null;
@@ -19,24 +23,43 @@ function resolvePortfolioImage(item: {
   return item.coverImageAsset?.url ?? item.coverImage ?? PORTFOLIO_PLACEHOLDER_IMAGE;
 }
 
+function normalizeCategory(category: string | null) {
+  const normalized = String(category ?? '').trim();
+  return normalized || UNCATEGORIZED_LABEL;
+}
+
+function parseGalleryImages(value: Prisma.JsonValue): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
+    .filter((entry) => Boolean(entry));
+}
+
 function mapPublicPortfolioItem(item: {
   id: string;
   slug: string;
   title: string;
-  category: string;
+  category: string | null;
   shortDescription: string | null;
+  featured: boolean;
   sortOrder: number;
   coverImage: string | null;
+  galleryImages: Prisma.JsonValue;
   coverImageAsset: { url: string } | null;
 }): PublicPortfolioItem {
   return {
     id: item.id,
     slug: item.slug,
     title: item.title,
-    category: item.category,
+    category: normalizeCategory(item.category),
     shortDescription: item.shortDescription ?? '',
     image: resolvePortfolioImage(item),
-    sortOrder: item.sortOrder
+    featured: item.featured,
+    sortOrder: item.sortOrder,
+    galleryImages: parseGalleryImages(item.galleryImages),
   };
 }
 
@@ -47,10 +70,10 @@ export async function getPublicPortfolioItems() {
     include: {
       coverImageAsset: {
         select: {
-          url: true
-        }
-      }
-    }
+          url: true,
+        },
+      },
+    },
   });
 
   return items.map(mapPublicPortfolioItem);
@@ -64,10 +87,10 @@ export async function getFeaturedPortfolioItems(limit = 3) {
     include: {
       coverImageAsset: {
         select: {
-          url: true
-        }
-      }
-    }
+          url: true,
+        },
+      },
+    },
   });
 
   return items.map(mapPublicPortfolioItem);
