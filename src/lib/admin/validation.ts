@@ -30,7 +30,15 @@ export const portfolioItemSchema = z.object({
   shortDescription: optionalTrimmedString,
   coverImage: optionalTrimmedString,
   coverImageAssetId: optionalTrimmedString,
-  galleryImages: z.array(z.string().trim().url('Изображение галереи должно быть валидным URL.')).max(30).default([]),
+  galleryImages: z
+    .array(
+      z.object({
+        url: z.string().trim().url('Изображение галереи должно быть валидным URL.'),
+        assetId: optionalTrimmedString
+      })
+    )
+    .max(30)
+    .default([]),
   featured: z.boolean().default(false),
   published: z.boolean().default(false),
   sortOrder: z.coerce.number().int().min(0).max(100000).default(0)

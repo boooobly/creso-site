@@ -21,7 +21,7 @@ export default function AdminPortfolioCreatePage() {
           shortDescription: '',
           coverImage: '',
           coverImageAssetId: '',
-          galleryImages: '',
+          galleryImages: [],
           featured: false,
           published: false,
           sortOrder: 0

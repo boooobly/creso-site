@@ -18,7 +18,7 @@ export type AdminPaginatedResult<T> = {
 export type PortfolioItemInput = Omit<
   PortfolioItem,
   'id' | 'createdAt' | 'updatedAt' | 'galleryImages'
-> & { galleryImages: string[] };
+> & { galleryImages: Array<{ url: string; assetId?: string }> };
 
 export type SiteSettingInput = Omit<SiteSetting, 'id' | 'createdAt' | 'updatedAt'>;
 
