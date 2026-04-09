@@ -4,16 +4,34 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { ChevronDown, Moon, Sun } from 'lucide-react';
 import { messages } from '@/lib/messages';
 
-const nav: Array<{ href: string; key: keyof typeof messages.nav }> = [
-  { href: '/baget', key: 'baget' },
-  { href: '/services', key: 'services' },
-  { href: '/production', key: 'production' },
-  { href: '/portfolio', key: 'portfolio' },
-  { href: '/reviews', key: 'reviews' },
-  { href: '/contacts', key: 'contacts' },
+type NavItem = {
+  href: string;
+  label: string;
+  key?: keyof typeof messages.nav;
+};
+
+const serviceDropdownItems: Array<{ label: string; href: string }> = [
+  { label: 'Багет', href: '/baget' },
+  { label: 'Широкоформатная печать', href: '/wide-format-printing' },
+  { label: 'Плоттерная резка', href: '/plotter-cutting' },
+  { label: 'Печать на футболках', href: '/heat-transfer' },
+  { label: 'Печать на кружках', href: '/services/mugs' },
+  { label: 'Изготовление стендов', href: '/services/stands' },
+  { label: 'Наружная реклама', href: '/outdoor-advertising' },
+  { label: 'Визитки и флаеры', href: '/print' },
+  { label: 'Фрезеровка листовых материалов', href: '/milling' },
+];
+
+const nav: NavItem[] = [
+  { href: '/', label: 'Главная' },
+  { href: '/services', label: messages.nav.services, key: 'services' },
+  { href: '/production', label: messages.nav.production, key: 'production' },
+  { href: '/portfolio', label: messages.nav.portfolio, key: 'portfolio' },
+  { href: '/reviews', label: messages.nav.reviews, key: 'reviews' },
+  { href: '/contacts', label: messages.nav.contacts, key: 'contacts' },
 ];
 
 export default function SiteHeader() {
@@ -79,22 +97,73 @@ export default function SiteHeader() {
             className={`hidden h-10 w-auto transition-all duration-200 dark:block ${isScrolled ? 'h-8' : 'h-10'}`}
           />
         </Link>
-        <nav className="hidden gap-5 md:flex">
-          {nav.map((n) => {
-            const active = pathname === n.href;
-            return (
-              <Link
-                key={n.href}
-                href={n.href}
-                className={
-                  'no-underline text-sm font-medium hover:text-[var(--brand-red)] ' +
-                  (active ? 'text-[var(--brand-red)]' : 'text-neutral-700 dark:text-neutral-300')
-                }
-              >
-                <span>{messages.nav[n.key]}</span>
-              </Link>
-            );
-          })}
+        <nav className="hidden md:flex">
+          <ul className="flex items-center gap-5">
+            {nav.map((n) => {
+              if (n.href === '/services') {
+                const isServicesActive = pathname === '/services' || serviceDropdownItems.some((item) => pathname === item.href);
+
+                return (
+                  <li key={n.href} className="group relative">
+                    <Link
+                      href={n.href}
+                      className={
+                        'inline-flex items-center gap-1 no-underline text-sm font-medium transition-colors hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:text-[var(--brand-red)] ' +
+                        (isServicesActive ? 'text-[var(--brand-red)]' : 'text-neutral-700 dark:text-neutral-300')
+                      }
+                      aria-haspopup="menu"
+                    >
+                      <span>{n.label}</span>
+                      <ChevronDown className="size-3.5 transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true" />
+                    </Link>
+                    <div className="pointer-events-none absolute left-1/2 top-full z-50 w-[320px] -translate-x-1/2 pt-2 opacity-0 transition duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+                      <ul
+                        className="rounded-xl border border-neutral-200/80 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/95"
+                        role="menu"
+                        aria-label="Услуги"
+                      >
+                        {serviceDropdownItems.map((item) => {
+                          const active = pathname === item.href;
+
+                          return (
+                            <li key={item.href} role="none">
+                              <Link
+                                href={item.href}
+                                role="menuitem"
+                                className={
+                                  'block rounded-lg px-3 py-2 text-sm no-underline transition-colors focus-visible:outline-none ' +
+                                  (active
+                                    ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)]'
+                                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-200 dark:hover:bg-neutral-800')
+                                }
+                              >
+                                {item.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  </li>
+                );
+              }
+
+              const active = pathname === n.href;
+              return (
+                <li key={n.href}>
+                  <Link
+                    href={n.href}
+                    className={
+                      'no-underline text-sm font-medium hover:text-[var(--brand-red)] ' +
+                      (active ? 'text-[var(--brand-red)]' : 'text-neutral-700 dark:text-neutral-300')
+                    }
+                  >
+                    <span>{n.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
