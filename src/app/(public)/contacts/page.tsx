@@ -88,7 +88,7 @@ export default async function ContactsPage() {
   ];
 
   return (
-    <div className="space-y-10 pb-12 md:pb-16">
+    <div className="space-y-8 pb-10 md:space-y-9 md:pb-12">
       <section className="space-y-4">
         <h1 className="text-2xl font-bold">{heroTitle}</h1>
         <p className="text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
@@ -165,21 +165,23 @@ export default async function ContactsPage() {
         <div id="contact-form"><ContactsLeadCapture t={messages} /></div>
       </section>
 
-      <section className="grid items-start gap-6 md:grid-cols-2">
-        <div>
-          <h2 className="text-2xl font-bold">Как нас найти</h2>
-          <p className="mt-2 text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
-          <p className="text-neutral-700 dark:text-neutral-300">Тел: {settings.phone}</p>
-          <p className="text-neutral-700 dark:text-neutral-300">E-mail: {settings.email}</p>
-          <a className="btn-secondary mt-4 inline-block no-underline" href={BRAND.yandexRoute} target="_blank" rel="noreferrer">Маршрут в Яндекс.Картах</a>
+      <section className="space-y-5 md:space-y-6">
+        <div className="grid items-start gap-5 md:grid-cols-2 md:gap-6">
+          <div className="card h-full rounded-2xl border-neutral-200/85 bg-white/90 p-6 dark:border-neutral-800/90 dark:bg-neutral-900/85">
+            <h2 className="text-2xl font-bold">Как нас найти</h2>
+            <p className="mt-2 text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
+            <p className="text-neutral-700 dark:text-neutral-300">Тел: {settings.phone}</p>
+            <p className="text-neutral-700 dark:text-neutral-300">E-mail: {settings.email}</p>
+            <a className="btn-secondary mt-4 inline-block no-underline" href={BRAND.yandexRoute} target="_blank" rel="noreferrer">Маршрут в Яндекс.Картах</a>
+          </div>
+          <MapSection />
         </div>
-        <MapSection />
-      </section>
 
-      <section className="space-y-3 rounded-2xl bg-[var(--brand-red)]/10 p-6 text-center">
-        <h2 className="text-2xl font-bold">{ctaTitle}</h2>
-        <p className="text-neutral-700 dark:text-neutral-300">{ctaDescription}</p>
-        <Link href="/contacts#contact-form" className="btn-primary inline-flex no-underline">{ctaButtonText}</Link>
+        <div className="card rounded-2xl border border-red-200/70 bg-[var(--brand-red)]/10 p-6 text-center dark:border-red-500/30 dark:bg-red-500/10 md:p-7">
+          <h2 className="text-2xl font-bold">{ctaTitle}</h2>
+          <p className="mt-2 text-neutral-700 dark:text-neutral-300">{ctaDescription}</p>
+          <Link href="/contacts#contact-form" className="btn-primary mt-4 inline-flex no-underline">{ctaButtonText}</Link>
+        </div>
       </section>
     </div>
   );

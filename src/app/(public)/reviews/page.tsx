@@ -63,7 +63,7 @@ async function loadApprovedReviews(): Promise<PublicReviewItem[]> {
 export default async function ReviewsPage() {
   const reviews = await loadApprovedReviews();
   return (
-    <div className="space-y-8 md:space-y-10">
+    <div className="space-y-7 md:space-y-8">
       <section className="card rounded-3xl border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/80 to-red-50/[0.18] p-6 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:p-8">
         <RevealOnScroll>
           <div className="space-y-3 text-center md:space-y-4">
@@ -76,7 +76,7 @@ export default async function ReviewsPage() {
         </RevealOnScroll>
       </section>
       <ReviewsClient reviews={reviews} />
-      <section className="card rounded-2xl p-6 md:p-8">
+      <section className="card relative z-10 rounded-2xl p-6 md:p-8">
         <RevealOnScroll>
           <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-7">
             <div className="space-y-2">
@@ -96,7 +96,7 @@ export default async function ReviewsPage() {
           </div>
         </RevealOnScroll>
       </section>
-      <section className="card rounded-2xl p-6 md:p-8">
+      <section className="card relative z-10 rounded-2xl p-6 md:p-8">
         <RevealOnScroll>
           <div className="mb-4 flex items-center gap-2.5 md:mb-5">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
@@ -122,9 +122,9 @@ export default async function ReviewsPage() {
           </ul>
         </RevealOnScroll>
       </section>
-      <section className="pb-2">
+      <section className="relative z-10 pb-2">
         <RevealOnScroll>
-          <div className="cta-shell card border-neutral-200/85">
+          <div className="cta-shell card border-neutral-200/85 dark:border-neutral-800/90 dark:bg-neutral-900/85">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="space-y-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Следующий шаг</p>
