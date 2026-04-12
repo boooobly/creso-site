@@ -73,6 +73,11 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
     flyersRequested: values.flyersRequested,
   }), [summary, values.flyersRequested]);
 
+  const selectedOptions = [
+    summary.lamination ? 'ламинация' : null,
+    summary.needDesign ? 'дизайн' : null,
+  ].filter(Boolean).join(', ');
+
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
 
@@ -171,7 +176,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
     <div id="business-cards-form" className={publicFormStyles.shell}>
       <div className={publicFormStyles.heading}>
         <h2 className="text-2xl font-bold">Отправить заявку</h2>
-        <p className="mt-1.5 text-sm leading-6 text-neutral-600">Оставьте контакты и приложите макет. Менеджер уточнит детали и подтвердит сроки.</p>
+        <p className="mt-1.5 text-sm leading-6 text-neutral-600">Оставьте контакты и макет — мы свяжемся для подтверждения заказа.</p>
       </div>
 
       <form className={`${publicFormStyles.fieldsStack} mt-5`} onSubmit={handleSubmit} noValidate>
@@ -224,7 +229,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
               helperTextClassName="mt-1 t-small text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
-            <p className="t-small text-muted-foreground">Перед печатью проверим макет и при необходимости подскажем, что поправить.</p>
+            <p className="t-small text-muted-foreground">Проверим файл перед запуском в печать.</p>
           </div>
         </div>
 
@@ -252,8 +257,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
         <div className={`${publicFormStyles.summaryCard} space-y-0.5`}>
           <p><b>Тираж:</b> {summary.quantity.toLocaleString('ru-RU')} шт.</p>
           <p><b>Печать:</b> {summary.printSide === 'single' ? 'Односторонняя' : 'Двусторонняя'}</p>
-          <p><b>Ламинация:</b> {summary.lamination ? 'Да' : 'Нет'}</p>
-          <p><b>Нужен дизайн:</b> {summary.needDesign ? 'Да' : 'Нет'}</p>
+          <p><b>Опции:</b> {selectedOptions || 'Без доп. опций'}</p>
           <p><b>Итого:</b> {summary.totalPrice.toLocaleString('ru-RU')} ₽</p>
         </div>
 
