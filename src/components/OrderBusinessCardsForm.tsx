@@ -42,9 +42,9 @@ const defaultValues: FormValues = {
 };
 
 const FIXED_NOTES = [
-  'Double-sided price is the same',
-  'Lamination +15%, one side only',
-  'Design price is agreed with manager',
+  'Цена для односторонней и двусторонней печати одинаковая',
+  'Ламинация +15%, только с одной стороны',
+  'Стоимость дизайна согласовывается с менеджером',
 ];
 
 export default function OrderBusinessCardsForm({ summary }: Props) {
@@ -171,7 +171,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
     <div id="business-cards-form" className={publicFormStyles.shell}>
       <div className={publicFormStyles.heading}>
         <h2 className="text-2xl font-bold">Отправить заявку</h2>
-        <p className="mt-1.5 text-sm text-neutral-600">Оставьте контакты и приложите макет — менеджер подтвердит детали и сроки.</p>
+        <p className="mt-1.5 text-sm leading-6 text-neutral-600">Оставьте контакты и приложите макет. Менеджер уточнит детали и подтвердит сроки.</p>
       </div>
 
       <form className={`${publicFormStyles.fieldsStack} mt-5`} onSubmit={handleSubmit} noValidate>
@@ -207,7 +207,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
               onChange={setFile}
               title="Загрузка файла"
               accept=".jpg,.jpeg,.png,.webp,.tif,.tiff,.pdf,.cdr,.ai,.psd"
-              helperText="JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD. 1 файл, до 50 МБ."
+              helperText="JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD — 1 файл до 50 МБ."
               allowedMimeTypes={[
                 'image/jpeg',
                 'image/png',
@@ -224,7 +224,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
               helperTextClassName="mt-1 t-small text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
-            <p className="t-small text-muted-foreground">Мы проверим макет перед печатью и подтвердим детали заказа.</p>
+            <p className="t-small text-muted-foreground">Перед печатью проверим макет и при необходимости подскажем, что поправить.</p>
           </div>
         </div>
 
@@ -236,11 +236,11 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
               onChange={(e) => setValues((prev) => ({ ...prev, flyersRequested: e.target.checked }))}
               className="h-4 w-4"
             />
-            <span className="text-sm font-medium">Флаеры (расчёт по согласованию)</span>
+            <span className="text-sm font-medium">Добавить расчёт флаеров</span>
           </label>
-          <p className="t-small text-muted-foreground">Укажите желаемый формат, бумагу и тираж в комментарии.</p>
+          <p className="t-small text-muted-foreground">Если нужны флаеры, укажите в комментарии формат, бумагу и тираж.</p>
           {values.flyersRequested && !values.comment.trim() && (
-            <p className="t-small text-amber-700 dark:text-amber-300">Подсказка: добавьте в комментарии параметры флаеров для точного расчёта.</p>
+            <p className="t-small text-amber-700 dark:text-amber-300">Подсказка: добавьте параметры флаеров в комментарий для точного расчёта.</p>
           )}
         </div>
 
