@@ -368,6 +368,22 @@ export const TSHIRTS_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   { key: 'tshirts.examples.film', label: 'Печать на футболках — пример: термоплёнка', pageTitle: 'Печать на футболках', sectionLabel: 'Примеры работ', usageLabel: 'Карточка «Надпись термоплёнкой»', route: '/heat-transfer', fallbackUrl: '/images/t-shirt/termoplenka.png', fallbackAlt: 'Надпись термоплёнкой', groupKey: 'tshirts', groupLabel: 'Печать на футболках', groupDescription: 'Изображения страницы печати на футболках: реальные примеры работ.' },
 ];
 
+export const PRINT_SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
+  {
+    key: 'print.hero.main',
+    label: 'Визитки — главный экран',
+    pageTitle: 'Визитки и флаеры',
+    sectionLabel: 'Первый экран',
+    usageLabel: 'Главное изображение страницы услуги «Визитки и флаеры»',
+    route: '/print',
+    fallbackUrl: '/images/bussinescard/hero.png',
+    fallbackAlt: 'Офсетные визитки с фиксированными параметрами печати',
+    groupKey: 'print',
+    groupLabel: 'Визитки и флаеры',
+    groupDescription: 'Изображения страницы визиток и флаеров: главный экран.',
+  },
+];
+
 export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   ...HOME_IMAGE_SLOTS,
   ...SERVICE_CARD_IMAGE_SLOTS,
@@ -377,6 +393,7 @@ export const SITE_IMAGE_SLOTS: SiteImageSlotDefinition[] = [
   ...MUGS_SITE_IMAGE_SLOTS,
   ...PLOTTER_SITE_IMAGE_SLOTS,
   ...TSHIRTS_SITE_IMAGE_SLOTS,
+  ...PRINT_SITE_IMAGE_SLOTS,
 ];
 
 export const SITE_IMAGE_SLOT_KEYS = new Set(SITE_IMAGE_SLOTS.map((slot) => slot.key));
