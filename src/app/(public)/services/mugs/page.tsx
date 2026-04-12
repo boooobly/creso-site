@@ -173,12 +173,12 @@ export default async function MugsServicePage() {
             {quickBenefits.map((item) => {
               const Icon = item.icon;
               return (
-                <article key={item.title} className="h-full rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-300">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                <article key={item.title} className="h-full rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900/82 dark:shadow-[0_12px_28px_-24px_rgba(0,0,0,0.8)] dark:hover:border-neutral-700">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-500/12 dark:text-red-300">
                     <Icon className="h-4 w-4" aria-hidden="true" />
                   </span>
-                  <h2 className="mt-3 text-base font-semibold text-neutral-900">{item.title}</h2>
-                  <p className="mt-1 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+                  <h2 className="mt-3 text-base font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h2>
+                  <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
                 </article>
               );
             })}
@@ -190,7 +190,7 @@ export default async function MugsServicePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <p className="t-eyebrow">Цены и условия</p>
           <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Понятная стоимость без скрытых доплат</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600 sm:text-base">Стоимость формируется без скрытых пунктов: вы заранее понимаете цену, сроки и что именно входит в заказ.</p>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">Стоимость формируется без скрытых пунктов: вы заранее понимаете цену, сроки и что именно входит в заказ.</p>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
             {pricingCards.map((item) => {
@@ -216,8 +216,8 @@ export default async function MugsServicePage() {
             })}
           </div>
 
-          <div className="mt-5 rounded-2xl border border-red-100 bg-red-50/60 p-4 text-sm text-neutral-700 sm:p-5">
-            <span className="font-semibold text-neutral-900">Скидки за объём:</span> каждые 12 шт — минус 2,5%, максимальная суммарная скидка — 20%.
+          <div className="mt-5 rounded-2xl border border-red-100 bg-red-50/60 p-4 text-sm text-neutral-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-neutral-200 sm:p-5">
+            <span className="font-semibold text-neutral-900 dark:text-neutral-100">Скидки за объём:</span> каждые 12 шт — минус 2,5%, максимальная суммарная скидка — 20%.
           </div>
         </div>
       </Section>
@@ -225,23 +225,23 @@ export default async function MugsServicePage() {
       <Section className="py-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
+            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/88 dark:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.78)] sm:p-8">
               <p className="t-eyebrow">Что вы получаете</p>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">Кружка как готовый коммерческий продукт</h2>
-              <p className="mt-4 text-sm leading-relaxed text-neutral-600 sm:text-base">
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">Кружка как готовый коммерческий продукт</h2>
+              <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
                 Мы делаем не просто “нанесение на сувенир”, а готовое изделие для продаж, подарков и бренд-коммуникации. Важно, чтобы тираж выглядел единообразно и профессионально.
               </p>
               <div className="mt-6 grid gap-3">
                 {resultCards.map((item) => (
-                  <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4">
-                    <h3 className="text-base font-semibold text-neutral-900">{item.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+                  <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 dark:border-neutral-700/80 dark:bg-neutral-800/60">
+                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
                   </article>
                 ))}
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-3xl border border-neutral-200 shadow-sm">
+            <div className="overflow-hidden rounded-3xl border border-neutral-200 shadow-sm dark:border-neutral-800 dark:shadow-[0_18px_34px_-26px_rgba(0,0,0,0.8)]">
               <div className="relative h-full min-h-[420px] w-full sm:min-h-[520px] lg:min-h-[560px]">
                 <ProtectedImage
                   src={resultImageSrc}
@@ -263,21 +263,21 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-order" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
         <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_16px_34px_-30px_rgba(0,0,0,0.6)] sm:p-7">
-            <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 dark:border-neutral-800 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/92 dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-7">
+            <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 dark:border-neutral-800/90 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-2xl">
                 <p className="t-eyebrow">Оформление заказа</p>
                 <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Отправьте заявку за 1 минуту</h2>
                 <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Укажите основные параметры заказа, чтобы быстро получить расчёт и план запуска по вашему тиражу.</p>
               </div>
-              <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 lg:min-w-[340px]">
+              <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-200 lg:min-w-[340px]">
                 {[
                   'Укажите тираж и покрытие',
                   'Приложите макет или кратко опишите задачу',
                   'Получите расчёт и следующий шаг',
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-neutral-700 dark:bg-neutral-800/70">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600" aria-hidden="true" />
+                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-neutral-700/90 dark:bg-neutral-800/70">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600 dark:text-red-400" aria-hidden="true" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -290,7 +290,7 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-faq" className="pb-12 pt-0 lg:pb-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_16px_34px_-30px_rgba(0,0,0,0.6)] sm:p-8">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/92 dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-8">
             <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Частые вопросы</h2>
             <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 sm:text-base">Коротко о сроках, макетах и процессе печати.</p>
 
