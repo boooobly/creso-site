@@ -82,7 +82,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
 
   return (
     <div className="space-y-6 md:space-y-7">
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-neutral-200/80 bg-white/85 p-2 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.45)]">
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-neutral-200/80 bg-gradient-to-r from-white/95 via-neutral-50/90 to-white/95 p-2.5 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.45)] dark:border-neutral-800/90 dark:from-neutral-900/95 dark:via-neutral-900/88 dark:to-neutral-900/95 dark:shadow-[0_14px_28px_-28px_rgba(0,0,0,0.55)]">
         {categories.map((category) => {
           const isActive = category === activeCategory;
 
@@ -95,7 +95,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                 'inline-flex min-h-9 items-center rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all duration-200 md:text-sm',
                 isActive
                   ? 'border-red-200/80 bg-red-50 text-red-700 shadow-[0_10px_20px_-16px_rgba(220,38,38,0.6)] dark:border-red-500/45 dark:bg-red-500/15 dark:text-red-200'
-                  : 'border-transparent bg-transparent text-neutral-600 hover:border-neutral-200/85 hover:bg-neutral-50/80 hover:text-neutral-900 dark:text-neutral-300'
+                  : 'border-transparent bg-transparent text-neutral-600 hover:border-neutral-200/85 hover:bg-white/90 hover:text-neutral-900 dark:text-neutral-300 dark:hover:border-neutral-700/80 dark:hover:bg-neutral-800/85 dark:hover:text-neutral-100'
               )}
               aria-pressed={isActive}
             >
@@ -111,7 +111,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
             const description = getItemDescription(item);
 
             return (
-              <article key={item.id} className="card-visual card-interactive group overflow-hidden border-neutral-200/85 bg-white/90 shadow-[0_20px_40px_-34px_rgba(15,23,42,0.4)]">
+              <article key={item.id} className="card-visual card-interactive group overflow-hidden border-neutral-200/85 bg-white/90 shadow-[0_20px_40px_-34px_rgba(15,23,42,0.4)] dark:border-neutral-800/90 dark:bg-neutral-900/90">
                 <button
                   type="button"
                   onClick={() => {
@@ -136,8 +136,8 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                   </div>
 
                   <div className="space-y-3 p-4 md:p-5">
-                    <h3 className="text-lg font-semibold tracking-tight text-neutral-900 md:text-[1.2rem]">{item.title}</h3>
-                    <p className="line-clamp-3 text-sm leading-6 text-neutral-600 md:text-[0.95rem]">
+                    <h3 className="text-lg font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-[1.2rem]">{item.title}</h3>
+                    <p className="line-clamp-3 text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-[0.95rem]">
                       {description || 'Описание проекта добавляется. Откройте карточку, чтобы посмотреть детали и изображения.'}
                     </p>
                     <div className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">

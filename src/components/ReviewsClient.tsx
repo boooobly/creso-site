@@ -87,8 +87,8 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
             {visibleReviews.map((review) => (
               <RevealOnScroll key={review.id}>
-                <article className="premium-card h-full rounded-2xl border-neutral-200/90 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900 md:p-6">
-                  <div className="mb-3 flex items-start justify-between gap-3 border-b border-neutral-100 pb-3 dark:border-neutral-800">
+                <article className="premium-card h-full rounded-2xl border-neutral-200/90 bg-white p-5 dark:border-neutral-800/95 dark:bg-neutral-900 md:p-6">
+                  <div className="mb-3 flex items-start justify-between gap-3 border-b border-neutral-100 pb-3 dark:border-neutral-800/90">
                     <div>
                       <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{getPublicName(review)}</p>
                       <p className="mt-1 text-xs text-neutral-500">{new Date(review.createdAt).toLocaleDateString('ru-RU')}</p>
@@ -104,7 +104,7 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
                     {'★'.repeat(review.rating)}
                   </p>
 
-                  <p className="text-sm leading-6 text-neutral-700 dark:text-neutral-300">{review.text}</p>
+                  <p className="text-sm leading-6 text-neutral-700 dark:text-neutral-200/95">{review.text}</p>
                 </article>
               </RevealOnScroll>
             ))}
