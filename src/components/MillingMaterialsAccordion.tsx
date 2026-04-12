@@ -57,7 +57,7 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
         return (
           <div
             key={group.id}
-            className={`overflow-hidden rounded-2xl border bg-white shadow-[0_16px_34px_-32px_rgba(15,23,42,0.62)] transition-colors dark:bg-neutral-900 ${isHighlighted ? 'border-red-400 ring-2 ring-red-500/25' : 'border-neutral-200/90 dark:border-neutral-700'}`}
+            className={`overflow-hidden rounded-2xl border bg-white shadow-[0_16px_34px_-32px_rgba(15,23,42,0.62)] transition-colors dark:bg-neutral-900/85 dark:shadow-[0_18px_36px_-30px_rgba(0,0,0,0.62)] ${isHighlighted ? 'border-red-400 ring-2 ring-red-500/25 dark:border-red-500/55 dark:ring-red-500/20' : 'border-neutral-200/90 dark:border-neutral-800/90'}`}
           >
             <h3>
               <button
@@ -66,11 +66,11 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => setOpenId((prev) => (prev === group.id ? null : group.id))}
-                className="flex min-h-16 w-full items-center justify-between gap-4 border-b border-transparent bg-neutral-50/80 px-5 py-4 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:bg-neutral-800/70 dark:hover:border-neutral-600 dark:hover:bg-neutral-800"
+                className="flex min-h-16 w-full items-center justify-between gap-4 border-b border-transparent bg-neutral-50/80 px-5 py-4 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:bg-neutral-800/65 dark:hover:border-neutral-700 dark:hover:bg-neutral-800/90"
               >
-                <span className="text-base font-semibold md:text-lg">{group.title}</span>
+                <span className="text-base font-semibold text-neutral-900 dark:text-neutral-100 md:text-lg">{group.title}</span>
                 <ChevronDown
-                  className={`h-5 w-5 shrink-0 text-neutral-500 transition-transform duration-300 motion-reduce:duration-0 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+                  className={`h-5 w-5 shrink-0 text-neutral-500 transition-transform duration-300 motion-reduce:duration-0 dark:text-neutral-400 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
                   aria-hidden="true"
                 />
               </button>
@@ -83,11 +83,11 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
               className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
             >
               <div className="overflow-hidden">
-                <div className="border-t border-neutral-200/90 p-4 dark:border-neutral-700">
+                <div className="border-t border-neutral-200/90 p-4 dark:border-neutral-800">
                   <p className="text-sm text-neutral-600 dark:text-neutral-300">{group.description}</p>
-                  <div className="mt-4 overflow-hidden rounded-xl border border-zinc-200/90 dark:border-neutral-800">
+                  <div className="mt-4 overflow-hidden rounded-xl border border-zinc-200/90 dark:border-neutral-700/80">
                     <table className="w-full table-fixed text-left text-sm">
-                      <thead className="bg-neutral-50 dark:bg-neutral-800/60">
+                      <thead className="bg-neutral-50 dark:bg-neutral-800/75">
                         <tr>
                           <th className="w-1/2 px-4 py-2 font-medium">Толщина</th>
                           <th className="w-1/2 px-4 py-2 text-right font-medium">Цена</th>
@@ -97,9 +97,9 @@ export default function MillingMaterialsAccordion({ groups }: MillingMaterialsAc
                         {group.rows.map((row, rowIndex) => (
                           <tr
                             key={row.thickness}
-                            className={`border-t border-zinc-200 dark:border-neutral-800 transition-colors hover:bg-zinc-100 dark:hover:bg-neutral-800/80 ${rowIndex % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-zinc-50 dark:bg-neutral-800/50'}`}
+                            className={`border-t border-zinc-200 dark:border-neutral-700/80 transition-colors hover:bg-zinc-100 dark:hover:bg-neutral-800 ${rowIndex % 2 === 0 ? 'bg-white dark:bg-neutral-900/70' : 'bg-zinc-50 dark:bg-neutral-800/50'}`}
                           >
-                            <td className={`px-4 py-3 align-top ${rowIndex % 2 !== 0 ? 'border-l-2 border-l-zinc-200 dark:border-l-transparent' : ''}`}>{row.thickness}</td>
+                            <td className={`px-4 py-3 align-top ${rowIndex % 2 !== 0 ? 'border-l-2 border-l-zinc-200 dark:border-l-neutral-700/60' : ''}`}>{row.thickness}</td>
                             <td className="px-4 py-3 text-right font-medium align-top">{row.price}</td>
                           </tr>
                         ))}
