@@ -152,7 +152,7 @@ export default function OrderMugsForm() {
     <div id="mug-order-form" className={`${publicFormStyles.shell} sm:p-8 md:p-9`}>
       <div className={publicFormStyles.heading}>
         <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">Заявка на печать кружек</h2>
-        <p className="mt-2 text-sm text-neutral-600">Укажите параметры заказа, и мы свяжемся с вами для подтверждения деталей.</p>
+        <p className="mt-2 text-sm text-neutral-600">Заполните поля формы для предварительного расчёта.</p>
       </div>
 
       <form className={`${publicFormStyles.fieldsStack} mt-6`} onSubmit={handleSubmit} noValidate>
@@ -174,7 +174,7 @@ export default function OrderMugsForm() {
             />
             <span>
               <span className="text-sm font-medium text-neutral-900">Нужен дизайн макета для кружки</span>
-              <span className="mt-1 block text-xs text-neutral-600">Если отметите, покажем варианты сложности и что входит в подготовку.</span>
+              <span className="mt-1 block text-xs text-neutral-600">Отметьте, если нужен макет с нуля или доработка исходника.</span>
             </span>
           </label>
 
@@ -186,8 +186,8 @@ export default function OrderMugsForm() {
           >
             <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4 sm:p-5">
               <h3 className="text-xl font-semibold">Дизайн</h3>
-              <p className="text-sm text-neutral-700">2 макета входит в стоимость.</p>
-              <p className="text-sm text-neutral-700">К двум макетам включены 2 правки 1-й категории.</p>
+              <p className="text-sm text-neutral-700">2 варианта макета входят в стоимость.</p>
+              <p className="text-sm text-neutral-700">Также включены 2 правки 1-й категории.</p>
 
               <div>
                 <h4 className="text-lg font-medium">Категории сложности I/II/III</h4>
@@ -295,7 +295,7 @@ export default function OrderMugsForm() {
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
 
-          <p className="mt-3 text-xs text-neutral-500">Нажимая кнопку, вы соглашаетесь на обработку заявки для расчёта и обратной связи.</p>
+          <p className="mt-3 text-xs text-neutral-500">После отправки формы пришлём расчёт и свяжемся удобным способом.</p>
         </div>
 
         {formError && <p className="text-sm text-red-600">{formError}</p>}

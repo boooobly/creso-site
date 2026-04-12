@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import Image from 'next/image';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 
 export default function FeatureCard({
   title,
@@ -21,7 +21,7 @@ export default function FeatureCard({
       className="premium-card group flex h-full flex-col overflow-hidden"
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-neutral-200/80 bg-neutral-100 dark:border-neutral-800">
-        <Image
+        <ProtectedImage
           src={imageSrc}
           alt={title}
           fill

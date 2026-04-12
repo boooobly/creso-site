@@ -22,7 +22,7 @@ export default async function Home() {
   const services = (sCMS ?? servicesLocal) as any[];
   const faq = (fCMS ?? faqLocal) as any[];
 
-  const adminFaqItems = getFaqItemsFromContentMap(contentMap, 'faq', 4);
+  const adminFaqItems = getFaqItemsFromContentMap(contentMap, 'faq', 5);
   const faqItems = adminFaqItems.length > 0 ? adminFaqItems : faq;
 
   const resolveServiceHref = (service: any) => {

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Building2, ClipboardCheck, Clock3, Droplets, FileText, Ruler } from 'lucide-react';
+import { Building2, ClipboardCheck, Clock3, Droplets, FileText, Ruler } from 'lucide-react';
 import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 import OrderWideFormatForm from '@/components/OrderWideFormatForm';
@@ -26,10 +26,10 @@ export default async function WideFormatPrintingPage() {
   const ctaButtonText = getPageContentValue(contentMap, 'cta', 'buttonText', 'Перейти к плоттерной резке');
 
   const trustMarkers = [
-    'Баннер, пленка, бумага, холст',
-    'Интерьерная и уличная печать',
-    'Люверсы, проклейка, резка',
-    'Для офисов, сетей и агентств',
+    'Баннеров, плёнок, бумаги и холста',
+    'Интерьерной и уличной печати',
+    'Люверсов, проклейки и резки',
+    'Офисов, сетей и агентств',
   ];
   const heroHighlights = [
     {
@@ -44,7 +44,7 @@ export default async function WideFormatPrintingPage() {
     },
     {
       title: 'Проверка макета',
-      description: 'Проверяем файл и подсказываем материал и постобработку.',
+      description: 'Проверяем технические требования файла перед печатью.',
       icon: ClipboardCheck,
     },
     {
@@ -60,8 +60,8 @@ export default async function WideFormatPrintingPage() {
       icon: 'building',
     },
     {
-      title: 'Проверка макета',
-      description: 'Проверяем файл перед запуском в печать.',
+      title: 'Технический контроль',
+      description: 'Проверяем параметры заказа и ведём его по этапам производства.',
       icon: 'check',
     },
     {
@@ -85,28 +85,27 @@ export default async function WideFormatPrintingPage() {
     <div className="pb-8 md:pb-12">
       <Section spacing="compact">
         <PageHero className="border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50/65 to-red-50/[0.16] p-5 shadow-sm shadow-neutral-200/60 md:p-7 lg:p-9" contentClassName="flex h-full flex-col lg:min-h-[29rem]" mediaClassName="h-full" media={
-          <HeroMediaPanel className="h-full p-4 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm md:p-5">
+          <HeroMediaPanel className="flex h-full flex-col border-neutral-200/90 bg-neutral-100/90 p-4 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm md:p-5">
             <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3.5">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Производственный профиль</p>
-                <p className="mt-1 text-sm leading-5 text-neutral-500">Ключевые параметры услуги.</p>
               </div>
-              <div className="inline-flex size-9 items-center justify-center rounded-2xl bg-red-50/80 text-[var(--brand-red)]">
+              <div className="inline-flex size-9 items-center justify-center rounded-xl border border-red-200/70 bg-red-50 text-[var(--brand-red)]">
                 <Droplets size={18} strokeWidth={1.9} aria-hidden="true" />
               </div>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="mt-4 grid flex-1 content-between gap-3 sm:grid-cols-2 lg:grid-cols-1">
               {heroHighlights.map((item) => {
                 const Icon = item.icon;
 
                 return (
                   <article
                     key={item.title}
-                    className="rounded-2xl border border-neutral-200/70 bg-white/70 p-4 transition-colors duration-200 hover:border-neutral-300 hover:bg-white"
+                    className="card-structured rounded-xl border-neutral-200/90 bg-white/80 p-4 transition-colors duration-200 hover:border-neutral-300 hover:bg-white/90 dark:bg-neutral-900/70"
                   >
-                    <div className="flex items-start gap-3">
-                      <span className="inline-flex h-[2.25rem] w-[2.25rem] shrink-0 items-center justify-center rounded-xl border border-[var(--brand-red)]/10 bg-[var(--brand-red)]/[0.07] text-[var(--brand-red)]">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex h-[2.25rem] w-[2.25rem] shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
                         <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
                       </span>
                       <div className="space-y-1.5">
@@ -121,33 +120,17 @@ export default async function WideFormatPrintingPage() {
           </HeroMediaPanel>
         }>
           <div className="space-y-4">
-            <HeroEyebrow>Широкоформатная печать</HeroEyebrow>
-            <HeroTitle className="max-w-3xl text-[clamp(2.35rem,5.2vw,4.05rem)] leading-[1.01] tracking-[-0.035em]">{heroTitle}</HeroTitle>
+            <HeroEyebrow>Экосольвентная печать</HeroEyebrow>
+            <HeroTitle className="max-w-3xl text-3xl md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[41rem] text-sm leading-6 md:text-[1.05rem] md:leading-7">
-              {heroDescription} Поможем быстро согласовать материал, формат и запуск в нужный срок.
+              {heroDescription} Поможем согласовать материал, формат и постобработку под вашу задачу.
             </HeroLead>
           </div>
 
           <div className="mt-7 flex flex-1 flex-col justify-end gap-4 lg:pt-7">
-            <HeroActions>
-              <Link
-                href="#wide-format-calculator"
-                className="btn-primary min-h-11 gap-2 px-5 py-3 text-sm no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
-              >
-                Рассчитать стоимость
-                <ArrowRight size={16} aria-hidden="true" />
-              </Link>
-              <Link
-                href="#wide-format-form"
-                className="btn-secondary min-h-11 border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline"
-              >
-                Отправить параметры
-              </Link>
-            </HeroActions>
-
-            <div className="space-y-3 border-t border-neutral-200/80 pt-4">
-              <p className="max-w-lg text-sm leading-6 text-neutral-500">
-                Подскажем по материалам, подготовке макета и постобработке до запуска в печать.
+            <div className="space-y-4 border-t border-neutral-200/80 pt-4">
+              <p className="max-w-xl text-sm leading-6 text-neutral-500">
+                Подскажем по материалам, постобработке и требованиям к файлу перед печатью.
               </p>
               <div className="flex flex-wrap items-center gap-2.5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Подходит для</p>
@@ -162,6 +145,21 @@ export default async function WideFormatPrintingPage() {
                 ))}
               </HeroChipList>
             </div>
+
+            <HeroActions>
+              <Link
+                href="#wide-format-calculator"
+                className="btn-primary min-h-11 gap-2 px-5 py-3 text-sm no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
+              >
+                Рассчитать стоимость
+              </Link>
+              <Link
+                href="#wide-format-form"
+                className="btn-secondary min-h-11 border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline"
+              >
+                Отправить параметры
+              </Link>
+            </HeroActions>
           </div>
         </PageHero>
       </Section>
@@ -192,7 +190,7 @@ export default async function WideFormatPrintingPage() {
           <div className="cta-shell card border-neutral-200/85">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="max-w-2xl space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Связанная услуга</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Связанная услуга</p>
                 <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">{ctaTitle}</h2>
                 <p className="text-sm leading-6 text-neutral-600 md:text-base">{ctaDescription}</p>
               </div>

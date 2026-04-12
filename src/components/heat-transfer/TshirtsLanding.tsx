@@ -2,10 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Brush, CheckCheck, ChevronDown, ClipboardCheck, FileUp, Palette, Shirt, Sparkles, Truck, UploadCloud } from 'lucide-react';
+import { BadgeCheck, ChevronDown, ClipboardCheck, FileImage, FileUp, Layers, Palette, ShieldCheck, Shirt, Timer, Truck } from 'lucide-react';
 import { CSSProperties, ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
-import FloatingTshirtsCTA from '@/components/heat-transfer/FloatingTshirtsCTA';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import Section from '@/components/layout/Section';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
@@ -26,22 +25,20 @@ type SectionBlockProps = {
   children: (state: SectionRenderState) => ReactNode;
 };
 
-const kpiChips = [
-  { title: 'Свои или наши футболки', subtitle: 'Печатаем на любых заготовках' },
-  { title: 'Мерч и форма', subtitle: 'Для команд, брендов и событий' },
-  { title: 'Макет под контролем', subtitle: 'Проверка перед запуском' },
-];
+const kpiChips = ['От 1 изделия', 'Для бизнеса и команд', 'Аккуратный принт', 'Согласование до запуска'] as const;
 
 const pricingCards = [
   {
     title: 'Полноцвет A4',
+    icon: FileImage,
     price: '250 ₽/сторона',
     lines: ['Перед, спина или рукав', 'Проверка макета перед стартом'],
     featured: true,
   },
-  { title: 'Футболки', price: 'от 500 ₽', lines: ['Размеры 32–60', 'Можно печатать на наших или ваших'], featured: false },
+  { title: 'Футболки', icon: Shirt, price: 'от 500 ₽', lines: ['Размеры 32–60', 'Можно печатать на наших или ваших'], featured: false },
   {
     title: 'Термоплёнка',
+    icon: Layers,
     price: 'Расчёт менеджером',
     lines: ['Печать + резка + перенос', 'Цветная и флуор плёнка'],
     featured: false,
@@ -52,16 +49,16 @@ const printTechnologyCards = [
   {
     title: 'Сублимация',
     label: 'Для полноцвета',
-    descriptor: 'Яркая полноцветная печать для светлого полиэстера с высокой стойкостью.',
-    points: ['Фото, градиенты и сложные иллюстрации', 'Лёгкие спортивные и промо-футболки', 'Цвет не трескается и не ощущается плёнкой'],
-    bestFor: 'Лучше всего: когда важны насыщенные цвета и долговечность на синтетике.',
+    descriptor: 'Яркое полноцветное изображение для светлой синтетики.',
+    points: ['Подходит для фото, градиентов и сложной графики', 'Оптимально для спортивной и промо-одежды', 'Принт стойкий, без эффекта плотной наклейки'],
+    bestFor: 'Когда нужен насыщенный полноцвет на полиэстере.',
   },
   {
     title: 'Термотрансферная пленка',
     label: 'Для надписей и логотипов',
-    descriptor: 'Чёткие графические элементы на хлопке и смесовых тканях.',
-    points: ['Логотипы, имена, номера и короткие надписи', 'Футбольная и рабочая форма, корпоративная одежда', 'Ровные контуры и аккуратная посадка плёнки'],
-    bestFor: 'Лучше всего: когда нужен контрастный знак, номер или бренд-элемент.',
+    descriptor: 'Чёткие надписи и логотипы на хлопке и смесовых тканях.',
+    points: ['Имена, номера, логотипы и короткие надписи', 'Подходит для формы, спецодежды и брендированной одежды', 'Контрастный знак с ровным контуром'],
+    bestFor: 'Когда важна читаемая графика и точный контур.',
   },
 ] as const;
 
@@ -89,34 +86,34 @@ const galleryCards = [
 const steps = [
   {
     title: 'Присылаете макет или задачу',
-    description: 'Отправляете файл или описание, а мы помогаем подобрать формат нанесения.',
+    description: 'Принимаем файл или описание задачи и быстро уточняем исходные данные.',
     icon: FileUp,
   },
   {
     title: 'Уточняем детали и подтверждаем стоимость',
-    description: 'Согласовываем тираж, размер, тип ткани и итоговую цену перед запуском.',
+    description: 'Согласовываем тираж, способ нанесения, срок и итоговую стоимость.',
     icon: ClipboardCheck,
   },
   {
     title: 'Печать и выдача / доставка',
-    description: 'Изготавливаем заказ и передаём готовые изделия или отправляем доставкой.',
+    description: 'Печатаем заказ, проверяем качество и передаём удобным способом.',
     icon: Truck,
   },
 ] as const;
 
 const advantages = [
-  { text: 'Работаем по вашим файлам', icon: UploadCloud },
-  { text: 'Помогаем с подготовкой макета', icon: Brush },
-  { text: 'Печать на ваших футболках', icon: Shirt },
-  { text: 'Без минимального тиража', icon: Sparkles },
-  { text: 'Подтверждаем макет до печати', icon: CheckCheck },
+  { text: 'Собственное производство и контроль на каждом этапе', icon: ShieldCheck },
+  { text: 'Понятные сроки и аккуратное соблюдение договорённостей', icon: Timer },
+  { text: 'Стабильный результат в повторных тиражах', icon: BadgeCheck },
+  { text: 'Работаем на ваших и наших футболках', icon: Shirt },
   { text: 'Цветная и флуор плёнка', icon: Palette },
+  { text: 'Поддержка менеджера до передачи готового заказа', icon: ClipboardCheck },
 ] as const;
 
 const faqItems: FaqItem[] = [
-  { question: 'Можно на своей футболке?', answer: 'Да. Печатаем как на ваших, так и на наших футболках.' },
+  { question: 'Можно печатать на своей футболке?', answer: 'Да, работаем как с вашими изделиями, так и с нашими заготовками.' },
   { question: 'Сколько стоит футболка?', answer: 'Футболки от 500 ₽, итог зависит от размера и наличия. Точную цену сообщит менеджер.' },
-  { question: 'Можно без файла?', answer: 'Да. Отправьте заявку без файла и опишите задачу в комментарии.' },
+  { question: 'Что делать, если нет файла?', answer: 'Оставьте заявку и кратко опишите задачу — подскажем, как лучше подготовить макет.' },
   { question: 'Сроки?', answer: 'Обычно 3–5 рабочих дней, но при свободной загрузке можем сделать быстрее.' },
   { question: 'Есть минималка?', answer: 'Нет, минимального тиража нет.' },
 ];
@@ -142,7 +139,11 @@ function SectionBlock({ id, eyebrow, title, subtitle, children }: SectionBlockPr
         <div className="section-header">
           {eyebrow && <p className="t-eyebrow">{eyebrow}</p>}
           <h2 className="t-h2">{title}</h2>
-          {subtitle && <p className="max-w-3xl t-body">{subtitle}</p>}
+          {subtitle && (
+            <p className={`t-body ${id === 'examples' ? 'max-w-5xl lg:whitespace-nowrap' : 'max-w-3xl'}`}>
+              {subtitle}
+            </p>
+          )}
         </div>
         {children({ isVisible: reveal.isVisible, prefersReducedMotion: reveal.prefersReducedMotion })}
       </div>
@@ -221,7 +222,7 @@ type TshirtsLandingProps = {
 
 export default function TshirtsLanding({
   heroTitle = 'Печать на футболках',
-  heroDescription = 'Полноцвет A4 — 250 ₽ за 1 сторону. Работаем на ваших или наших футболках.',
+  heroDescription = 'Печать на футболках для команд, брендов и мероприятий. Помогаем выбрать способ нанесения и выдаём изделие, готовое к использованию.',
   heroPrimaryButtonText = 'Оставить заявку',
   heroSecondaryButtonText = 'Смотреть примеры',
   galleryImages = {},
@@ -237,8 +238,8 @@ export default function TshirtsLanding({
             className={`transition-all duration-700 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
           >
             <PageHero
-              className="border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50 to-red-50/15 p-5 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:bg-neutral-900 md:p-8"
-              contentClassName="max-w-[560px]"
+              className="border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50 to-red-50/15 p-5 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:bg-neutral-900 md:p-7 lg:p-9"
+              contentClassName="max-w-[580px]"
               mediaClassName="lg:min-h-[420px]"
               media={
                 <HeroMediaPanel className="relative min-h-[250px] p-0 shadow-[0_16px_36px_rgba(15,23,42,0.14)] sm:min-h-[320px] lg:min-h-[420px]">
@@ -256,32 +257,36 @@ export default function TshirtsLanding({
                 </HeroMediaPanel>
               }
             >
-              <HeroEyebrow className="text-xs tracking-[0.2em]">Брендированная одежда</HeroEyebrow>
-              <HeroTitle className="mt-3 max-w-[16ch] text-3xl leading-tight md:text-5xl">{heroTitle}</HeroTitle>
-              <HeroLead className="mt-4 max-w-2xl text-sm leading-relaxed dark:text-neutral-300 md:text-base">
-                  {heroDescription} Печатаем для мерча, формы и брендированной одежды — от одной вещи до корпоративных партий.
+              <HeroEyebrow className="text-xs tracking-[0.18em]">Брендированная одежда</HeroEyebrow>
+              <HeroTitle className="mt-3 max-w-[15ch] text-3xl font-extrabold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">{heroTitle}</HeroTitle>
+              <HeroLead className="mt-3 max-w-2xl text-sm leading-6 dark:text-neutral-300 md:text-[1.03rem] md:leading-7">
+                {heroDescription}
               </HeroLead>
 
-                <HeroChipList className="mt-5 gap-2.5 sm:grid-cols-3">
+                <p className="mt-6 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
+                  Работаем с тиражами от 1 изделия: подойдёт для мерча, формы и корпоративных запусков.
+                </p>
+                <HeroChipList className="mt-3 gap-2 sm:grid-cols-2">
                   {kpiChips.map((chip, index) => (
                     <HeroChip
-                      key={chip.title}
+                      key={chip}
                       style={delayStyle(index, heroReveal.prefersReducedMotion)}
-                      className={`rounded-xl border-neutral-200 bg-neutral-50/80 px-3 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/70 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+                      className={`rounded-xl border border-neutral-200 bg-white px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
                     >
-                      <p className="text-xs font-semibold leading-snug text-neutral-900 dark:text-neutral-100">{chip.title}</p>
-                      <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{chip.subtitle}</p>
+                      <p className="flex items-center gap-2 text-xs font-semibold leading-none text-neutral-900 dark:text-neutral-100">
+                        <span className="size-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
+                        {chip}
+                      </p>
                     </HeroChip>
                   ))}
                 </HeroChipList>
 
-                <HeroActions className="mt-7">
+                <HeroActions className="mt-6">
                   <Link
                     href="#tshirts-order"
                     className="btn-primary h-11 px-6 text-sm no-underline"
                   >
                     {heroPrimaryButtonText}
-                    <ArrowRight size={16} className="ml-2" aria-hidden="true" />
                   </Link>
                   <Link
                     href="#examples"
@@ -298,10 +303,10 @@ export default function TshirtsLanding({
       <SectionBlock
         eyebrow="Технологии"
         title="Технологии печати"
-        subtitle="Две рабочие технологии под разные задачи: подскажем оптимальный вариант по ткани, макету и тиражу."
+        subtitle="Подбираем технологию под ткань, задачу и тип макета."
       >
         {(reveal) => (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2">
             {printTechnologyCards.map((card, index) => (
               <AnimatedCard
                 key={card.title}
@@ -334,8 +339,8 @@ export default function TshirtsLanding({
       </SectionBlock>
 
       <SectionBlock
-        eyebrow="Стоимость"
-        title="Тарифы"
+        eyebrow="Ориентиры по цене"
+        title="Стоимость"
         subtitle="Прозрачные условия без скрытых доплат. Для нестандартных задач менеджер подтвердит расчёт перед печатью."
       >
         {(reveal) => (
@@ -345,20 +350,25 @@ export default function TshirtsLanding({
                 key={card.title}
                 index={index}
                 reveal={reveal}
-                className={`h-full rounded-2xl border bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:bg-neutral-900 ${
+                className={`card-info card-interactive h-full rounded-2xl border bg-white/95 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:bg-neutral-900 ${
                   card.featured
                     ? 'border-red-300 ring-1 ring-red-200/70 dark:border-red-900 dark:ring-red-900/40'
                     : 'border-neutral-200 dark:border-neutral-800'
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-lg font-semibold">{card.title}</h3>
-                  {card.featured && <span className="rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-semibold text-white">Популярно</span>}
+                <div className="mb-3 inline-flex size-8 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                  <card.icon size={16} strokeWidth={1.9} aria-hidden="true" />
                 </div>
-                <p className="mt-4 text-right text-2xl font-bold text-neutral-900 dark:text-neutral-50">{card.price}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-base font-semibold md:text-lg">{card.title}</h3>
+                </div>
+                <p className="mt-3 border-t border-neutral-200/80 pt-3 text-2xl font-bold text-neutral-900 dark:border-neutral-800 dark:text-neutral-50">{card.price}</p>
                 <ul className="mt-4 space-y-2 text-sm text-neutral-600 dark:text-neutral-300">
                   {card.lines.map((line) => (
-                    <li key={line}>• {line}</li>
+                    <li key={line} className="flex items-start gap-2">
+                      <span className="mt-[7px] size-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
+                      <span>{line}</span>
+                    </li>
                   ))}
                 </ul>
               </AnimatedCard>
@@ -401,7 +411,7 @@ export default function TshirtsLanding({
                   reveal={reveal}
                   className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900"
                 >
-                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                   </div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
@@ -425,10 +435,10 @@ export default function TshirtsLanding({
                 key={item.text}
                 index={index}
                 reveal={reveal}
-                className="card-info card-interactive rounded-2xl p-4"
+                className="card-info card-interactive rounded-2xl border border-neutral-200/90 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"
               >
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-300">
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-950/30 dark:text-red-300">
                     <Icon className="size-4" aria-hidden="true" />
                   </span>
                   <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{item.text}</p>
@@ -440,18 +450,11 @@ export default function TshirtsLanding({
         )}
       </SectionBlock>
 
-      <SectionBlock eyebrow="FAQ" title="Частые вопросы" subtitle="Коротко ответили на частые вопросы о печати на футболках.">
+      <SectionBlock eyebrow="FAQ" title="Частые вопросы" subtitle="Короткие ответы по срокам, файлам и условиям заказа.">
         {() => <FaqAccordion />}
       </SectionBlock>
 
-      <FloatingTshirtsCTA />
-
       <Section id="tshirts-order" spacing="tight" className="scroll-mt-24">
-        <div className="cta-shell mb-6 md:mb-7">
-          <p className="t-eyebrow">Заявка на печать</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">Отправьте параметры заказа</h2>
-          <p className="mt-2 max-w-3xl t-body">Менеджер уточнит детали, проверит макет и подтвердит стоимость перед запуском в работу.</p>
-        </div>
         <OrderTshirtsForm />
       </Section>
     </div>

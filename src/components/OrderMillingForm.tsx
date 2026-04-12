@@ -20,6 +20,7 @@ type FormValues = {
   thickness: string;
   comment: string;
   helpWithPrep: boolean;
+  privacyConsent: boolean;
   website: string;
 };
 
@@ -62,6 +63,7 @@ const defaultValues: FormValues = {
   thickness: '',
   comment: '',
   helpWithPrep: false,
+  privacyConsent: false,
   website: '',
 };
 
@@ -94,6 +96,7 @@ export default function OrderMillingForm() {
 
     if (!values.material.trim()) nextErrors.material = 'Выберите материал';
     if (!values.thickness.trim()) nextErrors.thickness = 'Выберите толщину';
+    if (!values.privacyConsent) nextErrors.privacyConsent = 'Необходимо согласие на обработку персональных данных';
 
     return nextErrors;
   };
@@ -127,6 +130,7 @@ export default function OrderMillingForm() {
       formData.set('thickness', values.thickness.trim());
       formData.set('comment', values.comment.trim());
       formData.set('helpWithPrep', String(values.helpWithPrep));
+      formData.set('privacyConsent', String(values.privacyConsent));
       formData.set('website', values.website);
       if (file) formData.set('file', file, file.name);
 
@@ -201,8 +205,6 @@ export default function OrderMillingForm() {
     <div id="milling-request" className={publicFormStyles.shell}>
       <div className={`${publicFormStyles.heading} mb-6`}>
         <h2 className="text-2xl font-semibold">Заявка на фрезеровку</h2>
-        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Принимаем только векторные файлы: PDF, CDR, AI, EPS, DXF, SVG.</p>
-        <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Максимальный размер заготовки: 2×4 м.</p>
       </div>
 
       <form className={publicFormStyles.fieldsStack} onSubmit={handleSubmit} noValidate>
@@ -298,6 +300,27 @@ export default function OrderMillingForm() {
         </div>
 
         <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
+
+        <div className={publicFormStyles.summaryCard}>
+          <label className="inline-flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={values.privacyConsent}
+              onChange={(e) => setValues((prev) => ({ ...prev, privacyConsent: e.target.checked }))}
+              className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500"
+            />
+            <span>
+              Я согласен с{' '}
+              <a
+                href="/privacy"
+                className="text-red-600 underline underline-offset-2 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+              >
+                политикой обработки персональных данных
+              </a>
+            </span>
+          </label>
+          {errors.privacyConsent && <p className="mt-2 text-xs text-red-600">{errors.privacyConsent}</p>}
+        </div>
 
         <div className={publicFormStyles.actionRow}>
           <button

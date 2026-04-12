@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 
 export default function ServiceCard({
   title,
@@ -22,9 +22,9 @@ export default function ServiceCard({
         featured ? 'bg-[rgba(212,28,28,0.04)]' : 'bg-white'
       }`}
     >
-      <div className={`card-structured mb-4 overflow-hidden transition-colors duration-300 ${featured ? 'border-[var(--brand-red)]/20 bg-white/80 group-hover:border-[var(--brand-red)]/30' : 'bg-neutral-50/85 group-hover:border-neutral-300'} p-2.5`}>
-        <div className={`relative h-28 overflow-hidden rounded-xl border border-white/70 ${featured ? 'bg-gradient-to-r from-[var(--brand-red)]/20 to-transparent' : 'bg-gradient-to-r from-neutral-200 to-neutral-100'}`}>
-          {imageSrc ? <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 20vw, (min-width: 768px) 35vw, 90vw" /> : null}
+      <div className="mb-4 overflow-hidden rounded-xl border border-neutral-200/80 transition-colors duration-300 group-hover:border-neutral-300">
+        <div className="relative aspect-[16/5] w-full overflow-hidden rounded-xl">
+          {imageSrc ? <ProtectedImage src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 20vw, (min-width: 768px) 35vw, 90vw" /> : null}
           <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-45 transition-opacity duration-300 group-hover:opacity-20" />
         </div>
       </div>

@@ -1,50 +1,50 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Building2, CheckCircle2, ClipboardList, PackageCheck, Ruler, School, ShieldCheck, Sparkles, Wrench } from 'lucide-react';
 import LeadForm from '@/components/LeadForm';
 import Section from '@/components/Section';
 import StandPreviewCard from '@/components/services/StandPreviewCard';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 import { messages } from '@/lib/messages';
 import { getSiteImages } from '@/lib/site-images';
 import { STANDS_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
 
-const heroChips = ['Собственное производство', 'Карманы и сменные блоки', 'Изготовление по размерам', 'Доставка и монтаж'] as const;
+const heroChips = ['Для помещений и улицы', 'Структура под ваши документы', 'Согласование макета перед запуском', 'От 1 стенда до серии'] as const;
 
 const indoorStands = [
-  { title: 'Стенд «Информация»', description: 'Универсальное решение для объявлений и инструкций.', previewHint: 'Типовая компоновка с карманами А4 и шапкой.', imageSrc: '/images/stands/info.png', slotKey: 'stands.indoor.info' },
-  { title: 'Уголок потребителя', description: 'Для торговых точек, салонов и офисов.', previewHint: 'Блоки с документами, реквизитами и правилами.', imageSrc: '/images/stands/consumer_corner.png', slotKey: 'stands.indoor.consumer_corner' },
-  { title: 'Пожарные стенды', description: 'Схемы, регламенты и инструкции по безопасности.', previewHint: 'Схема эвакуации и обязательные памятки.', imageSrc: '/images/stands/fire_safety.png', slotKey: 'stands.indoor.fire_safety' },
-  { title: 'Охрана труда', description: 'Наглядные материалы для производственных зон.', previewHint: 'Нормативы, инструкции и чек-листы для персонала.', imageSrc: '/images/stands/labor_protection.png', slotKey: 'stands.indoor.labor_protection' },
-  { title: 'Первая помощь', description: 'Памятки и алгоритмы действий в экстренных случаях.', previewHint: 'Алгоритмы оказания помощи и контактные номера.', imageSrc: '/images/stands/first_aid.png', slotKey: 'stands.indoor.first_aid' },
-  { title: 'Гражданская оборона и ЧС', description: 'Информационные блоки для обучения персонала.', previewHint: 'Порядок действий при внештатных ситуациях.', imageSrc: '/images/stands/civil_defense.png', slotKey: 'stands.indoor.civil_defense' },
+  { title: 'Стенд «Информация»', description: 'Для текущих объявлений, графиков и внутренних уведомлений.', previewHint: 'Шапка стенда и карманы A4/A5 для быстрой замены листов.', imageSrc: '/images/stands/info.png', slotKey: 'stands.indoor.info' },
+  { title: 'Уголок потребителя', description: 'Для размещения обязательных сведений в точках обслуживания.', previewHint: 'Фиксированные блоки под реквизиты, правила и контакты.', imageSrc: '/images/stands/consumer_corner.png', slotKey: 'stands.indoor.consumer_corner' },
+  { title: 'Пожарные стенды', description: 'Для инструктажа и информирования по пожарной безопасности.', previewHint: 'Зона под схему эвакуации и набор обязательных памяток.', imageSrc: '/images/stands/fire_safety.png', slotKey: 'stands.indoor.fire_safety' },
+  { title: 'Охрана труда', description: 'Для регулярного информирования персонала на производстве.', previewHint: 'Секции под инструкции, нормы и журнальные чек-листы.', imageSrc: '/images/stands/labor_protection.png', slotKey: 'stands.indoor.labor_protection' },
+  { title: 'Первая помощь', description: 'Для наглядных алгоритмов действий в экстренных ситуациях.', previewHint: 'Пошаговые памятки и отдельный блок с экстренными номерами.', imageSrc: '/images/stands/first_aid.png', slotKey: 'stands.indoor.first_aid' },
+  { title: 'Гражданская оборона и ЧС', description: 'Для обучения сотрудников действиям при ЧС.', previewHint: 'Структурированные разделы по сценариям и порядку оповещения.', imageSrc: '/images/stands/civil_defense.png', slotKey: 'stands.indoor.civil_defense' },
 ] as const;
 
 const outdoorStands = [
-  { title: 'Уличные информационные стенды', description: 'Антивандальные решения с защитой от погоды.', previewHint: 'Усиленная рама и защищённая зона размещения листов.', imageSrc: '/images/stands/street_stand.png', slotKey: 'stands.outdoor.street_stand' },
-  { title: 'Уличные городские стенды', description: 'Оформление в фирменных требованиях муниципалитетов.', previewHint: 'Формат с бренд-зоной и нормативной структурой.', imageSrc: '/images/stands/city_stand.png', slotKey: 'stands.outdoor.city_stand' },
-  { title: 'На детские площадки', description: 'Яркие и безопасные конструкции для дворов и парков.', previewHint: 'Визуально читаемый стенд для жителей и родителей.', imageSrc: '/images/stands/playgrounds.png', slotKey: 'stands.outdoor.playgrounds' },
+  { title: 'Уличные информационные стенды', description: 'Для объявлений на входных группах и внешних территориях.', previewHint: 'Герметичная зона под листы и усиленный профиль для улицы.', imageSrc: '/images/stands/street_stand.png', slotKey: 'stands.outdoor.street_stand' },
+  { title: 'Уличные городские стенды', description: 'Для официальной информации во дворах и общественных местах.', previewHint: 'Компоновка под муниципальные требования и фирменный блок.', imageSrc: '/images/stands/city_stand.png', slotKey: 'stands.outdoor.city_stand' },
+  { title: 'На детские площадки', description: 'Для правил поведения, контактов и полезной информации.', previewHint: 'Безопасные материалы, читаемая типографика и защитное покрытие.', imageSrc: '/images/stands/playgrounds.png', slotKey: 'stands.outdoor.playgrounds' },
 ] as const;
 
 const materials = [
-  { title: 'Основа из ПВХ', description: 'Лёгкая и практичная база для интерьерных стендов.', icon: ClipboardList },
-  { title: 'Композитные панели', description: 'Жёсткая конструкция для долговечной эксплуатации.', icon: PackageCheck },
-  { title: 'Карманы из оргстекла', description: 'Прозрачные карманы под листы и сменные сообщения.', icon: Sparkles },
-  { title: 'Стойки и рамы', description: 'Настенные и напольные варианты крепления.', icon: Wrench },
-  { title: 'Сменные информационные блоки', description: 'Быстрое обновление данных без переделки стенда.', icon: CheckCircle2 },
-  { title: 'Изготовление по индивидуальным размерам', description: 'Подстраиваем формат и компоновку под вашу задачу.', icon: Ruler },
+  { title: 'Основа из ПВХ', description: 'Ровная лёгкая плита для интерьерных стендов и кабинетов.', icon: ClipboardList },
+  { title: 'Композитные панели', description: 'Жёсткая основа для уличной установки и длительной эксплуатации.', icon: PackageCheck },
+  { title: 'Карманы из оргстекла', description: 'Прозрачные накладные карманы для листов A4/A5 и бланков.', icon: Sparkles },
+  { title: 'Стойки и рамы', description: 'Настенный или напольный вариант с подбором типа крепления.', icon: Wrench },
+  { title: 'Сменные информационные блоки', description: 'Модульные секции, которые обновляются без замены всей основы.', icon: CheckCircle2 },
+  { title: 'Изготовление по размерам', description: 'Точно выдерживаем габариты под нишу, стену или фасад.', icon: Ruler },
 ] as const;
 
 const audiences = ['Школы', 'Детские сады', 'Магазины и офисы', 'Производственные предприятия', 'Управляющие компании', 'Муниципальные учреждения'] as const;
 
 const advantages = [
-  'Собственное производство',
-  'Изготовление по ТЗ и размерам',
-  'Разработка макета',
-  'Карманы, стойки и рамки под задачу',
-  'Доставка и монтаж',
-  'Работаем с единичными и тиражными заказами',
+  'Понятный расчёт по параметрам и комплектации',
+  'Аккуратное изготовление по согласованному макету',
+  'Соблюдаем согласованные сроки производства',
+  'Сопровождаем заказ от заявки до сдачи',
+  'Организуем доставку и монтаж при необходимости',
+  'Работаем с разовыми и серийными заказами',
 ] as const;
 
 
@@ -72,9 +72,9 @@ export default async function StandsServicePage() {
         <PageHero
           className="bg-gradient-to-br from-white to-neutral-50"
           media={
-            <HeroMediaPanel className="rounded-3xl border-dashed border-neutral-300 bg-gradient-to-br from-neutral-100/90 to-white p-5 md:p-6">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-white/80">
-                <Image
+            <HeroMediaPanel className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-0">
+              <div className="relative aspect-[5/4] min-h-[320px] overflow-hidden rounded-3xl">
+                <ProtectedImage
                   src={heroImageSrc}
                   alt={heroImageAlt}
                   fill
@@ -89,9 +89,18 @@ export default async function StandsServicePage() {
           <HeroEyebrow>Изготовление стендов</HeroEyebrow>
           <HeroTitle className="max-w-2xl text-3xl tracking-tight md:text-5xl">Изготовление информационных стендов</HeroTitle>
           <HeroLead>
-            Производим стенды для школ, детских садов, организаций, офисов, предприятий и уличных пространств. Подбираем формат,
-            материалы и конструкцию под конкретную задачу.
+            Делаем стенды для навигации, инструкций и обязательной информации. В результате вы получаете готовую к установке конструкцию
+            с понятной подачей материалов и удобным обновлением листов.
           </HeroLead>
+
+          <HeroChipList className="mt-5 max-w-xl gap-2.5">
+            {heroChips.map((chip) => (
+              <HeroChip key={chip} className="chip-elevated gap-2 px-3 py-1.5 text-xs">
+                <span className="size-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                <span>{chip}</span>
+              </HeroChip>
+            ))}
+          </HeroChipList>
 
           <HeroActions className="mt-7">
             <Link href="#stands-lead-form" className="btn-primary no-underline">
@@ -101,21 +110,13 @@ export default async function StandsServicePage() {
               Смотреть варианты
             </Link>
           </HeroActions>
-
-          <HeroChipList className="mt-5 max-w-xl gap-2.5">
-            {heroChips.map((chip) => (
-              <HeroChip key={chip} className="chip-elevated px-3 py-1.5 text-xs">
-                {chip}
-              </HeroChip>
-            ))}
-          </HeroChipList>
         </PageHero>
       </Section>
 
       <Section id="stands-catalog" background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Стенды для помещений</h2>
-          <p className="t-body max-w-3xl">Базовые и специализированные стенды для ежедневной работы, инструктажей и внутренней коммуникации.</p>
+          <p className="t-body max-w-3xl">Решения для внутренних зон: офисов, учебных и производственных помещений.</p>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -135,7 +136,7 @@ export default async function StandsServicePage() {
       <Section background="default" className="py-12 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Уличные стенды</h2>
-          <p className="t-body max-w-3xl">Решения для размещения на фасадах, территориях учреждений и общественных площадках.</p>
+          <p className="t-body max-w-3xl">Конструкции для фасадов и открытых площадок с учётом уличной эксплуатации.</p>
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-3">
@@ -156,7 +157,7 @@ export default async function StandsServicePage() {
       <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Как изготавливаем стенды</h2>
-          <p className="t-body max-w-3xl">Подбираем конструкцию с учётом места установки, условий эксплуатации и частоты обновления информации.</p>
+          <p className="t-body max-w-3xl">Подбираем основу, крепления и информационные элементы под место установки и формат обновления контента.</p>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -176,8 +177,8 @@ export default async function StandsServicePage() {
 
       <Section className="py-12 md:py-16">
         <div className="space-y-3">
-          <h2 className="t-h2">Для кого подойдут стенды</h2>
-          <p className="t-body max-w-3xl">Изготавливаем стенды под требования учреждений, бизнеса и производственных площадок.</p>
+          <h2 className="t-h2">Где устанавливают такие стенды</h2>
+          <p className="t-body max-w-3xl">Типовые площадки, где важна регулярная и наглядная подача информации.</p>
         </div>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -197,7 +198,7 @@ export default async function StandsServicePage() {
       <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Почему заказывают у нас</h2>
-          <p className="t-body max-w-3xl">Работаем в привычном для клиентов формате: от идеи и макета до готовой поставки и монтажа.</p>
+          <p className="t-body max-w-3xl">Фокус на предсказуемом процессе: понятные условия, аккуратное исполнение и сопровождение на каждом этапе.</p>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -216,25 +217,11 @@ export default async function StandsServicePage() {
         </div>
       </Section>
 
-      <Section className="py-12 md:py-16">
-        <div className="rounded-2xl bg-neutral-900 px-6 py-8 text-white md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-6 md:px-8">
-          <div>
-            <h2 className="text-3xl font-bold">Нужен стенд под вашу задачу?</h2>
-            <p className="mt-2 max-w-2xl text-sm text-neutral-200 md:text-base">
-              Подскажем размеры, материалы, количество карманов и формат крепления, рассчитаем стоимость изготовления, доставки и монтажа.
-            </p>
-          </div>
-          <Link href="#stands-lead-form" className="btn-primary mt-5 w-full no-underline md:mt-0 md:w-auto">
-            Получить консультацию
-          </Link>
-        </div>
-      </Section>
-
       <Section id="stands-lead-form" background="muted" fullBleed className="pt-0">
         <div className="card rounded-2xl border border-neutral-200/80 bg-white p-6 md:p-8">
           <h2 className="text-2xl font-bold">Рассчитать стоимость стенда</h2>
           <p className="mt-2 text-sm text-neutral-600 md:text-base">
-            Опишите, какой стенд нужен, где он будет размещаться и требуются ли карманы, стойки или монтаж — подготовим расчёт и варианты.
+            Укажите тип стенда, размеры, место установки и желаемую комплектацию. После заявки уточним детали и отправим расчёт с вариантами исполнения.
           </p>
           <div className="mt-5">
             <LeadForm

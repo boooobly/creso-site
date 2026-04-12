@@ -1,5 +1,5 @@
 import { PanelsTopLeft } from 'lucide-react';
-import Image from 'next/image';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 
 type StandPreviewCardProps = {
   title: string;
@@ -54,7 +54,7 @@ export default function StandPreviewCard({ title, description, label, variant = 
         aria-hidden="true"
       >
         <div className="relative flex h-full w-full items-end p-3 md:p-4">
-          <Image src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" />
+          <ProtectedImage src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/5 to-white/5" />
 
           <div className="absolute inset-x-0 bottom-0 z-20 translate-y-1 bg-gradient-to-t from-black/45 via-black/20 to-transparent px-4 pb-4 pt-10 opacity-0 transition-all duration-300 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-visible:translate-y-0 md:group-focus-visible:opacity-100">

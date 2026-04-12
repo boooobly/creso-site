@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 
 type PortfolioImage = {
   src: string;
@@ -28,16 +28,16 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
   return (
     <button
       type="button"
-      className="card-visual card-interactive group flex h-full flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
+      className="card-visual card-interactive group relative block h-full min-h-[250px] overflow-hidden text-left select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
       onClick={() => onOpen({ ...image, src: currentSrc })}
       aria-label={`Открыть ${image.alt}`}
     >
-      <div className="relative h-56 w-full overflow-hidden bg-neutral-100">
-        <Image
+      <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+        <ProtectedImage
           src={currentSrc}
           alt={image.alt}
           fill
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
           sizes="(max-width: 1024px) 100vw, 33vw"
           onError={() => {
             if (image.fallbackSrc && currentSrc !== image.fallbackSrc) {
@@ -45,12 +45,11 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
             }
           }}
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
       </div>
-
-      <div className="flex flex-1 flex-col justify-between gap-2 p-4 md:p-5">
-        <p className="t-h4 !text-base leading-snug">{image.title}</p>
-        {image.category ? <p className="t-small text-muted-foreground">{image.category}</p> : null}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-3 bottom-3 md:inset-x-4 md:bottom-4">
+        <p className="t-h4 !text-base !text-white leading-snug">{image.title}</p>
+        {image.category ? <p className="t-small mt-1 text-white/80">{image.category}</p> : null}
       </div>
     </button>
   );
@@ -81,8 +80,7 @@ export default function OutdoorPortfolioGallery({ projects }: OutdoorPortfolioGa
     <>
       <div className="space-y-7">
         {projects.map((project) => (
-          <div key={project.id} className="space-y-3">
-            <p className="t-caption text-neutral-600 dark:text-neutral-300">{project.label}</p>
+          <div key={project.id}>
             <div className="grid-cards md:grid-cols-3">
               {project.images.map((image) => (
                 <PortfolioCard key={image.src} image={image} onOpen={setActiveImage} />
@@ -100,7 +98,7 @@ export default function OutdoorPortfolioGallery({ projects }: OutdoorPortfolioGa
           onClick={() => setActiveImage(null)}
         >
           <div className="relative w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>
-            <Image
+            <ProtectedImage
               src={activeImage.src}
               alt={activeImage.alt}
               width={1600}
