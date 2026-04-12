@@ -19,7 +19,7 @@ export default async function PrintPage() {
   const heroImageAlt = heroImage?.altText || 'Офсетные визитки с фиксированными параметрами печати';
 
   return (
-    <div className="pb-8 md:pb-10">
+    <div className="pb-12 md:pb-16">
       <Section spacing="compact" className="pb-4 md:pb-5">
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"

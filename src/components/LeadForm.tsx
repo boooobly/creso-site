@@ -213,15 +213,15 @@ export default function LeadForm({
       {showMessageField ? (
         <div>
           <textarea
-            className="t-input min-h-[120px]"
+            className={`${publicFormStyles.inputBase} min-h-[120px] py-3`}
             placeholder="Комментарий"
             {...register('message')}
           />
         </div>
       ) : (
-        <p className="t-helper">Укажите телефон или e-mail — как вам удобнее.</p>
+        <p className={publicFormStyles.helper}>Укажите телефон или e-mail — как вам удобнее.</p>
       )}
-      <p className="t-helper rounded-xl border border-neutral-200/90 bg-neutral-50/80 px-3.5 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/70">Ответим в течение 30 минут. Без спама.</p>
+      <p className={`${publicFormStyles.helper} rounded-xl border border-neutral-200/90 bg-neutral-50/80 px-3.5 py-2.5 dark:border-neutral-700/80 dark:bg-neutral-950/70`}>Ответим в течение 30 минут. Без спама.</p>
 
       <label className={publicFormStyles.consent}>
         <input type="checkbox" className="mt-1" {...register('consent')} />
