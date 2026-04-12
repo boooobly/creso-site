@@ -146,7 +146,7 @@ export default async function ContactsPage() {
           {processSteps.map((step, index) => (
             <div
               key={step.title}
-              className="relative flex h-full flex-col rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]"
+              className="relative flex h-full flex-col rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:hover:border-neutral-700 dark:hover:shadow-none"
             >
               <span className="absolute right-5 top-5 text-xs font-semibold text-neutral-400">0{index + 1}</span>
               <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">

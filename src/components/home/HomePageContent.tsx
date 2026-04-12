@@ -112,11 +112,11 @@ export default function HomePageContent({
 }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
   const splitCtaClassName =
-    'inline-flex min-h-11 items-center rounded-xl border border-neutral-300 bg-white px-4 py-2 t-button text-neutral-700 no-underline transition-colors hover:border-neutral-400 hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2';
+    'inline-flex min-h-11 items-center rounded-xl border border-neutral-300 bg-white px-4 py-2 t-button text-neutral-700 no-underline transition-colors hover:border-neutral-400 hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-600';
 
   return (
     <div className="relative">
-      <Section spacing="hero" fullBleed className="relative overflow-hidden border-b border-neutral-200/70">
+      <Section spacing="hero" fullBleed className="relative overflow-hidden border-b border-neutral-200/70 dark:border-neutral-800/80">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent" />
         <div className="relative z-10 grid items-center gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
@@ -172,7 +172,7 @@ export default function HomePageContent({
         </div>
       </Section>
 
-      <Section spacing="tight" className="border-y border-neutral-200/70" background="muted" fullBleed>
+      <Section spacing="tight" className="border-y border-neutral-200/70 dark:border-neutral-800/80" background="muted" fullBleed>
         <div className="section-header">
           <p className="t-eyebrow">{trustSectionEyebrow}</p>
           <h2 className="t-h2">{trustSectionTitle}</h2>
@@ -213,7 +213,7 @@ export default function HomePageContent({
         </motion.div>
       </Section>
 
-      <Section spacing="tight" background="muted" className="border-y border-neutral-200/60" fullBleed>
+      <Section spacing="tight" background="muted" className="border-y border-neutral-200/60 dark:border-neutral-800/70" fullBleed>
         <div className="section-header-split">
           <div className="space-y-2">
             <p className="t-eyebrow">ПОРТФОЛИО</p>
@@ -247,7 +247,7 @@ export default function HomePageContent({
                 variants={fadeUp(16)}
                 className="card-info card-interactive relative h-full border-neutral-200/90 p-6"
               >
-                <span className="t-caption absolute right-5 top-5 rounded-full border border-neutral-200 bg-white/80 px-2.5 py-1">0{index + 1}</span>
+                <span className="t-caption absolute right-5 top-5 rounded-full border border-neutral-200 bg-white/80 px-2.5 py-1 dark:border-neutral-700 dark:bg-neutral-900/80">0{index + 1}</span>
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
@@ -259,7 +259,7 @@ export default function HomePageContent({
         </motion.ol>
       </Section>
 
-      <Section spacing="tight" background="muted" className="border-y border-neutral-200/60" fullBleed>
+      <Section spacing="tight" background="muted" className="border-y border-neutral-200/60 dark:border-neutral-800/70" fullBleed>
         <div className="section-header-split">
           <div className="space-y-2">
             <p className="t-eyebrow">{faqEyebrow}</p>
@@ -274,14 +274,14 @@ export default function HomePageContent({
       </Section>
 
       <Section id="lead-form" spacing="tight">
-        <motion.div className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#231717] sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-20 top-1/2 z-0 h-[19rem] w-[25rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.16)_0%,rgba(212,28,28,0.07)_34%,rgba(212,28,28,0.02)_58%,transparent_76%)] blur-3xl"
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-[44%] z-0 w-[12rem] bg-gradient-to-r from-transparent via-white/92 to-white"
+            className="pointer-events-none absolute inset-y-0 left-[44%] z-0 w-[12rem] bg-gradient-to-r from-transparent via-white/92 to-white dark:via-neutral-900/90 dark:to-neutral-900"
           />
           <div className="relative z-10 space-y-4 lg:max-w-[30rem]">
             <div className="space-y-3">
@@ -291,7 +291,7 @@ export default function HomePageContent({
             </div>
             <ul className="space-y-2">
               {leadPoints.map((point, index) => (
-                <li key={`${point.label}-${index}`} className="t-body flex items-start gap-2.5 text-neutral-700">
+                <li key={`${point.label}-${index}`} className="t-body flex items-start gap-2.5 text-neutral-700 dark:text-neutral-300">
                   <CheckCircle2 className="mt-0.5 size-4 text-[var(--brand-red)]" />
                   <span>{point.label}</span>
                 </li>

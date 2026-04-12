@@ -22,7 +22,7 @@ export default async function PrintPage() {
     <div className="pb-8 md:pb-10">
       <Section spacing="compact" className="pb-4 md:pb-5">
         <PageHero
-          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20"
+          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"
           contentClassName="flex h-full max-w-[37rem] flex-col gap-6"
           media={
             <HeroMediaPanel className="overflow-hidden rounded-[1.4rem] border-neutral-200/85 bg-neutral-900 p-0">
@@ -74,7 +74,7 @@ export default async function PrintPage() {
             </Link>
             <Link
               href="#print-order-form"
-              className="btn-secondary border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline"
+              className="btn-secondary border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200"
             >
               Отправить заявку
             </Link>
@@ -87,7 +87,7 @@ export default async function PrintPage() {
           <div className="space-y-2">
             <p className="t-eyebrow">Калькулятор и тарифы</p>
             <h2 className="t-h2">Рассчитайте стоимость и сразу передайте параметры в заявку</h2>
-            <p className="max-w-3xl text-sm leading-6 text-neutral-600 md:text-base">
+            <p className="max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
               Используйте тарифную таблицу как ориентир, затем настройте заказ в конфигураторе.
             </p>
           </div>
