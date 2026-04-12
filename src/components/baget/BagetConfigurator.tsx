@@ -729,26 +729,26 @@ export default function BagetConfigurator({
           ))}
         </div>
         {pagedItems.length === 0 && (
-          <div className="card rounded-2xl p-4 text-sm text-neutral-600">По заданным фильтрам ничего не найдено.</div>
+          <div className="card rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">По заданным фильтрам ничего не найдено.</div>
         )}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-3 text-sm">
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900/85 dark:text-neutral-200">
             <button
               type="button"
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
               disabled={page === 1}
-              className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn-secondary min-w-[7rem] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Назад
             </button>
-            <span>
+            <span className="text-neutral-700 dark:text-neutral-300">
               Страница {page} из {totalPages}
             </span>
             <button
               type="button"
               onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={page === totalPages}
-              className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn-secondary min-w-[7rem] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Вперёд
             </button>
@@ -772,7 +772,7 @@ export default function BagetConfigurator({
               <p className="text-green-600 dark:text-green-400">Файл загружен</p>
             </div>
           ) : (
-            <p className="mt-2 text-xs text-neutral-500">Поддерживаются изображения JPG, PNG, WEBP.</p>
+            <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-300">Поддерживаются изображения JPG, PNG, WEBP.</p>
           )}
         </div>
 
@@ -798,10 +798,10 @@ export default function BagetConfigurator({
               {!isNoFrameStretchedCanvas ? (
                 <>
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500">Артикул:</span> {selectedBagetForQuote?.article}
+                    <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
                   </li>
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500">Ширина профиля:</span> {selectedBagetForQuote?.width_mm} мм
+                    <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_mm} мм
                   </li>
                 </>
               ) : (
@@ -810,45 +810,45 @@ export default function BagetConfigurator({
                 </li>
               )}
               <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
+                <span className="text-neutral-500 dark:text-neutral-300">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
               </li>
               {materials.passepartout ? (
                 <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
+                  <span className="text-neutral-500 dark:text-neutral-300">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
                 </li>
               ) : null}
               {!isNoFrameStretchedCanvas ? (
                 <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
+                  <span className="text-neutral-500 dark:text-neutral-300">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
                 </li>
               ) : null}
               <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
+                <span className="text-neutral-500 dark:text-neutral-300">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
               </li>
               {!isNoFrameStretchedCanvas ? (
                 <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
+                  <span className="text-neutral-500 dark:text-neutral-300">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
                   {selectedBagetForQuote?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
                 </li>
               ) : null}
               {summaryCostRows.map((row) => (
                 <li key={row.key} className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
+                  <span className="text-neutral-500 dark:text-neutral-300">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
                   {row.note ?? null}
                 </li>
               ))}
               {autoAdditions?.forceCardboard ? (
-                <li className="text-xs text-neutral-500">Картон (задник): Добавлено автоматически</li>
+                <li className="text-xs text-neutral-500 dark:text-neutral-300">Картон (задник): Добавлено автоматически</li>
               ) : null}
               {autoAdditions?.stretchingRequired ? (
-                <li className="text-xs text-neutral-500">Требуется натяжка: Добавлено автоматически</li>
+                <li className="text-xs text-neutral-500 dark:text-neutral-300">Требуется натяжка: Добавлено автоматически</li>
               ) : null}
               <li className="mt-1 border-t border-neutral-300 pt-3 text-xl font-bold text-neutral-900 dark:border-neutral-600 dark:text-neutral-100">
                 Итого: {quote.total.toLocaleString('ru-RU')} ₽
               </li>
             </ul>
           ) : (
-            <p className="text-sm text-neutral-600">Выберите багет для расчёта.</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">Выберите багет для расчёта.</p>
           )}
 
           <button

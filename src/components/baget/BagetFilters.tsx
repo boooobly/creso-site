@@ -222,7 +222,7 @@ export default function BagetFilters({
         <div className="space-y-3 text-sm">
           {materials.workType === 'stretchedCanvas' ? (
             <div className="space-y-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
-              <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Оформление холста</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Оформление холста</p>
               <label className="flex items-center gap-2">
                 <input
                   type="radio"
@@ -246,7 +246,7 @@ export default function BagetFilters({
 
           {materials.workType === 'stretchedCanvas' ? (
             <div className="space-y-2 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
-              <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Подрамник</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Подрамник</p>
               <label className="flex items-center gap-2">
                 <input
                   type="radio"
@@ -266,7 +266,7 @@ export default function BagetFilters({
                 />
                 Широкий (4 см)
               </label>
-              {!stretcherNarrowAllowed ? <p className="text-xs text-amber-700">Узкий подрамник доступен до 50x50 см</p> : null}
+              {!stretcherNarrowAllowed ? <p className="text-xs text-amber-700 dark:text-amber-300">Узкий подрамник доступен до 50x50 см</p> : null}
             </div>
           ) : null}
 
@@ -284,7 +284,7 @@ export default function BagetFilters({
               <option value="pet1mm">ПЭТ 1мм</option>
             </SelectWithChevron>
           </label>
-          {!glazingAllowed && glazingDisabledReason ? <p className="text-xs text-amber-700">{glazingDisabledReason}</p> : null}
+          {!glazingAllowed && glazingDisabledReason ? <p className="text-xs text-amber-700 dark:text-amber-300">{glazingDisabledReason}</p> : null}
 
           <label className="flex items-center gap-2">
             <input
@@ -328,7 +328,7 @@ export default function BagetFilters({
             />
             Паспарту
           </label>
-          {!passepartoutAllowed && passepartoutDisabledReason ? <p className="text-xs text-amber-700">{passepartoutDisabledReason}</p> : null}
+          {!passepartoutAllowed && passepartoutDisabledReason ? <p className="text-xs text-amber-700 dark:text-amber-300">{passepartoutDisabledReason}</p> : null}
 
           {materials.passepartout ? (
             <div className="grid grid-cols-1 gap-3 rounded-xl border border-neutral-200 p-3 md:grid-cols-2 md:items-end dark:border-neutral-700">
