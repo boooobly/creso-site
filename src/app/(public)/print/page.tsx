@@ -1,33 +1,100 @@
+import Link from 'next/link';
+import ProtectedImage from '@/components/ui/ProtectedImage';
 import PrintPricingCalculator from '@/components/PrintPricingCalculator';
-import { HeroChip, HeroChipList, HeroLead, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import Section from '@/components/Section';
+import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { getSiteImage } from '@/lib/site-images';
 
 const featureChips = [
-  'Офсетная печать',
-  '300 gsm мелованный картон',
-  'Кратно 1000',
-  '7–10 рабочих дней',
+  'Офсетная печать 4+0 / 4+4',
+  'Мелованный картон 300 gsm',
+  'Тиражи: 1 000 / 2 000 / 3 000',
+  'Срок 7–10 рабочих дней',
 ] as const;
 
-export default function PrintPage() {
+export default async function PrintPage() {
+  const heroImage = await getSiteImage('print.hero.main');
+
+  const heroImageSrc = heroImage?.url ?? '/images/bussinescard/hero.png';
+  const heroImageAlt = heroImage?.altText || 'Офсетные визитки с фиксированными параметрами печати';
+
   return (
-    <div className="space-y-6">
-      <PageHero className="p-6 md:p-7 lg:p-8">
-        <HeroTitle className="max-w-[20ch] text-[clamp(2rem,4vw,3rem)]">Офсетные визитки</HeroTitle>
-        <HeroLead>
-          Фиксированные параметры печати: 90x50 мм, мелованный картон 300 gsm. Выберите тираж и опции, затем отправьте заявку менеджеру.
-        </HeroLead>
+    <div className="pb-8 md:pb-10">
+      <Section spacing="compact" className="pb-4 md:pb-5">
+        <PageHero
+          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20"
+          contentClassName="flex h-full max-w-[37rem] flex-col gap-6"
+          media={
+            <HeroMediaPanel className="overflow-hidden rounded-[1.4rem] border-neutral-200/85 bg-neutral-900 p-0">
+              <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[inherit]">
+                <ProtectedImage
+                  src={heroImageSrc}
+                  alt={heroImageAlt}
+                  fill
+                  className="h-full w-full object-cover"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 46vw"
+                />
+              </div>
+              <div className="pointer-events-none absolute bottom-4 left-4 right-4 rounded-2xl border border-white/30 bg-black/35 px-4 py-3 backdrop-blur-sm shadow-[0_14px_34px_-24px_rgba(2,6,23,0.9)] md:bottom-5 md:left-5 md:right-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/80">Фиксированный офсет</p>
+                <p className="mt-1 text-sm font-semibold text-white">Стабильный результат для корпоративных тиражей</p>
+              </div>
+            </HeroMediaPanel>
+          }
+        >
+          <div className="space-y-4">
+            <HeroEyebrow className="w-fit rounded-full border border-[var(--brand-red)]/55 px-3 py-1 text-[var(--brand-red)]">
+              Визитки и флаеры
+            </HeroEyebrow>
+            <HeroTitle className="max-w-[16ch] text-3xl leading-[1.06] md:text-5xl">Офсетные визитки для бизнеса</HeroTitle>
+            <HeroLead className="max-w-[34rem] text-base md:text-[1.05rem] md:leading-relaxed">
+              Фиксированные параметры печати: формат 90×50 мм, мелованный картон 300 gsm и понятная сетка тиражей.
+              Рассчитайте стоимость, отметьте опции и отправьте заявку менеджеру без лишних шагов.
+            </HeroLead>
+          </div>
 
-        <HeroChipList className="gap-2">
-          {featureChips.map((chip) => (
-            <HeroChip key={chip} className="gap-2 border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
-              {chip}
-            </HeroChip>
-          ))}
-        </HeroChipList>
-      </PageHero>
+          <HeroChipList className="max-w-[36rem] gap-2.5">
+            {featureChips.map((chip) => (
+              <HeroChip
+                key={chip}
+                className="min-h-10 rounded-xl border-neutral-200 bg-white/80 px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
+                {chip}
+              </HeroChip>
+            ))}
+          </HeroChipList>
 
-      <PrintPricingCalculator />
+          <HeroActions className="gap-3.5">
+            <Link
+              href="#print-calculator"
+              className="btn-primary px-5 py-3 text-sm no-underline shadow-[0_8px_20px_rgba(220,38,38,0.24)] hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]"
+            >
+              Рассчитать стоимость
+            </Link>
+            <Link
+              href="#print-order-form"
+              className="btn-secondary border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline"
+            >
+              Отправить заявку
+            </Link>
+          </HeroActions>
+        </PageHero>
+      </Section>
+
+      <Section spacing="tight" className="pt-0">
+        <div id="print-calculator" className="scroll-mt-24 space-y-4 md:space-y-5">
+          <div className="space-y-2">
+            <p className="t-eyebrow">Калькулятор и тарифы</p>
+            <h2 className="t-h2">Рассчитайте тираж и сразу передайте параметры в заявку</h2>
+            <p className="max-w-3xl text-sm leading-6 text-neutral-600 md:text-base">
+              Калькулятор сохраняет текущую механику расчёта и форму заказа: выберите тираж, отметьте ламинацию и, при необходимости, запросите дизайн.
+            </p>
+          </div>
+          <PrintPricingCalculator />
+        </div>
+      </Section>
     </div>
   );
 }

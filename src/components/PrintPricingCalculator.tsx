@@ -40,10 +40,10 @@ export default function PrintPricingCalculator() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <section className="space-y-6">
-          <div className="card rounded-2xl p-4 shadow-sm md:p-6 space-y-4">
+    <div className="space-y-5 md:space-y-6">
+      <div className="grid gap-4 md:gap-5 lg:grid-cols-[1fr_360px]">
+        <section className="space-y-4 md:space-y-5">
+          <div className="card rounded-2xl border-neutral-200/80 p-4 shadow-sm md:p-6 space-y-4">
             <h2 className="text-lg font-semibold">Тарифы на визитки (офсет)</h2>
             <p className="text-sm text-neutral-600 dark:text-neutral-300">300 gsm, размер 90x50 мм, срок изготовления 7–10 рабочих дней.</p>
             <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
@@ -69,7 +69,7 @@ export default function PrintPricingCalculator() {
             <p className="text-xs text-neutral-500 dark:text-neutral-400">Цены указаны без ламинации.</p>
           </div>
 
-          <div className="card rounded-2xl p-4 shadow-sm md:p-6 space-y-4">
+          <div className="card rounded-2xl border-neutral-200/80 p-4 shadow-sm md:p-6 space-y-4">
             <h2 className="text-xl font-semibold">Конфигуратор</h2>
 
             <div className="space-y-2.5">
@@ -135,7 +135,7 @@ export default function PrintPricingCalculator() {
           </div>
         </section>
 
-        <aside className="card h-fit rounded-2xl p-5 shadow-sm space-y-4 lg:sticky lg:top-24">
+        <aside className="card h-fit rounded-2xl border-neutral-200/80 p-5 shadow-sm space-y-4 lg:sticky lg:top-24">
           <h3 className="text-lg font-semibold">Итог</h3>
           <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
             <li>Продукт: <b>Визитки</b></li>
@@ -161,22 +161,24 @@ export default function PrintPricingCalculator() {
         </aside>
       </div>
 
-      <section className="card rounded-2xl border-neutral-200/70 bg-neutral-50/70 p-3 md:p-5 shadow-sm space-y-2 dark:border-neutral-800 dark:bg-neutral-900/40">
+      <section className="card rounded-2xl border-neutral-200/80 bg-neutral-50/70 p-4 md:p-5 shadow-sm space-y-2 dark:border-neutral-800 dark:bg-neutral-900/40">
         <h2 className="text-lg font-semibold">Флаеры</h2>
         <p className="text-sm text-neutral-700 dark:text-neutral-300">Флаеры рассчитываются индивидуально. Цена зависит от размера, бумаги и тиража.</p>
         <p className="text-xs text-neutral-500 dark:text-neutral-400">Отметьте чекбокс Флаеры в заявке ниже, и менеджер подготовит расчёт.</p>
       </section>
 
-      <OrderBusinessCardsForm
-        summary={{
-          quantity,
-          printSide: printType,
-          lamination,
-          needDesign,
-          unitPrice: Math.round((pricing.total / quantity) * 100) / 100,
-          totalPrice: pricing.total,
-        }}
-      />
+      <div id="print-order-form" className="scroll-mt-24">
+        <OrderBusinessCardsForm
+          summary={{
+            quantity,
+            printSide: printType,
+            lamination,
+            needDesign,
+            unitPrice: Math.round((pricing.total / quantity) * 100) / 100,
+            totalPrice: pricing.total,
+          }}
+        />
+      </div>
     </div>
   );
 }
