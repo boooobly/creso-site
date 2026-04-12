@@ -62,7 +62,7 @@ export default function OutdoorFloatingCtas() {
         </Link>
       </div>
 
-      <div className="fixed bottom-3 right-3 z-30 md:hidden">
+      <div className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] right-3 z-30 md:hidden">
         <div className="rounded-full border border-neutral-300 bg-white/95 p-1.5 shadow-xl backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/95">
           <div className="flex items-center gap-1.5">
             <a
