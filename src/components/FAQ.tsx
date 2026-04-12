@@ -7,7 +7,7 @@ export default function FAQ({ items }: { items: FaqItem[] }) {
       {items.map((f, i) => (
         <details
           key={i}
-          className="accordion-panel"
+          className="accordion-panel group"
         >
           <summary className="accordion-trigger t-faq">
             <span className="flex items-start gap-2">

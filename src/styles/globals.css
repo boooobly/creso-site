@@ -294,11 +294,19 @@ a { @apply underline-offset-4; }
 }
 
 .accordion-panel {
-  @apply group overflow-hidden rounded-2xl border border-neutral-200/85 bg-white shadow-[0_12px_30px_-28px_rgba(15,23,42,0.5)] transition-colors duration-200 hover:border-neutral-300 open:border-[var(--brand-red)]/25 dark:border-neutral-800/90 dark:bg-neutral-900/85 dark:shadow-[0_16px_34px_-30px_rgba(0,0,0,0.6)] dark:hover:border-neutral-700 dark:open:border-red-500/35;
+  @apply overflow-hidden rounded-2xl border border-neutral-200/85 bg-white shadow-[0_12px_30px_-28px_rgba(15,23,42,0.5)] transition-colors duration-200 hover:border-neutral-300 dark:border-neutral-800/90 dark:bg-neutral-900/85 dark:shadow-[0_16px_34px_-30px_rgba(0,0,0,0.6)] dark:hover:border-neutral-700;
+}
+
+.accordion-panel[open] {
+  border-color: color-mix(in srgb, var(--brand-red) 25%, transparent);
+}
+
+.dark .accordion-panel[open] {
+  border-color: rgb(248 113 113 / 0.35);
 }
 
 .accordion-trigger {
-  @apply flex w-full cursor-pointer list-none items-start justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-neutral-50/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/30 dark:hover:bg-neutral-800/70 sm:px-5 sm:py-4;
+  @apply flex w-full cursor-pointer list-none items-start justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-neutral-50/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/30 dark:hover:bg-neutral-800/70 sm:px-5 sm:py-4;
 }
 
 .accordion-content {

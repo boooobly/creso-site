@@ -296,7 +296,7 @@ export default async function MugsServicePage() {
 
             <div className="mt-5 space-y-3">
               {faqItems.map((item) => (
-                <details key={item.question} className="accordion-panel p-4">
+                <details key={item.question} className="accordion-panel group p-4">
                   <summary className="accordion-trigger -mx-4 -mt-4 mb-2 px-4 py-3 text-sm font-semibold text-neutral-900 marker:hidden dark:text-neutral-100">
                     <span>{item.question}</span>
                     <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180 dark:text-neutral-400" aria-hidden="true" />
