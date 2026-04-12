@@ -61,7 +61,7 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   return (
     <>
       <article
-        className={`card flex h-full flex-col rounded-2xl p-2.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md ${
+        className={`card flex h-full flex-col rounded-2xl border border-neutral-200/90 bg-white/95 p-2.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:border-neutral-700/80 dark:bg-gradient-to-b dark:from-neutral-900 dark:to-[#1a1b20] dark:shadow-[0_18px_35px_-25px_rgba(0,0,0,0.7)] ${
           selected
             ? 'border-[var(--brand-red)] ring-1 ring-[var(--brand-red)]/30 shadow-[0_8px_22px_rgba(220,38,38,0.2)]'
             : ''
@@ -90,8 +90,8 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
           </span>
         </button>
         <h3 className="min-h-[2.25rem] text-xs font-semibold leading-tight sm:text-sm">{item.name}</h3>
-        <p className="mt-1 text-[11px] text-neutral-600 sm:text-xs">{item.width_mm} мм</p>
-        <p className="text-[11px] text-neutral-700 sm:text-xs">{item.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
+        <p className="mt-1 text-[11px] text-neutral-600 dark:text-neutral-300 sm:text-xs">{item.width_mm} мм</p>
+        <p className="text-[11px] text-neutral-700 dark:text-neutral-200 sm:text-xs">{item.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
         <button
           type="button"
           onClick={() => onSelect(item)}
@@ -99,7 +99,7 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
             'mt-auto w-full rounded-xl border px-2.5 py-1.5 text-xs transition-all duration-200 active:scale-[0.98] sm:text-sm',
             selected
               ? 'border-red-600 bg-red-600 text-white shadow-md'
-              : 'border-neutral-300 bg-white text-neutral-900 hover:scale-[1.02] hover:border-red-500 hover:bg-red-50',
+              : 'border-neutral-300 bg-white text-neutral-900 hover:scale-[1.02] hover:border-red-500 hover:bg-red-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:border-red-500 dark:hover:bg-red-500/20',
           ].join(' ')}
         >
           {selected ? 'Выбран' : 'Выбрать багет'}

@@ -185,13 +185,13 @@ export default function HomePageContent({
               <motion.li
                 key={`${item.title}-${index}`}
                 variants={fadeUp(14)}
-                className="card-info card-interactive h-full border-neutral-200/90 p-6"
+                className="card-info card-interactive h-full border-neutral-200/90 p-6 dark:border-neutral-700/90 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-[#1e1f24] dark:shadow-[0_18px_40px_-26px_rgba(0,0,0,0.62)]"
               >
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
                 <p className="t-h4">{item.title}</p>
-                <p className="t-body mt-2 leading-relaxed">{item.description}</p>
+                <p className="t-body mt-2 leading-relaxed dark:text-neutral-300">{item.description}</p>
               </motion.li>
             );
           })}
@@ -245,14 +245,14 @@ export default function HomePageContent({
               <motion.li
                 key={`${step.title}-${index}`}
                 variants={fadeUp(16)}
-                className="card-info card-interactive relative h-full border-neutral-200/90 p-6"
+                className="card-info card-interactive relative h-full border-neutral-200/90 p-6 dark:border-neutral-700/85 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-[#1b1b1f]"
               >
-                <span className="t-caption absolute right-5 top-5 rounded-full border border-neutral-200 bg-white/80 px-2.5 py-1 dark:border-neutral-700 dark:bg-neutral-900/80">0{index + 1}</span>
+                <span className="t-caption absolute right-5 top-5 rounded-full border border-neutral-200 bg-white/80 px-2.5 py-1 dark:border-neutral-600 dark:bg-neutral-800/90 dark:text-neutral-300">0{index + 1}</span>
                 <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
                 <h3 className="t-h3">{step.title}</h3>
-                <p className="t-body mt-2">{step.description}</p>
+                <p className="t-body mt-2 dark:text-neutral-300">{step.description}</p>
               </motion.li>
             );
           })}
@@ -268,20 +268,20 @@ export default function HomePageContent({
           </div>
           <Link href="/contacts" className={splitCtaClassName}>{faqLinkLabel}</Link>
         </div>
-        <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="card p-4 sm:p-5 md:p-6">
+        <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="card p-4 dark:border-neutral-700/90 dark:bg-gradient-to-b dark:from-neutral-900 dark:to-neutral-900/90 sm:p-5 md:p-6">
           <FAQ items={faq.slice(0, 5)} />
         </motion.div>
       </Section>
 
       <Section id="lead-form" spacing="tight">
-        <motion.div className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#231717] sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 dark:border-neutral-700/90 dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_26px_58px_-36px_rgba(0,0,0,0.72)] sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-20 top-1/2 z-0 h-[19rem] w-[25rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.16)_0%,rgba(212,28,28,0.07)_34%,rgba(212,28,28,0.02)_58%,transparent_76%)] blur-3xl"
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-[44%] z-0 w-[12rem] bg-gradient-to-r from-transparent via-white/92 to-white dark:via-neutral-900/90 dark:to-neutral-900"
+            className="pointer-events-none absolute inset-y-0 left-[44%] z-0 w-[12rem] bg-gradient-to-r from-transparent via-white/92 to-white dark:via-[#1a1a20]/92 dark:to-[#17171d]"
           />
           <div className="relative z-10 space-y-4 lg:max-w-[30rem]">
             <div className="space-y-3">
