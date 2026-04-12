@@ -263,20 +263,20 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-order" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
         <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-7">
-            <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_16px_34px_-30px_rgba(0,0,0,0.6)] sm:p-7">
+            <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 dark:border-neutral-800 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-2xl">
                 <p className="t-eyebrow">Оформление заказа</p>
-                <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900">Отправьте заявку за 1 минуту</h2>
-                <p className="mt-2 text-sm leading-relaxed text-neutral-600">Укажите основные параметры заказа, чтобы быстро получить расчёт и план запуска по вашему тиражу.</p>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Отправьте заявку за 1 минуту</h2>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Укажите основные параметры заказа, чтобы быстро получить расчёт и план запуска по вашему тиражу.</p>
               </div>
-              <ul className="grid gap-2 text-sm text-neutral-700 lg:min-w-[340px]">
+              <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 lg:min-w-[340px]">
                 {[
                   'Укажите тираж и покрытие',
                   'Приложите макет или кратко опишите задачу',
                   'Получите расчёт и следующий шаг',
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-neutral-700 dark:bg-neutral-800/70">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600" aria-hidden="true" />
                     <span>{item}</span>
                   </li>
@@ -290,18 +290,18 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-faq" className="pb-12 pt-0 lg:pb-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="text-2xl font-bold tracking-tight text-neutral-900">Частые вопросы</h2>
-            <p className="mt-2 text-sm text-neutral-600 sm:text-base">Коротко о сроках, макетах и процессе печати.</p>
+          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_16px_34px_-30px_rgba(0,0,0,0.6)] sm:p-8">
+            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Частые вопросы</h2>
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 sm:text-base">Коротко о сроках, макетах и процессе печати.</p>
 
             <div className="mt-5 space-y-3">
               {faqItems.map((item) => (
-                <details key={item.question} className="group rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 transition hover:border-neutral-300">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 pr-1 text-sm font-semibold text-neutral-900 marker:hidden">
+                <details key={item.question} className="accordion-panel p-4">
+                  <summary className="accordion-trigger -mx-4 -mt-4 mb-2 px-4 py-3 text-sm font-semibold text-neutral-900 marker:hidden dark:text-neutral-100">
                     <span>{item.question}</span>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180" aria-hidden="true" />
+                    <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180 dark:text-neutral-400" aria-hidden="true" />
                   </summary>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-700">{item.answer}</p>
+                  <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{item.answer}</p>
                 </details>
               ))}
             </div>

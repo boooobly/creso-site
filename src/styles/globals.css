@@ -11,6 +11,10 @@
 html { scroll-behavior: smooth; }
 body { @apply bg-white text-neutral-900 font-normal transition-colors dark:bg-neutral-950 dark:text-neutral-100; }
 
+:root {
+  --public-floating-bar-space: 88px;
+}
+
 @layer base {
   h1 {
     @apply font-extrabold;
@@ -107,7 +111,7 @@ a { @apply underline-offset-4; }
   }
 
   .t-faq {
-    @apply text-base font-semibold leading-[1.4] tracking-normal text-neutral-900;
+    @apply text-base font-semibold leading-[1.4] tracking-normal text-neutral-900 dark:text-neutral-100;
   }
 
   .section-rhythm {
@@ -289,6 +293,18 @@ a { @apply underline-offset-4; }
   @apply relative overflow-hidden rounded-[1.75rem] border border-neutral-200/80 bg-white/85 p-1.5 shadow-[0_20px_44px_rgba(17,24,39,0.12)] dark:border-neutral-800/90 dark:bg-neutral-900/90 dark:shadow-[0_20px_46px_rgba(0,0,0,0.45)];
 }
 
+.accordion-panel {
+  @apply group overflow-hidden rounded-2xl border border-neutral-200/85 bg-white shadow-[0_12px_30px_-28px_rgba(15,23,42,0.5)] transition-colors duration-200 hover:border-neutral-300 open:border-[var(--brand-red)]/25 dark:border-neutral-800/90 dark:bg-neutral-900/85 dark:shadow-[0_16px_34px_-30px_rgba(0,0,0,0.6)] dark:hover:border-neutral-700 dark:open:border-red-500/35;
+}
+
+.accordion-trigger {
+  @apply flex w-full cursor-pointer list-none items-start justify-between gap-3 px-4 py-3.5 transition-colors duration-200 hover:bg-neutral-50/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/30 dark:hover:bg-neutral-800/70 sm:px-5 sm:py-4;
+}
+
+.accordion-content {
+  @apply px-4 pb-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:px-5 sm:pb-5;
+}
+
 
 .marquee-wrap {
   position: relative;
@@ -305,4 +321,14 @@ a { @apply underline-offset-4; }
 
 .main-layout:has(> .home-page-root) {
   padding-top: 0;
+}
+
+.public-layout-main {
+  padding-bottom: calc(2rem + var(--public-floating-bar-space) + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  :root {
+    --public-floating-bar-space: 0px;
+  }
 }

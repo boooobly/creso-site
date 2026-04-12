@@ -160,23 +160,23 @@ function FaqAccordion() {
         const isOpen = openIndex === index;
 
         return (
-          <div key={item.question} className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md motion-reduce:transition-none dark:border-neutral-800 dark:bg-neutral-900">
+          <div key={item.question} className="overflow-hidden rounded-2xl border border-neutral-200/85 bg-white shadow-[0_12px_28px_-24px_rgba(15,23,42,0.45)] transition motion-reduce:transition-none hover:border-neutral-300 dark:border-neutral-800/90 dark:bg-neutral-900/85 dark:shadow-[0_16px_34px_-30px_rgba(0,0,0,0.6)] dark:hover:border-neutral-700">
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-neutral-50/80 dark:hover:bg-neutral-800/70"
               onClick={() => setOpenIndex(isOpen ? null : index)}
               aria-expanded={isOpen}
             >
-              <span className="pr-4 text-sm font-semibold md:text-base">{item.question}</span>
+              <span className="pr-4 text-sm font-semibold text-neutral-900 dark:text-neutral-100 md:text-base">{item.question}</span>
               <ChevronDown
-                className={`size-5 shrink-0 text-red-600 transition-transform duration-300 motion-reduce:transition-none ${isOpen ? 'rotate-180' : ''}`}
+                className={`size-5 shrink-0 text-red-600 transition-transform duration-300 motion-reduce:transition-none dark:text-red-400 ${isOpen ? 'rotate-180' : ''}`}
                 aria-hidden="true"
               />
             </button>
 
             <div className={`grid transition-all duration-300 ease-out motion-reduce:transition-none ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
               <div className="overflow-hidden">
-                <p className="px-5 pb-4 text-sm text-neutral-600 dark:text-neutral-300">{item.answer}</p>
+                <p className="px-5 pb-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.answer}</p>
               </div>
             </div>
           </div>

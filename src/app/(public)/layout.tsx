@@ -6,7 +6,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main className="main-layout container py-8">{children}</main>
+      <main className="main-layout public-layout-main container py-8">{children}</main>
       <SiteFooter />
     </>
   );
