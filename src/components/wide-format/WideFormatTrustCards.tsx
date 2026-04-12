@@ -39,11 +39,11 @@ export default function WideFormatTrustCards({ features }: WideFormatTrustCardsP
             variants={fadeUp(14)}
             className="card-info card-interactive h-full md:p-6"
           >
-            <div className="mb-3 inline-flex h-[2.25rem] w-[2.25rem] items-center justify-center rounded-xl border border-red-200/70 bg-red-50 text-red-600">
+            <div className="mb-3 inline-flex h-[2.25rem] w-[2.25rem] items-center justify-center rounded-xl border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
               <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
             </div>
-            <h3 className="text-sm font-semibold text-neutral-900">{feature.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{feature.description}</p>
+            <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{feature.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{feature.description}</p>
           </motion.div>
         );
       })}
