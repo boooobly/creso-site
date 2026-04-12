@@ -66,7 +66,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
     turnaround: '7–10 business days',
     fixedSpecs: {
       size: '90x50',
-      stock: '300 gsm',
+      stock: '300 г/м²',
       printType: 'offset',
     },
     notes: FIXED_NOTES,

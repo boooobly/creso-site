@@ -45,7 +45,7 @@ export default function PrintPricingCalculator() {
         <section className="space-y-4 md:space-y-5">
           <div className="card rounded-2xl border-neutral-200/80 p-4 shadow-sm md:p-6 space-y-4">
             <h2 className="text-lg font-semibold">Тарифы на визитки (офсет)</h2>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">Фиксированные параметры: формат 90×50 мм, мелованный картон 300 gsm.</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">Фиксированные параметры: формат 90×50 мм, мелованный картон 300 г/м².</p>
             <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
               <table className="w-full min-w-[420px] text-sm">
                 <thead className="bg-neutral-100/90 dark:bg-neutral-800/80">
@@ -155,7 +155,7 @@ export default function PrintPricingCalculator() {
           </div>
 
           <div className="rounded-xl border border-neutral-200 bg-white/70 p-3 text-xs leading-5 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900/50 dark:text-neutral-300 space-y-1">
-            <p>• Формат и материал фиксированы: 90×50 мм, 300 gsm.</p>
+            <p>• Формат и материал фиксированы: 90×50 мм, 300 г/м².</p>
             <p>• Срок изготовления: 7–10 рабочих дней.</p>
           </div>
         </aside>
