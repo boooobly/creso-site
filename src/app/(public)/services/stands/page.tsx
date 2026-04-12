@@ -70,9 +70,9 @@ export default async function StandsServicePage() {
     <div>
       <Section className="pb-8 pt-8 md:pb-10 md:pt-10" background="default" id="stands-hero">
         <PageHero
-          className="bg-gradient-to-br from-white to-neutral-50"
+          className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-950 dark:to-neutral-900/80"
           media={
-            <HeroMediaPanel className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-0">
+            <HeroMediaPanel className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-0 dark:border-neutral-800 dark:bg-neutral-900">
               <div className="relative aspect-[5/4] min-h-[320px] overflow-hidden rounded-3xl">
                 <ProtectedImage
                   src={heroImageSrc}
@@ -113,7 +113,7 @@ export default async function StandsServicePage() {
         </PageHero>
       </Section>
 
-      <Section id="stands-catalog" background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
+      <Section id="stands-catalog" background="muted" fullBleed className="border-y border-neutral-200/70 py-12 dark:border-neutral-800/80 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Стенды для помещений</h2>
           <p className="t-body max-w-3xl">Решения для внутренних зон: офисов, учебных и производственных помещений.</p>
@@ -154,7 +154,7 @@ export default async function StandsServicePage() {
         </div>
       </Section>
 
-      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
+      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 dark:border-neutral-800/80 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Как изготавливаем стенды</h2>
           <p className="t-body max-w-3xl">Подбираем основу, крепления и информационные элементы под место установки и формат обновления контента.</p>
@@ -163,12 +163,12 @@ export default async function StandsServicePage() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {materials.map((item) => (
             <RevealOnScroll key={item.title} className="h-full">
-              <article className="group h-full rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]">
-                <span className="inline-flex size-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
+              <article className="group h-full rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.75)] dark:hover:border-neutral-700 dark:hover:shadow-[0_18px_36px_-24px_rgba(220,38,38,0.35)]">
+                <span className="inline-flex size-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100 dark:bg-red-500/12 dark:text-red-300 dark:group-hover:bg-red-500/20">
                   <item.icon className="size-4" aria-hidden="true" />
                 </span>
-                <h3 className="mt-3 text-base font-semibold">{item.title}</h3>
-                <p className="mt-2 text-sm text-neutral-600">{item.description}</p>
+                <h3 className="mt-3 text-base font-semibold dark:text-neutral-100">{item.title}</h3>
+                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{item.description}</p>
               </article>
             </RevealOnScroll>
           ))}
@@ -183,19 +183,19 @@ export default async function StandsServicePage() {
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {audiences.map((item) => (
-            <article key={item} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+            <article key={item} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/80 dark:shadow-[0_10px_28px_-24px_rgba(0,0,0,0.8)]">
               <div className="flex items-center gap-3">
-                <span className="inline-flex size-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-600">
+                <span className="inline-flex size-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
                   {item.includes('Школ') || item.includes('сады') ? <School className="size-4" aria-hidden="true" /> : <Building2 className="size-4" aria-hidden="true" />}
                 </span>
-                <p className="text-sm font-semibold text-neutral-800">{item}</p>
+                <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">{item}</p>
               </div>
             </article>
           ))}
         </div>
       </Section>
 
-      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 md:py-16">
+      <Section background="muted" fullBleed className="border-y border-neutral-200/70 py-12 dark:border-neutral-800/80 md:py-16">
         <div className="space-y-3">
           <h2 className="t-h2">Почему заказывают у нас</h2>
           <p className="t-body max-w-3xl">Фокус на предсказуемом процессе: понятные условия, аккуратное исполнение и сопровождение на каждом этапе.</p>
@@ -204,12 +204,12 @@ export default async function StandsServicePage() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {advantages.map((item, index) => (
             <RevealOnScroll key={item} className={getRevealDelayClass(index)}>
-              <article className="group flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)]">
+              <article className="group flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.75)] dark:hover:border-neutral-700 dark:hover:shadow-[0_18px_36px_-24px_rgba(220,38,38,0.35)]">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100">
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100 dark:bg-red-500/12 dark:text-red-300 dark:group-hover:bg-red-500/20">
                     <ShieldCheck className="size-4" aria-hidden="true" />
                   </span>
-                  <p className="text-sm font-semibold leading-relaxed text-neutral-800">{item}</p>
+                  <p className="text-sm font-semibold leading-relaxed text-neutral-800 dark:text-neutral-100">{item}</p>
                 </div>
               </article>
             </RevealOnScroll>
@@ -218,9 +218,9 @@ export default async function StandsServicePage() {
       </Section>
 
       <Section id="stands-lead-form" background="muted" fullBleed className="pt-0">
-        <div className="card rounded-2xl border border-neutral-200/80 bg-white p-6 md:p-8">
-          <h2 className="text-2xl font-bold">Рассчитать стоимость стенда</h2>
-          <p className="mt-2 text-sm text-neutral-600 md:text-base">
+        <div className="card rounded-2xl border border-neutral-200/80 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900/88 dark:shadow-[0_16px_36px_-26px_rgba(0,0,0,0.8)] md:p-8">
+          <h2 className="text-2xl font-bold dark:text-neutral-100">Рассчитать стоимость стенда</h2>
+          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">
             Укажите тип стенда, размеры, место установки и желаемую комплектацию. После заявки уточним детали и отправим расчёт с вариантами исполнения.
           </p>
           <div className="mt-5">
