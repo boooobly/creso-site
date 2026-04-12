@@ -40,12 +40,12 @@ export default function PrintPricingCalculator() {
   );
 
   return (
-    <div className="space-y-5 md:space-y-6">
-      <div className="grid gap-4 md:gap-5 lg:grid-cols-[1fr_360px]">
+    <div className="space-y-6 md:space-y-7">
+      <div className="grid gap-5 md:gap-6 lg:grid-cols-[1fr_360px]">
         <section className="space-y-4 md:space-y-5">
           <div className="card rounded-2xl border-neutral-200/80 p-4 shadow-sm md:p-6 space-y-4">
             <h2 className="text-lg font-semibold">Тарифы на визитки (офсет)</h2>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">300 gsm, размер 90x50 мм, срок изготовления 7–10 рабочих дней.</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">Фиксированные параметры: формат 90×50 мм, мелованный картон 300 gsm.</p>
             <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
               <table className="w-full min-w-[420px] text-sm">
                 <thead className="bg-neutral-100/90 dark:bg-neutral-800/80">
@@ -66,11 +66,14 @@ export default function PrintPricingCalculator() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">Цены указаны без ламинации.</p>
+            <p className="text-xs leading-5 text-neutral-500 dark:text-neutral-400">Цены в таблице указаны без ламинации.</p>
           </div>
 
           <div className="card rounded-2xl border-neutral-200/80 p-4 shadow-sm md:p-6 space-y-4">
             <h2 className="text-xl font-semibold">Конфигуратор</h2>
+            <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300">
+              Выберите параметры — стоимость пересчитается автоматически.
+            </p>
 
             <div className="space-y-2.5">
               <p className="font-medium">Тираж</p>
@@ -80,13 +83,13 @@ export default function PrintPricingCalculator() {
                     key={value}
                     type="button"
                     onClick={() => setQuantity(value)}
-                    className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
+                    className={`rounded-xl border px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/45 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-950 ${
                       quantity === value
-                        ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/15 text-[var(--brand-red)] shadow-sm ring-1 ring-[var(--brand-red)]/30'
+                        ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/12 text-[var(--brand-red)] shadow-sm'
                         : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700'
                     }`}
                   >
-                    {value}
+                    {value.toLocaleString('ru-RU')}
                   </button>
                 ))}
               </div>
@@ -104,7 +107,7 @@ export default function PrintPricingCalculator() {
                   Двусторонняя
                 </ToggleButton>
               </div>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Цена для односторонней и двусторонней печати одинаковая.</p>
+              <p className="text-xs leading-5 text-neutral-500 dark:text-neutral-400">Стоимость не меняется: печать с одной и двух сторон стоит одинаково.</p>
             </div>
 
             <div className="space-y-2.5">
@@ -117,7 +120,7 @@ export default function PrintPricingCalculator() {
                 />
                 <span className="font-medium">Ламинация (+15%)</span>
               </label>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Ламинация возможна только с одной стороны.</p>
+              <p className="text-xs leading-5 text-neutral-500 dark:text-neutral-400">Ламинация наносится только с одной стороны.</p>
             </div>
 
             <div className="space-y-2.5">
@@ -130,7 +133,7 @@ export default function PrintPricingCalculator() {
                 />
                 <span className="font-medium">Нужен дизайн</span>
               </label>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Стоимость дизайна согласовывается с менеджером.</p>
+              <p className="text-xs leading-5 text-neutral-500 dark:text-neutral-400">Стоимость дизайна рассчитывается отдельно после уточнения задачи.</p>
             </div>
           </div>
         </section>
@@ -139,12 +142,10 @@ export default function PrintPricingCalculator() {
           <h3 className="text-lg font-semibold">Итог</h3>
           <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
             <li>Продукт: <b>Визитки</b></li>
-            <li>Размер: <b>90x50</b></li>
-            <li>Материал: <b>300 gsm</b></li>
             <li>Печать: <b>{printType === 'single' ? 'Односторонняя' : 'Двусторонняя'}</b></li>
             <li>Ламинация: <b>{lamination ? 'Да' : 'Нет'}</b></li>
-            <li>Тираж: <b>{quantity.toLocaleString('ru-RU')}</b></li>
-            <li>Срок: <b>7–10 рабочих дней</b></li>
+            <li>Дизайн: <b>{needDesign ? 'Нужен' : 'Не нужен'}</b></li>
+            <li>Тираж: <b>{quantity.toLocaleString('ru-RU')} шт.</b></li>
           </ul>
 
           <div className="rounded-xl bg-neutral-200/80 p-4 dark:bg-neutral-800/90">
@@ -153,18 +154,17 @@ export default function PrintPricingCalculator() {
             <p className="text-sm text-neutral-600 dark:text-neutral-300">{pricing.perPiece.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₽ / шт.</p>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 p-3 text-xs text-neutral-600 dark:border-neutral-700 dark:text-neutral-300 space-y-1">
-            <p>• Цены без скрытых платежей.</p>
-            <p>• Цена для двусторонней печати не меняется.</p>
-            <p>• Стоимость дизайна согласовывается с менеджером.</p>
+          <div className="rounded-xl border border-neutral-200 bg-white/70 p-3 text-xs leading-5 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900/50 dark:text-neutral-300 space-y-1">
+            <p>• Формат и материал фиксированы: 90×50 мм, 300 gsm.</p>
+            <p>• Срок изготовления: 7–10 рабочих дней.</p>
           </div>
         </aside>
       </div>
 
       <section className="card rounded-2xl border-neutral-200/80 bg-neutral-50/70 p-4 md:p-5 shadow-sm space-y-2 dark:border-neutral-800 dark:bg-neutral-900/40">
         <h2 className="text-lg font-semibold">Флаеры</h2>
-        <p className="text-sm text-neutral-700 dark:text-neutral-300">Флаеры рассчитываются индивидуально. Цена зависит от размера, бумаги и тиража.</p>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">Отметьте чекбокс Флаеры в заявке ниже, и менеджер подготовит расчёт.</p>
+        <p className="text-sm text-neutral-700 dark:text-neutral-300">Флаеры считаем индивидуально по формату, бумаге и тиражу.</p>
+        <p className="text-xs leading-5 text-neutral-500 dark:text-neutral-400">Чтобы добавить расчёт, отметьте «Добавить расчёт флаеров» в форме ниже.</p>
       </section>
 
       <div id="print-order-form" className="scroll-mt-24">
@@ -188,7 +188,7 @@ function ToggleButton({ active, onClick, children }: { active: boolean; onClick:
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl border px-4 py-3 text-left transition ${
+      className={`rounded-xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/45 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-950 ${
         active
           ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red)]'
           : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700'

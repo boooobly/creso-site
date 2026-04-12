@@ -6,10 +6,10 @@ import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPa
 import { getSiteImage } from '@/lib/site-images';
 
 const featureChips = [
-  'Офсетная печать 4+0 / 4+4',
-  'Мелованный картон 300 gsm',
-  'Тиражи: 1 000 / 2 000 / 3 000',
-  'Срок 7–10 рабочих дней',
+  'Тиражи от 1 000 до 9 000 шт.',
+  'Ламинация +15%',
+  'Можно заказать дизайн',
+  'Флаеры — по запросу',
 ] as const;
 
 export default async function PrintPage() {
@@ -49,8 +49,7 @@ export default async function PrintPage() {
             </HeroEyebrow>
             <HeroTitle className="max-w-[16ch] text-3xl leading-[1.06] md:text-5xl">Офсетные визитки для бизнеса</HeroTitle>
             <HeroLead className="max-w-[34rem] text-base md:text-[1.05rem] md:leading-relaxed">
-              Фиксированные параметры печати: формат 90×50 мм, мелованный картон 300 gsm и понятная сетка тиражей.
-              Рассчитайте стоимость, отметьте опции и отправьте заявку менеджеру без лишних шагов.
+              Быстрый расчёт для стандартных тиражей: выберите параметры, получите итоговую стоимость и отправьте заявку в одном потоке.
             </HeroLead>
           </div>
 
@@ -87,9 +86,9 @@ export default async function PrintPage() {
         <div id="print-calculator" className="scroll-mt-24 space-y-4 md:space-y-5">
           <div className="space-y-2">
             <p className="t-eyebrow">Калькулятор и тарифы</p>
-            <h2 className="t-h2">Рассчитайте тираж и сразу передайте параметры в заявку</h2>
+            <h2 className="t-h2">Рассчитайте стоимость и сразу передайте параметры в заявку</h2>
             <p className="max-w-3xl text-sm leading-6 text-neutral-600 md:text-base">
-              Калькулятор сохраняет текущую механику расчёта и форму заказа: выберите тираж, отметьте ламинацию и, при необходимости, запросите дизайн.
+              Используйте тарифную таблицу как ориентир, затем настройте заказ в конфигураторе.
             </p>
           </div>
           <PrintPricingCalculator />
