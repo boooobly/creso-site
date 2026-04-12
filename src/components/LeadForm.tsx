@@ -156,7 +156,7 @@ export default function LeadForm({
   };
 
   if (isSubmitSuccessful) {
-    return <p className="t-body text-green-700">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>;
+    return <p className="t-body text-green-700 dark:text-green-400">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>;
   }
 
   return (

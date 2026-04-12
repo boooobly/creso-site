@@ -84,9 +84,9 @@ export default async function WideFormatPrintingPage() {
   return (
     <div className="pb-8 md:pb-12">
       <Section spacing="compact">
-        <PageHero className="border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50/65 to-red-50/[0.16] p-5 shadow-sm shadow-neutral-200/60 md:p-7 lg:p-9" contentClassName="flex h-full flex-col lg:min-h-[29rem]" mediaClassName="h-full" media={
-          <HeroMediaPanel className="flex h-full flex-col border-neutral-200/90 bg-neutral-100/90 p-4 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm md:p-5">
-            <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3.5">
+        <PageHero className="border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50/65 to-red-50/[0.16] p-5 shadow-sm shadow-neutral-200/60 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] dark:shadow-none md:p-7 lg:p-9" contentClassName="flex h-full flex-col lg:min-h-[29rem]" mediaClassName="h-full" media={
+          <HeroMediaPanel className="flex h-full flex-col border-neutral-200/90 bg-neutral-100/90 p-4 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm dark:border-neutral-800/90 dark:bg-neutral-900/90 dark:shadow-none md:p-5">
+            <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3.5 dark:border-neutral-800/80">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Производственный профиль</p>
               </div>
@@ -109,8 +109,8 @@ export default async function WideFormatPrintingPage() {
                         <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
                       </span>
                       <div className="space-y-1.5">
-                        <h3 className="text-sm font-semibold leading-5 text-neutral-900">{item.title}</h3>
-                        <p className="text-sm leading-[1.45] text-neutral-600">{item.description}</p>
+                        <h3 className="text-sm font-semibold leading-5 text-neutral-900 dark:text-neutral-100">{item.title}</h3>
+                        <p className="text-sm leading-[1.45] text-neutral-600 dark:text-neutral-300">{item.description}</p>
                       </div>
                     </div>
                   </article>
@@ -128,17 +128,17 @@ export default async function WideFormatPrintingPage() {
           </div>
 
           <div className="mt-7 flex flex-1 flex-col justify-end gap-4 lg:pt-7">
-            <div className="space-y-4 border-t border-neutral-200/80 pt-4">
-              <p className="max-w-xl text-sm leading-6 text-neutral-500">
+            <div className="space-y-4 border-t border-neutral-200/80 pt-4 dark:border-neutral-800/80">
+              <p className="max-w-xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                 Подскажем по материалам, постобработке и требованиям к файлу перед печатью.
               </p>
               <div className="flex flex-wrap items-center gap-2.5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Подходит для</p>
-                <span className="h-px flex-1 bg-neutral-200/80" aria-hidden="true" />
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400 dark:text-neutral-500">Подходит для</p>
+                <span className="h-px flex-1 bg-neutral-200/80 dark:bg-neutral-800/80" aria-hidden="true" />
               </div>
               <HeroChipList className="max-w-[34rem] gap-2">
                 {trustMarkers.map((marker) => (
-                  <HeroChip key={marker} className="chip-elevated min-h-8 gap-1.5 border-neutral-200/80 bg-white/75 py-1.5 text-[11px] shadow-none md:text-xs">
+                  <HeroChip key={marker} className="chip-elevated min-h-8 gap-1.5 border-neutral-200/80 bg-white/75 py-1.5 text-[11px] shadow-none dark:border-neutral-700/80 dark:bg-neutral-900/80 dark:text-neutral-200 md:text-xs">
                     <span className="card-dot h-1.5 w-1.5" aria-hidden="true" />
                     {marker}
                   </HeroChip>
@@ -155,7 +155,7 @@ export default async function WideFormatPrintingPage() {
               </Link>
               <Link
                 href="#wide-format-form"
-                className="btn-secondary min-h-11 border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline"
+                className="btn-secondary min-h-11 border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200"
               >
                 Отправить параметры
               </Link>
@@ -170,14 +170,14 @@ export default async function WideFormatPrintingPage() {
             <div className="mb-4 space-y-3 md:mb-5">
               <p className="t-eyebrow">Калькулятор</p>
               <h2 className="t-h2">Технический расчёт стоимости</h2>
-              <p className="max-w-3xl text-sm leading-6 text-neutral-600 md:text-base">
+              <p className="max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
                 Укажите материал, размеры и тираж, чтобы получить предварительную стоимость и сразу передать параметры в форму заявки.
               </p>
               <div className="flex flex-wrap gap-2">
                 {calculatorMarkers.map((marker) => (
                   <span
                     key={marker}
-                    className="inline-flex items-center rounded-full border border-neutral-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-neutral-600"
+                    className="inline-flex items-center rounded-full border border-neutral-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-neutral-600 dark:border-neutral-700/80 dark:bg-neutral-900/80 dark:text-neutral-300"
                   >
                     {marker}
                   </span>
@@ -191,8 +191,8 @@ export default async function WideFormatPrintingPage() {
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="max-w-2xl space-y-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Связанная услуга</p>
-                <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">{ctaTitle}</h2>
-                <p className="text-sm leading-6 text-neutral-600 md:text-base">{ctaDescription}</p>
+                <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">{ctaTitle}</h2>
+                <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">{ctaDescription}</p>
               </div>
               <div className="flex w-full md:w-auto md:justify-end">
                 <Link href="/plotter-cutting" className="btn-primary w-full text-center no-underline md:w-auto">{ctaButtonText}</Link>

@@ -64,12 +64,12 @@ export default async function ReviewsPage() {
   const reviews = await loadApprovedReviews();
   return (
     <div className="space-y-8 md:space-y-10">
-      <section className="card rounded-3xl border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/80 to-red-50/[0.18] p-6 md:p-8">
+      <section className="card rounded-3xl border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/80 to-red-50/[0.18] p-6 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:p-8">
         <RevealOnScroll>
           <div className="space-y-3 text-center md:space-y-4">
             <p className="t-eyebrow mx-auto">Социальное доказательство</p>
-            <h1 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">Отзывы реальных клиентов</h1>
-            <p className="mx-auto max-w-2xl text-sm leading-6 text-neutral-600 md:text-base">
+            <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-4xl">Отзывы реальных клиентов</h1>
+            <p className="mx-auto max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
               Собрали живую обратную связь о качестве, сроках и коммуникации — чтобы вы могли оценить наш подход до старта проекта.
             </p>
           </div>
@@ -84,7 +84,7 @@ export default async function ReviewsPage() {
                 <MessagesSquare className="h-3.5 w-3.5" aria-hidden="true" />
                 Отзывы на Яндекс Картах
               </div>
-              <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Смотрите отзывы на внешней площадке</h2>
+              <h2 className="text-xl font-semibold tracking-tight dark:text-neutral-100 md:text-2xl">Смотрите отзывы на внешней площадке</h2>
               <p className="max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
                 Для дополнительной проверки можно открыть карточку компании в Яндекс Картах и посмотреть полный список оценок.
               </p>
@@ -102,7 +102,7 @@ export default async function ReviewsPage() {
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
               <BadgeCheck className="h-4 w-4" aria-hidden="true" />
             </span>
-            <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Почему отзывам можно доверять</h2>
+            <h2 className="text-xl font-semibold tracking-tight dark:text-neutral-100 md:text-2xl">Почему отзывам можно доверять</h2>
           </div>
           <ul className="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
             {credibilityPoints.map((point) => {

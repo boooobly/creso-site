@@ -81,7 +81,7 @@ export default function SiteHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-black/70 ${
+      className={`sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800/90 dark:bg-neutral-950/80 ${
         isScrolled ? 'shadow-md' : 'shadow-sm'
       }`}
     >
@@ -143,7 +143,7 @@ export default function SiteHeader() {
                       }`}
                     >
                       <ul
-                        className="rounded-xl border border-neutral-200/80 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/95"
+                        className="rounded-xl border border-neutral-200/80 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur dark:border-neutral-800/90 dark:bg-neutral-900/95 dark:shadow-black/40"
                         role="menu"
                         aria-label="Услуги"
                       >
@@ -159,8 +159,8 @@ export default function SiteHeader() {
                                 className={
                                   'block rounded-lg px-3 py-2 text-sm no-underline transition-colors focus-visible:outline-none ' +
                                   (active
-                                    ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)]'
-                                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-200 dark:hover:bg-neutral-800')
+                                    ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
+                                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-200 dark:hover:bg-neutral-800/90')
                                 }
                               >
                                 {item.label}
@@ -219,7 +219,7 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-neutral-300 bg-white/80 text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200 dark:hover:bg-neutral-800"
       aria-label="Переключить тему"
       disabled={!mounted}
     >

@@ -195,7 +195,7 @@ export default async function OutdoorAdvertisingPage() {
 
       <Section className="pb-6 md:pb-10" id="outdoor-hero" background="default" spacing="compact">
         <PageHero
-          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25"
+          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"
           contentClassName="flex h-full max-w-[38.5rem] flex-col gap-6 md:gap-7 lg:pr-3"
           media={
             <HeroMediaPanel className="overflow-hidden rounded-[1.4rem] border-neutral-200/85 bg-neutral-900 p-0">
@@ -226,7 +226,7 @@ export default async function OutdoorAdvertisingPage() {
 
           <HeroChipList className="max-w-[38rem] gap-2.5 pt-1">
             {heroTrustBadges.map((badge) => (
-              <HeroChip key={badge} className="h-11 whitespace-nowrap rounded-xl px-3.5 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
+              <HeroChip key={badge} className="h-11 whitespace-nowrap rounded-xl px-3.5 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-neutral-100">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                 {badge}
               </HeroChip>
@@ -370,7 +370,7 @@ export default async function OutdoorAdvertisingPage() {
             <p className={sectionIntroClassName}>Работаем по городам ЮФО и заранее обозначаем, как логистика влияет на сроки монтажа.</p>
           </div>
           <div className="mt-5 grid gap-6 md:grid-cols-[1.1fr_1fr]">
-            <ul className="grid gap-x-4 gap-y-2 rounded-2xl border border-neutral-200/80 bg-white/70 p-4 text-sm md:grid-cols-2">
+            <ul className="grid gap-x-4 gap-y-2 rounded-2xl border border-neutral-200/80 bg-white/70 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900/70 md:grid-cols-2">
               {cities.map((city) => (
                 <li key={city} className="text-neutral-700 dark:text-neutral-300">
                   <span className="inline-flex items-center gap-2">

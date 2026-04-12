@@ -140,16 +140,16 @@ export default async function ProductionPage() {
   const sectionTitleClassName = 't-h2';
   const sectionIntroClassName = 't-body text-muted-foreground max-w-3xl';
   const infoIconClassName =
-    'inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700';
+    'inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300';
 
   return (
     <div>
       <Section>
         <PageHero
-          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25"
+          className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"
           contentClassName="max-w-[38.5rem] space-y-6 lg:pr-3"
           media={
-            <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/95">
+            <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/95 dark:border-neutral-800/90 dark:bg-neutral-900/90">
               <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
                 <Image src={heroImageSrc} alt={heroImageAlt} fill className="object-cover" priority />
               </div>
@@ -168,7 +168,7 @@ export default async function ProductionPage() {
 
           <HeroChipList className="max-w-[36rem] gap-2.5">
             {capabilityBadges.map((badge) => (
-              <HeroChip key={badge} className="h-11 rounded-xl px-4 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900">
+              <HeroChip key={badge} className="h-11 rounded-xl px-4 text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50/40 hover:text-neutral-900 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-neutral-100">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                 {badge}
               </HeroChip>
@@ -182,7 +182,7 @@ export default async function ProductionPage() {
             >{heroPrimaryButtonText}</Link>
             <a
               href="#production-equipment"
-              className={`${heroCtaBaseClass} border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)]`}
+              className={`${heroCtaBaseClass} border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-800`}
             >
               {heroSecondaryButtonText}
             </a>
@@ -246,8 +246,8 @@ export default async function ProductionPage() {
                     <span className={`${infoIconClassName} h-9 w-9 rounded-lg`}>
                       <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                     </span>
-                    <h3 className="mt-4 min-h-12 text-lg font-semibold leading-6 tracking-tight text-neutral-900">{item.title}</h3>
-                    <p className="mt-2.5 text-sm leading-6 text-neutral-600 md:text-base">{item.text}</p>
+                    <h3 className="mt-4 min-h-12 text-lg font-semibold leading-6 tracking-tight text-neutral-900 dark:text-neutral-100">{item.title}</h3>
+                    <p className="mt-2.5 text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">{item.text}</p>
                   </article>
                 </RevealOnScroll>
               );
@@ -327,8 +327,8 @@ export default async function ProductionPage() {
                     <span className={`${infoIconClassName} h-9 w-9 rounded-lg`}>
                       <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                     </span>
-                    <h3 className="mt-4 text-lg font-semibold leading-6 tracking-tight text-neutral-900">{step.title}</h3>
-                    <p className="mt-2.5 text-sm leading-6 text-neutral-600 md:text-base">{step.text}</p>
+                    <h3 className="mt-4 text-lg font-semibold leading-6 tracking-tight text-neutral-900 dark:text-neutral-100">{step.title}</h3>
+                    <p className="mt-2.5 text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">{step.text}</p>
                   </article>
                 </RevealOnScroll>
               );
@@ -338,7 +338,7 @@ export default async function ProductionPage() {
       </Section>
 
       <Section className="pt-0">
-        <div className="rounded-3xl border border-neutral-200/90 bg-neutral-50/70 p-6 md:p-10">
+        <div className="rounded-3xl border border-neutral-200/90 bg-neutral-50/70 p-6 dark:border-neutral-800/90 dark:bg-neutral-900/60 md:p-10">
           <div className="space-y-6">
             <div className="section-header-tight mb-0">
               <p className="t-eyebrow">НАДЁЖНОСТЬ</p>
@@ -353,7 +353,7 @@ export default async function ProductionPage() {
                   <RevealOnScroll key={item.title}>
                     <article
                       style={{ transitionDelay: `${index * 65}ms` }}
-                      className={`card-info card-interactive flex min-h-[184px] flex-col bg-white p-6 md:p-7 ${index === 0 ? 'border-neutral-300' : ''}`}
+                      className={`card-info card-interactive flex min-h-[184px] flex-col bg-white p-6 dark:bg-neutral-900 md:p-7 ${index === 0 ? 'border-neutral-300 dark:border-neutral-700' : ''}`}
                     >
                       <span className={infoIconClassName}>
                         <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -370,7 +370,7 @@ export default async function ProductionPage() {
       </Section>
 
       <Section className="pt-0 pb-0">
-        <div className="card flex flex-col gap-6 border-neutral-200/90 bg-gradient-to-br from-white via-white to-red-50/20 p-7 md:flex-row md:items-center md:justify-between md:gap-8 md:p-10">
+        <div className="card flex flex-col gap-6 border-neutral-200/90 bg-gradient-to-br from-white via-white to-red-50/20 p-7 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:flex-row md:items-center md:justify-between md:gap-8 md:p-10">
           <div className="max-w-2xl space-y-3.5">
             <p className="t-eyebrow">ЗАЯВКА НА ПРОЕКТ</p>
             <h2 className="t-h2">{ctaTitle}</h2>

@@ -73,12 +73,12 @@ export default async function PortfolioPage() {
     <div className="pb-8 md:pb-12">
       <Section spacing="compact">
         <PageHero
-          className="border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/70 to-red-50/[0.2] p-5 shadow-[0_18px_45px_-38px_rgba(15,23,42,0.45)] md:p-7 lg:p-9"
+          className="border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/70 to-red-50/[0.2] p-5 shadow-[0_18px_45px_-38px_rgba(15,23,42,0.45)] dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] dark:shadow-none md:p-7 lg:p-9"
           contentClassName="flex h-full flex-col justify-between gap-6"
           mediaClassName="h-full"
           media={
             featuredItem ? (
-              <HeroMediaPanel className="group flex h-full flex-col overflow-hidden border-neutral-200/85 bg-neutral-100/90 p-2 md:p-3">
+              <HeroMediaPanel className="group flex h-full flex-col overflow-hidden border-neutral-200/85 bg-neutral-100/90 p-2 dark:border-neutral-800/90 dark:bg-neutral-900/90 md:p-3">
                 <div className="relative min-h-[250px] flex-1 overflow-hidden rounded-2xl md:min-h-[300px]">
                   <ProtectedImage
                     src={featuredItem.image}
@@ -101,13 +101,13 @@ export default async function PortfolioPage() {
                 </div>
               </HeroMediaPanel>
             ) : (
-              <HeroMediaPanel className="h-full border-neutral-200/85 bg-neutral-100/85 p-3 md:p-4">
+              <HeroMediaPanel className="h-full border-neutral-200/85 bg-neutral-100/85 p-3 dark:border-neutral-800/90 dark:bg-neutral-900/85 md:p-4">
                 <div className="grid h-full min-h-[260px] grid-cols-2 gap-3 md:min-h-[300px]">
                   {showcaseItems.length > 0 ? (
                     showcaseItems.map((item, index) => (
                       <article
                         key={item.id}
-                        className={`relative overflow-hidden rounded-xl border border-neutral-200/75 bg-white ${index === 0 ? 'col-span-2' : ''}`}
+                        className={`relative overflow-hidden rounded-xl border border-neutral-200/75 bg-white dark:border-neutral-800/80 dark:bg-neutral-900 ${index === 0 ? 'col-span-2' : ''}`}
                       >
                         <ProtectedImage
                           src={item.image}
@@ -123,7 +123,7 @@ export default async function PortfolioPage() {
                       </article>
                     ))
                   ) : (
-                    <div className="col-span-2 flex items-center justify-center rounded-xl border border-dashed border-neutral-300/80 bg-white/60 p-5 text-center text-sm leading-6 text-neutral-500">
+                    <div className="col-span-2 flex items-center justify-center rounded-xl border border-dashed border-neutral-300/80 bg-white/60 p-5 text-center text-sm leading-6 text-neutral-500 dark:border-neutral-700/80 dark:bg-neutral-900/70 dark:text-neutral-400">
                       После публикации работ в админке здесь появится превью портфолио.
                     </div>
                   )}
@@ -138,11 +138,11 @@ export default async function PortfolioPage() {
             <HeroLead className="max-w-[41rem] text-sm leading-6 md:text-base md:leading-7">{heroDescription}</HeroLead>
           </div>
 
-          <div className="space-y-3 border-t border-neutral-200/85 pt-4 md:pt-5">
+          <div className="space-y-3 border-t border-neutral-200/85 pt-4 dark:border-neutral-800/80 md:pt-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">Портфолио как рабочая витрина</p>
             <HeroChipList className="max-w-[38rem] gap-2 sm:grid-cols-1">
               {heroContextChips.map((chip) => (
-                <HeroChip key={chip} className="chip-elevated min-h-9 justify-start rounded-xl border-neutral-200/85 bg-white/80 px-3.5 py-2 text-[12px] font-medium text-neutral-700 shadow-none">
+                <HeroChip key={chip} className="chip-elevated min-h-9 justify-start rounded-xl border-neutral-200/85 bg-white/80 px-3.5 py-2 text-[12px] font-medium text-neutral-700 shadow-none dark:border-neutral-700/80 dark:bg-neutral-900/80 dark:text-neutral-200">
                   <span className="card-dot" aria-hidden="true" />
                   {chip}
                 </HeroChip>
@@ -154,7 +154,7 @@ export default async function PortfolioPage() {
 
       {featuredItem ? (
         <Section spacing="tight">
-          <article className="card-visual overflow-hidden border-neutral-200/85 bg-white/90 shadow-[0_20px_45px_-38px_rgba(15,23,42,0.45)]">
+          <article className="card-visual overflow-hidden border-neutral-200/85 bg-white/90 shadow-[0_20px_45px_-38px_rgba(15,23,42,0.45)] dark:border-neutral-800/90 dark:bg-neutral-900/90 dark:shadow-none">
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
               <div className="relative min-h-[240px] md:min-h-[320px]">
                 <ProtectedImage
@@ -173,8 +173,8 @@ export default async function PortfolioPage() {
                   <span className="inline-flex w-fit items-center rounded-full border border-red-200/70 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-200">
                     {featuredItem.category}
                   </span>
-                  <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 md:text-[1.9rem]">{featuredItem.title}</h2>
-                  <p className="text-sm leading-6 text-neutral-600 md:text-base">
+                  <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-[1.9rem]">{featuredItem.title}</h2>
+                  <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
                     {featuredItem.shortDescription || 'Описание проекта пока добавляется в админ-панели.'}
                   </p>
                 </div>

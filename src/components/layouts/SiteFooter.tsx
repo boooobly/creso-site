@@ -32,7 +32,7 @@ export default async function SiteFooter() {
   const whatsappHref = toExternalLink(settings.whatsapp, 'whatsapp');
 
   return (
-    <footer className="mt-12 border-t border-neutral-200/90 bg-gradient-to-b from-neutral-50 to-neutral-100 text-neutral-700 dark:border-neutral-800 dark:from-neutral-950 dark:to-neutral-950 dark:text-neutral-300">
+    <footer className="mt-12 border-t border-neutral-200/90 bg-gradient-to-b from-neutral-50 to-neutral-100 text-neutral-700 dark:border-neutral-800/90 dark:from-neutral-950 dark:to-neutral-900 dark:text-neutral-300">
       <div className="container py-10 md:py-12">
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-[1.25fr_1fr_0.9fr] lg:gap-6">
           <section className="card-structured space-y-4 border-neutral-200 bg-white/75 md:p-6 dark:border-neutral-800 dark:bg-neutral-900/70" aria-labelledby="footer-contacts">
@@ -126,7 +126,7 @@ export default async function SiteFooter() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-md px-2 py-1.5 leading-5 no-underline transition-colors hover:bg-white hover:text-[var(--brand-red)] dark:hover:bg-neutral-900"
+                  className="rounded-md px-2 py-1.5 leading-5 no-underline transition-colors hover:bg-white hover:text-[var(--brand-red)] dark:hover:bg-neutral-900 dark:hover:text-red-300"
                 >
                   {item.label}
                 </Link>
@@ -137,7 +137,7 @@ export default async function SiteFooter() {
 
         <div className="mt-6 flex flex-col gap-2.5 border-t border-neutral-200/90 pt-4 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400 md:flex-row md:items-center md:justify-between">
           <p className="leading-5">{settings.footerText}</p>
-          <Link href="/privacy" className="w-fit font-medium no-underline transition-colors hover:text-[var(--brand-red)]">
+          <Link href="/privacy" className="w-fit font-medium no-underline transition-colors hover:text-[var(--brand-red)] dark:hover:text-red-300">
             Политика конфиденциальности
           </Link>
         </div>
