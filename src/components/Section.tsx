@@ -15,8 +15,8 @@ type SectionProps = PropsWithChildren<{
 }>;
 
 const backgroundStyles: Record<NonNullable<SectionProps['background']>, string> = {
-  default: 'bg-white',
-  muted: 'bg-neutral-50/70',
+  default: 'bg-white dark:bg-neutral-950',
+  muted: 'bg-neutral-50/70 dark:bg-neutral-900/50',
 };
 
 const spacingStyles: Record<NonNullable<SectionProps['spacing']>, string> = {
