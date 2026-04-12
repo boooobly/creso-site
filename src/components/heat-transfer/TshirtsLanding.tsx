@@ -230,7 +230,7 @@ export default function TshirtsLanding({
   const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.12 });
 
   return (
-    <div className="bg-white pb-10 dark:bg-neutral-950">
+    <div className="bg-white pb-14 dark:bg-neutral-950 md:pb-16">
       <Section id="tshirts-hero" spacing="hero" className="relative overflow-hidden">
         <div className="relative">
           <div

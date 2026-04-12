@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { AlarmClock, ArrowRight, CheckCircle2, ClipboardCheck, Clock3, FileCheck2, Ruler, Scissors, ScanSearch, Shapes, Spline, Sticker } from 'lucide-react';
 import Section from '@/components/Section';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { publicFormStyles } from '@/lib/public-form-styles';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { SiteImageRecord } from '@/lib/site-images';
 
@@ -216,7 +217,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   };
 
   return (
-    <div className="pb-16 md:pb-20">
+    <div className="pb-20 md:pb-24">
       <Section className="pb-0 pt-12 md:pt-16">
         <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/35 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-10 ${revealBase}`}>
           <div className="grid gap-7 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
@@ -472,7 +473,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       </Section>
 
       <Section className="pt-0">
-        <div id="plotter-request" className="card border border-neutral-200/90 bg-white/95 p-6 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8">
+        <div id="plotter-request" className={`${publicFormStyles.shell} border-neutral-200/90 dark:border-neutral-700/85`}>
           <div className="section-header-tight mb-6">
             <p className="t-eyebrow">Заявка</p>
             <h2 className="t-h3">Отправьте заявку на плоттерную резку</h2>
@@ -487,7 +488,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   value={name}
                   onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
                   onChange={(event) => setName(event.target.value)}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+                  className={`${publicFormStyles.inputBase} px-3.5`}
                 />
                 {nameError && <p className="text-sm text-red-600">{nameError}</p>}
               </div>
@@ -512,17 +513,17 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   id="serviceType"
                   value={serviceType}
                   onChange={(event) => setServiceType(event.target.value as ServiceType)}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+                  className={`${publicFormStyles.inputBase} px-3.5`}
                 >
                   <option value="обычная">Обычная (резка по векторному контуру)</option>
                   <option value="по меткам">По меткам (печать + точная контурная резка)</option>
                 </select>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Обычная — когда есть контур для резки. По меткам — когда сначала печатаем, затем режем по позиционным меткам.</p>
+                <p className={publicFormStyles.helper}>Обычная — когда есть контур для резки. По меткам — когда сначала печатаем, затем режем по позиционным меткам.</p>
               </div>
 
               <div className="space-y-1.5">
                 <label htmlFor="files" className="text-sm font-medium">Файл (опционально)</label>
-                <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 p-3 dark:border-neutral-700 dark:bg-neutral-900/50">
+                <div className={publicFormStyles.uploadZone}>
                   <input
                     id="files"
                     type="file"
@@ -530,9 +531,9 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                     multiple
                     accept={acceptedAttr}
                     onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
-                    className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+                    className={`${publicFormStyles.inputBase} h-auto rounded-lg p-2.5 text-sm`}
                   />
-                  <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Можно приложить макет в векторном или растровом формате.</p>
+                  <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Можно приложить макет в векторном или растровом формате.</p>
                 </div>
               </div>
             </div>
@@ -544,12 +545,12 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}
                 rows={4}
-                className="w-full rounded-xl border border-neutral-300 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900"
+                className={`${publicFormStyles.inputBase} min-h-[120px] py-3`}
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="inline-flex items-start gap-2.5 text-sm text-neutral-700 dark:text-neutral-300">
+              <label className={publicFormStyles.consent}>
                 <input
                   type="checkbox"
                   checked={privacyConsent}
@@ -570,15 +571,15 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             </div>
 
             {files.length > 0 && (
-              <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-600 dark:text-neutral-300">
+              <ul className={`${publicFormStyles.summaryCard} list-disc space-y-1 pl-8`}>
                 {files.map((file) => (
                   <li key={`${file.name}-${file.size}`}>{file.name}</li>
                 ))}
               </ul>
             )}
 
-            <div className="flex flex-col gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-800 md:flex-row md:items-center md:justify-between">
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Уточним детали по макету и вернёмся с расчётом в рабочее время.</p>
+            <div className={publicFormStyles.actionRow}>
+              <p className={publicFormStyles.helper}>Уточним детали по макету и вернёмся с расчётом в рабочее время.</p>
               <button type="submit" disabled={isSubmitting} className="btn-primary w-full justify-center py-3 text-[15px] tracking-[0.01em] disabled:opacity-60 md:w-auto md:px-7">
                 {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
               </button>

@@ -88,7 +88,7 @@ export default async function ContactsPage() {
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 pb-12 md:pb-16">
       <section className="space-y-4">
         <h1 className="text-2xl font-bold">{heroTitle}</h1>
         <p className="text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>

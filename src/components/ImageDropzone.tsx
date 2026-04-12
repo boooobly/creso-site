@@ -35,7 +35,7 @@ export default function ImageDropzone({
   buttonText = 'Загрузить макет',
   helperText = 'JPG, PNG, WEBP, TIFF. До 50 МБ.',
   className = '',
-  helperTextClassName = 'mt-1 text-xs text-neutral-500',
+  helperTextClassName = 'mt-1 text-xs text-neutral-600 dark:text-neutral-300',
   icon,
   allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/tiff'],
   allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff'],
@@ -72,7 +72,7 @@ export default function ImageDropzone({
 
   return (
     <div
-      className={`min-h-[120px] rounded-xl border-2 border-dashed p-3 transition-colors md:p-4 ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/20' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700 dark:bg-neutral-900/50'} ${className}`.trim()}
+      className={`min-h-[120px] rounded-xl border-2 border-dashed p-3 transition-colors md:p-4 ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/20' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-600 dark:bg-neutral-950/65'} ${className}`.trim()}
       onDragEnter={(event) => {
         event.preventDefault();
         setIsDragging(true);
@@ -105,7 +105,7 @@ export default function ImageDropzone({
             {icon}
             <p className="text-sm font-medium">{title}</p>
           </div>
-          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{description}</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-200">{description}</p>
         </div>
 
         <div className="ml-auto flex w-full flex-col items-end gap-2 sm:w-auto sm:min-w-[220px]">
@@ -116,11 +116,11 @@ export default function ImageDropzone({
           >
             {buttonText}
           </button>
-          {!value && <span className="mt-1 text-right text-xs text-neutral-500">Файл не выбран</span>}
+          {!value && <span className="mt-1 text-right text-xs text-neutral-500 dark:text-neutral-300">Файл не выбран</span>}
           {value && (
             <div className="mt-1 text-right">
               <p className="max-w-[200px] truncate text-xs font-medium">{value.name}</p>
-              <p className="text-xs text-neutral-500">{formatFileSize(value.size)}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-300">{formatFileSize(value.size)}</p>
             </div>
           )}
         </div>

@@ -160,7 +160,7 @@ export default function MillingPageClient({
   };
 
   return (
-    <div>
+    <div className="pb-12 md:pb-16">
       <Section className="pt-8 pb-6 md:pt-10 md:pb-8">
         <PageHero
           className={`border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 p-6 shadow-sm shadow-neutral-200/60 md:p-8 lg:p-10 ${revealClass(heroVisible)}`}

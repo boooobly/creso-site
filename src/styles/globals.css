@@ -155,7 +155,7 @@ a { @apply underline-offset-4; }
   }
 
   .form-shell {
-    @apply rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5 md:p-6 lg:p-7;
+    @apply rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5 md:p-6 lg:p-7 dark:border-neutral-700/80 dark:bg-neutral-900/75;
   }
 }
 

@@ -190,7 +190,7 @@ export default async function OutdoorAdvertisingPage() {
   const sectionIntroClassName = 't-body text-muted-foreground max-w-3xl';
 
   return (
-    <div className="pb-24 md:pb-0">
+    <div className="pb-24 md:pb-12">
       <OutdoorFloatingCtas />
 
       <Section className="pb-6 md:pb-10" id="outdoor-hero" background="default" spacing="compact">
