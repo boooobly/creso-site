@@ -197,13 +197,13 @@ export default async function MugsServicePage() {
               const Icon = item.icon;
               return (
                 <article key={item.title} className="premium-card h-full p-5 sm:p-6">
-                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-500/14 dark:text-red-300">
                     <Icon className="h-4 w-4" aria-hidden="true" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-neutral-900">{item.title}</h3>
-                  <p className="mt-3 text-3xl font-bold tracking-tight text-neutral-900">{item.price}</p>
-                  <p className="mt-1 text-sm text-neutral-600">{item.caption}</p>
-                  <ul className="mt-4 space-y-2.5 text-sm text-neutral-700">
+                  <h3 className="mt-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
+                  <p className="mt-3 text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">{item.price}</p>
+                  <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">{item.caption}</p>
+                  <ul className="mt-4 space-y-2.5 text-sm text-neutral-700 dark:text-neutral-200">
                     {item.bullets.map((bullet) => (
                       <li key={bullet} className="flex items-start gap-2.5">
                         <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
@@ -225,7 +225,7 @@ export default async function MugsServicePage() {
       <Section className="py-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/88 dark:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.78)] sm:p-8">
+            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-neutral-900/80 dark:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.78)] sm:p-8">
               <p className="t-eyebrow">Что вы получаете</p>
               <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">Кружка как готовый коммерческий продукт</h2>
               <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
@@ -233,7 +233,7 @@ export default async function MugsServicePage() {
               </p>
               <div className="mt-6 grid gap-3">
                 {resultCards.map((item) => (
-                  <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 dark:border-neutral-700/80 dark:bg-neutral-800/60">
+                  <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 dark:border-neutral-700/80 dark:bg-neutral-800/75">
                     <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
                     <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
                   </article>
@@ -263,7 +263,7 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-order" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
         <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/92 dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-7">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-neutral-900/75 dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-7">
             <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 dark:border-neutral-800/90 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-2xl">
                 <p className="t-eyebrow">Оформление заказа</p>
@@ -276,7 +276,7 @@ export default async function MugsServicePage() {
                   'Приложите макет или кратко опишите задачу',
                   'Получите расчёт и следующий шаг',
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-neutral-700/90 dark:bg-neutral-800/70">
+                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-neutral-700/90 dark:bg-neutral-800/85">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600 dark:text-red-400" aria-hidden="true" />
                     <span>{item}</span>
                   </li>
@@ -290,7 +290,7 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-faq" className="pb-12 pt-0 lg:pb-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/92 dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-8">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-neutral-900/78 dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-8">
             <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Частые вопросы</h2>
             <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 sm:text-base">Коротко о сроках, макетах и процессе печати.</p>
 
