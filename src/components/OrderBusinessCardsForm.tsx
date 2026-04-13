@@ -254,7 +254,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           <textarea className={`${inputClass('comment')} min-h-[110px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
         </label>
 
-        <div className={`${publicFormStyles.summaryCard} space-y-0.5`}>
+        <div className={`${publicFormStyles.summaryCard} space-y-1 border-neutral-200/90 dark:border-neutral-700/90 dark:from-neutral-900 dark:to-[#1b1b21]`}>
           <p><b>Тираж:</b> {summary.quantity.toLocaleString('ru-RU')} шт.</p>
           <p><b>Печать:</b> {summary.printSide === 'single' ? 'Односторонняя' : 'Двусторонняя'}</p>
           <p><b>Опции:</b> {selectedOptions || 'Без доп. опций'}</p>
