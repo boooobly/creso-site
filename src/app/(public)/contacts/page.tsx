@@ -177,7 +177,7 @@ export default async function ContactsPage() {
           <MapSection />
         </div>
 
-        <div className="card rounded-2xl border border-red-200/70 bg-[var(--brand-red)]/10 p-6 text-center dark:border-red-500/30 dark:bg-red-500/10 md:p-7">
+        <div className="card rounded-2xl border border-red-200/70 bg-gradient-to-br from-white via-red-50/70 to-red-100/40 p-6 text-center dark:border-red-500/30 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:p-7">
           <h2 className="text-2xl font-bold">{ctaTitle}</h2>
           <p className="mt-2 text-neutral-700 dark:text-neutral-300">{ctaDescription}</p>
           <Link href="/contacts#contact-form" className="btn-primary mt-4 inline-flex no-underline">{ctaButtonText}</Link>

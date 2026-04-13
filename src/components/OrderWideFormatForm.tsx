@@ -256,7 +256,7 @@ export default function OrderWideFormatForm() {
               ]}
               allowedExtensions={['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.pdf', '.cdr', '.ai', '.psd']}
               invalidTypeMessage="Допустимые форматы: JPG, PNG, WEBP, TIFF, PDF, CDR, AI, PSD."
-              className={`${publicFormStyles.uploadZone} bg-white px-2.5 py-2 md:px-3 md:py-2.5`}
+              className={`${publicFormStyles.uploadZone} px-2.5 py-2 md:px-3 md:py-2.5`}
               helperTextClassName="mt-0.5 text-xs text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
