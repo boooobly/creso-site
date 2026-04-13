@@ -386,10 +386,12 @@ export default function MillingPageClient({
       )}
 
       <Section id="milling-order" className="pt-0">
-        <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200">
+        <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 dark:border-neutral-700/90 dark:bg-neutral-900/92 dark:text-neutral-200">
           <p className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-red-500" aria-hidden="true" /><span>Подтверждаем стоимость перед запуском. Макет проверяется инженером.</span></p>
         </div>
-        <OrderMillingForm />
+        <div className="rounded-2xl border border-neutral-200/85 bg-white/90 p-4 shadow-[0_12px_32px_-26px_rgba(15,23,42,0.5)] dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-neutral-900/75 dark:shadow-[0_18px_40px_-28px_rgba(0,0,0,0.75)] sm:p-6">
+          <OrderMillingForm />
+        </div>
       </Section>
     </div>
   );
