@@ -90,7 +90,7 @@ export default async function WideFormatPrintingPage() {
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Производственный профиль</p>
               </div>
-              <div className="inline-flex size-9 items-center justify-center rounded-xl border border-red-200/70 bg-red-50 text-[var(--brand-red)]">
+              <div className="public-icon-badge">
                 <Droplets size={18} strokeWidth={1.9} aria-hidden="true" />
               </div>
             </div>
@@ -105,7 +105,7 @@ export default async function WideFormatPrintingPage() {
                     className="card-structured rounded-xl border-neutral-200/90 bg-white/80 p-4 transition-colors duration-200 hover:border-neutral-300 hover:bg-white/90 dark:bg-neutral-900/70"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="inline-flex h-[2.25rem] w-[2.25rem] shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                      <span className="public-icon-badge shrink-0">
                         <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
                       </span>
                       <div className="space-y-1.5">

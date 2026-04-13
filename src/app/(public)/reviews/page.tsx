@@ -99,7 +99,7 @@ export default async function ReviewsPage() {
       <section className="card relative z-10 rounded-2xl p-6 md:p-8">
         <RevealOnScroll>
           <div className="mb-4 flex items-center gap-2.5 md:mb-5">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
+            <span className="public-icon-badge">
               <BadgeCheck className="h-4 w-4" aria-hidden="true" />
             </span>
             <h2 className="text-xl font-semibold tracking-tight dark:text-neutral-100 md:text-2xl">Почему отзывам можно доверять</h2>
@@ -110,7 +110,7 @@ export default async function ReviewsPage() {
               return (
                 <li key={point.title} className="card-structured h-full rounded-xl p-4">
                   <div className="space-y-2">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-100 bg-red-50/70 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
+                    <span className="public-icon-badge-sm">
                       <Icon className="h-4 w-4" aria-hidden="true" />
                     </span>
                     <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 md:text-base">{point.title}</p>
