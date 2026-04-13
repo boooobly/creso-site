@@ -306,7 +306,7 @@ export default async function OutdoorAdvertisingPage() {
                   key={item.title}
                   className="card-info card-interactive h-full p-6"
                 >
-                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                  <div className="public-icon-badge mb-3">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                   </div>
                   <h3 className="t-h4 !text-base">{item.title}</h3>

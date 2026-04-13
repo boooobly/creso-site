@@ -117,7 +117,7 @@ export default function HomePageContent({
   return (
     <div className="relative">
       <Section spacing="hero" fullBleed className="relative overflow-hidden border-b border-neutral-200/70 dark:border-neutral-800/80">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent dark:from-red-500/12" />
         <div className="relative z-10 grid items-center gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
             <div className="space-y-5">
@@ -187,7 +187,7 @@ export default function HomePageContent({
                 variants={fadeUp(14)}
                 className="card-info card-interactive h-full border-neutral-200/90 p-6 dark:border-neutral-700/90 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-[#1e1f24] dark:shadow-[0_18px_40px_-26px_rgba(0,0,0,0.62)]"
               >
-                <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                <div className="public-icon-badge mb-3">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
                 <p className="t-h4">{item.title}</p>
@@ -248,7 +248,7 @@ export default function HomePageContent({
                 className="card-info card-interactive relative h-full border-neutral-200/90 p-6 dark:border-neutral-700/85 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-[#1b1b1f]"
               >
                 <span className="t-caption absolute right-5 top-5 rounded-full border border-neutral-200 bg-white/80 px-2.5 py-1 dark:border-neutral-600 dark:bg-neutral-800/90 dark:text-neutral-300">0{index + 1}</span>
-                <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-[var(--brand-red)]/20 bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                <div className="public-icon-badge mb-3">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
                 <h3 className="t-h3">{step.title}</h3>

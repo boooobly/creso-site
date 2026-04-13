@@ -139,8 +139,7 @@ export default async function ProductionPage() {
     'inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold leading-none transition-all duration-200';
   const sectionTitleClassName = 't-h2';
   const sectionIntroClassName = 't-body text-muted-foreground max-w-3xl';
-  const infoIconClassName =
-    'inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-100 bg-red-50/70 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300';
+  const infoIconClassName = 'public-icon-badge';
 
   return (
     <div>
@@ -243,7 +242,7 @@ export default async function ProductionPage() {
                     style={{ transitionDelay: `${index * 55}ms` }}
                     className="card-info card-interactive flex h-full min-h-[196px] flex-col p-5 md:p-6"
                   >
-                    <span className={`${infoIconClassName} h-9 w-9 rounded-lg`}>
+                    <span className={infoIconClassName}>
                       <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                     </span>
                     <h3 className="mt-4 min-h-12 text-lg font-semibold leading-6 tracking-tight text-neutral-900 dark:text-neutral-100">{item.title}</h3>
