@@ -30,6 +30,10 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
     title: 'Отзывы',
     subtitle: 'Отзывы клиентов и их модерация'
   },
+  '/admin/health': {
+    title: 'Системное здоровье',
+    subtitle: 'Проверка критичных настроек и источников данных'
+  },
   '/admin/settings': {
     title: 'Настройки',
     subtitle: 'Контакты компании и системные настройки'

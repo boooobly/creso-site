@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   Image,
   MessageSquareQuote,
+  Activity,
   Settings
 } from 'lucide-react';
 
@@ -24,5 +25,6 @@ export const adminNavigation: AdminNavItem[] = [
   { href: '/admin/orders', label: 'Заказы', icon: ShoppingCart },
   { href: '/admin/site-images', label: 'Изображения сайта', icon: Image },
   { href: '/admin/reviews', label: 'Отзывы', icon: MessageSquareQuote },
+  { href: '/admin/health', label: 'Системное здоровье', icon: Activity },
   { href: '/admin/settings', label: 'Настройки', icon: Settings }
 ];
