@@ -1,4 +1,3 @@
-import { unstable_cache } from 'next/cache';
 import BagetConfigurator from '@/components/baget/BagetConfigurator';
 import { isWideFormatCanvasBagetTransfer } from '@/lib/baget/transfer';
 import type { BagetTransferSource } from '@/lib/baget/printRequirement';
@@ -15,18 +14,6 @@ type BagetPageProps = {
   }>;
 };
 
-const getCachedBagetPageContentMap = unstable_cache(
-  async () => getPageContentMap('baget'),
-  ['baget.page.content'],
-  { revalidate: 60 }
-);
-
-const getCachedBagetExtrasPricingConfig = unstable_cache(
-  async () => getBaguetteExtrasPricingConfig(),
-  ['baget.page.extras_pricing'],
-  { revalidate: 60 }
-);
-
 async function measureAsync<T>(action: () => Promise<T>) {
   const startedAt = Date.now();
   const data = await action();
@@ -42,8 +29,8 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
 
   const [catalogResult, contentResult, pricingResult] = await Promise.all([
     measureAsync(() => loadBagetCatalog()),
-    measureAsync(() => getCachedBagetPageContentMap()),
-    measureAsync(() => getCachedBagetExtrasPricingConfig()),
+    measureAsync(() => getPageContentMap('baget')),
+    measureAsync(() => getBaguetteExtrasPricingConfig()),
   ]);
   const { items, source: catalogSource } = catalogResult.data;
   const contentMap = contentResult.data;
