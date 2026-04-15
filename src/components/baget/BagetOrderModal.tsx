@@ -108,6 +108,7 @@ type OrderResponse = {
   quote: BagetQuoteResult;
   prepayRequired: boolean;
   prepayAmount: number | null;
+  secureOrderUrl?: string;
 };
 
 export default function BagetOrderModal({
@@ -326,6 +327,13 @@ export default function BagetOrderModal({
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-900/20 dark:text-emerald-200">
                 <p className="font-medium">Заявка отправлена. Мы свяжемся с вами в ближайшее время.</p>
                 <p className="mt-2 text-xs sm:text-sm">Номер заказа: {serverResult?.orderNumber}</p>
+                {serverResult?.secureOrderUrl ? (
+                  <p className="mt-2 text-xs sm:text-sm">
+                    <Link href={serverResult.secureOrderUrl} className="text-red-700 underline underline-offset-2 hover:text-red-800">
+                      Открыть защищённую страницу заказа
+                    </Link>
+                  </p>
+                ) : null}
                 <p className="mt-1 text-xs sm:text-sm">Итог по расчёту сервера: {serverResult?.quote.total.toLocaleString('ru-RU')} ₽</p>
               </div>
               <button
