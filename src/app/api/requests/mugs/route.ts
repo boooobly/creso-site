@@ -14,11 +14,13 @@ import {
   MUGS_ALLOWED_MIME_TYPES,
   MUGS_COVERING_OPTIONS,
 } from '@/lib/pricing-config/mugs';
+import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 
 export const runtime = 'nodejs';
 
 const allowedExtensionsSet = new Set<string>(MUGS_ALLOWED_EXTENSIONS);
 const allowedMimeTypesSet = new Set<string>(MUGS_ALLOWED_MIME_TYPES);
+const MUGS_MAX_CONTENT_LENGTH_BYTES = FIVE_MB_IN_BYTES + (1024 * 1024);
 
 const mugsRequestSchema = z.object({
   name: z.string().trim().min(1),
@@ -142,6 +144,12 @@ async function sendMugsTelegramNotification(params: {
 export async function POST(request: NextRequest) {
   try {
     getServerEnv();
+    const contentLengthValidation = validateMultipartContentLength(request, {
+      maxContentLengthBytes: MUGS_MAX_CONTENT_LENGTH_BYTES,
+    });
+    if (!contentLengthValidation.ok) {
+      return multipartErrorResponse(contentLengthValidation);
+    }
 
     const formData = await request.formData();
     const fileValue = formData.get('file');
@@ -183,6 +191,14 @@ export async function POST(request: NextRequest) {
     if (parsed.data.website) return NextResponse.json({ ok: true });
 
     const file = fileValue instanceof File ? fileValue : null;
+    const filesValidation = validateMultipartFiles(file ? [file] : [], {
+      maxFiles: 1,
+      maxFileBytes: FIVE_MB_IN_BYTES,
+      maxTotalBytes: FIVE_MB_IN_BYTES,
+    });
+    if (!filesValidation.ok) {
+      return multipartErrorResponse(filesValidation);
+    }
 
     if (file) {
       const fileValidation = validateUploadedFile({

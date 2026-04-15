@@ -15,11 +15,15 @@ import {
 } from '@/lib/pricing-config/milling';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
+import { FIVE_MB_IN_BYTES } from '@/lib/file-validation';
+import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 
 export const runtime = 'nodejs';
 
 const allowedExtensionsSet = new Set<string>(MILLING_ALLOWED_EXTENSIONS);
 const allowedMimeTypesSet = new Set<string>(MILLING_ALLOWED_MIME_TYPES);
+const MILLING_MAX_UPLOAD_BYTES = FIVE_MB_IN_BYTES;
+const MILLING_MAX_CONTENT_LENGTH_BYTES = MILLING_MAX_UPLOAD_BYTES + (512 * 1024);
 
 const millingRequestSchema = z.object({
   name: z.string().trim().min(1),
@@ -158,6 +162,12 @@ async function sendMillingTelegramNotification(params: {
 export async function POST(request: NextRequest) {
   try {
     getServerEnv();
+    const contentLengthValidation = validateMultipartContentLength(request, {
+      maxContentLengthBytes: MILLING_MAX_CONTENT_LENGTH_BYTES,
+    });
+    if (!contentLengthValidation.ok) {
+      return multipartErrorResponse(contentLengthValidation);
+    }
 
     const formData = await request.formData();
     const fileValue = formData.get('file');
@@ -199,6 +209,14 @@ export async function POST(request: NextRequest) {
     }
 
     const file = fileValue instanceof File ? fileValue : null;
+    const filesValidation = validateMultipartFiles(file ? [file] : [], {
+      maxFiles: 1,
+      maxFileBytes: MILLING_MAX_UPLOAD_BYTES,
+      maxTotalBytes: MILLING_MAX_UPLOAD_BYTES,
+    });
+    if (!filesValidation.ok) {
+      return multipartErrorResponse(filesValidation);
+    }
 
     if (file) {
       const fileValidation = validateUploadedFile({

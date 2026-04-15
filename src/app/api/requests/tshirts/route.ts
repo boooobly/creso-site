@@ -14,11 +14,14 @@ import {
 } from '@/lib/pricing-config/mugs';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
+import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 
 export const runtime = 'nodejs';
 
 const allowedExtensionsSet = new Set<string>(MUGS_ALLOWED_EXTENSIONS);
 const allowedMimeTypesSet = new Set<string>(MUGS_ALLOWED_MIME_TYPES);
+const TSHIRTS_MAX_UPLOAD_BYTES = MUGS_MAX_UPLOAD_SIZE_MB * 1024 * 1024;
+const TSHIRTS_MAX_CONTENT_LENGTH_BYTES = TSHIRTS_MAX_UPLOAD_BYTES + (512 * 1024);
 
 const tshirtsRequestSchema = z.object({
   name: z.string().trim().min(1),
@@ -113,6 +116,12 @@ async function sendTshirtsTelegramNotification(params: {
 export async function POST(request: NextRequest) {
   try {
     getServerEnv();
+    const contentLengthValidation = validateMultipartContentLength(request, {
+      maxContentLengthBytes: TSHIRTS_MAX_CONTENT_LENGTH_BYTES,
+    });
+    if (!contentLengthValidation.ok) {
+      return multipartErrorResponse(contentLengthValidation);
+    }
 
     const formData = await request.formData();
     const fileValue = formData.get('file');
@@ -150,13 +159,21 @@ export async function POST(request: NextRequest) {
     }
 
     const file = fileValue instanceof File ? fileValue : null;
+    const filesValidation = validateMultipartFiles(file ? [file] : [], {
+      maxFiles: 1,
+      maxFileBytes: TSHIRTS_MAX_UPLOAD_BYTES,
+      maxTotalBytes: TSHIRTS_MAX_UPLOAD_BYTES,
+    });
+    if (!filesValidation.ok) {
+      return multipartErrorResponse(filesValidation);
+    }
 
     if (file) {
       const fileValidation = validateUploadedFile({
         file,
         allowedMimeTypes: allowedMimeTypesSet,
         allowedExtensions: allowedExtensionsSet,
-        maxBytes: MUGS_MAX_UPLOAD_SIZE_MB * 1024 * 1024,
+        maxBytes: TSHIRTS_MAX_UPLOAD_BYTES,
       });
 
       if (!fileValidation.ok) {
