@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
+import Link from 'next/link';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
 import ImageDropzone from '@/components/ImageDropzone';
@@ -22,6 +23,7 @@ type FormValues = {
   plotterCutByRegistrationMarks: boolean;
   cutByPositioningMarks: boolean;
   comment: string;
+  privacyConsent: boolean;
   website: string;
 };
 
@@ -42,6 +44,7 @@ const defaultValues: FormValues = {
   plotterCutByRegistrationMarks: false,
   cutByPositioningMarks: false,
   comment: '',
+  privacyConsent: false,
   website: '',
 };
 
@@ -135,6 +138,10 @@ export default function OrderWideFormatForm() {
       }
     });
 
+    if (!values.privacyConsent) {
+      nextErrors.privacyConsent = 'Подтвердите согласие с политикой конфиденциальности.';
+    }
+
     return nextErrors;
   };
 
@@ -168,6 +175,7 @@ export default function OrderWideFormatForm() {
       formData.set('plotterCutByRegistrationMarks', String(values.plotterCutByRegistrationMarks));
       formData.set('cutByPositioningMarks', String(values.cutByPositioningMarks));
       formData.set('comment', values.comment.trim());
+      formData.set('privacyConsent', String(values.privacyConsent));
       formData.set('pageUrl', typeof window !== 'undefined' ? window.location.href : '');
       formData.set('website', values.website);
       if (file) {
@@ -301,6 +309,22 @@ export default function OrderWideFormatForm() {
           onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))}
           aria-hidden="true"
         />
+
+        <label className={publicFormStyles.consent}>
+          <input
+            type="checkbox"
+            checked={values.privacyConsent}
+            onChange={(e) => setValues((prev) => ({ ...prev, privacyConsent: e.target.checked }))}
+            className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500"
+          />
+          <span>
+            Я согласен(а) с{' '}
+            <Link href="/privacy" className="underline hover:no-underline">
+              политикой конфиденциальности
+            </Link>
+          </span>
+        </label>
+        {errors.privacyConsent && <p className="-mt-3 text-xs text-red-600">{errors.privacyConsent}</p>}
 
         <div className={publicFormStyles.actionRow}>
           <button
