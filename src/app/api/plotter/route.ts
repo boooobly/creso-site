@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
 import { calculatePlotterCuttingPricing } from '@/lib/calculations/plotterCuttingPricing';
 import { getPlotterCuttingPricingConfig } from '@/lib/plotter-cutting/plotterCuttingPricing';
+import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 export const runtime = 'nodejs';
 
 type PlotterPayload = {
@@ -128,6 +129,13 @@ export async function POST(req: NextRequest) {
   try {
     getServerEnv();
     const payload = (await req.json()) as PlotterPayload;
+
+    const blockedResponse = enforcePublicRequestGuard(req, {
+      route: '/api/plotter',
+      payload,
+      requirePayload: true,
+    });
+    if (blockedResponse) return blockedResponse;
 
     if (!payload?.contact?.name || !payload?.contact?.phone || !payload?.contact?.agreed) {
       return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });

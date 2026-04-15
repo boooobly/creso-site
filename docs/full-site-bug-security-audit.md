@@ -26,6 +26,12 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 - **F-006 — Resolved:** baget catalog debug endpoint now returns 404 in production.
 - **F-007 — Resolved:** sitemap and robots now use env-driven base URL (`PUBLIC_BASE_URL`) via `getBaseUrl()`.
 
+## PR 2 resolution status (this PR)
+
+- **Public request hardening — Resolved:** introduced `enforcePublicRequestGuard` to centralize user-agent, IP rate-limit, empty payload and honeypot checks with consistent response shape and structured warning logs.
+- **Reviews rate-limit gap — Resolved:** `/api/reviews` now uses standardized anti-spam guard (including explicit rate limiting).
+- **Calculator submission hardening — Resolved:** `/api/plotter` and `/api/heat-transfer` now enforce shared public request guard checks before business validation/processing.
+
 ## Detailed findings by area
 
 ### 1. Auth and admin
@@ -177,4 +183,3 @@ Use this on deployed Vercel preview as a non-technical owner checklist:
 10. **SEO smoke checks**
    - Open `/sitemap.xml` and `/robots.txt`.
    - Confirm they contain the real production domain (currently likely incorrect).
-

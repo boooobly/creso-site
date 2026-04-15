@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { hashIp } from '@/lib/reviews/hash';
+import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 
 export const runtime = 'nodejs';
 
@@ -105,15 +106,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Некорректный JSON в запросе.' }, { status: 400 });
     }
 
+    const blockedResponse = enforcePublicRequestGuard(request, {
+      route: '/api/reviews',
+      payload,
+      honeypotFields: ['website'],
+      requirePayload: true,
+    });
+    if (blockedResponse) return blockedResponse;
+
     const parsed = createReviewSchema.safeParse(payload);
 
     if (!parsed.success) {
       const firstError = parsed.error.issues[0]?.message || 'Проверьте корректность данных отзыва.';
       return NextResponse.json({ ok: false, error: firstError }, { status: 400 });
-    }
-
-    if (parsed.data.website?.trim()) {
-      return new NextResponse(null, { status: 204 });
     }
 
     const name = parsed.data.name?.trim();
