@@ -45,6 +45,7 @@ const enableDatabaseSchema = z.preprocess((value) => {
 
 const publicEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  VERCEL_ENV: z.enum(['development', 'preview', 'production']).optional(),
   PUBLIC_BASE_URL: optionalUrl,
 });
 
@@ -54,6 +55,7 @@ const serverEnvSchema = z.object({
   DATABASE_URL: optionalDatabaseUrl,
   DATABASE_URL_UNPOOLED: optionalDatabaseUrl,
   PUBLIC_BASE_URL: optionalUrl,
+  VERCEL_ENV: z.enum(['development', 'preview', 'production']).optional(),
   SEND_CUSTOMER_EMAILS: sendCustomerEmailsSchema,
   ADMIN_TOKEN: z.string().trim().min(1, 'ADMIN_TOKEN is required.'),
   MAIL_TO: z.string().trim().min(1, 'MAIL_TO is required.'),
@@ -149,6 +151,7 @@ export function getPublicEnv(): PublicEnv {
   if (!parsed.success) {
     return {
       NODE_ENV: process.env.NODE_ENV === 'production' ? 'production' : process.env.NODE_ENV === 'test' ? 'test' : 'development',
+      VERCEL_ENV: process.env.VERCEL_ENV === 'production' ? 'production' : process.env.VERCEL_ENV === 'preview' ? 'preview' : process.env.VERCEL_ENV === 'development' ? 'development' : undefined,
       PUBLIC_BASE_URL: undefined,
     };
   }

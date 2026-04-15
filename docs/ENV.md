@@ -15,7 +15,7 @@ Use this matrix when configuring variables in Vercel:
 | `ADMIN_SESSION_TTL_SECONDS` | Optional | Optional | Optional | Session lifetime in seconds. Defaults to `86400` (24h). |
 | `ADMIN_TOKEN` | Required at runtime | Required at runtime | Required at runtime | Service token used by non-browser internal API flows (for example order PDF bearer access). Not used by `/api/admin/*` browser session auth. |
 | `MAIL_TO` | Required at runtime | Required at runtime | Required at runtime | Primary recipient for incoming request notifications. |
-| `PUBLIC_BASE_URL` | Optional (falls back to `http://localhost:3000` in development) | Optional | **Required at runtime** | Must be set in production runtime. |
+| `PUBLIC_BASE_URL` | Optional (falls back to `http://localhost:3000` for local/non-production contexts) | Optional (fallback applies in preview/non-production contexts) | **Required at runtime** | Required in production deploy/runtime (`NODE_ENV=production` + `VERCEL_ENV=production`). |
 | `SEND_CUSTOMER_EMAILS` | Optional | Optional | Optional | Boolean flag, defaults to `false` when omitted. |
 | `PAYMENT_WEBHOOK_SECRET` | Optional* | Optional* | Optional* | Set this if/when payment webhook signature verification is enabled in your deployment. |
 | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Optional | Optional | Optional | If Telegram sending is enabled, both values must be set together. |
@@ -52,3 +52,9 @@ Use this matrix when configuring variables in Vercel:
 - `DATABASE_URL` (runtime): pooled Neon URL (usually pooler host).
 - `DATABASE_URL_UNPOOLED` (migrations): direct/non-pooled Neon URL (direct host), used by Prisma `directUrl`.
 - In production with `ENABLE_DATABASE=true`, both URLs must be set.
+
+## Sitemap/robots fallback behavior
+
+- In production deploy/runtime, set `PUBLIC_BASE_URL` explicitly. Missing value is treated as an error.
+- For local/test/non-production preview contexts, sitemap/robots generation falls back to `http://localhost:3000` when `PUBLIC_BASE_URL` is missing.
+- `https://example.com` is never used as a fallback base URL.
