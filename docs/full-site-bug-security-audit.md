@@ -47,6 +47,16 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
   - `/api/quotes/print`, `/api/quotes/wide-format`, `/api/quotes/heat-transfer` — calculator quote endpoints do not accept contact/order/request submission data and remain out of scope for customer form anti-spam hardening.
 - **Reviews rate-limit gap — Resolved:** `/api/reviews` uses standardized anti-spam guard with explicit per-IP request throttling.
 
+
+## PR 3 resolution status (this PR)
+
+- **File uploads and media hardening — Partially resolved:** centralized image validation now verifies MIME + extension and magic bytes for JPG/PNG/WEBP/GIF while preserving existing size limits.
+- **Admin upload folder allowlist — Resolved:** `/api/admin/upload-image` now accepts only predefined folders (`site`, `portfolio`, `orders`, `temp`) and rejects unknown folders with a safe Russian 400 error.
+- **SVG upload policy — Resolved:** SVG uploads are now rejected in hardened upload flows because the project does not implement SVG sanitization.
+- **Filename/path safety — Resolved:** upload filename normalization now strips control/path characters, and customer upload blob paths no longer include user-provided raw filenames.
+- **Customer blob privacy — Partially resolved (documented limitation):** customer image blobs remain `public` to keep existing admin/order link behavior working without redesign; risk is reduced via unguessable random path IDs and minimizing URL exposure to required admin/order contexts.
+- **Regression coverage — Resolved for this scope:** added tests for valid/invalid image signatures, extension/MIME mismatch, admin folder allowlist rejection, and safe customer blob path generation.
+
 ## Detailed findings by area
 
 ### 1. Auth and admin
@@ -75,7 +85,7 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 
 1. **File validation trusts MIME + extension only** (**Medium**): no magic-byte/content sniffing, so renamed or malformed files may pass. (`src/lib/file-validation.ts`)
 2. **Admin upload folder input not constrained to allowlist** (**Low/Medium**): path is sanitized by naming strategy but folder string is user-controlled; should be allowlisted (`site`, `portfolio`, etc.). (`src/app/api/admin/upload-image/route.ts`)
-3. **Public blob storage for customer uploads** (**Medium, business decision risk**): baget customer images are uploaded as `public`, potentially exposing customer artwork if URL leaks. (`src/lib/orders/storeCustomerImage.ts`)
+3. **Public blob storage for customer uploads** (**Medium, business decision risk, partially mitigated**): baget customer images are still uploaded as `public` for compatibility, but blob paths now use unguessable random IDs and no raw customer filename segments. (`src/lib/orders/storeCustomerImage.ts`)
 
 ### 5. Calculators and pricing
 
