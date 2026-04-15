@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
+import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 import { logger } from '@/lib/logger';
 import { FIVE_MB_IN_BYTES, validateUploadedFile } from '@/lib/file-validation';
 import { getServerEnv } from '@/lib/env';
@@ -82,14 +82,6 @@ export async function POST(request: NextRequest) {
   try {
     const env = getServerEnv();
 
-    if (!hasUserAgent(request)) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
-    }
-
-    if (isRateLimited(getClientIp(request))) {
-      return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
-    }
-
     const formData = await request.formData();
     const name = toStringValue(formData.get('name'));
     const phoneRaw = toStringValue(formData.get('phone')).replace(/\D/g, '');
@@ -116,8 +108,21 @@ export async function POST(request: NextRequest) {
     const fileSize = Number(toStringValue(formData.get('fileSize')) || '0');
     const fileRaw = formData.get('file');
 
-    if (website) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
+    const blockedResponse = enforcePublicRequestGuard(request, {
+      route: '/api/requests/business-cards',
+      payload: {
+        name,
+        phone: phoneRaw,
+        email,
+        comment,
+        website,
+      },
+      honeypotFields: ['website'],
+      requirePayload: true,
+    });
+
+    if (blockedResponse) {
+      return blockedResponse;
     }
 
     if (!name || !phoneRaw) {

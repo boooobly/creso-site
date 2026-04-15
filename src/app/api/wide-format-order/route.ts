@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
+import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 import { calculateWideFormatPricing } from '@/lib/calculations/wideFormatPricing';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentWithCaption';
@@ -96,14 +96,6 @@ export async function POST(request: NextRequest) {
   try {
     const env = getServerEnv();
 
-    if (!hasUserAgent(request)) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
-    }
-
-    if (isRateLimited(getClientIp(request))) {
-      return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
-    }
-
     const formData = await request.formData();
     const name = toStringValue(formData.get('name'));
     const phoneRaw = toStringValue(formData.get('phone')).replace(/\D/g, '');
@@ -122,8 +114,26 @@ export async function POST(request: NextRequest) {
     const pageUrl = toStringValue(formData.get('pageUrl'));
     const fileRaw = formData.get('file');
 
-    if (website) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
+    const blockedResponse = enforcePublicRequestGuard(request, {
+      route: '/api/wide-format-order',
+      payload: {
+        name,
+        phone: phoneRaw,
+        email,
+        width,
+        height,
+        quantity,
+        materialId: materialIdRaw,
+        comment,
+        pageUrl,
+        website,
+      },
+      honeypotFields: ['website'],
+      requirePayload: true,
+    });
+
+    if (blockedResponse) {
+      return blockedResponse;
     }
 
     if (!name || !phoneRaw) {

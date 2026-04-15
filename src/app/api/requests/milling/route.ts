@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getClientIp, hasUserAgent, isRateLimited } from '@/lib/anti-spam';
+import { enforcePublicRequestGuard, getClientIp } from '@/lib/anti-spam';
 import { getServerEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { validateUploadedFile } from '@/lib/file-validation';
@@ -158,16 +158,27 @@ async function sendMillingTelegramNotification(params: {
 export async function POST(request: NextRequest) {
   try {
     getServerEnv();
-    if (!hasUserAgent(request)) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
-    }
-
-    if (isRateLimited(getClientIp(request))) {
-      return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
-    }
 
     const formData = await request.formData();
     const fileValue = formData.get('file');
+
+    const blockedResponse = enforcePublicRequestGuard(request, {
+      route: '/api/requests/milling',
+      payload: {
+        name: toText(formData.get('name')),
+        phone: toText(formData.get('phone')),
+        material: toText(formData.get('material')),
+        thickness: toText(formData.get('thickness')),
+        comment: toText(formData.get('comment')),
+        helpWithPrep: toText(formData.get('helpWithPrep')),
+        website: toText(formData.get('website')),
+      },
+      requirePayload: true,
+    });
+
+    if (blockedResponse) {
+      return blockedResponse;
+    }
 
     const parsed = millingRequestSchema.safeParse({
       name: toText(formData.get('name')),
