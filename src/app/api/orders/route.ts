@@ -15,6 +15,7 @@ import { getServerEnv } from '@/lib/env';
 import { getBagetCatalogFromSheet, mapSheetItemsToBagetItems } from '@/lib/baget/sheetsCatalog';
 import { buildBagetOrderSummary, type PersistedOrderUpload } from '@/lib/orders/bagetOrderSummary';
 import { MAX_ORDER_IMAGE_SIZE_BYTES, storeBagetCustomerImage } from '@/lib/orders/storeCustomerImage';
+import { validateUploadedImageFile } from '@/lib/file-validation';
 
 export const runtime = 'nodejs';
 
@@ -87,16 +88,25 @@ async function parseOrderRequest(request: NextRequest): Promise<ParsedOrderReque
   return { payload, customerImageFile: null };
 }
 
-function getSafeCustomerImageFile(file: File | null): File | null {
+const CUSTOMER_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']);
+const CUSTOMER_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
+
+async function getSafeCustomerImageFile(file: File | null): Promise<File | null> {
   if (!file) return null;
-  if (!file.type.startsWith('image/')) {
-    logger.warn('orders.customer_image.invalid_type', { type: file.type, name: file.name });
+
+  const validation = await validateUploadedImageFile({
+    file,
+    allowedMimeTypes: CUSTOMER_IMAGE_MIME_TYPES,
+    allowedExtensions: CUSTOMER_IMAGE_EXTENSIONS,
+    maxBytes: MAX_ORDER_IMAGE_SIZE_BYTES,
+    rejectSvg: true,
+  });
+
+  if (!validation.ok) {
+    logger.warn('orders.customer_image.invalid', { type: file.type, name: file.name, size: file.size, reason: validation.error });
     return null;
   }
-  if (file.size > MAX_ORDER_IMAGE_SIZE_BYTES) {
-    logger.warn('orders.customer_image.too_large', { size: file.size, name: file.name, limit: MAX_ORDER_IMAGE_SIZE_BYTES });
-    return null;
-  }
+
   return file;
 }
 
@@ -191,7 +201,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Не удалось рассчитать стоимость заказа.' }, { status: 400 });
     }
 
-    const safeCustomerImageFile = getSafeCustomerImageFile(customerImageFile);
+    const safeCustomerImageFile = await getSafeCustomerImageFile(customerImageFile);
     let uploadedImage: PersistedOrderUpload | null = null;
 
     if (safeCustomerImageFile) {

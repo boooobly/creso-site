@@ -29,7 +29,7 @@ type ExtraForm = {
 };
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/svg+xml'];
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
 const emptyExtraForm: ExtraForm = { title: '', imageUrl: '', altText: '', note: '' };
 
 export default function SiteImagesManager() {
@@ -128,7 +128,7 @@ export default function SiteImagesManager() {
 
   function validateFile(file: File) {
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      setError('Можно загружать JPG, PNG, WEBP, AVIF и SVG. Выберите другой файл.');
+      setError('Можно загружать JPG, PNG, WEBP, GIF и AVIF. Выберите другой файл.');
       return false;
     }
 
@@ -402,7 +402,7 @@ export default function SiteImagesManager() {
                           {isUploading ? 'Загрузка...' : 'Заменить изображение'}
                           <input
                             type="file"
-                            accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                            accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
                             className="hidden"
                             onChange={(event) => {
                               const file = event.target.files?.[0];
@@ -491,7 +491,7 @@ export default function SiteImagesManager() {
                 {uploadingKey === 'extra' ? 'Загрузка...' : 'Заменить изображение'}
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
                   className="hidden"
                   onChange={(event) => {
                     const file = event.target.files?.[0];
