@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'crypto';
+import { createHash, createHmac, timingSafeEqual } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
@@ -11,6 +11,7 @@ const webhookSchema = z.object({
   orderNumber: z.string().trim().min(1),
   status: z.enum(['paid', 'failed']),
   paidAmount: z.number().int().positive().optional(),
+  eventId: z.string().trim().min(1).max(191).optional(),
 });
 
 function getRequestIp(request: NextRequest): string {
@@ -39,6 +40,14 @@ function verifyWebhookSignature(params: {
   }
 
   return timingSafeEqual(receivedBuffer, expectedBuffer);
+}
+
+function deriveEventId(rawBody: string, eventId?: string): string {
+  if (eventId) {
+    return eventId;
+  }
+
+  return createHash('sha256').update(rawBody).digest('hex');
 }
 
 export async function POST(request: NextRequest) {
@@ -88,46 +97,97 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Invalid webhook payload.' }, { status: 400 });
     }
 
-    const order = await prisma.order.findUnique({
-      where: { number: parsed.data.orderNumber },
-      select: {
-        id: true,
-        total: true,
-        prepayRequired: true,
-        prepayAmount: true,
-      },
-    });
+    const eventId = deriveEventId(rawBody, parsed.data.eventId);
 
-    if (!order) {
-      logger.warn('payments.webhook.order_not_found', {
-        orderNumber: parsed.data.orderNumber,
-        ip: getRequestIp(request),
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        await tx.paymentWebhookEvent.create({
+          data: {
+            provider: 'mock',
+            eventId,
+            orderNumber: parsed.data.orderNumber,
+            status: parsed.data.status,
+            payloadJson: payload as object,
+          },
+        });
+
+        const order = await tx.order.findUnique({
+          where: { number: parsed.data.orderNumber },
+          select: {
+            id: true,
+            total: true,
+            prepayRequired: true,
+            prepayAmount: true,
+            paymentStatus: true,
+          },
+        });
+
+        if (!order) {
+          logger.warn('payments.webhook.order_not_found', {
+            orderNumber: parsed.data.orderNumber,
+            ip: getRequestIp(request),
+            eventId,
+          });
+          return { status: 404, body: { ok: false, error: 'Order not found.' } };
+        }
+
+        if (parsed.data.status === 'paid') {
+          if (order.paymentStatus !== 'paid') {
+            const computedAmount = order.prepayRequired ? Number(order.prepayAmount ?? 0) : Number(order.total);
+            await tx.order.update({
+              where: { id: order.id },
+              data: {
+                paymentStatus: 'paid',
+                paidAmount: parsed.data.paidAmount ?? computedAmount,
+                paidAt: new Date(),
+              },
+            });
+          }
+
+          await tx.paymentWebhookEvent.update({
+            where: { eventId },
+            data: { processedAt: new Date() },
+          });
+
+          return { status: 200, body: { ok: true } };
+        }
+
+        if (order.paymentStatus !== 'paid') {
+          await tx.order.update({
+            where: { id: order.id },
+            data: {
+              paymentStatus: 'failed',
+              paidAmount: null,
+              paidAt: null,
+            },
+          });
+        }
+
+        await tx.paymentWebhookEvent.update({
+          where: { eventId },
+          data: { processedAt: new Date() },
+        });
+
+        return { status: 200, body: { ok: true } };
       });
-      return NextResponse.json({ ok: false, error: 'Order not found.' }, { status: 404 });
+
+      return NextResponse.json(result.body, { status: result.status });
+    } catch (error) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === 'P2002'
+      ) {
+        logger.info('payments.webhook.duplicate_event', {
+          eventId,
+          orderNumber: parsed.data.orderNumber,
+        });
+        return NextResponse.json({ ok: true, duplicate: true });
+      }
+
+      throw error;
     }
-
-    if (parsed.data.status === 'paid') {
-      const computedAmount = order.prepayRequired ? Number(order.prepayAmount ?? 0) : Number(order.total);
-      await prisma.order.update({
-        where: { id: order.id },
-        data: {
-          paymentStatus: 'paid',
-          paidAmount: parsed.data.paidAmount ?? computedAmount,
-          paidAt: new Date(),
-        },
-      });
-
-      return NextResponse.json({ ok: true });
-    }
-
-    await prisma.order.update({
-      where: { id: order.id },
-      data: {
-        paymentStatus: 'failed',
-      },
-    });
-
-    return NextResponse.json({ ok: true });
   } catch (error) {
     if (error instanceof SyntaxError) {
       logger.warn('payments.webhook.invalid_json', {
