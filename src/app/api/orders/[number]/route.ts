@@ -9,9 +9,9 @@ import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 type Params = {
-  params: {
+  params: Promise<{
     number: string;
-  };
+  }>;
 };
 
 function toCustomerQuoteSummary(quoteJson: unknown) {
@@ -38,6 +38,8 @@ function toCustomerQuoteSummary(quoteJson: unknown) {
 }
 
 export async function GET(request: NextRequest, { params }: Params) {
+  const resolvedParams = await params;
+
   try {
     const env = getServerEnv();
     const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
@@ -45,7 +47,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const token = request.nextUrl.searchParams.get('token');
     const hasValidSignedToken = hasValidOrderAccessToken({
       token,
-      orderNumber: params.number,
+      orderNumber: resolvedParams.number,
       secret: tokenSecret,
     });
     const hasAdminAccess = isAdminAuthorized(request, env.ADMIN_TOKEN);
@@ -56,7 +58,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     const order = await prisma.order.findUnique({
       where: {
-        number: params.number,
+        number: resolvedParams.number,
       },
       select: hasAdminAccess
         ? {
@@ -127,7 +129,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       accessToken,
     });
   } catch (error) {
-    logger.error('orders.get.failed', { error, orderNumber: params.number });
+    logger.error('orders.get.failed', { error, orderNumber: resolvedParams.number });
     return NextResponse.json({ ok: false, error: 'Ошибка получения заказа.' }, { status: 500 });
   }
 }
