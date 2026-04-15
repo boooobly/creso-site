@@ -24,10 +24,10 @@ type OrderDetailPageProps = {
   params: {
     id: string;
   };
-  searchParams?: {
+  searchParams?: Promise<{
     success?: string;
     error?: string;
-  };
+  }>;
 };
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -48,13 +48,14 @@ function DetailRow({ label, value }: { label: string; value: ReactNode }) {
 }
 
 export default async function AdminOrderDetailPage({ params, searchParams }: OrderDetailPageProps) {
+  const resolvedSearchParams = await searchParams;
   const order = await prisma.order.findUnique({ where: { id: params.id } });
 
   if (!order) notFound();
 
   const submitAction = updateOrderAdminAction.bind(null, order.id);
-  const success = searchParams?.success === 'saved';
-  const error = searchParams?.error === 'validation';
+  const success = resolvedSearchParams?.success === 'saved';
+  const error = resolvedSearchParams?.error === 'validation';
   const bagetSummary = getPersistedBagetOrderSummary(order.payloadJson, order.quoteJson);
 
   return (

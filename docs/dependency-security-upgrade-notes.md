@@ -67,6 +67,10 @@ This pass focused only on dependency security remediation with the smallest safe
 - `npm run lint`
 - `npm audit --audit-level=high`
 
+## Next 15 compatibility follow-up
+- Updated App Router page prop typing for `searchParams` to the Next 15 Promise-based shape (`searchParams?: Promise<...>`), then awaited inside page components before reading values.
+- Applied this compatibility fix to `src/app/(public)/baget/page.tsx` and other server `page.tsx` files that declared typed `searchParams`, without changing page behavior or business logic.
+
 ## If a future migration is needed
 If policy later requires latest major baselines (Next 16 / React 19), do it as a separate staged effort:
 1. Create dedicated migration branch and run official Next codemods.

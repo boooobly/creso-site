@@ -23,12 +23,12 @@ const successMessages: Record<string, string> = {
 };
 
 type AdminReviewsPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     filter?: string;
     q?: string;
     success?: string;
     error?: string;
-  };
+  }>;
 };
 
 function getFilter(raw?: string): FilterKey {
@@ -84,8 +84,9 @@ function getTextPreview(text: string, limit = 260) {
 }
 
 export default async function AdminReviewsPage({ searchParams }: AdminReviewsPageProps) {
-  const filter = getFilter(searchParams?.filter);
-  const query = searchParams?.q?.trim() ?? '';
+  const resolvedSearchParams = await searchParams;
+  const filter = getFilter(resolvedSearchParams?.filter);
+  const query = resolvedSearchParams?.q?.trim() ?? '';
 
   const where: Prisma.ReviewWhereInput = {
     ...(filter !== 'all' ? { status: filter } : {}),
@@ -131,7 +132,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
   if (filter !== 'pending') redirectSearchParams.set('filter', filter);
   if (query) redirectSearchParams.set('q', query);
 
-  const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
+  const successMessage = resolvedSearchParams?.success ? successMessages[resolvedSearchParams.success] : null;
 
   return (
     <div className="space-y-6">
@@ -153,8 +154,8 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
           <AdminAlert tone="success" className="mt-3">{successMessage}</AdminAlert>
         ) : null}
 
-        {searchParams?.error ? (
-          <AdminAlert tone="error" className="mt-3">{searchParams.error}</AdminAlert>
+        {resolvedSearchParams?.error ? (
+          <AdminAlert tone="error" className="mt-3">{resolvedSearchParams.error}</AdminAlert>
         ) : null}
 
         <form method="GET" className="mt-4 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[1fr_auto]">
