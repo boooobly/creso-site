@@ -117,7 +117,10 @@ export default function HomePageContent({
   return (
     <div className="relative">
       <Section spacing="hero" fullBleed className="relative overflow-hidden border-b border-neutral-200/70 dark:border-neutral-800/80">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent dark:from-red-500/12" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent dark:from-[#4a1717]/28 dark:via-[#2b1010]/14 dark:to-transparent"
+        />
         <div className="relative z-10 grid items-center gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
           <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
             <div className="space-y-5">
