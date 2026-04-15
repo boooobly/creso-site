@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 type OrderItem = {
@@ -24,6 +24,8 @@ type OrderApiResponse = {
   paymentRef?: string | null;
   paidAmount?: number | null;
   paidAt?: string | null;
+  securePdfUrl?: string;
+  accessToken?: string;
   quoteJson?: {
     effectiveSize?: {
       width?: number;
@@ -46,7 +48,10 @@ function formatDate(value: string | null | undefined) {
 
 export default function OrderStatusPage() {
   const params = useParams<{ number: string }>();
+  const searchParams = useSearchParams();
   const orderNumber = String(params.number || '');
+  const token = searchParams.get('token')?.trim() || '';
+
   const [order, setOrder] = useState<OrderApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +59,13 @@ export default function OrderStatusPage() {
   const [payError, setPayError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!token) {
+      setOrder(null);
+      setError('Ссылка на заказ недействительна или устарела. Обратитесь к менеджеру за новой ссылкой.');
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
     async function load() {
@@ -61,7 +73,7 @@ export default function OrderStatusPage() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`/api/orders/${encodeURIComponent(orderNumber)}`, {
+        const response = await fetch(`/api/orders/${encodeURIComponent(orderNumber)}?token=${encodeURIComponent(token)}`, {
           cache: 'no-store',
         });
         const json = await response.json().catch(() => null);
@@ -69,7 +81,7 @@ export default function OrderStatusPage() {
         if (!response.ok) {
           if (!cancelled) {
             setOrder(null);
-            setError(response.status === 404 ? 'Order not found' : json?.error || 'Failed to load order');
+            setError(response.status === 404 ? 'Заказ не найден.' : json?.error || 'Не удалось загрузить заказ.');
           }
           return;
         }
@@ -78,7 +90,7 @@ export default function OrderStatusPage() {
           setOrder(json as OrderApiResponse);
         }
       } catch {
-        if (!cancelled) setError('Failed to load order');
+        if (!cancelled) setError('Не удалось загрузить заказ.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -88,7 +100,7 @@ export default function OrderStatusPage() {
     return () => {
       cancelled = true;
     };
-  }, [orderNumber]);
+  }, [orderNumber, token]);
 
   const effectiveSizeText = useMemo(() => {
     const width = order?.quoteJson?.effectiveSize?.width;
@@ -110,32 +122,32 @@ export default function OrderStatusPage() {
       const response = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderNumber: order.number }),
+        body: JSON.stringify({ orderNumber: order.number, token: order.accessToken || token }),
       });
       const json = await response.json().catch(() => null);
 
       if (!response.ok || !json?.redirectUrl) {
-        setPayError(json?.error || 'Payment session creation failed');
+        setPayError(json?.error || 'Не удалось создать оплату.');
         return;
       }
 
       window.location.href = json.redirectUrl;
     } catch {
-      setPayError('Payment session creation failed');
+      setPayError('Не удалось создать оплату.');
     } finally {
       setPaying(false);
     }
   }
 
   if (loading) {
-    return <main className="container py-12"><p className="text-sm text-neutral-600">Loading order...</p></main>;
+    return <main className="container py-12"><p className="text-sm text-neutral-600">Загрузка заказа...</p></main>;
   }
 
   if (error || !order) {
     return (
       <main className="container py-12">
-        <h1 className="text-2xl font-semibold">Order status</h1>
-        <p className="mt-3 text-sm text-red-600">{error || 'Order not found'}</p>
+        <h1 className="text-2xl font-semibold">Статус заказа</h1>
+        <p className="mt-3 text-sm text-red-600">{error || 'Заказ не найден.'}</p>
       </main>
     );
   }
@@ -145,50 +157,50 @@ export default function OrderStatusPage() {
   return (
     <main className="container py-10">
       <div className="mx-auto max-w-3xl space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-semibold">Order #{order.number}</h1>
-        <p className="text-sm text-neutral-600">Created: {formatDate(order.createdAt)}</p>
+        <h1 className="text-2xl font-semibold">Заказ #{order.number}</h1>
+        <p className="text-sm text-neutral-600">Создан: {formatDate(order.createdAt)}</p>
 
         <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-          <p><span className="text-neutral-500">Customer:</span> {order.customerName || '—'}</p>
-          <p><span className="text-neutral-500">Phone:</span> {order.phone || '—'}</p>
+          <p><span className="text-neutral-500">Клиент:</span> {order.customerName || '—'}</p>
+          <p><span className="text-neutral-500">Телефон:</span> {order.phone || '—'}</p>
           <p><span className="text-neutral-500">Email:</span> {order.email || '—'}</p>
-          <p><span className="text-neutral-500">Payment status:</span> {order.paymentStatus || 'unpaid'}</p>
-          <p className="sm:col-span-2"><span className="text-neutral-500">Effective size:</span> {effectiveSizeText}</p>
-          {order.comment ? <p className="sm:col-span-2"><span className="text-neutral-500">Comment:</span> {order.comment}</p> : null}
+          <p><span className="text-neutral-500">Статус оплаты:</span> {order.paymentStatus || 'unpaid'}</p>
+          <p className="sm:col-span-2"><span className="text-neutral-500">Итоговый размер:</span> {effectiveSizeText}</p>
+          {order.comment ? <p className="sm:col-span-2"><span className="text-neutral-500">Комментарий:</span> {order.comment}</p> : null}
         </div>
 
         <div className="rounded-xl border border-neutral-200 p-4">
-          <h2 className="mb-2 text-base font-semibold">Items</h2>
+          <h2 className="mb-2 text-base font-semibold">Позиции</h2>
           {items.length === 0 ? (
-            <p className="text-sm text-neutral-500">No items.</p>
+            <p className="text-sm text-neutral-500">Позиции отсутствуют.</p>
           ) : (
             <ul className="space-y-2 text-sm">
               {items.map((item, idx) => (
                 <li key={`${item.title ?? 'item'}-${idx}`} className="flex items-center justify-between">
-                  <span>{item.title || 'Item'}</span>
+                  <span>{item.title || 'Позиция'}</span>
                   <span className="font-medium">{formatMoney(item.total)}</span>
                 </li>
               ))}
             </ul>
           )}
           <div className="mt-4 border-t border-neutral-200 pt-3 text-sm">
-            <p><span className="text-neutral-500">Total:</span> <span className="font-semibold">{formatMoney(order.total)}</span></p>
+            <p><span className="text-neutral-500">Итого:</span> <span className="font-semibold">{formatMoney(order.total)}</span></p>
             {order.prepayRequired ? (
-              <p><span className="text-neutral-500">Prepayment (50%):</span> <span className="font-semibold">{formatMoney(order.prepayAmount)}</span></p>
+              <p><span className="text-neutral-500">Предоплата (50%):</span> <span className="font-semibold">{formatMoney(order.prepayAmount)}</span></p>
             ) : null}
             {order.paidAt ? (
-              <p><span className="text-neutral-500">Paid at:</span> {formatDate(order.paidAt)}</p>
+              <p><span className="text-neutral-500">Оплачено:</span> {formatDate(order.paidAt)}</p>
             ) : null}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-3">
           <Link
-            href={`/api/orders/${encodeURIComponent(order.number)}/pdf`}
+            href={order.securePdfUrl || `/api/orders/${encodeURIComponent(order.number)}/pdf?token=${encodeURIComponent(order.accessToken || token)}`}
             target="_blank"
             className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-50"
           >
-            Download PDF
+            Скачать PDF
           </Link>
 
           {canPay ? (
@@ -198,10 +210,10 @@ export default function OrderStatusPage() {
               disabled={paying}
               className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
             >
-              {paying ? 'Creating payment...' : 'Pay'}
+              {paying ? 'Создание оплаты...' : 'Оплатить'}
             </button>
           ) : (
-            <span className="inline-flex items-center rounded-xl bg-green-100 px-4 py-2 text-sm font-medium text-green-800">Paid</span>
+            <span className="inline-flex items-center rounded-xl bg-green-100 px-4 py-2 text-sm font-medium text-green-800">Оплачено</span>
           )}
         </div>
 

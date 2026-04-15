@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
 import { calculateHeatTransferPricing } from '@/lib/calculations/heatTransferPricing';
 import { getHeatTransferPricingConfig } from '@/lib/heat-transfer/heatTransferPricing';
+import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 export const runtime = 'nodejs';
 
 type HeatTransferPayload = {
@@ -124,6 +125,13 @@ export async function POST(req: NextRequest) {
   try {
     getServerEnv();
     const payload = (await req.json()) as HeatTransferPayload;
+
+    const blockedResponse = enforcePublicRequestGuard(req, {
+      route: '/api/heat-transfer',
+      payload,
+      requirePayload: true,
+    });
+    if (blockedResponse) return blockedResponse;
 
     if (!payload?.contact?.name || !payload?.contact?.phone || !payload?.contact?.agreed) {
       return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });
