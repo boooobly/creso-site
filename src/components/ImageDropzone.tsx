@@ -72,7 +72,7 @@ export default function ImageDropzone({
 
   return (
     <div
-      className={`min-h-[120px] rounded-xl border-2 border-dashed p-3 transition-colors md:p-4 ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/25' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700/85 dark:bg-neutral-900/70'} ${className}`.trim()}
+      className={`min-h-[120px] rounded-xl border-2 border-dashed p-3 transition-colors md:p-4 ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/25' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700/85 dark:bg-neutral-950/55'} ${className}`.trim()}
       onDragEnter={(event) => {
         event.preventDefault();
         setIsDragging(true);
