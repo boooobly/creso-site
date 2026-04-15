@@ -42,7 +42,7 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 
 ### New delta after re-audit
 - **PR #591 update:** metadata base URL now uses env-driven logic and no longer hardcodes `https://example.com` (**A-002 resolved**).
-- **PR #591 update:** dependencies were upgraded to reduce risk surface (`next`, `axios`, `nodemailer`, `eslint-config-next`), but `npm audit` still reports remaining high items tied to major-version upgrade paths (**A-001 partially resolved**).
+- **PR #591 update:** dependencies were upgraded in a staged path (`next` 14→15.5.15, `eslint-config-next` 14→15.5.15, `vitest` 2→3, `tailwindcss` 3.4.17→3.4.19, plus transitive refresh), and `npm audit --audit-level=high` now reports zero vulnerabilities (**A-001 resolved**).
 - Remaining reliability/security hardening gaps include CSRF/origin protections for admin mutations, upload and memory-pressure controls, and distributed rate-limit state.
 
 ---
@@ -54,12 +54,13 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-001
 - **Severity:** High
 - **Area:** Dependency security / platform
-- **Status:** **Partially resolved in PR #591**
-- **Files:** `package.json`
-- **What is wrong:** Dependency baseline was improved (Next 14 patch line + axios/nodemailer updates), but `npm audit --audit-level=high` still reports high vulnerabilities that require major-version upgrades (notably Next 16 and newer lint/test toolchain packages).
-- **Why it matters:** Remaining advisories still affect security posture and should be tracked to closure.
-- **Suggested fix:** Plan a controlled major-upgrade security PR (Next/tooling) with compatibility testing.
-- **Suggested regression test / QA:** CI job with `npm audit --audit-level=high`; smoke-test all API routes and payment/order flows after each dependency step.
+- **Status:** **Resolved (staged dependency security upgrade completed)**
+- **Files:** `package.json`, `package-lock.json`
+- **What was wrong:** Previous dependency baseline left high-severity advisories in `npm audit`, primarily from Next.js/tooling dependency chains.
+- **Why it mattered:** Known high advisories increased exposure for build/runtime and CI tooling.
+- **Fix delivered:** Completed a smallest-safe staged upgrade path without jumping to Next 16/React 19: upgraded to `next@15.5.15` (keeping React 18), aligned `eslint-config-next@15.5.15`, moved `vitest` to `3.2.4`, updated `tailwindcss` to `3.4.19`, and refreshed transitive dependencies (`glob` to fixed line) via lockfile updates.
+- **Verification:** `npm audit --audit-level=high` now returns `found 0 vulnerabilities`.
+- **Suggested regression test / QA:** Keep CI gates for `npm audit --audit-level=high`, `npm run test`, `npm run lint`, and periodic build smoke tests in an environment with Google Fonts egress.
 
 ### A-002
 - **Severity:** High
