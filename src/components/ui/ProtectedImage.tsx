@@ -12,9 +12,12 @@ const preventDefault = (event: MouseEvent<HTMLElement> | DragEvent<HTMLElement>)
 };
 
 export default function ProtectedImage({ disableSelection = true, className, onContextMenu, onDragStart, draggable, ...props }: ProtectedImageProps) {
+  const { alt = '' } = props;
+
   return (
     <Image
       {...props}
+      alt={alt}
       draggable={draggable ?? false}
       onContextMenu={(event) => {
         preventDefault(event);

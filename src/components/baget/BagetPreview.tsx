@@ -129,7 +129,7 @@ export default function BagetPreview({
       passePx,
       passeBottomPx,
     };
-  }, [containerPx.height, containerPx.width, passepartoutEnabled, safeHeightMm, safePasseBottomMm, safePasseMm, safeWidthMm, selectedBaget, stretchedCanvas]);
+  }, [containerPx.height, containerPx.width, safeHeightMm, safePasseBottomMm, safePasseMm, safeWidthMm, selectedBaget, stretchedCanvas]);
 
   const textureUrl = selectedBaget?.frameTextureImage || '';
   const fallback = 'linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 65%, #7f1d1d 100%)';

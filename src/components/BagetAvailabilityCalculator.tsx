@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import { engineUiCatalog, getBagetValidation, getRequiredBagetLength, isBagetSuitable } from '@/lib/engine';
 
@@ -86,9 +87,11 @@ export default function BagetAvailabilityCalculator() {
                   }
                 >
                   <td className="p-3">
-                    <img
+                    <Image
                       src={item.image}
                       alt={item.name}
+                      width={48}
+                      height={48}
                       className="h-12 w-12 rounded-md border border-neutral-300 object-contain bg-white p-1 dark:border-neutral-700 dark:bg-neutral-900"
                     />
                   </td>

@@ -295,6 +295,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                 className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- CMS-provided URLs can be external and this fallback behavior relies on direct <img> error handling. */}
                   <img
                     src={siteImages[item.slotKey]?.url ?? item.image}
                     alt={siteImages[item.slotKey]?.altText || item.title}
