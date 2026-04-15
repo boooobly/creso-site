@@ -15,8 +15,8 @@ function MockPaymentContent() {
   const [error, setError] = useState<string | null>(null);
 
   async function mark(status: 'paid' | 'failed') {
-    if (!paymentRef) {
-      setError('Missing payment ref');
+    if (!paymentRef || !orderNumber || !token) {
+      setError('Недостаточно данных для mock-оплаты. Вернитесь на страницу заказа.');
       return;
     }
 
@@ -25,21 +25,21 @@ function MockPaymentContent() {
       setError(null);
       setMessage(null);
 
-      const response = await fetch('/api/payments/webhook', {
+      const response = await fetch('/api/payments/mock/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentRef, status }),
+        body: JSON.stringify({ orderNumber, paymentRef, status, token }),
       });
 
       const result = await response.json().catch(() => null);
       if (!response.ok || !result?.ok) {
-        setError(result?.error || 'Failed to update payment status');
+        setError(result?.error || 'Не удалось обновить статус mock-оплаты.');
         return;
       }
 
-      setMessage(`Payment marked as ${status.toUpperCase()}.`);
+      setMessage(status === 'paid' ? 'Mock-оплата отмечена как оплаченная.' : 'Mock-оплата отмечена как неуспешная.');
     } catch {
-      setError('Failed to update payment status');
+      setError('Не удалось обновить статус mock-оплаты.');
     } finally {
       setLoading(false);
     }
@@ -48,8 +48,9 @@ function MockPaymentContent() {
   return (
     <main className="container py-10">
       <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-semibold">Mock payment</h1>
-        <p className="text-sm text-neutral-600">Ref: {paymentRef || '—'}</p>
+        <h1 className="text-2xl font-semibold">Mock-оплата (демо)</h1>
+        <p className="text-sm text-neutral-600">Референс: {paymentRef || '—'}</p>
+        <p className="text-xs text-neutral-500">Эта страница предназначена только для тестового/демо сценария оплаты.</p>
 
         <div className="flex flex-wrap gap-3">
           <button
@@ -58,7 +59,7 @@ function MockPaymentContent() {
             disabled={loading}
             className="inline-flex items-center justify-center rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-60"
           >
-            Mark as PAID
+            Отметить как ОПЛАЧЕНО
           </button>
           <button
             type="button"
@@ -66,7 +67,7 @@ function MockPaymentContent() {
             disabled={loading}
             className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
           >
-            Mark as FAILED
+            Отметить как НЕУСПЕХ
           </button>
         </div>
 
@@ -75,10 +76,10 @@ function MockPaymentContent() {
 
         {orderNumber ? (
           <Link href={`/order/${encodeURIComponent(orderNumber)}${token ? `?token=${encodeURIComponent(token)}` : ''}`} className="text-sm text-red-600 underline underline-offset-2">
-            Back to order
+            Вернуться к заказу
           </Link>
         ) : (
-          <p className="text-xs text-neutral-500">Open your order page again to check updated status.</p>
+          <p className="text-xs text-neutral-500">Откройте страницу заказа снова, чтобы увидеть обновлённый статус.</p>
         )}
       </div>
     </main>
@@ -87,7 +88,7 @@ function MockPaymentContent() {
 
 export default function MockPaymentPage() {
   return (
-    <Suspense fallback={<main className="container py-10 text-sm text-neutral-600">Loading payment...</main>}>
+    <Suspense fallback={<main className="container py-10 text-sm text-neutral-600">Загрузка mock-оплаты...</main>}>
       <MockPaymentContent />
     </Suspense>
   );
