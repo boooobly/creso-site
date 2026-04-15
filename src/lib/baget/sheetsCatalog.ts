@@ -1,4 +1,5 @@
 import { parse } from 'csv-parse/sync';
+import { unstable_cache } from 'next/cache';
 import localCatalogData from '../../../data/baget.json';
 import { normalizeBagetImageUrl } from './normalizeBagetImageUrl';
 import { logger } from '@/lib/logger';
@@ -61,6 +62,12 @@ export type BagetCatalogLoadResult = {
   tab: string;
   items: BagetSheetItem[];
   error: string | null;
+};
+
+type BagetCatalogSourceConfig = {
+  sheetId: string;
+  tab: string;
+  cacheSeconds: number;
 };
 
 function toNumber(input: string, fallback?: number): number {
@@ -142,11 +149,20 @@ export function mapSheetItemsToBagetItems(items: BagetSheetItem[]): BagetCatalog
   }));
 }
 
-export async function loadBagetCatalog(): Promise<BagetCatalogLoadResult> {
+function getBagetCatalogSourceConfig(): BagetCatalogSourceConfig {
   const sheetId = process.env.BAGET_SHEET_ID?.trim() || DEFAULT_SHEET_ID;
   const tab = process.env.BAGET_SHEET_TAB?.trim() || DEFAULT_TAB;
   const cacheSecondsRaw = process.env.BAGET_SHEET_CACHE_SECONDS?.trim();
   const cacheSeconds = toNumber(cacheSecondsRaw ?? '', DEFAULT_CACHE_SECONDS);
+  return {
+    sheetId,
+    tab,
+    cacheSeconds,
+  };
+}
+
+export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSourceConfig()): Promise<BagetCatalogLoadResult> {
+  const { sheetId, tab, cacheSeconds } = sourceConfig;
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
 
   try {
@@ -190,6 +206,31 @@ export async function loadBagetCatalog(): Promise<BagetCatalogLoadResult> {
     logger.error('baget.sheets_catalog.fallback.fetch_failure', { error: message, sheetId, tab, url });
     return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error: message };
   }
+}
+
+async function loadBagetCatalogCached(sourceConfig: BagetCatalogSourceConfig): Promise<BagetCatalogLoadResult> {
+  const { sheetId, tab, cacheSeconds } = sourceConfig;
+  const load = unstable_cache(
+    async () => loadBagetCatalogUncached(sourceConfig),
+    ['baget.sheets_catalog.parsed', sheetId, tab, String(cacheSeconds)],
+    { revalidate: cacheSeconds }
+  );
+
+  try {
+    return await load();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : '';
+    if (message.includes('incrementalCache missing')) {
+      return loadBagetCatalogUncached(sourceConfig);
+    }
+
+    throw error;
+  }
+}
+
+export async function loadBagetCatalog(): Promise<BagetCatalogLoadResult> {
+  const sourceConfig = getBagetCatalogSourceConfig();
+  return loadBagetCatalogCached(sourceConfig);
 }
 
 export async function getBagetCatalogFromSheet(): Promise<BagetSheetItem[]> {
