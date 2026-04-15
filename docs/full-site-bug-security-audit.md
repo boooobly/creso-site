@@ -22,6 +22,7 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 - **F-002 — Resolved:** `/api/payments/create` now requires a valid signed order token or admin bearer auth.
 - **F-003 — Resolved:** mock payment now uses a dedicated safe endpoint (`/api/payments/mock/complete`) that validates order+paymentRef and updates status without weakening real webhook signature checks.
 - **F-004 — Resolved:** order page now uses tokenized order context and a server-issued tokenized PDF URL.
+- **F-005 — Resolved:** admin login now has best-effort in-memory IP-based throttling (failed-attempt window + temporary lockout) with reset on successful login and structured warning logs.
 - **F-006 — Resolved:** baget catalog debug endpoint now returns 404 in production.
 - **F-007 — Resolved:** sitemap and robots now use env-driven base URL (`PUBLIC_BASE_URL`) via `getBaseUrl()`.
 
