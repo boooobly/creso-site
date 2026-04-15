@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { enforcePublicRequestGuard } from '@/lib/anti-spam';
+import { POST as postCanonicalLead } from '@/app/api/leads/route';
 
 import { logger } from '@/lib/logger';
-const leadSchema = z.object({
+const legacyLeadSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   phone: z.string().min(6),
@@ -14,28 +14,35 @@ const leadSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const payload = await req.json();
-
-    const blockedResponse = enforcePublicRequestGuard(req, {
-      route: '/api/lead',
-      payload,
-      honeypotFields: ['website'],
-      requirePayload: true,
-    });
-
-    if (blockedResponse) {
-      return blockedResponse;
-    }
-
-    const parsed = leadSchema.safeParse(payload);
+    const payload = await req.json().catch(() => null);
+    const parsed = legacyLeadSchema.safeParse(payload);
 
     if (!parsed.success) {
       return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });
     }
 
-    const calculationDetails = parsed.data.message?.includes('Расчёт:') ? parsed.data.message : undefined;
+    const commentParts = [parsed.data.service, parsed.data.message]
+      .map((value) => value?.trim())
+      .filter(Boolean);
+    const canonicalPayload = {
+      source: 'legacy-lead-form',
+      name: parsed.data.name,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      comment: commentParts.length > 0 ? commentParts.join('\n') : undefined,
+    };
+    const nextRequest = new NextRequest('http://localhost:3000/api/leads', {
+      method: 'POST',
+      headers: req.headers,
+      body: JSON.stringify(canonicalPayload),
+    });
 
-    return NextResponse.json({ ok: true, calculationDetails });
+    const response = await postCanonicalLead(nextRequest);
+    response.headers.set('x-creso-api-deprecated', 'true');
+    response.headers.set('x-creso-api-canonical', '/api/leads');
+    response.headers.append('warning', '299 - "/api/lead deprecated; use /api/leads"');
+
+    return response;
   } catch (error) {
     logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });

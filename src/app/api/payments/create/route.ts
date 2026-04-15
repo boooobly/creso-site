@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const parsed = createPaymentSchema.safeParse(payload);
 
     if (!parsed.success) {
-      return NextResponse.json({ ok: false, error: 'Invalid request payload.' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Некорректные параметры запроса.' }, { status: 400 });
     }
 
     const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const hasAdminAccess = isAdminAuthorized(request, env.ADMIN_TOKEN);
 
     if (!hasValidSignedToken && !hasAdminAccess) {
-      return NextResponse.json({ ok: false, error: 'Forbidden.' }, { status: 403 });
+      return NextResponse.json({ ok: false, error: 'Нет доступа к созданию оплаты по этому заказу.' }, { status: 403 });
     }
 
     const order = await prisma.order.findUnique({
@@ -51,11 +51,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (!order) {
-      return NextResponse.json({ ok: false, error: 'Order not found.' }, { status: 404 });
+      return NextResponse.json({ ok: false, error: 'Заказ не найден.' }, { status: 404 });
     }
 
     if (order.paymentStatus === 'paid') {
-      return NextResponse.json({ ok: false, error: 'Already paid' }, { status: 409 });
+      return NextResponse.json({ ok: false, error: 'Заказ уже оплачен.' }, { status: 409 });
     }
 
     const amount = order.prepayRequired ? Number(order.prepayAmount ?? 0) : Number(order.total);
@@ -84,6 +84,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     logger.error('payments.create.failed', { error });
-    return NextResponse.json({ ok: false, error: 'Payment session creation failed.' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'Не удалось создать сессию оплаты.' }, { status: 500 });
   }
 }
