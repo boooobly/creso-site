@@ -41,8 +41,9 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 | F-007 Sitemap/robots `example.com` | Resolved | **Resolved for sitemap/robots only** | `robots.ts` and `sitemap.ts` now use env base URL. |
 
 ### New delta after re-audit
-- A **new SEO inconsistency** remains in metadata: `metadataBase` is still hardcoded to `https://example.com` in `src/lib/seo.ts`.
-- Several **reliability/security hardening gaps** remain (CSRF hardening for cookie-auth admin APIs, upload and memory-pressure controls, dependency vulnerabilities, distributed rate-limit state).
+- **PR #591 update:** metadata base URL now uses env-driven logic and no longer hardcodes `https://example.com` (**A-002 resolved**).
+- **PR #591 update:** dependencies were upgraded to reduce risk surface (`next`, `axios`, `nodemailer`, `eslint-config-next`), but `npm audit` still reports remaining high items tied to major-version upgrade paths (**A-001 partially resolved**).
+- Remaining reliability/security hardening gaps include CSRF/origin protections for admin mutations, upload and memory-pressure controls, and distributed rate-limit state.
 
 ---
 
@@ -53,29 +54,32 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-001
 - **Severity:** High
 - **Area:** Dependency security / platform
+- **Status:** **Partially resolved in PR #591**
 - **Files:** `package.json`
-- **What is wrong:** `next` is pinned to `14.2.7`, and `npm audit` currently reports multiple critical/high vulnerabilities in dependency graph (including Next.js advisories and axios advisories).
-- **Why it matters:** Exposed production apps can be impacted by known CVEs or receive poor security posture scores.
-- **Suggested fix:** Upgrade `next` and vulnerable dependencies to patched versions compatible with the app; then rerun regression checks.
-- **Suggested regression test / QA:** CI job with `npm audit --audit-level=high`; smoke-test all API routes and payment/order flows after upgrade.
+- **What is wrong:** Dependency baseline was improved (Next 14 patch line + axios/nodemailer updates), but `npm audit --audit-level=high` still reports high vulnerabilities that require major-version upgrades (notably Next 16 and newer lint/test toolchain packages).
+- **Why it matters:** Remaining advisories still affect security posture and should be tracked to closure.
+- **Suggested fix:** Plan a controlled major-upgrade security PR (Next/tooling) with compatibility testing.
+- **Suggested regression test / QA:** CI job with `npm audit --audit-level=high`; smoke-test all API routes and payment/order flows after each dependency step.
 
 ### A-002
 - **Severity:** High
 - **Area:** SEO / metadata
-- **Files:** `src/lib/seo.ts`, `src/app/robots.ts`, `src/app/sitemap.ts`
-- **What is wrong:** `metadataBase` is hardcoded to `https://example.com` while robots/sitemap already use env-driven base URL.
-- **Why it matters:** Canonical/OpenGraph metadata can point to the wrong domain even if robots/sitemap are correct.
-- **Suggested fix:** Build `metadataBase` from `getBaseUrl()` (or validated env URL) consistently.
-- **Suggested regression test / QA:** Add test asserting metadata canonical host equals `PUBLIC_BASE_URL` host in production config.
+- **Status:** **Resolved in PR #591**
+- **Files:** `src/lib/seo.ts`, `src/app/robots.ts`, `src/app/sitemap.ts`, `src/lib/seo.test.ts`
+- **What was wrong:** `metadataBase` was hardcoded to `https://example.com` while robots/sitemap already used env-driven base URL.
+- **Why it mattered:** Canonical/OpenGraph metadata could point to the wrong domain even when sitemap/robots were correct.
+- **Fix delivered:** `metadataBase` now uses the same env-driven base URL path (`getBaseUrl()`), with regression tests to prevent reintroduction.
+- **Suggested regression test / QA:** Keep metadata base URL tests in CI and verify production host values in preview/prod smoke checks.
 
 ### A-003
 - **Severity:** Medium
 - **Area:** Admin auth / CSRF hardening
-- **Files:** `middleware.ts`, `src/lib/admin/api-auth.ts`, `src/app/api/admin/**`
-- **What is wrong:** Admin API authorization checks only session cookie validity; no explicit CSRF token or strict Origin/Referer validation for state-changing endpoints.
-- **Why it matters:** `SameSite=Lax` reduces risk but does not provide explicit anti-CSRF guarantees for all browser/request edge cases.
-- **Suggested fix:** Add CSRF token (double-submit or synchronizer token) or at minimum enforce trusted `Origin` for non-GET admin API calls.
-- **Suggested regression test / QA:** Security test suite that submits cross-origin style requests with valid cookie but invalid origin and expects 403.
+- **Status:** **Resolved in this PR (origin-based mutation protection)**
+- **Files:** `middleware.ts`, `src/lib/admin/api-auth.ts`, `src/app/api/admin/**`, `src/lib/admin/api-auth.test.ts`
+- **What was wrong:** Admin API authorization previously checked only session cookie validity, with no explicit origin check on state-changing endpoints.
+- **Why it mattered:** `SameSite=Lax` reduces risk but is not a complete CSRF defense layer by itself.
+- **Fix delivered:** Non-GET `/api/admin/*` requests now require a trusted same-origin `Origin` value (request origin / forwarded host origin / configured public base origin). Cross-origin or missing-origin mutation attempts are rejected with `403`. GET endpoints remain compatible.
+- **Suggested regression test / QA:** Keep admin origin-hardening tests in CI for allow/deny mutation scenarios plus GET compatibility checks.
 
 ### A-004
 - **Severity:** Medium
@@ -199,7 +203,7 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 
 - Session signing and cookie flags are generally implemented correctly.
 - Login throttling exists (in-memory, IP-based).
-- Explicit CSRF defense layer for admin mutations is still missing (recommend origin+token hardening).
+- Non-GET admin API routes now enforce trusted same-origin `Origin` validation in shared auth helper (cross-origin and missing-origin mutations are rejected).
 
 ---
 
@@ -231,7 +235,7 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 
 ## 9) SEO, mobile/adaptive, and UX code-level notes
 
-- SEO: robots/sitemap fixed to env base URL, but metadata canonical base still hardcoded to example.com.
+- SEO: robots/sitemap and metadata base URL now consistently use env-driven base URL logic.
 - Mobile/adaptive: no obvious catastrophic layout break found from static read; **Needs verification** on real devices for calculators/order pages with long text and validation states.
 - UX bugs visible from code:
   - mixed-language status/errors in customer order/payment flow,
