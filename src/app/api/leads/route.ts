@@ -5,8 +5,7 @@ import { buildLeadNotificationText, type LeadNotificationFile } from '@/lib/noti
 import { sendTelegramLead, sendTelegramDocumentBuffer } from '@/lib/notifications/telegram';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
-import { getClientIp } from '@/lib/utils/request';
-import { isRateLimited } from '@/lib/anti-spam';
+import { enforcePublicRequestGuard, getClientIp } from '@/lib/anti-spam';
 import { sourceTitle } from '@/lib/utils/sourceTitle';
 import { getServerEnv } from '@/lib/env';
 
@@ -145,12 +144,17 @@ async function sendLeadTelegramFiles(params: { files: LeadNotificationFile[] }):
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-
-    if (isRateLimited(ip)) {
-      return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
-    }
-
     const { payload, files } = await parseLeadRequest(request);
+
+    const blockedResponse = enforcePublicRequestGuard(request, {
+      route: '/api/leads',
+      payload,
+      requirePayload: true,
+    });
+
+    if (blockedResponse) {
+      return blockedResponse;
+    }
     const parsed = leadSchema.safeParse(payload);
 
     if (!parsed.success) {

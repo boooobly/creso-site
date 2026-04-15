@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getClientIp, hasUserAgent, isEmptyPayload, isHoneypotTriggered, isRateLimited } from '@/lib/anti-spam';
+import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 
 import { logger } from '@/lib/logger';
 const leadSchema = z.object({
@@ -16,20 +16,15 @@ export async function POST(req: Request) {
   try {
     const payload = await req.json();
 
-    if (!hasUserAgent(req)) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
-    }
+    const blockedResponse = enforcePublicRequestGuard(req, {
+      route: '/api/lead',
+      payload,
+      honeypotFields: ['website'],
+      requirePayload: true,
+    });
 
-    if (isRateLimited(getClientIp(req))) {
-      return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
-    }
-
-    if (isEmptyPayload(payload)) {
-      return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });
-    }
-
-    if (isHoneypotTriggered(payload, 'website')) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
+    if (blockedResponse) {
+      return blockedResponse;
     }
 
     const parsed = leadSchema.safeParse(payload);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { getClientIp, hasUserAgent, isEmptyPayload, isHoneypotTriggered, isRateLimited } from '@/lib/anti-spam';
+import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 
 import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
@@ -72,20 +72,15 @@ export async function POST(req: NextRequest) {
     getServerEnv();
     const payload = (await req.json()) as OutdoorPayload;
 
-    if (!hasUserAgent(req)) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
-    }
+    const blockedResponse = enforcePublicRequestGuard(req, {
+      route: '/api/outdoor',
+      payload,
+      honeypotFields: ['website'],
+      requirePayload: true,
+    });
 
-    if (isRateLimited(getClientIp(req))) {
-      return NextResponse.json({ ok: false, error: 'Слишком много запросов. Попробуйте позже.' }, { status: 429 });
-    }
-
-    if (isEmptyPayload(payload)) {
-      return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });
-    }
-
-    if (isHoneypotTriggered(payload, 'website')) {
-      return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 400 });
+    if (blockedResponse) {
+      return blockedResponse;
     }
 
     if (!payload?.address || !payload?.dimensions || !payload?.phone || !payload?.agreed) {

@@ -28,9 +28,24 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 
 ## PR 2 resolution status (this PR)
 
-- **Public request hardening — Resolved:** introduced `enforcePublicRequestGuard` to centralize user-agent, IP rate-limit, empty payload and honeypot checks with consistent response shape and structured warning logs.
-- **Reviews rate-limit gap — Resolved:** `/api/reviews` now uses standardized anti-spam guard (including explicit rate limiting).
-- **Calculator submission hardening — Resolved:** `/api/plotter` and `/api/heat-transfer` now enforce shared public request guard checks before business validation/processing.
+- **Public request hardening — In progress:** `enforcePublicRequestGuard` is now applied on public customer-facing submission routes that accept lead/order/request data, while preserving route-specific validation and delivery logic.
+- **Covered routes:**
+  - `/api/reviews`
+  - `/api/plotter`
+  - `/api/heat-transfer`
+  - `/api/lead`
+  - `/api/leads`
+  - `/api/outdoor`
+  - `/api/wide-format-order`
+  - `/api/requests/mugs`
+  - `/api/requests/tshirts`
+  - `/api/requests/business-cards`
+  - `/api/requests/milling`
+- **Intentionally left unchanged:**
+  - `/api/orders` — currently contains order creation + order access-token flow integration; left unchanged in this PR per scope constraint to avoid touching order/payment token logic.
+  - `/api/payments/create`, `/api/payments/webhook`, `/api/payments/mock/complete` — payment/token/webhook routes are intentionally excluded from this anti-spam hardening pass.
+  - `/api/quotes/print`, `/api/quotes/wide-format`, `/api/quotes/heat-transfer` — calculator quote endpoints do not accept contact/order/request submission data and remain out of scope for customer form anti-spam hardening.
+- **Reviews rate-limit gap — Resolved:** `/api/reviews` uses standardized anti-spam guard with explicit per-IP request throttling.
 
 ## Detailed findings by area
 
