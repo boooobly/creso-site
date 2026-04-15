@@ -93,6 +93,67 @@ describe('POST /api/payments/webhook security', () => {
     }));
   });
 
+  it('rejects paid webhook when provided amount mismatches expected order amount', async () => {
+    findUniqueMock.mockResolvedValue({
+      id: 'order-id',
+      total: 10000,
+      prepayRequired: false,
+      prepayAmount: null,
+      paymentStatus: 'pending',
+    });
+    createWebhookEventMock.mockResolvedValue({ id: 'evt-row' });
+
+    const { POST } = await import('@/app/api/payments/webhook/route');
+    const body = JSON.stringify({ orderNumber: 'ORDER1', status: 'paid', eventId: 'evt_bad_amount', paidAmount: 9000 });
+    const request = new NextRequest('http://localhost:3000/api/payments/webhook', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-webhook-signature': signPayload(body),
+      },
+      body,
+    });
+
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json).toEqual(expect.objectContaining({ ok: false }));
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts paid webhook when provided amount matches expected order amount', async () => {
+    findUniqueMock.mockResolvedValue({
+      id: 'order-id',
+      total: 10000,
+      prepayRequired: false,
+      prepayAmount: null,
+      paymentStatus: 'pending',
+    });
+    createWebhookEventMock.mockResolvedValue({ id: 'evt-row' });
+    updateWebhookEventMock.mockResolvedValue({});
+    updateMock.mockResolvedValue({});
+
+    const { POST } = await import('@/app/api/payments/webhook/route');
+    const body = JSON.stringify({ orderNumber: 'ORDER1', status: 'paid', eventId: 'evt_good_amount', paidAmount: 10000 });
+    const request = new NextRequest('http://localhost:3000/api/payments/webhook', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-webhook-signature': signPayload(body),
+      },
+      body,
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(200);
+    expect(updateMock).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'order-id' },
+      data: expect.objectContaining({ paymentStatus: 'paid', paidAmount: 10000 }),
+    }));
+  });
+
   it('uses deterministic event id when payload omits eventId', async () => {
     findUniqueMock.mockResolvedValue({
       id: 'order-id',

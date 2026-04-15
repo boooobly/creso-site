@@ -134,11 +134,25 @@ export async function POST(request: NextRequest) {
         if (parsed.data.status === 'paid') {
           if (order.paymentStatus !== 'paid') {
             const computedAmount = order.prepayRequired ? Number(order.prepayAmount ?? 0) : Number(order.total);
+            if (typeof parsed.data.paidAmount === 'number' && parsed.data.paidAmount !== computedAmount) {
+              logger.warn('payments.webhook.amount_mismatch', {
+                orderNumber: parsed.data.orderNumber,
+                eventId,
+                expectedAmount: computedAmount,
+                providedAmount: parsed.data.paidAmount,
+                ip: getRequestIp(request),
+              });
+              return {
+                status: 400,
+                body: { ok: false, error: 'Paid amount does not match expected order amount.' },
+              };
+            }
+
             await tx.order.update({
               where: { id: order.id },
               data: {
                 paymentStatus: 'paid',
-                paidAmount: parsed.data.paidAmount ?? computedAmount,
+                paidAmount: computedAmount,
                 paidAt: new Date(),
               },
             });
