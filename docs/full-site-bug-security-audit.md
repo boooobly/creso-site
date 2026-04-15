@@ -57,6 +57,11 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 - **Customer blob privacy — Partially resolved (documented limitation):** customer image blobs remain `public` to keep existing admin/order link behavior working without redesign; risk is reduced via unguessable random path IDs and minimizing URL exposure to required admin/order contexts.
 - **Regression coverage — Resolved for this scope:** added tests for valid/invalid image signatures, extension/MIME mismatch, admin folder allowlist rejection, and safe customer blob path generation.
 
+## PR 4 resolution status (this PR)
+
+- **Admin health visibility — Resolved:** added a dedicated admin health page (`/admin/health`) with owner-friendly status cards for DB, `PUBLIC_BASE_URL`, SMTP/email, Telegram, Vercel Blob, admin auth safety, pricing DB-vs-fallback source, and baguette Google Sheets configuration presence.
+- **Scope note:** this is a **visibility layer** for configuration risks inside admin; it is **not** a full monitoring/alerting system and does not replace external uptime/error monitoring.
+
 ## Detailed findings by area
 
 ### 1. Auth and admin
@@ -96,7 +101,7 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 ### 6. Database and env
 
 1. **Strong env validation exists** (**Low / positive**): server env schema checks many required combinations and DB URL format. (`src/lib/env.ts`)
-2. **Operational risk from `ENABLE_DATABASE=false` mode** (**Medium reliability risk**): build/runtime can proceed with fallback behavior, potentially serving stale defaults without obvious owner-facing warning UI. (`src/lib/db/prisma.ts`, pricing loaders)
+2. **Operational risk from `ENABLE_DATABASE=false` mode** (**Medium reliability risk, visibility improved**): build/runtime can proceed with fallback behavior, but admin now has a dedicated health panel that clearly surfaces DB/pricing fallback risks to the owner. (`src/lib/db/prisma.ts`, pricing loaders, `src/lib/admin/system-health.ts`, `src/app/admin/(panel)/health/page.tsx`)
 3. **Needs verification: graceful degradation paths for DB-disabled state in admin pages** (**Medium, Needs verification**): API/runtime errors may surface as generic 500 for owner.
 
 ### 7. Content/admin CMS
@@ -152,7 +157,7 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 
 ### PR 5: Admin UX and content/pricing safety
 - Add login attempt throttling and owner-facing lockout messaging.
-- Add explicit admin health indicators (DB enabled, pricing fallback active, notification channels active).
+- Add explicit admin health indicators (DB enabled, pricing fallback active, notification channels active). **Done in PR 4 as owner-facing visibility.**
 - Improve admin error surfacing for env/db misconfiguration.
 
 ### PR 6: Frontend/mobile/SEO polish
