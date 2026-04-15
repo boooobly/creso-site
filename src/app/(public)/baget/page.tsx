@@ -4,6 +4,7 @@ import type { BagetTransferSource } from '@/lib/baget/printRequirement';
 import { loadBagetCatalog } from '@/lib/baget/sheetsCatalog';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
+import { logger } from '@/lib/logger';
 
 type BagetPageProps = {
   searchParams?: Promise<{
@@ -13,13 +14,40 @@ type BagetPageProps = {
   }>;
 };
 
+async function measureAsync<T>(action: () => Promise<T>) {
+  const startedAt = Date.now();
+  const data = await action();
+  return {
+    data,
+    durationMs: Date.now() - startedAt,
+  };
+}
+
 export default async function BagetPage({ searchParams }: BagetPageProps) {
   const resolvedSearchParams = await searchParams;
-  const [{ items }, contentMap, pricingConfigData] = await Promise.all([
-    loadBagetCatalog(),
-    getPageContentMap('baget'),
-    getBaguetteExtrasPricingConfig(),
+  const pageLoadStartedAt = Date.now();
+
+  const [catalogResult, contentResult, pricingResult] = await Promise.all([
+    measureAsync(() => loadBagetCatalog()),
+    measureAsync(() => getPageContentMap('baget')),
+    measureAsync(() => getBaguetteExtrasPricingConfig()),
   ]);
+  const { items, source: catalogSource } = catalogResult.data;
+  const contentMap = contentResult.data;
+  const pricingConfigData = pricingResult.data;
+
+  const shouldLogDiagnostics = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview';
+  if (shouldLogDiagnostics) {
+    logger.info('baget.page.load_diagnostics', {
+      totalDurationMs: Date.now() - pageLoadStartedAt,
+      loadBagetCatalogMs: catalogResult.durationMs,
+      getPageContentMapMs: contentResult.durationMs,
+      getBaguetteExtrasPricingConfigMs: pricingResult.durationMs,
+      catalogSource,
+      bagetItemsCount: items.length,
+    });
+  }
+
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Конфигуратор багета');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Подберите профиль, оцените превью и получите точный расчёт стоимости.');
   const shouldUseStretchedCanvasPreset = isWideFormatCanvasBagetTransfer(resolvedSearchParams?.transferSource);
