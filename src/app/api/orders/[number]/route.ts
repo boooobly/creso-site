@@ -14,6 +14,29 @@ type Params = {
   };
 };
 
+function toCustomerQuoteSummary(quoteJson: unknown) {
+  const quote = quoteJson && typeof quoteJson === 'object' ? quoteJson as {
+    effectiveSize?: { width?: unknown; height?: unknown };
+    items?: Array<{ title?: unknown; total?: unknown }>;
+  } : null;
+
+  const effectiveSize = quote?.effectiveSize;
+  const items = Array.isArray(quote?.items)
+    ? quote.items.map((item) => ({
+      title: typeof item?.title === 'string' ? item.title : undefined,
+      total: typeof item?.total === 'number' ? item.total : undefined,
+    }))
+    : [];
+
+  return {
+    effectiveSize: {
+      width: typeof effectiveSize?.width === 'number' ? effectiveSize.width : undefined,
+      height: typeof effectiveSize?.height === 'number' ? effectiveSize.height : undefined,
+    },
+    items,
+  };
+}
+
 export async function GET(request: NextRequest, { params }: Params) {
   try {
     const env = getServerEnv();
@@ -35,24 +58,40 @@ export async function GET(request: NextRequest, { params }: Params) {
       where: {
         number: params.number,
       },
-      select: {
-        number: true,
-        status: true,
-        createdAt: true,
-        customerName: true,
-        phone: true,
-        email: true,
-        comment: true,
-        total: true,
-        prepayRequired: true,
-        prepayAmount: true,
-        paymentStatus: true,
-        paymentProvider: true,
-        paymentRef: true,
-        paidAmount: true,
-        paidAt: true,
-        quoteJson: true,
-      },
+      select: hasAdminAccess
+        ? {
+          number: true,
+          status: true,
+          createdAt: true,
+          customerName: true,
+          phone: true,
+          email: true,
+          comment: true,
+          total: true,
+          prepayRequired: true,
+          prepayAmount: true,
+          paymentStatus: true,
+          paymentProvider: true,
+          paymentRef: true,
+          paidAmount: true,
+          paidAt: true,
+          quoteJson: true,
+        }
+        : {
+          number: true,
+          createdAt: true,
+          customerName: true,
+          phone: true,
+          email: true,
+          comment: true,
+          total: true,
+          prepayRequired: true,
+          prepayAmount: true,
+          paymentStatus: true,
+          paidAmount: true,
+          paidAt: true,
+          quoteJson: true,
+        },
     });
 
     if (!order) {
@@ -62,8 +101,28 @@ export async function GET(request: NextRequest, { params }: Params) {
     const accessToken = hasValidSignedToken && token ? token : createOrderAccessToken(order.number, tokenSecret);
     const securePdfUrl = `${getBaseUrl()}/api/orders/${encodeURIComponent(order.number)}/pdf?token=${encodeURIComponent(accessToken)}`;
 
+    if (hasAdminAccess) {
+      return NextResponse.json({
+        ...order,
+        securePdfUrl,
+        accessToken,
+      });
+    }
+
     return NextResponse.json({
-      ...order,
+      number: order.number,
+      createdAt: order.createdAt,
+      customerName: order.customerName,
+      phone: order.phone,
+      email: order.email,
+      comment: order.comment,
+      total: order.total,
+      prepayRequired: order.prepayRequired,
+      prepayAmount: order.prepayAmount,
+      paymentStatus: order.paymentStatus,
+      paidAmount: order.paidAmount,
+      paidAt: order.paidAt,
+      quoteJson: toCustomerQuoteSummary(order.quoteJson),
       securePdfUrl,
       accessToken,
     });

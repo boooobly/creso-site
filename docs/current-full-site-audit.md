@@ -105,11 +105,12 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-006
 - **Severity:** Medium
 - **Area:** Webhook/payment integrity
+- **Status:** **Resolved in this PR (strict paid amount reconciliation)**
 - **Files:** `src/app/api/payments/webhook/route.ts`
-- **What is wrong:** For `paid` status, webhook stores `paidAmount` from payload when provided, otherwise computed amount.
-- **Why it matters:** Even signed webhooks are safer if persisted amount is deterministic from internal order data (unless gateway amount is independently validated and required).
-- **Suggested fix:** Persist internal computed amount (or add strict gateway amount reconciliation rules and mismatch handling).
-- **Suggested regression test / QA:** Test signed webhook with mismatched `paidAmount`; ensure stored amount and state follow policy.
+- **What was wrong:** For `paid` status, webhook previously stored payload `paidAmount` when present.
+- **Why it mattered:** Signed webhooks should still enforce deterministic server-side amount policy to avoid persisting mismatched payment values.
+- **Fix delivered:** `paid` webhook events now strictly reconcile provided `paidAmount` against internally computed expected amount; mismatches are rejected (`400`) and order payment state is not updated. Successful paid updates always persist computed internal amount.
+- **Suggested regression test / QA:** Keep mismatched/matching signed `paidAmount` tests in CI.
 
 ### A-007
 - **Severity:** Medium
@@ -125,11 +126,12 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-008
 - **Severity:** Low
 - **Area:** Public diagnostics exposure
+- **Status:** **Resolved in this PR (auth/token gate in non-production)**
 - **Files:** `src/app/api/baget/catalog-debug/route.ts`
-- **What is wrong:** Endpoint is hidden in production but still available in non-production and exposes sheet IDs, tab names, parse errors, and sample items.
-- **Why it matters:** Preview links can leak internal integration details.
-- **Suggested fix:** Gate behind admin auth or temporary debug token even in non-production previews.
-- **Suggested regression test / QA:** Verify preview endpoint requires auth/token.
+- **What was wrong:** Endpoint was hidden in production but openly available in non-production.
+- **Why it mattered:** Preview links could expose integration internals (sheet IDs/tab/errors/sample data).
+- **Fix delivered:** Non-production access now requires either admin bearer auth or a configured debug token (`BAGET_CATALOG_DEBUG_TOKEN` via `debugToken` query or `x-debug-token` header). Production remains hard-blocked (`404`).
+- **Suggested regression test / QA:** Keep unauthenticated preview rejection tests in CI.
 
 ### A-009
 - **Severity:** Medium
@@ -164,11 +166,12 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-012
 - **Severity:** Low
 - **Area:** Data privacy minimization
+- **Status:** **Resolved in this PR (customer-safe order response split)**
 - **Files:** `src/app/api/orders/[number]/route.ts`
-- **What is wrong:** Authorized order response returns full customer PII and quote payload by default.
-- **Why it matters:** Even with token protection, least-privilege response modeling reduces accidental exposure and client-side leakage.
-- **Suggested fix:** Split response modes (customer-safe subset vs full admin detail) or redact unnecessary fields for customer view.
-- **Suggested regression test / QA:** Snapshot test for customer response schema excluding non-required fields.
+- **What was wrong:** Token-authorized customer response used the same full payload shape as admin and could include unnecessary internals.
+- **Why it mattered:** Least-privilege response design lowers accidental exposure risk in browser/client logs.
+- **Fix delivered:** `/api/orders/[number]` now returns a minimized customer-safe payload for signed token access (only fields required by public order page, with quote payload reduced to `effectiveSize` + item `title/total`); admin bearer access retains full details.
+- **Suggested regression test / QA:** Keep schema assertions proving customer response excludes admin-only/raw payload fields.
 
 ### A-013
 - **Severity:** Medium
