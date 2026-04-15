@@ -57,6 +57,12 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 - **Customer blob privacy — Partially resolved (documented limitation):** customer image blobs remain `public` to keep existing admin/order link behavior working without redesign; risk is reduced via unguessable random path IDs and minimizing URL exposure to required admin/order contexts.
 - **Regression coverage — Resolved for this scope:** added tests for valid/invalid image signatures, extension/MIME mismatch, admin folder allowlist rejection, and safe customer blob path generation.
 
+## PR 5 resolution status (this PR)
+
+- **Calculator/pricing drift risk — Partially addressed:** added regression tests that cross-check quote endpoints, order endpoint server-side recomputation, and shared calculation modules for wide format, heat transfer, plotter cutting, print/business cards, and baguette fallback configs.
+- **Confirmed business-rule fix included:** `/api/wide-format-order` now rejects oversized non-banner dimensions (`max_width_exceeded`) instead of silently allowing a zeroed calculation path.
+- **Scope clarification:** this pass improves automated reliability coverage and catches drift regressions; it is **not** a full business-pricing audit of every commercial rule/value.
+
 ## PR 4 resolution status (this PR)
 
 - **Admin health visibility — Resolved:** added a dedicated admin health page (`/admin/health`) with owner-friendly status cards for DB, `PUBLIC_BASE_URL`, SMTP/email, Telegram, Vercel Blob, admin auth safety, pricing DB-vs-fallback source, and baguette Google Sheets configuration presence.

@@ -181,6 +181,10 @@ export async function POST(request: NextRequest) {
       cutByPositioningMarks,
     }, pricing.config);
 
+    if (calculated.widthWarningCode === 'max_width_exceeded') {
+      return NextResponse.json({ ok: false, error: 'Превышена максимальная ширина материала. Проверьте размеры.' }, { status: 400 });
+    }
+
     const materialLabel = getWideFormatMaterialLabel(materialIdRaw);
 
     const extras = [

@@ -38,6 +38,22 @@ describe('calculatePlotterCuttingPricing', () => {
     expect(result.totalCost).toBe(PLOTTER_CUTTING_PRICING_CONFIG.minimumOrderTotal);
   });
 
+
+  it('never returns a negative total when complexity is invalid', () => {
+    const result = calculatePlotterCuttingPricing({
+      cutLengthInput: '10',
+      areaInput: '2',
+      complexity: -2,
+      weeding: true,
+      mountingFilm: true,
+      transfer: true,
+      urgent: false,
+    });
+
+    expect(result.positiveValues).toBe(false);
+    expect(result.totalCost).toBeGreaterThanOrEqual(0);
+  });
+
   it('respects injected admin pricing config values', () => {
     const result = calculatePlotterCuttingPricing(
       {
