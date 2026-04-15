@@ -164,7 +164,7 @@ export default async function StandsServicePage() {
           {materials.map((item) => (
             <RevealOnScroll key={item.title} className="h-full">
               <article className="group h-full rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.75)] dark:hover:border-neutral-700 dark:hover:shadow-[0_18px_36px_-24px_rgba(220,38,38,0.35)]">
-                <span className="inline-flex size-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100 dark:bg-red-500/12 dark:text-red-300 dark:group-hover:bg-red-500/20">
+                <span className="public-icon-badge-sm">
                   <item.icon className="size-4" aria-hidden="true" />
                 </span>
                 <h3 className="mt-3 text-base font-semibold dark:text-neutral-100">{item.title}</h3>
@@ -206,7 +206,7 @@ export default async function StandsServicePage() {
             <RevealOnScroll key={item} className={getRevealDelayClass(index)}>
               <article className="group flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.75)] dark:hover:border-neutral-700 dark:hover:shadow-[0_18px_36px_-24px_rgba(220,38,38,0.35)]">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:bg-red-100 dark:bg-red-500/12 dark:text-red-300 dark:group-hover:bg-red-500/20">
+                  <span className="public-icon-badge-sm shrink-0">
                     <ShieldCheck className="size-4" aria-hidden="true" />
                   </span>
                   <p className="text-sm font-semibold leading-relaxed text-neutral-800 dark:text-neutral-100">{item}</p>
