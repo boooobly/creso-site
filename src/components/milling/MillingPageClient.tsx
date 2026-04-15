@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import {
   CheckCircle2,
@@ -358,11 +359,12 @@ export default function MillingPageClient({
             {galleryItems.map((item) => (
               <article key={item.title} className="card-visual card-interactive group">
                 <div className="relative h-44 overflow-hidden">
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
                   />
                 </div>
                 <div className="px-4 py-3.5">

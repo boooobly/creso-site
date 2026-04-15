@@ -206,6 +206,7 @@ export default function BagetConfigurator({
 
   useEffect(() => {
     if (!isPreviewOpen) return;
+    const previewTrigger = previewTriggerRef.current;
 
     const onEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -220,7 +221,7 @@ export default function BagetConfigurator({
     return () => {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', onEsc);
-      previewTriggerRef.current?.focus();
+      previewTrigger?.focus();
     };
   }, [isPreviewOpen]);
 
@@ -570,7 +571,7 @@ export default function BagetConfigurator({
       })),
     };
   }, [
-    effectiveWidthMm,
+    materials.frameMode,
     materials.glazing,
     materials.hanging,
     materials.passepartout,
@@ -586,7 +587,9 @@ export default function BagetConfigurator({
     printRequirement.requiresPrint,
     printRequirement.transferSource,
     quote.items,
-    quote.meta,
+    calcMeta.hangingQuantity,
+    calcMeta.hangingType,
+    calcMeta.printCost,
     widthMm,
     heightMm,
   ]);
