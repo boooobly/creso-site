@@ -65,7 +65,7 @@ export default async function ServicesPage() {
       </Section>
 
       <Section spacing="tight">
-        <div className="cta-shell">
+        <div className="cta-shell dark:border-neutral-700/80 dark:bg-gradient-to-br dark:from-[#141419] dark:via-[#191920] dark:to-[#261717] dark:shadow-[0_22px_44px_-34px_rgba(0,0,0,0.7)]">
           <div className="section-header-split mb-0">
             <div className="space-y-2">
               <p className="t-eyebrow">НЕ ЗНАЕТЕ, С ЧЕГО НАЧАТЬ</p>
