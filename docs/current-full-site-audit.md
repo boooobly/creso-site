@@ -187,20 +187,23 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-014
 - **Severity:** Low
 - **Area:** Docs/config mismatch
+- **Status:** **Partially resolved in PR-6 (owner smoke checklist added)**
 - **Files:** `README.md`, `docs/ENV.md`, `.env.example`
 - **What is wrong:** README is minimal and does not document runbook/check commands; docs mention env expectations but not a practical owner checklist for production hardening decisions (especially around fallback mode and moderation legacy route).
 - **Why it matters:** Non-technical owner may apply partial configuration and miss hidden risk modes.
-- **Suggested fix:** Add “Owner deployment checklist” and “Security baseline checklist” docs linked from README.
+- **Fix delivered:** Added `docs/e2e-smoke-checklist.md` with a practical owner smoke checklist covering customer order/payment/PDF flow, admin auth/health, upload, moderation, and safe pricing/content edits.
+- **Remaining gap:** README/ENV docs still do not include full runbook/security-baseline guidance.
 - **Suggested regression test / QA:** Manual doc QA: fresh operator can configure preview/prod without additional tribal knowledge.
 
 ### A-015
 - **Severity:** Medium
 - **Area:** Tests coverage gaps
+- **Status:** **Resolved in PR-6 (integration smoke suites for critical flows)**
 - **Files:** `src/app/api/admin/**`, `src/app/(public)/**`, `src/app/api/orders/route.ts`, `src/app/api/leads/route.ts`
 - **What is wrong:** Unit tests exist for many security/price flows, but limited end-to-end coverage for critical user journey (order create → pay mock → status page → PDF download; admin content updates).
 - **Why it matters:** Regression risk remains high for integration edges and owner-visible flows.
-- **Suggested fix:** Add Playwright/Vitest integration suites around complete customer and admin workflows.
-- **Suggested regression test / QA:** Full e2e happy path and key failure path tests in CI.
+- **Fix delivered:** Added Vitest integration-style workflow coverage for customer order/payment/PDF happy path, admin protected API smoke (session auth + moderation + pricing/content read/update), and failure paths (invalid order/payment token, disabled legacy moderation route, canonical lead wrapper behavior).
+- **Suggested regression test / QA:** Keep new integration smoke suite in CI (`critical-flows.integration.test.ts`) plus targeted unit tests.
 
 ---
 
