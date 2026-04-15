@@ -113,6 +113,31 @@ beforeEach(() => {
 });
 
 describe('calculator & pricing regression coverage', () => {
+  const createWideFormatOrderFormData = (overrides?: Record<string, string>) => {
+    const formData = new FormData();
+    formData.set('name', 'Иван');
+    formData.set('phone', '89991234567');
+    formData.set('email', 'user@example.com');
+    formData.set('width', '1600');
+    formData.set('height', '1600');
+    formData.set('quantity', '1');
+    formData.set('materialId', 'self_adhesive_film_matte_1_5');
+    formData.set('edgeGluing', 'false');
+    formData.set('imageWelding', 'false');
+    formData.set('grommets', 'false');
+    formData.set('plotterCutByRegistrationMarks', 'false');
+    formData.set('cutByPositioningMarks', 'false');
+    formData.set('privacyConsent', 'true');
+
+    if (overrides) {
+      for (const [key, value] of Object.entries(overrides)) {
+        formData.set(key, value);
+      }
+    }
+
+    return formData;
+  };
+
   it('wide-format quote and shared calculation stay aligned for minimum price and quantity growth', async () => {
     const { POST } = await import('@/app/api/quotes/wide-format/route');
 
@@ -165,19 +190,7 @@ describe('calculator & pricing regression coverage', () => {
   it('wide-format order rejects oversized film dimensions from business width rules', async () => {
     const { POST } = await import('@/app/api/wide-format-order/route');
 
-    const formData = new FormData();
-    formData.set('name', 'Иван');
-    formData.set('phone', '89991234567');
-    formData.set('email', 'user@example.com');
-    formData.set('width', '1600');
-    formData.set('height', '1600');
-    formData.set('quantity', '1');
-    formData.set('materialId', 'self_adhesive_film_matte_1_5');
-    formData.set('edgeGluing', 'false');
-    formData.set('imageWelding', 'false');
-    formData.set('grommets', 'false');
-    formData.set('plotterCutByRegistrationMarks', 'false');
-    formData.set('cutByPositioningMarks', 'false');
+    const formData = createWideFormatOrderFormData();
 
     const response = await POST(new NextRequest('http://localhost:3000/api/wide-format-order', {
       method: 'POST',
@@ -188,6 +201,25 @@ describe('calculator & pricing regression coverage', () => {
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toMatchObject({
       ok: false,
+    });
+    expect(sendMailMock).not.toHaveBeenCalled();
+  });
+
+  it('wide-format order rejects requests without privacy consent', async () => {
+    const { POST } = await import('@/app/api/wide-format-order/route');
+
+    const formData = createWideFormatOrderFormData({ privacyConsent: 'false' });
+
+    const response = await POST(new NextRequest('http://localhost:3000/api/wide-format-order', {
+      method: 'POST',
+      headers: { 'user-agent': 'Vitest' },
+      body: formData,
+    }));
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: false,
+      error: 'Подтвердите согласие с политикой конфиденциальности.',
     });
     expect(sendMailMock).not.toHaveBeenCalled();
   });

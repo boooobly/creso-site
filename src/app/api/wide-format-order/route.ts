@@ -119,6 +119,7 @@ export async function POST(request: NextRequest) {
     const grommets = toBooleanValue(formData.get('grommets'));
     const plotterCutByRegistrationMarks = toBooleanValue(formData.get('plotterCutByRegistrationMarks'));
     const cutByPositioningMarks = toBooleanValue(formData.get('cutByPositioningMarks'));
+    const privacyConsent = toBooleanValue(formData.get('privacyConsent'));
     const pageUrl = toStringValue(formData.get('pageUrl'));
     const fileRaw = formData.get('file');
 
@@ -132,6 +133,7 @@ export async function POST(request: NextRequest) {
         height,
         quantity,
         materialId: materialIdRaw,
+        privacyConsent,
         comment,
         pageUrl,
         website,
@@ -142,6 +144,10 @@ export async function POST(request: NextRequest) {
 
     if (blockedResponse) {
       return blockedResponse;
+    }
+
+    if (!privacyConsent) {
+      return NextResponse.json({ ok: false, error: 'Подтвердите согласие с политикой конфиденциальности.' }, { status: 400 });
     }
 
     if (!name || !phoneRaw) {
