@@ -136,7 +136,7 @@ export default function OrderTshirtsForm() {
             <textarea className={`${inputClass('comment')} min-h-[120px] py-3`} rows={4} value={values.comment} onChange={(e) => setValues((prev) => ({ ...prev, comment: e.target.value }))} />
           </label>
 
-          <div className={`${publicFormStyles.summaryCard} space-y-2.5`}>
+          <div className={`${publicFormStyles.uploadCard} space-y-2.5`}>
             <ImageDropzone
               value={file}
               onChange={setFile}
