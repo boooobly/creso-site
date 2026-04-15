@@ -286,7 +286,7 @@ export default function OrderMugsForm() {
         </label>
         {errors.consent && <p className="-mt-3 text-xs text-red-600">{errors.consent}</p>}
 
-        <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5">
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 dark:border-neutral-700/80 dark:bg-neutral-950/65 dark:text-neutral-200 sm:p-5">
           <button
             type="submit"
             disabled={isSending}
@@ -295,7 +295,7 @@ export default function OrderMugsForm() {
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
 
-          <p className="mt-3 text-xs text-neutral-500">После отправки формы пришлём расчёт и свяжемся удобным способом.</p>
+          <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400">После отправки формы пришлём расчёт и свяжемся удобным способом.</p>
         </div>
 
         {formError && <p className="text-sm text-red-600">{formError}</p>}

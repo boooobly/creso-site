@@ -31,7 +31,7 @@ export default function StandPreviewCard({ title, description, label, variant = 
         ].join(' ')}
       >
         <div className="flex items-start justify-between gap-3">
-          <p className={isOutdoor ? 'inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600 dark:bg-red-500/14 dark:text-red-300' : 'inline-flex rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300'}>{label}</p>
+          <p className={isOutdoor ? 'inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600 dark:border dark:border-red-500/25 dark:bg-red-500/10 dark:text-red-200' : 'inline-flex rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300'}>{label}</p>
           <span className="inline-flex size-7 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-400 transition-colors duration-300 group-hover:border-red-200 group-hover:text-red-500 group-focus-visible:border-red-200 group-focus-visible:text-red-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-500 dark:group-hover:border-red-500/35 dark:group-hover:text-red-300 dark:group-focus-visible:border-red-500/35 dark:group-focus-visible:text-red-300">
             <PanelsTopLeft className="size-3.5" aria-hidden="true" />
           </span>

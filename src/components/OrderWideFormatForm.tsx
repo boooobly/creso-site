@@ -237,7 +237,7 @@ export default function OrderWideFormatForm() {
             </label>
           </div>
 
-          <div className={`${publicFormStyles.summaryCard} flex flex-col gap-2 p-3 md:p-3.5`}>
+          <div className={`${publicFormStyles.uploadCard} flex flex-col gap-2`}>
             <ImageDropzone
               value={file}
               onChange={setFile}
