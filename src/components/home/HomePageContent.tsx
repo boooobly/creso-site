@@ -124,7 +124,7 @@ export default function HomePageContent({
               <p className="hero-eyebrow">
                 {heroEyebrow}
               </p>
-              <AnimatedBlurHeadline className="t-h1 max-w-[20ch] md:max-w-none" text={heroTitle} breakAfterWord={2} />
+              <AnimatedBlurHeadline className="t-h1 max-w-[20ch] md:max-w-none" text={heroTitle} breakAfterWord={1} />
               <p className="t-lead max-w-[39rem] text-muted-foreground">{heroDescription}</p>
             </div>
 
