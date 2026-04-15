@@ -8,6 +8,7 @@ function MockPaymentContent() {
   const searchParams = useSearchParams();
   const paymentRef = searchParams.get('ref') || '';
   const orderNumber = searchParams.get('order') || '';
+  const token = searchParams.get('token') || '';
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -73,7 +74,7 @@ function MockPaymentContent() {
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
         {orderNumber ? (
-          <Link href={`/order/${encodeURIComponent(orderNumber)}`} className="text-sm text-red-600 underline underline-offset-2">
+          <Link href={`/order/${encodeURIComponent(orderNumber)}${token ? `?token=${encodeURIComponent(token)}` : ''}`} className="text-sm text-red-600 underline underline-offset-2">
             Back to order
           </Link>
         ) : (

@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
+import { getServerEnv } from '@/lib/env';
+import { hasValidOrderAccessToken, isAdminAuthorized } from '@/lib/orders/access';
 
 import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 const createPaymentSchema = z.object({
   orderNumber: z.string().trim().min(1),
+  token: z.string().trim().min(1).optional(),
 });
 
 function generatePaymentRef(): string {
@@ -16,11 +19,24 @@ function generatePaymentRef(): string {
 
 export async function POST(request: NextRequest) {
   try {
+    const env = getServerEnv();
     const payload = await request.json().catch(() => null);
     const parsed = createPaymentSchema.safeParse(payload);
 
     if (!parsed.success) {
       return NextResponse.json({ ok: false, error: 'Invalid request payload.' }, { status: 400 });
+    }
+
+    const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
+    const hasValidSignedToken = hasValidOrderAccessToken({
+      token: parsed.data.token,
+      orderNumber: parsed.data.orderNumber,
+      secret: tokenSecret,
+    });
+    const hasAdminAccess = isAdminAuthorized(request, env.ADMIN_TOKEN);
+
+    if (!hasValidSignedToken && !hasAdminAccess) {
+      return NextResponse.json({ ok: false, error: 'Forbidden.' }, { status: 403 });
     }
 
     const order = await prisma.order.findUnique({
@@ -54,13 +70,17 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const tokenQuery = hasValidSignedToken && parsed.data.token
+      ? `&token=${encodeURIComponent(parsed.data.token)}`
+      : '';
+
     return NextResponse.json({
       orderNumber: order.number,
       paymentStatus: 'pending',
       provider: 'mock',
       paymentRef,
       amount,
-      redirectUrl: `/pay/mock?ref=${encodeURIComponent(paymentRef)}&order=${encodeURIComponent(order.number)}`,
+      redirectUrl: `/pay/mock?ref=${encodeURIComponent(paymentRef)}&order=${encodeURIComponent(order.number)}${tokenQuery}`,
     });
   } catch (error) {
     logger.error('payments.create.failed', { error });

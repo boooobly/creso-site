@@ -15,6 +15,15 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 | F-006 | **High** | Public diagnostics exposure | `src/app/api/baget/catalog-debug/route.ts` | Public debug endpoint reveals data source status, sheet metadata and parse errors. | Leaks internals useful for reconnaissance and can expose operational issues publicly. | Remove in production or guard with admin auth/feature flag. | Verify endpoint returns 404/401 in production mode. |
 | F-007 | **High** | SEO / discoverability | `src/app/sitemap.ts`, `src/app/robots.txt` | Sitemap and robots hardcode `https://example.com`. | Search engines index incorrect domain; real site pages can be under-indexed. | Build URL from validated env base URL and fail-safe on misconfiguration. | Verify generated `/sitemap.xml` and `/robots.txt` contain production domain. |
 
+
+## PR 1 resolution status (this PR)
+
+- **F-001 — Resolved:** `GET /api/orders/:number` now requires a valid signed order token or admin bearer auth.
+- **F-002 — Resolved:** `/api/payments/create` now requires a valid signed order token or admin bearer auth.
+- **F-004 — Resolved:** order page now uses tokenized order context and a server-issued tokenized PDF URL.
+- **F-006 — Resolved:** baget catalog debug endpoint now returns 404 in production.
+- **F-007 — Resolved:** sitemap and robots now use env-driven base URL (`PUBLIC_BASE_URL`) via `getBaseUrl()`.
+
 ## Detailed findings by area
 
 ### 1. Auth and admin

@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from 'crypto';
 
 const TOKEN_TTL_SECONDS = 24 * 60 * 60;
 
-type PdfTokenPayload = {
+type OrderAccessTokenPayload = {
   orderNumber: string;
   exp: number;
 };
@@ -23,8 +23,8 @@ function signPart(payloadPart: string, secret: string): string {
   return createHmac('sha256', secret).update(payloadPart).digest('base64url');
 }
 
-export function createOrderPdfAccessToken(orderNumber: string, secret: string): string {
-  const payload: PdfTokenPayload = {
+export function createOrderAccessToken(orderNumber: string, secret: string): string {
+  const payload: OrderAccessTokenPayload = {
     orderNumber,
     exp: Math.floor(Date.now() / 1000) + TOKEN_TTL_SECONDS,
   };
@@ -34,7 +34,7 @@ export function createOrderPdfAccessToken(orderNumber: string, secret: string): 
   return `${payloadPart}.${signature}`;
 }
 
-export function verifyOrderPdfAccessToken(params: {
+export function verifyOrderAccessToken(params: {
   token: string;
   orderNumber: string;
   secret: string;
@@ -61,9 +61,9 @@ export function verifyOrderPdfAccessToken(params: {
     return false;
   }
 
-  let payload: PdfTokenPayload;
+  let payload: OrderAccessTokenPayload;
   try {
-    payload = JSON.parse(decodedPayload) as PdfTokenPayload;
+    payload = JSON.parse(decodedPayload) as OrderAccessTokenPayload;
   } catch {
     return false;
   }
@@ -77,4 +77,16 @@ export function verifyOrderPdfAccessToken(params: {
   }
 
   return true;
+}
+
+export function createOrderPdfAccessToken(orderNumber: string, secret: string): string {
+  return createOrderAccessToken(orderNumber, secret);
+}
+
+export function verifyOrderPdfAccessToken(params: {
+  token: string;
+  orderNumber: string;
+  secret: string;
+}): boolean {
+  return verifyOrderAccessToken(params);
 }

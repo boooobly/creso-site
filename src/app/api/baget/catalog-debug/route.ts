@@ -4,6 +4,10 @@ import { loadBagetCatalog } from '@/lib/baget/sheetsCatalog';
 export const runtime = 'nodejs';
 
 export async function GET() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ ok: false, error: 'Not found.' }, { status: 404 });
+  }
+
   const result = await loadBagetCatalog();
 
   return NextResponse.json({
