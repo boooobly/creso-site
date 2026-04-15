@@ -1,5 +1,4 @@
 import { sendSmtpEmail } from '@/lib/notifications/email';
-import { getBaseUrl } from '@/lib/url/getBaseUrl';
 
 function formatMoneyRub(amount: number | null | undefined): string {
   return `${Math.round(Number(amount ?? 0)).toLocaleString('ru-RU')} ₽`;
@@ -18,9 +17,9 @@ export async function sendCustomerOrderEmail(params: {
   prepayRequired: boolean;
   prepayAmount?: number | null;
   pdfUrl: string;
+  orderUrl: string;
 }): Promise<void> {
   const greetingName = formatValue(params.customerName);
-  const orderUrl = `${getBaseUrl()}/order/${encodeURIComponent(params.orderNumber)}`;
 
   const lines = [
     `Здравствуйте, ${greetingName}!`,
@@ -31,7 +30,7 @@ export async function sendCustomerOrderEmail(params: {
       ? `Предоплата (50%): ${formatMoneyRub(params.prepayAmount)}. Мы уточним удобный способ оплаты.`
       : 'Предоплата не требуется. Детали оплаты согласуем при подтверждении.',
     '',
-    `Страница заказа: ${orderUrl}`,
+    `Страница заказа: ${params.orderUrl}`,
     `PDF-документ заказа: ${params.pdfUrl}`,
     '',
     'Если у вас есть вопросы, ответьте на это письмо или свяжитесь с нами по телефону на сайте.',

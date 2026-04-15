@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { buildOrderPdf } from '@/lib/pdf/buildOrderPdf';
 import { getServerEnv } from '@/lib/env';
-import { verifyOrderPdfAccessToken } from '@/lib/orders/pdfAccessToken';
+import { hasValidOrderAccessToken, isAdminAuthorized } from '@/lib/orders/access';
 
 import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
@@ -13,30 +13,17 @@ type Params = {
   };
 };
 
-function isAdminAuthorized(request: NextRequest, adminToken: string): boolean {
-  const authorization = request.headers.get('authorization') || '';
-  if (!authorization.toLowerCase().startsWith('bearer ')) {
-    return false;
-  }
-
-  const token = authorization.slice(7).trim();
-  return token === adminToken;
-}
-
 export async function GET(request: NextRequest, { params }: Params) {
   try {
     const env = getServerEnv();
     const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
 
-    const token = request.nextUrl.searchParams.get('token')?.trim();
-    const hasValidSignedToken = Boolean(
-      token
-      && verifyOrderPdfAccessToken({
-        token,
-        orderNumber: params.number,
-        secret: tokenSecret,
-      }),
-    );
+    const token = request.nextUrl.searchParams.get('token');
+    const hasValidSignedToken = hasValidOrderAccessToken({
+      token,
+      orderNumber: params.number,
+      secret: tokenSecret,
+    });
 
     const hasAdminAccess = isAdminAuthorized(request, env.ADMIN_TOKEN);
 
