@@ -130,28 +130,31 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-009
 - **Severity:** Medium
 - **Area:** UX / localization consistency (RU)
+- **Status:** **Resolved in PR-4 (API RU localization cleanup)**
 - **Files:** `src/app/(public)/order/[number]/page.tsx`, `src/app/api/orders/[number]/route.ts`, `src/app/api/payments/create/route.ts`, `src/app/api/payments/mock/complete/route.ts`
-- **What is wrong:** Mixed EN/RU API and UI messages (`Forbidden`, `Order not found`, payment status `unpaid`) appear in RU customer flow.
-- **Why it matters:** Owner-facing production UX becomes inconsistent and less understandable for Russian-speaking users.
-- **Suggested fix:** Centralize localized user-safe message catalog; keep internal logs in technical English if needed.
+- **What was wrong:** Mixed EN/RU API and UI messages (`Forbidden`, `Order not found`, payment status `unpaid`) appeared in RU customer flow.
+- **Why it mattered:** Owner-facing production UX was inconsistent and less understandable for Russian-speaking users.
+- **Fix delivered:** Customer-facing errors in order/payment APIs were localized to Russian; order/payment pages now display Russian payment status labels and updated RU-friendly mock-payment messages.
 - **Suggested regression test / QA:** Manual RU flow check: place order → open status page → payment start/failure states all fully localized.
 
 ### A-010
 - **Severity:** Medium
 - **Area:** Deprecated/parallel moderation path
+- **Status:** **Resolved in PR-4 (legacy token route disabled)**
 - **Files:** `src/app/api/reviews/[id]/moderate/route.ts`, `src/app/api/admin/reviews/[id]/route.ts`, `.env.example`
-- **What is wrong:** Two moderation mechanisms coexist: admin cookie-protected API and separate token-header moderation endpoint.
-- **Why it matters:** Duplicate auth surfaces create maintenance and security drift risk.
-- **Suggested fix:** Consolidate to admin-auth API only (or clearly mark one as legacy and disable it by default).
+- **What was wrong:** Two moderation mechanisms coexisted: admin cookie-protected API and separate token-header moderation endpoint.
+- **Why it mattered:** Duplicate auth surfaces created maintenance and security drift risk.
+- **Fix delivered:** Legacy `/api/reviews/[id]/moderate` token route now returns explicit `410 Gone` deprecation response; active moderation path is `/api/admin/reviews/[id]`. `REVIEW_MODERATION_TOKEN` is marked deprecated in env docs.
 - **Suggested regression test / QA:** Ensure review moderation works only through one documented endpoint.
 
 ### A-011
 - **Severity:** Medium
 - **Area:** API design / dead-logic risk
+- **Status:** **Resolved in PR-4 (canonical lead endpoint)**
 - **Files:** `src/app/api/lead/route.ts`, `src/app/api/leads/route.ts`
-- **What is wrong:** Two similarly named endpoints overlap in purpose but with different behavior (one mostly validation echo, one real notification pipeline).
-- **Why it matters:** Integrations can call wrong endpoint; future changes likely diverge.
-- **Suggested fix:** Define one canonical lead endpoint and deprecate/remove the other, or document strict ownership/use-cases.
+- **What was wrong:** Two similarly named endpoints overlapped in purpose but with different behavior (one mostly validation echo, one real notification pipeline).
+- **Why it mattered:** Integrations could call wrong endpoint and behavior could diverge over time.
+- **Fix delivered:** `/api/leads` is the canonical route; `/api/lead` now acts as a backward-compatible wrapper forwarding to canonical processing and sets deprecation headers. Added regression test preventing accidental `/api/lead` usage in public frontend code.
 - **Suggested regression test / QA:** API contract test verifying front-end points only to canonical route.
 
 ### A-012
@@ -196,7 +199,7 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 
 - Customer-sensitive endpoints (`/api/orders/[number]`, `/api/orders/[number]/pdf`, `/api/payments/create`, `/api/payments/mock/complete`) now enforce signed token or admin auth.
 - Anti-spam guard is applied broadly for public forms, but relies on in-memory rate limits.
-- Legacy moderation route introduces extra token-auth surface and should be simplified.
+- Legacy moderation token route is disabled (`410 Gone`); moderation is consolidated to admin-auth API.
 
 ---
 
@@ -238,9 +241,9 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 
 - SEO: robots/sitemap and metadata base URL now consistently use env-driven base URL logic.
 - Mobile/adaptive: no obvious catastrophic layout break found from static read; **Needs verification** on real devices for calculators/order pages with long text and validation states.
-- UX bugs visible from code:
-  - mixed-language status/errors in customer order/payment flow,
-  - possible endpoint confusion from `/api/lead` vs `/api/leads` split.
+- UX/API notes after PR-4:
+  - customer order/payment flow messages are RU-localized,
+  - lead capture now has canonical `/api/leads` endpoint with `/api/lead` compatibility wrapper.
 
 ---
 

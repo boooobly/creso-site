@@ -28,7 +28,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const hasAdminAccess = isAdminAuthorized(request, env.ADMIN_TOKEN);
 
     if (!hasValidSignedToken && !hasAdminAccess) {
-      return NextResponse.json({ ok: false, error: 'Forbidden.' }, { status: 403 });
+      return NextResponse.json({ ok: false, error: 'Доступ к заказу запрещён.' }, { status: 403 });
     }
 
     const order = await prisma.order.findUnique({

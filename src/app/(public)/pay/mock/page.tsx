@@ -37,7 +37,7 @@ function MockPaymentContent() {
         return;
       }
 
-      setMessage(status === 'paid' ? 'Mock-оплата отмечена как оплаченная.' : 'Mock-оплата отмечена как неуспешная.');
+      setMessage(status === 'paid' ? 'Тестовая оплата отмечена как успешная.' : 'Тестовая оплата отмечена как неуспешная.');
     } catch {
       setError('Не удалось обновить статус mock-оплаты.');
     } finally {
@@ -48,7 +48,7 @@ function MockPaymentContent() {
   return (
     <main className="container py-10">
       <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-semibold">Mock-оплата (демо)</h1>
+        <h1 className="text-2xl font-semibold">Тестовая оплата (демо)</h1>
         <p className="text-sm text-neutral-600">Референс: {paymentRef || '—'}</p>
         <p className="text-xs text-neutral-500">Эта страница предназначена только для тестового/демо сценария оплаты.</p>
 
@@ -59,7 +59,7 @@ function MockPaymentContent() {
             disabled={loading}
             className="inline-flex items-center justify-center rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-60"
           >
-            Отметить как ОПЛАЧЕНО
+            Отметить как «ОПЛАЧЕНО»
           </button>
           <button
             type="button"
@@ -67,7 +67,7 @@ function MockPaymentContent() {
             disabled={loading}
             className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
           >
-            Отметить как НЕУСПЕХ
+            Отметить как «НЕУСПЕХ»
           </button>
         </div>
 
@@ -88,7 +88,7 @@ function MockPaymentContent() {
 
 export default function MockPaymentPage() {
   return (
-    <Suspense fallback={<main className="container py-10 text-sm text-neutral-600">Загрузка mock-оплаты...</main>}>
+    <Suspense fallback={<main className="container py-10 text-sm text-neutral-600">Загрузка страницы тестовой оплаты...</main>}>
       <MockPaymentContent />
     </Suspense>
   );

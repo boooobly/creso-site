@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const hasAdminAccess = isAdminAuthorized(request, env.ADMIN_TOKEN);
 
     if (!hasValidSignedToken && !hasAdminAccess) {
-      return NextResponse.json({ ok: false, error: 'Forbidden.' }, { status: 403 });
+      return NextResponse.json({ ok: false, error: 'Нет доступа к обновлению статуса оплаты.' }, { status: 403 });
     }
 
     const order = await prisma.order.findUnique({

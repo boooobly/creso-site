@@ -46,6 +46,25 @@ function formatDate(value: string | null | undefined) {
   return date.toLocaleString('ru-RU');
 }
 
+function paymentStatusLabel(status: string | null | undefined) {
+  if (!status) return 'Не оплачено';
+
+  switch (status) {
+    case 'unpaid':
+      return 'Не оплачено';
+    case 'pending':
+      return 'Ожидает оплаты';
+    case 'paid':
+      return 'Оплачено';
+    case 'failed':
+      return 'Ошибка оплаты';
+    case 'refunded':
+      return 'Возврат выполнен';
+    default:
+      return status;
+  }
+}
+
 export default function OrderStatusPage() {
   const params = useParams<{ number: string }>();
   const searchParams = useSearchParams();
@@ -164,7 +183,7 @@ export default function OrderStatusPage() {
           <p><span className="text-neutral-500">Клиент:</span> {order.customerName || '—'}</p>
           <p><span className="text-neutral-500">Телефон:</span> {order.phone || '—'}</p>
           <p><span className="text-neutral-500">Email:</span> {order.email || '—'}</p>
-          <p><span className="text-neutral-500">Статус оплаты:</span> {order.paymentStatus || 'unpaid'}</p>
+          <p><span className="text-neutral-500">Статус оплаты:</span> {paymentStatusLabel(order.paymentStatus)}</p>
           <p className="sm:col-span-2"><span className="text-neutral-500">Итоговый размер:</span> {effectiveSizeText}</p>
           {order.comment ? <p className="sm:col-span-2"><span className="text-neutral-500">Комментарий:</span> {order.comment}</p> : null}
         </div>
