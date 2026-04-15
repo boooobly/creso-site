@@ -10,10 +10,12 @@ import { getWideFormatPricingConfig, isWideFormatMaterialVisibleInConstructor } 
 import { logger } from '@/lib/logger';
 import { FIVE_MB_IN_BYTES, validateUploadedFile } from '@/lib/file-validation';
 import { getServerEnv } from '@/lib/env';
+import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
 const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024;
+const MAX_CONTENT_LENGTH_BYTES = MAX_UPLOAD_SIZE_BYTES + (1024 * 1024);
 const ALLOWED_UPLOAD_MIME_TYPES = new Set([
   'image/jpeg',
   'image/png',
@@ -95,6 +97,12 @@ async function sendEmail(text: string, file?: File) {
 export async function POST(request: NextRequest) {
   try {
     const env = getServerEnv();
+    const contentLengthValidation = validateMultipartContentLength(request, {
+      maxContentLengthBytes: MAX_CONTENT_LENGTH_BYTES,
+    });
+    if (!contentLengthValidation.ok) {
+      return multipartErrorResponse(contentLengthValidation);
+    }
 
     const formData = await request.formData();
     const name = toStringValue(formData.get('name'));
@@ -199,6 +207,14 @@ export async function POST(request: NextRequest) {
       : '• Нет';
 
     const file = fileRaw instanceof File ? fileRaw : undefined;
+    const filesValidation = validateMultipartFiles(file ? [file] : [], {
+      maxFiles: 1,
+      maxFileBytes: MAX_UPLOAD_SIZE_BYTES,
+      maxTotalBytes: MAX_UPLOAD_SIZE_BYTES,
+    });
+    if (!filesValidation.ok) {
+      return multipartErrorResponse(filesValidation);
+    }
 
     if (file) {
       const fileValidation = validateUploadedFile({

@@ -93,11 +93,12 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-005
 - **Severity:** Medium
 - **Area:** File upload / abuse resistance
+- **Status:** **Resolved in PR-3 (multipart upload hardening)**
 - **Files:** `src/app/api/orders/route.ts`, `src/app/api/leads/route.ts`
 - **What is wrong:** Multipart flows convert uploaded files to memory buffers (`arrayBuffer` → `Buffer`) without aggregate request limits at route level.
 - **Why it matters:** Large/many uploads can increase memory pressure and degrade API stability.
-- **Suggested fix:** Add strict per-file and total-size limits for all multipart entrypoints; reject oversize before buffering whole payloads.
-- **Suggested regression test / QA:** Add tests for oversized multipart submissions returning 413/400 and monitor memory during load test.
+- **Fix delivered:** Added centralized multipart guardrails (content-length precheck, per-file limit, total-size limit, max file count) and applied them across public upload routes before any notification buffering (`arrayBuffer`). Added coverage for oversized and multi-file rejection with RU user-safe messages plus admin upload compatibility checks.
+- **Suggested regression test / QA:** Keep multipart limit tests in CI and periodically run burst/load checks for multipart endpoints to monitor memory usage under parallel uploads.
 
 ### A-006
 - **Severity:** Medium
@@ -283,4 +284,3 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 - `npm run build`: succeeded; warnings about outdated browser datasets and fallback pricing/data sources.
 - `npm run lint`: blocked by interactive ESLint setup prompt (non-interactive CI style run unavailable until ESLint config is committed).
 - `npm audit --audit-level=moderate`: reported 20 vulnerabilities (including critical/high).
-

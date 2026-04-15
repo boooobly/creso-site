@@ -16,6 +16,7 @@ import { getBagetCatalogFromSheet, mapSheetItemsToBagetItems } from '@/lib/baget
 import { buildBagetOrderSummary, type PersistedOrderUpload } from '@/lib/orders/bagetOrderSummary';
 import { MAX_ORDER_IMAGE_SIZE_BYTES, storeBagetCustomerImage } from '@/lib/orders/storeCustomerImage';
 import { validateUploadedImageFile } from '@/lib/file-validation';
+import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 
 export const runtime = 'nodejs';
 
@@ -67,6 +68,9 @@ type ParsedOrderRequest = {
   payload: unknown;
   customerImageFile: File | null;
 };
+const ORDER_MAX_FILES = 1;
+const ORDER_MAX_TOTAL_SIZE_BYTES = MAX_ORDER_IMAGE_SIZE_BYTES;
+const ORDER_MAX_CONTENT_LENGTH_BYTES = MAX_ORDER_IMAGE_SIZE_BYTES + (1024 * 1024);
 
 async function parseOrderRequest(request: NextRequest): Promise<ParsedOrderRequest> {
   const contentType = request.headers.get('content-type') || '';
@@ -163,8 +167,30 @@ async function createOrderWithRetry(data: {
 
 export async function POST(request: NextRequest) {
   try {
+    const contentType = request.headers.get('content-type') || '';
+    if (contentType.includes('multipart/form-data')) {
+      const contentLengthValidation = validateMultipartContentLength(request, {
+        maxContentLengthBytes: ORDER_MAX_CONTENT_LENGTH_BYTES,
+      });
+      if (!contentLengthValidation.ok) {
+        return multipartErrorResponse(contentLengthValidation);
+      }
+    }
+
     const env = getServerEnv();
     const { payload, customerImageFile } = await parseOrderRequest(request);
+    const filesValidation = validateMultipartFiles(customerImageFile ? [customerImageFile] : [], {
+      maxFiles: ORDER_MAX_FILES,
+      maxFileBytes: MAX_ORDER_IMAGE_SIZE_BYTES,
+      maxTotalBytes: ORDER_MAX_TOTAL_SIZE_BYTES,
+      messages: {
+        FILE_TOO_LARGE: 'Размер файла не должен превышать 10 МБ.',
+        TOTAL_TOO_LARGE: 'Размер файла не должен превышать 10 МБ.',
+      },
+    });
+    if (!filesValidation.ok) {
+      return multipartErrorResponse(filesValidation);
+    }
     const parsed = orderSchema.safeParse(payload);
 
     if (!parsed.success) {

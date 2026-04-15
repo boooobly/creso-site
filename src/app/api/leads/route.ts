@@ -10,6 +10,7 @@ import { sourceTitle } from '@/lib/utils/sourceTitle';
 import { getServerEnv } from '@/lib/env';
 
 import { logger } from '@/lib/logger';
+import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 export const runtime = 'nodejs';
 
 const optionalTrimmedString = z.preprocess(
@@ -67,6 +68,11 @@ type ParsedLeadRequest = {
   payload: unknown;
   files: File[];
 };
+
+const LEADS_MAX_FILES = 5;
+const LEADS_MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const LEADS_MAX_TOTAL_SIZE_BYTES = 20 * 1024 * 1024;
+const LEADS_MAX_CONTENT_LENGTH_BYTES = 22 * 1024 * 1024;
 
 async function parseLeadRequest(request: NextRequest): Promise<ParsedLeadRequest> {
   const contentType = request.headers.get('content-type') || '';
@@ -143,8 +149,26 @@ async function sendLeadTelegramFiles(params: { files: LeadNotificationFile[] }):
 
 export async function POST(request: NextRequest) {
   try {
+    const contentType = request.headers.get('content-type') || '';
+    if (contentType.includes('multipart/form-data')) {
+      const contentLengthValidation = validateMultipartContentLength(request, {
+        maxContentLengthBytes: LEADS_MAX_CONTENT_LENGTH_BYTES,
+      });
+      if (!contentLengthValidation.ok) {
+        return multipartErrorResponse(contentLengthValidation);
+      }
+    }
+
     const ip = getClientIp(request);
     const { payload, files } = await parseLeadRequest(request);
+    const filesValidation = validateMultipartFiles(files, {
+      maxFiles: LEADS_MAX_FILES,
+      maxFileBytes: LEADS_MAX_FILE_SIZE_BYTES,
+      maxTotalBytes: LEADS_MAX_TOTAL_SIZE_BYTES,
+    });
+    if (!filesValidation.ok) {
+      return multipartErrorResponse(filesValidation);
+    }
 
     const blockedResponse = enforcePublicRequestGuard(request, {
       route: '/api/leads',

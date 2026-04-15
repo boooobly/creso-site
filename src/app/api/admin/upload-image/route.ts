@@ -2,6 +2,7 @@ import { put } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminApiAuth } from '@/lib/admin/api-auth';
 import { sanitizeUploadFileName, validateUploadedImageFile } from '@/lib/file-validation';
+import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 
 export const runtime = 'nodejs';
 
@@ -25,12 +26,33 @@ function mapUploadValidationError(error: 'File too large' | 'Invalid file type' 
 export async function POST(request: NextRequest) {
   const unauthorized = await requireAdminApiAuth(request);
   if (unauthorized) return unauthorized;
+  const contentLengthValidation = validateMultipartContentLength(request, {
+    maxContentLengthBytes: MAX_UPLOAD_SIZE_BYTES + (256 * 1024),
+    messages: {
+      REQUEST_TOO_LARGE: 'Размер файла не должен превышать 10 МБ.',
+    },
+  });
+  if (!contentLengthValidation.ok) {
+    return multipartErrorResponse(contentLengthValidation);
+  }
 
   const formData = await request.formData();
   const file = formData.get('file');
 
   if (!(file instanceof File)) {
     return NextResponse.json({ ok: false, error: 'Файл не выбран.' }, { status: 400 });
+  }
+  const filesValidation = validateMultipartFiles([file], {
+    maxFiles: 1,
+    maxFileBytes: MAX_UPLOAD_SIZE_BYTES,
+    maxTotalBytes: MAX_UPLOAD_SIZE_BYTES,
+    messages: {
+      FILE_TOO_LARGE: 'Размер файла не должен превышать 10 МБ.',
+      TOTAL_TOO_LARGE: 'Размер файла не должен превышать 10 МБ.',
+    },
+  });
+  if (!filesValidation.ok) {
+    return multipartErrorResponse(filesValidation);
   }
 
   const folder = String(formData.get('folder') ?? 'site').trim() || 'site';
