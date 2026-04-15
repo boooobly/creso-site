@@ -21,9 +21,9 @@ import SubmitOrderUpdateButton from '../SubmitOrderUpdateButton';
 import { updateOrderAdminAction } from '../actions';
 
 type OrderDetailPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
   searchParams?: Promise<{
     success?: string;
     error?: string;
@@ -48,8 +48,9 @@ function DetailRow({ label, value }: { label: string; value: ReactNode }) {
 }
 
 export default async function AdminOrderDetailPage({ params, searchParams }: OrderDetailPageProps) {
+  const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
-  const order = await prisma.order.findUnique({ where: { id: params.id } });
+  const order = await prisma.order.findUnique({ where: { id: resolvedParams.id } });
 
   if (!order) notFound();
 
