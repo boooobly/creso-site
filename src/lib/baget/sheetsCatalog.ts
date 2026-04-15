@@ -1,6 +1,7 @@
 import { parse } from 'csv-parse/sync';
 import localCatalogData from '../../../data/baget.json';
 import { normalizeBagetImageUrl } from './normalizeBagetImageUrl';
+import { logger } from '@/lib/logger';
 
 const DEFAULT_SHEET_ID = '1lH3zq_PrUQVbVa37P4WPn24Y60iAmmznnHP-soS7dYA';
 const DEFAULT_TAB = 'baget_catalog';
@@ -152,7 +153,7 @@ export async function loadBagetCatalog(): Promise<BagetCatalogLoadResult> {
     const response = await fetch(url, { next: { revalidate: cacheSeconds } });
     if (!response.ok) {
       const error = `Sheet response not ok: ${response.status} ${response.statusText}`;
-      console.error('[baget/sheetsCatalog] fallback: invalid response', { error, sheetId, tab, url });
+      logger.error('baget.sheets_catalog.fallback.invalid_response', { error, sheetId, tab, url });
       return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error };
     }
 
@@ -168,7 +169,7 @@ export async function loadBagetCatalog(): Promise<BagetCatalogLoadResult> {
       }) as CsvRow[];
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown CSV parse error';
-      console.error('[baget/sheetsCatalog] fallback: CSV parse failure', { error: message, sheetId, tab, url });
+      logger.error('baget.sheets_catalog.fallback.csv_parse_failure', { error: message, sheetId, tab, url });
       return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error: message };
     }
 
@@ -178,15 +179,15 @@ export async function loadBagetCatalog(): Promise<BagetCatalogLoadResult> {
 
     if (items.length === 0) {
       const error = 'Zero valid parsed items from sheet.';
-      console.error('[baget/sheetsCatalog] fallback: zero valid parsed items', { error, sheetId, tab, url, rows: records.length });
+      logger.error('baget.sheets_catalog.fallback.zero_valid_items', { error, sheetId, tab, url, rows: records.length });
       return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error };
     }
 
-    console.log('[baget/sheetsCatalog] loaded from Google Sheets', { sheetId, tab, count: items.length });
+    logger.info('baget.sheets_catalog.loaded', { sheetId, tab, count: items.length });
     return { source: 'sheet', sheetId, tab, items, error: null };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown fetch error';
-    console.error('[baget/sheetsCatalog] fallback: fetch failure', { error: message, sheetId, tab, url });
+    logger.error('baget.sheets_catalog.fallback.fetch_failure', { error: message, sheetId, tab, url });
     return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error: message };
   }
 }

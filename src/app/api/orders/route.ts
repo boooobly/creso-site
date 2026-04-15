@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
         pdfUrl: securePdfUrl,
         orderUrl: secureOrderUrl,
       }).catch((error) => {
-        console.error('[orders] Customer email send failed', error);
+        logger.error('orders.customer_email.send_failed', { error, orderNumber, customerEmail });
       });
     }
     return NextResponse.json({

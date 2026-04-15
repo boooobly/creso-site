@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 const warnedPricingFallbackLabels = new Set<string>();
 
 function getErrorMessage(error: unknown) {
@@ -20,9 +22,10 @@ export async function loadPricingConfigWithFallback<Row, Result>(options: {
   } catch (error) {
     if (!warnedPricingFallbackLabels.has(options.label)) {
       warnedPricingFallbackLabels.add(options.label);
-      console.warn(
-        `[${options.label}] Unable to load pricing from database, using fallback defaults instead: ${getErrorMessage(error)}`,
-      );
+      logger.warn('pricing.config.load_fallback', {
+        label: options.label,
+        reason: getErrorMessage(error),
+      });
     }
 
     return options.buildFromRows(options.fallbackRows ?? []);

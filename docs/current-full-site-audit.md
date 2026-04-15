@@ -84,11 +84,13 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-004
 - **Severity:** Medium
 - **Area:** Rate-limiting reliability
+- **Status:** **Partially resolved in PR-5 (extensible limiter store abstraction)**
 - **Files:** `src/lib/rate-limit.ts`, `src/lib/admin/login-rate-limit.ts`
-- **What is wrong:** Public and admin rate limiting are in-memory maps only.
+- **What was wrong:** Public and admin rate limiting were in-memory maps only.
 - **Why it matters:** Multi-instance/serverless deployments can bypass limits per instance; restarts reset counters.
-- **Suggested fix:** Move counters to shared storage (Redis/Upstash/DB with TTL).
-- **Suggested regression test / QA:** **Needs verification** in preview/prod with multi-instance traffic simulation.
+- **Fix delivered:** Introduced explicit rate-limit store abstractions (with current in-memory default) so shared/distributed backing storage can be plugged in without rewriting limiter logic.
+- **Remaining gap:** Runtime still uses in-memory fallback by default; distributed shared store is not yet wired.
+- **Suggested regression test / QA:** Keep unit tests for limiter behavior and add preview/prod multi-instance simulation when shared store is introduced.
 
 ### A-005
 - **Severity:** Medium
@@ -112,11 +114,13 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-007
 - **Severity:** Medium
 - **Area:** Logging consistency / observability
+- **Status:** **Partially resolved in PR-5 (structured logger standardization on sensitive paths)**
 - **Files:** `src/app/api/reviews/route.ts`, `src/app/api/admin/media/route.ts`, `src/lib/notifications/notifyNewOrder.ts`, `src/lib/baget/sheetsCatalog.ts`
-- **What is wrong:** Mixed logging style (`console.error` and structured logger) across sensitive routes.
+- **What was wrong:** Mixed logging style (`console.error` and structured logger) across sensitive routes.
 - **Why it matters:** Incident triage and centralized log parsing become inconsistent.
-- **Suggested fix:** Standardize on `src/lib/logger.ts` with event keys and metadata.
-- **Suggested regression test / QA:** Lint rule or code-search check blocking raw `console.*` in server routes/libs.
+- **Fix delivered:** Replaced raw console logging with structured `logger` calls on key sensitive server routes/libs; added regression test guard that blocks new raw `console.*` usage in selected sensitive server files.
+- **Remaining gap:** Some non-sensitive/dev-oriented modules still use console output and can be migrated in follow-up cleanup.
+- **Suggested regression test / QA:** Keep logging-guard test in CI and gradually widen protected file scope as remaining modules migrate.
 
 ### A-008
 - **Severity:** Low
@@ -169,11 +173,13 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-013
 - **Severity:** Medium
 - **Area:** Deployment/runtime reliability
+- **Status:** **Partially resolved in PR-5 (owner-facing fallback visibility)**
 - **Files:** `src/lib/env.ts`, `src/lib/pricing/loadPricingConfigWithFallback.ts`, `src/lib/db/prisma.ts`
-- **What is wrong:** App is designed to run with `ENABLE_DATABASE=false` and fallback configs; build output shows many fallback warnings.
+- **What was wrong:** App is designed to run with `ENABLE_DATABASE=false` and fallback configs; build output shows many fallback warnings.
 - **Why it matters:** Silent fallback can hide stale prices/config in production unless actively monitored.
-- **Suggested fix:** Add hard fail or prominent health alarms for production when fallback mode is active unexpectedly.
-- **Suggested regression test / QA:** **Needs verification** on deployed environment: admin health page should clearly surface live/fallback state and owner notification.
+- **Fix delivered:** Admin health now surfaces stronger Russian owner-facing warnings for production fallback/database-disabled scenarios; pricing fallback logging now emits structured warning events.
+- **Remaining gap:** Production hard-fail policy is still intentionally not enforced.
+- **Suggested regression test / QA:** Verify deployed admin health screen highlights fallback mode clearly and that structured fallback logs are visible in runtime logging pipeline.
 
 ### A-014
 - **Severity:** Low

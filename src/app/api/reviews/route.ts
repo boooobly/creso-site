@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { hashIp } from '@/lib/reviews/hash';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error('[api/reviews] GET failed', error);
+    logger.error('api.reviews.get.failed', { error });
     return NextResponse.json({ ok: false, error: 'Внутренняя ошибка сервера.' }, { status: 500 });
   }
 }
@@ -146,7 +147,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('[api/reviews] POST failed', error);
+    logger.error('api.reviews.post.failed', { error });
     return NextResponse.json({ ok: false, error: 'Внутренняя ошибка сервера.' }, { status: 500 });
   }
 }
