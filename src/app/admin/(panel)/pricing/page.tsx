@@ -49,10 +49,10 @@ const moduleNav = [
 ] as const;
 
 type AdminPricingPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     success?: string;
     error?: string;
-  };
+  }>;
 };
 
 type Category = Awaited<ReturnType<typeof listPriceCatalog>>[number];
@@ -175,6 +175,7 @@ function getModuleHealthLabel(isComplete: boolean, missingKeys: string[], fallba
 }
 
 export default async function AdminPricingPage({ searchParams }: AdminPricingPageProps) {
+  const resolvedSearchParams = await searchParams;
   const [categories, baguetteConfigData, wideFormatConfigData, plotterCuttingConfigData, heatTransferConfigData, printConfigData, millingConfigData] = await Promise.all([
     listPriceCatalog(),
     listBaguetteExtrasPricingAdminData(),
@@ -185,7 +186,7 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
     listMillingPricingAdminData(),
   ]);
 
-  const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
+  const successMessage = resolvedSearchParams?.success ? successMessages[resolvedSearchParams.success] : null;
   const baguetteCategories = categories.filter((category) => category.kind === 'baguette_extras');
   const generalCategories = categories.filter((category) => category.kind !== 'baguette_extras');
   const totalEditableItems = categories.reduce((sum, category) => sum + category.items.length, 0);
@@ -244,8 +245,8 @@ export default async function AdminPricingPage({ searchParams }: AdminPricingPag
           <AdminAlert tone="success" className="mt-5">{successMessage}</AdminAlert>
         ) : null}
 
-        {searchParams?.error ? (
-          <AdminAlert tone="error" className="mt-5">{searchParams.error}</AdminAlert>
+        {resolvedSearchParams?.error ? (
+          <AdminAlert tone="error" className="mt-5">{resolvedSearchParams.error}</AdminAlert>
         ) : null}
       </section>
 

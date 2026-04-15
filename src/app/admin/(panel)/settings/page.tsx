@@ -5,10 +5,10 @@ import { SITE_SETTINGS_SECTIONS, type SiteSettingFieldDefinition } from '@/lib/a
 import { listSiteSettingsByKeys } from '@/lib/admin/site-settings-service';
 
 type AdminSettingsPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     success?: string;
     error?: string;
-  };
+  }>;
 };
 
 const successMessages: Record<string, string> = {
@@ -44,9 +44,10 @@ function renderFieldInput(field: SiteSettingFieldDefinition, value: string) {
 }
 
 export default async function AdminSettingsPage({ searchParams }: AdminSettingsPageProps) {
+  const resolvedSearchParams = await searchParams;
   const keys = SITE_SETTINGS_SECTIONS.flatMap((section) => section.fields.map((field) => field.key));
   const existingMap = await listSiteSettingsByKeys(keys);
-  const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
+  const successMessage = resolvedSearchParams?.success ? successMessages[resolvedSearchParams.success] : null;
 
   const totalFields = SITE_SETTINGS_SECTIONS.reduce((sum, section) => sum + section.fields.length, 0);
   const requiredFields = SITE_SETTINGS_SECTIONS.flatMap((section) => section.fields).filter((field) => field.required).length;
@@ -69,8 +70,8 @@ export default async function AdminSettingsPage({ searchParams }: AdminSettingsP
           <AdminAlert tone="success" role="status" className="mt-4">{successMessage}</AdminAlert>
         ) : null}
 
-        {searchParams?.error ? (
-          <AdminAlert tone="error" role="alert" className="mt-4">Не удалось сохранить изменения. Проверьте поле и попробуйте ещё раз: {searchParams.error}</AdminAlert>
+        {resolvedSearchParams?.error ? (
+          <AdminAlert tone="error" role="alert" className="mt-4">Не удалось сохранить изменения. Проверьте поле и попробуйте ещё раз: {resolvedSearchParams.error}</AdminAlert>
         ) : null}
       </section>
 

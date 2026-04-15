@@ -25,7 +25,7 @@ export async function loginAdmin(
   _: LoginFormState,
   formData: FormData
 ): Promise<LoginFormState> {
-  const requestHeaders = headers();
+  const requestHeaders = await headers();
   const ip = getClientIpFromHeaders(requestHeaders);
   const password = formData.get('password');
   const nextPath = formData.get('next');

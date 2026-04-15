@@ -6,14 +6,15 @@ import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 
 type BagetPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     width?: string;
     height?: string;
     transferSource?: string;
-  };
+  }>;
 };
 
 export default async function BagetPage({ searchParams }: BagetPageProps) {
+  const resolvedSearchParams = await searchParams;
   const [{ items }, contentMap, pricingConfigData] = await Promise.all([
     loadBagetCatalog(),
     getPageContentMap('baget'),
@@ -21,7 +22,7 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
   ]);
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Конфигуратор багета');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Подберите профиль, оцените превью и получите точный расчёт стоимости.');
-  const shouldUseStretchedCanvasPreset = isWideFormatCanvasBagetTransfer(searchParams?.transferSource);
+  const shouldUseStretchedCanvasPreset = isWideFormatCanvasBagetTransfer(resolvedSearchParams?.transferSource);
   const initialTransferSource: BagetTransferSource = shouldUseStretchedCanvasPreset ? 'wide-format' : 'manual';
 
   return (
@@ -31,8 +32,8 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
         <p className="text-neutral-700">{heroDescription}</p>
         <BagetConfigurator
           items={items}
-          initialWidth={searchParams?.width}
-          initialHeight={searchParams?.height}
+          initialWidth={resolvedSearchParams?.width}
+          initialHeight={resolvedSearchParams?.height}
           initialWorkType={shouldUseStretchedCanvasPreset ? 'stretchedCanvas' : undefined}
           initialTransferSource={initialTransferSource}
           pricingConfig={pricingConfigData.config}

@@ -18,12 +18,12 @@ import {
 const PAGE_SIZE = 20;
 
 type OrdersPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string;
     status?: string;
     paymentStatus?: string;
     page?: string;
-  };
+  }>;
 };
 
 function getPageNumber(raw: string | undefined): number {
@@ -33,10 +33,11 @@ function getPageNumber(raw: string | undefined): number {
 }
 
 export default async function AdminOrdersPage({ searchParams }: OrdersPageProps) {
-  const query = searchParams?.q?.trim() ?? '';
-  const statusFilter = searchParams?.status?.trim() ?? '';
-  const paymentStatusFilter = searchParams?.paymentStatus?.trim() ?? '';
-  const page = getPageNumber(searchParams?.page);
+  const resolvedSearchParams = await searchParams;
+  const query = resolvedSearchParams?.q?.trim() ?? '';
+  const statusFilter = resolvedSearchParams?.status?.trim() ?? '';
+  const paymentStatusFilter = resolvedSearchParams?.paymentStatus?.trim() ?? '';
+  const page = getPageNumber(resolvedSearchParams?.page);
   const hasFilters = Boolean(query || statusFilter || paymentStatusFilter);
 
   const where: Prisma.OrderWhereInput = {

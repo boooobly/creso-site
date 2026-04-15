@@ -9,12 +9,12 @@ import PortfolioItemsGrid from '@/components/admin/portfolio/PortfolioItemsGrid'
 import { AdminAlert, AdminButton, AdminEmptyState } from '@/components/admin/ui';
 
 type AdminPortfolioPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     search?: string;
     category?: string;
     status?: 'all' | 'published' | 'hidden';
     success?: 'created' | 'updated' | 'deleted';
-  };
+  }>;
 };
 
 const successMap = {
@@ -24,9 +24,10 @@ const successMap = {
 } as const;
 
 export default async function AdminPortfolioPage({ searchParams }: AdminPortfolioPageProps) {
-  const search = searchParams?.search?.trim() ?? '';
-  const category = searchParams?.category?.trim() ?? '';
-  const status = searchParams?.status ?? 'all';
+  const resolvedSearchParams = await searchParams;
+  const search = resolvedSearchParams?.search?.trim() ?? '';
+  const category = resolvedSearchParams?.category?.trim() ?? '';
+  const status = resolvedSearchParams?.status ?? 'all';
   const published = status === 'all' ? undefined : status === 'published';
 
   let items = [] as Awaited<ReturnType<typeof listPortfolioItems>>['items'];
@@ -49,7 +50,7 @@ export default async function AdminPortfolioPage({ searchParams }: AdminPortfoli
   }
 
   const categories = Array.from(new Set(items.map((item) => item.category))).sort((a, b) => a.localeCompare(b, 'ru'));
-  const successMessage = searchParams?.success ? successMap[searchParams.success] : null;
+  const successMessage = resolvedSearchParams?.success ? successMap[resolvedSearchParams.success] : null;
 
   return (
     <div className="space-y-6">

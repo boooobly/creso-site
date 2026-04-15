@@ -5,11 +5,11 @@ import { listPageContentByPageKey, toPageContentStringMap } from '@/lib/admin/pa
 import SubmitContentButton from './SubmitContentButton';
 
 type AdminContentPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     success?: string;
     error?: string;
     page?: string;
-  };
+  }>;
 };
 
 const successMessages: Record<string, string> = {
@@ -72,15 +72,16 @@ function isPriorityField(fieldKey: string) {
 }
 
 export default async function AdminContentPage({ searchParams }: AdminContentPageProps) {
+  const resolvedSearchParams = await searchParams;
   const currentPageKey =
-    searchParams?.page && PAGE_CONTENT_DEFINITIONS.some((item) => item.key === searchParams.page)
-      ? searchParams.page
+    resolvedSearchParams?.page && PAGE_CONTENT_DEFINITIONS.some((item) => item.key === resolvedSearchParams.page)
+      ? resolvedSearchParams.page
       : PAGE_CONTENT_DEFINITIONS[0]?.key;
 
   const currentPage = PAGE_CONTENT_DEFINITIONS.find((item) => item.key === currentPageKey) ?? PAGE_CONTENT_DEFINITIONS[0];
   const existingItems = await listPageContentByPageKey(currentPage.key).catch(() => []);
   const existingMap = toPageContentStringMap(existingItems);
-  const successMessage = searchParams?.success ? successMessages[searchParams.success] : null;
+  const successMessage = resolvedSearchParams?.success ? successMessages[resolvedSearchParams.success] : null;
 
   return (
     <div className="space-y-6 pb-8">
@@ -94,8 +95,8 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
           <AdminAlert tone="success" role="status" className="mt-4">{successMessage}</AdminAlert>
         ) : null}
 
-        {searchParams?.error ? (
-          <AdminAlert tone="error" role="alert" className="mt-4">Не удалось сохранить: {searchParams.error}</AdminAlert>
+        {resolvedSearchParams?.error ? (
+          <AdminAlert tone="error" role="alert" className="mt-4">Не удалось сохранить: {resolvedSearchParams.error}</AdminAlert>
         ) : null}
       </section>
 

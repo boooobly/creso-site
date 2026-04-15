@@ -10,8 +10,9 @@ const actionSchema = z.object({
   action: z.enum(['approve', 'reject'])
 });
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const resolvedParams = await params;
     const unauthorized = await requireAdminApiAuth(request);
     if (unauthorized) return unauthorized;
 
@@ -26,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     const review = await prisma.review
       .update({
-        where: { id: params.id },
+        where: { id: resolvedParams.id },
         data: {
           status: nextStatus,
           moderatedAt: new Date()

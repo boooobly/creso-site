@@ -8,12 +8,14 @@ import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 type Params = {
-  params: {
+  params: Promise<{
     number: string;
-  };
+  }>;
 };
 
 export async function GET(request: NextRequest, { params }: Params) {
+  const resolvedParams = await params;
+
   try {
     const env = getServerEnv();
     const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const token = request.nextUrl.searchParams.get('token');
     const hasValidSignedToken = hasValidOrderAccessToken({
       token,
-      orderNumber: params.number,
+      orderNumber: resolvedParams.number,
       secret: tokenSecret,
     });
 
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     const order = await prisma.order.findUnique({
       where: {
-        number: params.number,
+        number: resolvedParams.number,
       },
       select: {
         number: true,
@@ -82,7 +84,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       return NextResponse.json({ ok: false, error: message }, { status: 500 });
     }
 
-    logger.error('orders.pdf.failed', { error, orderNumber: params.number });
+    logger.error('orders.pdf.failed', { error, orderNumber: resolvedParams.number });
     return NextResponse.json({ ok: false, error: 'Ошибка генерации PDF.' }, { status: 500 });
   }
 }

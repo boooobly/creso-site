@@ -6,12 +6,14 @@ export const metadata: Metadata = {
 };
 
 type AdminLoginPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     next?: string;
-  };
+  }>;
 };
 
-export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
+export default async function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
+  const resolvedSearchParams = await searchParams;
+
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4">
       <section className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -21,7 +23,7 @@ export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
         </p>
 
         <div className="mt-6">
-          <AdminLoginForm nextPath={searchParams?.next} />
+          <AdminLoginForm nextPath={resolvedSearchParams?.next} />
         </div>
       </section>
     </div>

@@ -6,11 +6,12 @@ import { getPortfolioItemById } from '@/lib/admin/portfolio-service';
 import { removePortfolioItemAction, updatePortfolioItemAction } from '../actions';
 
 type AdminPortfolioEditPageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function AdminPortfolioEditPage({ params }: AdminPortfolioEditPageProps) {
-  const item = await getPortfolioItemById(params.id);
+  const resolvedParams = await params;
+  const item = await getPortfolioItemById(resolvedParams.id);
 
   if (!item) {
     notFound();
