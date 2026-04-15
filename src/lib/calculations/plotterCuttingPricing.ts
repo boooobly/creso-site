@@ -34,8 +34,8 @@ export function calculatePlotterCuttingPricing(
   const cutLength = parseNumericInput(input.cutLengthInput);
   const area = parseNumericInput(input.areaInput);
 
-  const valuesValid = Number.isFinite(cutLength) && Number.isFinite(area);
-  const positiveValues = cutLength >= 0 && area >= 0;
+  const valuesValid = Number.isFinite(cutLength) && Number.isFinite(area) && Number.isFinite(input.complexity);
+  const positiveValues = cutLength >= 0 && area >= 0 && input.complexity > 0;
 
   const baseCost = valuesValid && positiveValues ? cutLength * pricingConfig.baseCutPricePerMeter * input.complexity : 0;
   const weedingCost = input.weeding && valuesValid && positiveValues
