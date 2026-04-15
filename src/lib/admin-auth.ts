@@ -154,7 +154,7 @@ function decodeSessionPayload(payloadPart: string): AdminSessionPayload | null {
 
 async function getCookieStore(): Promise<CookieStore> {
   const { cookies } = await import('next/headers');
-  return cookies() as CookieStore;
+  return await cookies() as CookieStore;
 }
 
 export function getAdminPassword() {
