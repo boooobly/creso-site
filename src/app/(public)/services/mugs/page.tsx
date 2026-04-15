@@ -225,7 +225,7 @@ export default async function MugsServicePage() {
       <Section className="py-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/88 dark:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.78)] sm:p-8">
+            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700/80 dark:bg-neutral-900/90 dark:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.78)] sm:p-8">
               <p className="t-eyebrow">Что вы получаете</p>
               <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">Кружка как готовый коммерческий продукт</h2>
               <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
@@ -233,7 +233,7 @@ export default async function MugsServicePage() {
               </p>
               <div className="mt-6 grid gap-3">
                 {resultCards.map((item) => (
-                  <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 dark:border-neutral-700/80 dark:bg-neutral-800/75">
+                  <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 dark:border-neutral-700/75 dark:bg-neutral-950/55 dark:text-neutral-200">
                     <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
                     <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
                   </article>
