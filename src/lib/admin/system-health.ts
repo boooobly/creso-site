@@ -31,6 +31,12 @@ function hasValue(value: string | undefined): boolean {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
+function isProductionEnv(env: EnvSource): boolean {
+  const nodeEnv = String(env.NODE_ENV ?? '').trim().toLowerCase();
+  const vercelEnv = String(env.VERCEL_ENV ?? '').trim().toLowerCase();
+  return nodeEnv === 'production' || vercelEnv === 'production';
+}
+
 function toStatusLabel(status: HealthStatusLevel): SystemHealthItem['statusLabel'] {
   if (status === 'ok') return 'OK';
   if (status === 'warning') return 'Предупреждение';
@@ -56,6 +62,7 @@ async function defaultLoadPricingEntryCount() {
 function resolveDatabaseItem(env: EnvSource) {
   const dbEnabled = String(env.ENABLE_DATABASE ?? '').trim().toLowerCase() === 'true';
   const databaseUrlPresent = hasValue(env.DATABASE_URL);
+  const isProduction = isProductionEnv(env);
 
   if (!dbEnabled) {
     return {
@@ -65,8 +72,10 @@ function resolveDatabaseItem(env: EnvSource) {
         key: 'database',
         title: 'База данных',
         status: 'warning',
-        summary: 'База данных отключена',
-        details: 'Переменная ENABLE_DATABASE выключена. Сайт работает в режиме без базы и использует резервные данные там, где это возможно.',
+        summary: isProduction ? 'Продакшен работает без базы данных' : 'База данных отключена',
+        details: isProduction
+          ? 'Предупреждение для владельца: ENABLE_DATABASE выключена в продакшене. Сайт переходит на резервные данные, обновления из админки и часть динамики будут ограничены.'
+          : 'Переменная ENABLE_DATABASE выключена. Сайт работает в режиме без базы и использует резервные данные там, где это возможно.',
       }),
     };
   }
@@ -255,6 +264,7 @@ function resolveAdminAuthItem(env: EnvSource) {
 async function resolvePricingItem(options: {
   dbEnabled: boolean;
   dbConfigured: boolean;
+  isProduction: boolean;
   loadPricingEntryCount: () => Promise<number>;
 }) {
   if (!options.dbEnabled || !options.dbConfigured) {
@@ -262,8 +272,10 @@ async function resolvePricingItem(options: {
       key: 'pricing_source',
       title: 'Источник прайс-конфигурации',
       status: 'warning',
-      summary: 'Используются резервные/встроенные значения',
-      details: 'База данных недоступна для чтения прайса, поэтому сервисы опираются на fallback/default конфигурации.',
+      summary: options.isProduction ? 'В продакшене активирован fallback-прайс' : 'Используются резервные/встроенные значения',
+      details: options.isProduction
+        ? 'Предупреждение для владельца: расчёты работают на fallback/default значениях, а не на живых данных БД. Проверьте ENABLE_DATABASE, DATABASE_URL и наполнение прайса в админке.'
+        : 'База данных недоступна для чтения прайса, поэтому сервисы опираются на fallback/default конфигурации.',
     });
   }
 
@@ -293,7 +305,9 @@ async function resolvePricingItem(options: {
       title: 'Источник прайс-конфигурации',
       status: 'warning',
       summary: 'Не удалось проверить записи прайса в БД',
-      details: 'Проверка прайса завершилась ошибкой. На уровне расчётов могут использоваться резервные значения.',
+      details: options.isProduction
+        ? 'Предупреждение для владельца: проверка прайса завершилась ошибкой в продакшене. На уровне расчётов могут использоваться резервные значения.'
+        : 'Проверка прайса завершилась ошибкой. На уровне расчётов могут использоваться резервные значения.',
     });
   }
 }
@@ -323,6 +337,7 @@ function resolveBaguetteCatalogItem(env: EnvSource) {
 
 export async function getAdminSystemHealth(options: SystemHealthOptions = {}): Promise<SystemHealthSnapshot> {
   const env = options.env ?? process.env;
+  const isProduction = isProductionEnv(env);
   const checkDbConnection = options.checkDbConnection ?? defaultCheckDbConnection;
   const loadPricingEntryCount = options.loadPricingEntryCount ?? defaultLoadPricingEntryCount;
 
@@ -360,6 +375,7 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
   items.push(await resolvePricingItem({
     dbEnabled: databaseState.dbEnabled,
     dbConfigured: databaseState.dbConfigured,
+    isProduction,
     loadPricingEntryCount,
   }));
   items.push(resolveBaguetteCatalogItem(env));

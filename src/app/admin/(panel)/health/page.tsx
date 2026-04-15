@@ -8,6 +8,9 @@ const statusStyles: Record<HealthStatusLevel, string> = {
 
 export default async function AdminHealthPage() {
   const health = await getAdminSystemHealth();
+  const hasReliabilityWarning = health.items.some((item) =>
+    (item.key === 'database' || item.key === 'pricing_source') && item.status !== 'ok',
+  );
 
   return (
     <div className="space-y-6 pb-8">
@@ -18,6 +21,16 @@ export default async function AdminHealthPage() {
         </p>
         <p className="mt-2 text-xs text-slate-500">Проверено: {new Date(health.checkedAt).toLocaleString('ru-RU')}</p>
       </section>
+
+      {hasReliabilityWarning ? (
+        <section className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900 shadow-sm">
+          <p className="text-sm font-semibold">Внимание владельцу: сайт работает с ограничениями надёжности</p>
+          <p className="mt-1 text-xs leading-5">
+            Обнаружены предупреждения по базе данных или источнику прайса. Проверьте карточки ниже: при fallback-режиме
+            расчёты и часть данных могут опираться на встроенные значения.
+          </p>
+        </section>
+      ) : null}
 
       <section className="grid gap-3 sm:grid-cols-2">
         {health.items.map((item) => (

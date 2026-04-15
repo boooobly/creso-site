@@ -84,11 +84,13 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-004
 - **Severity:** Medium
 - **Area:** Rate-limiting reliability
+- **Status:** **Partially resolved in PR-5 (extensible limiter store abstraction)**
 - **Files:** `src/lib/rate-limit.ts`, `src/lib/admin/login-rate-limit.ts`
-- **What is wrong:** Public and admin rate limiting are in-memory maps only.
+- **What was wrong:** Public and admin rate limiting were in-memory maps only.
 - **Why it matters:** Multi-instance/serverless deployments can bypass limits per instance; restarts reset counters.
-- **Suggested fix:** Move counters to shared storage (Redis/Upstash/DB with TTL).
-- **Suggested regression test / QA:** **Needs verification** in preview/prod with multi-instance traffic simulation.
+- **Fix delivered:** Introduced explicit rate-limit store abstractions (with current in-memory default) so shared/distributed backing storage can be plugged in without rewriting limiter logic.
+- **Remaining gap:** Runtime still uses in-memory fallback by default; distributed shared store is not yet wired.
+- **Suggested regression test / QA:** Keep unit tests for limiter behavior and add preview/prod multi-instance simulation when shared store is introduced.
 
 ### A-005
 - **Severity:** Medium
@@ -112,11 +114,13 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-007
 - **Severity:** Medium
 - **Area:** Logging consistency / observability
+- **Status:** **Partially resolved in PR-5 (structured logger standardization on sensitive paths)**
 - **Files:** `src/app/api/reviews/route.ts`, `src/app/api/admin/media/route.ts`, `src/lib/notifications/notifyNewOrder.ts`, `src/lib/baget/sheetsCatalog.ts`
-- **What is wrong:** Mixed logging style (`console.error` and structured logger) across sensitive routes.
+- **What was wrong:** Mixed logging style (`console.error` and structured logger) across sensitive routes.
 - **Why it matters:** Incident triage and centralized log parsing become inconsistent.
-- **Suggested fix:** Standardize on `src/lib/logger.ts` with event keys and metadata.
-- **Suggested regression test / QA:** Lint rule or code-search check blocking raw `console.*` in server routes/libs.
+- **Fix delivered:** Replaced raw console logging with structured `logger` calls on key sensitive server routes/libs; added regression test guard that blocks new raw `console.*` usage in selected sensitive server files.
+- **Remaining gap:** Some non-sensitive/dev-oriented modules still use console output and can be migrated in follow-up cleanup.
+- **Suggested regression test / QA:** Keep logging-guard test in CI and gradually widen protected file scope as remaining modules migrate.
 
 ### A-008
 - **Severity:** Low
@@ -130,28 +134,31 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-009
 - **Severity:** Medium
 - **Area:** UX / localization consistency (RU)
+- **Status:** **Resolved in PR-4 (API RU localization cleanup)**
 - **Files:** `src/app/(public)/order/[number]/page.tsx`, `src/app/api/orders/[number]/route.ts`, `src/app/api/payments/create/route.ts`, `src/app/api/payments/mock/complete/route.ts`
-- **What is wrong:** Mixed EN/RU API and UI messages (`Forbidden`, `Order not found`, payment status `unpaid`) appear in RU customer flow.
-- **Why it matters:** Owner-facing production UX becomes inconsistent and less understandable for Russian-speaking users.
-- **Suggested fix:** Centralize localized user-safe message catalog; keep internal logs in technical English if needed.
+- **What was wrong:** Mixed EN/RU API and UI messages (`Forbidden`, `Order not found`, payment status `unpaid`) appeared in RU customer flow.
+- **Why it mattered:** Owner-facing production UX was inconsistent and less understandable for Russian-speaking users.
+- **Fix delivered:** Customer-facing errors in order/payment APIs were localized to Russian; order/payment pages now display Russian payment status labels and updated RU-friendly mock-payment messages.
 - **Suggested regression test / QA:** Manual RU flow check: place order → open status page → payment start/failure states all fully localized.
 
 ### A-010
 - **Severity:** Medium
 - **Area:** Deprecated/parallel moderation path
+- **Status:** **Resolved in PR-4 (legacy token route disabled)**
 - **Files:** `src/app/api/reviews/[id]/moderate/route.ts`, `src/app/api/admin/reviews/[id]/route.ts`, `.env.example`
-- **What is wrong:** Two moderation mechanisms coexist: admin cookie-protected API and separate token-header moderation endpoint.
-- **Why it matters:** Duplicate auth surfaces create maintenance and security drift risk.
-- **Suggested fix:** Consolidate to admin-auth API only (or clearly mark one as legacy and disable it by default).
+- **What was wrong:** Two moderation mechanisms coexisted: admin cookie-protected API and separate token-header moderation endpoint.
+- **Why it mattered:** Duplicate auth surfaces created maintenance and security drift risk.
+- **Fix delivered:** Legacy `/api/reviews/[id]/moderate` token route now returns explicit `410 Gone` deprecation response; active moderation path is `/api/admin/reviews/[id]`. `REVIEW_MODERATION_TOKEN` is marked deprecated in env docs.
 - **Suggested regression test / QA:** Ensure review moderation works only through one documented endpoint.
 
 ### A-011
 - **Severity:** Medium
 - **Area:** API design / dead-logic risk
+- **Status:** **Resolved in PR-4 (canonical lead endpoint)**
 - **Files:** `src/app/api/lead/route.ts`, `src/app/api/leads/route.ts`
-- **What is wrong:** Two similarly named endpoints overlap in purpose but with different behavior (one mostly validation echo, one real notification pipeline).
-- **Why it matters:** Integrations can call wrong endpoint; future changes likely diverge.
-- **Suggested fix:** Define one canonical lead endpoint and deprecate/remove the other, or document strict ownership/use-cases.
+- **What was wrong:** Two similarly named endpoints overlapped in purpose but with different behavior (one mostly validation echo, one real notification pipeline).
+- **Why it mattered:** Integrations could call wrong endpoint and behavior could diverge over time.
+- **Fix delivered:** `/api/leads` is the canonical route; `/api/lead` now acts as a backward-compatible wrapper forwarding to canonical processing and sets deprecation headers. Added regression test preventing accidental `/api/lead` usage in public frontend code.
 - **Suggested regression test / QA:** API contract test verifying front-end points only to canonical route.
 
 ### A-012
@@ -166,11 +173,13 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 ### A-013
 - **Severity:** Medium
 - **Area:** Deployment/runtime reliability
+- **Status:** **Partially resolved in PR-5 (owner-facing fallback visibility)**
 - **Files:** `src/lib/env.ts`, `src/lib/pricing/loadPricingConfigWithFallback.ts`, `src/lib/db/prisma.ts`
-- **What is wrong:** App is designed to run with `ENABLE_DATABASE=false` and fallback configs; build output shows many fallback warnings.
+- **What was wrong:** App is designed to run with `ENABLE_DATABASE=false` and fallback configs; build output shows many fallback warnings.
 - **Why it matters:** Silent fallback can hide stale prices/config in production unless actively monitored.
-- **Suggested fix:** Add hard fail or prominent health alarms for production when fallback mode is active unexpectedly.
-- **Suggested regression test / QA:** **Needs verification** on deployed environment: admin health page should clearly surface live/fallback state and owner notification.
+- **Fix delivered:** Admin health now surfaces stronger Russian owner-facing warnings for production fallback/database-disabled scenarios; pricing fallback logging now emits structured warning events.
+- **Remaining gap:** Production hard-fail policy is still intentionally not enforced.
+- **Suggested regression test / QA:** Verify deployed admin health screen highlights fallback mode clearly and that structured fallback logs are visible in runtime logging pipeline.
 
 ### A-014
 - **Severity:** Low
@@ -196,7 +205,7 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 
 - Customer-sensitive endpoints (`/api/orders/[number]`, `/api/orders/[number]/pdf`, `/api/payments/create`, `/api/payments/mock/complete`) now enforce signed token or admin auth.
 - Anti-spam guard is applied broadly for public forms, but relies on in-memory rate limits.
-- Legacy moderation route introduces extra token-auth surface and should be simplified.
+- Legacy moderation token route is disabled (`410 Gone`); moderation is consolidated to admin-auth API.
 
 ---
 
@@ -238,9 +247,9 @@ Scope: full static code audit + non-interactive checks (`npm install`, `npm run 
 
 - SEO: robots/sitemap and metadata base URL now consistently use env-driven base URL logic.
 - Mobile/adaptive: no obvious catastrophic layout break found from static read; **Needs verification** on real devices for calculators/order pages with long text and validation states.
-- UX bugs visible from code:
-  - mixed-language status/errors in customer order/payment flow,
-  - possible endpoint confusion from `/api/lead` vs `/api/leads` split.
+- UX/API notes after PR-4:
+  - customer order/payment flow messages are RU-localized,
+  - lead capture now has canonical `/api/leads` endpoint with `/api/lead` compatibility wrapper.
 
 ---
 

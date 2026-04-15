@@ -105,4 +105,24 @@ describe('getAdminSystemHealth', () => {
     expect(combined).not.toContain(tgSecret);
     expect(combined).not.toContain(blobSecret);
   });
+
+  it('shows owner-facing fallback warning when production runs without database', async () => {
+    const health = await getAdminSystemHealth({
+      env: buildBaseEnv({
+        NODE_ENV: 'production',
+        ENABLE_DATABASE: 'false',
+        DATABASE_URL: undefined,
+      }),
+      checkDbConnection: async () => true,
+      loadPricingEntryCount: async () => 0,
+    });
+
+    const database = health.items.find((item) => item.key === 'database');
+    const pricingSource = health.items.find((item) => item.key === 'pricing_source');
+
+    expect(database?.status).toBe('warning');
+    expect(database?.summary).toContain('Продакшен');
+    expect(pricingSource?.status).toBe('warning');
+    expect(pricingSource?.details).toContain('Предупреждение для владельца');
+  });
 });

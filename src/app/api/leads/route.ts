@@ -217,13 +217,13 @@ export async function POST(request: NextRequest) {
           await sendLeadTelegramFiles({ files: notificationFiles });
         })
         .catch((error) => {
-          console.error('[leads] Telegram send failed', error);
+          logger.error('leads.notifications.telegram_send_failed', { error, source: parsed.data.source, ip });
         }),
       sendEmailLead({
         subject: `Новая заявка: ${sourceTitle(parsed.data.source)}`,
         html: buildEmailHtmlFromText(text),
       }).catch((error) => {
-        console.error('[leads] Email send failed', error);
+        logger.error('leads.notifications.email_send_failed', { error, source: parsed.data.source, ip });
       }),
     ]);
 

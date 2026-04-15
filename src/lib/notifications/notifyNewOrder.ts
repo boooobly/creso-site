@@ -4,6 +4,7 @@ import type { BagetOrderSummaryData } from '@/lib/orders/bagetOrderSummary';
 import { sendEmailLead } from '@/lib/notifications/email';
 import { sendTelegramDocumentBuffer, sendTelegramLead } from '@/lib/notifications/telegram';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
+import { logger } from '@/lib/logger';
 
 type NotifyNewOrderPayload = {
   orderNumber: string;
@@ -112,13 +113,13 @@ export async function notifyNewOrder(payload: NotifyNewOrderPayload): Promise<vo
 
   await Promise.all([
     sendTelegramLead(text).catch((error) => {
-      console.error('[orders] Telegram send failed', error);
+      logger.error('orders.notifications.telegram_send_failed', { error, orderNumber: payload.orderNumber });
     }),
     sendEmailLead({
       subject: `Новый заказ багета: ${payload.orderNumber}`,
       html: buildEmailHtmlFromText(text),
     }).catch((error) => {
-      console.error('[orders] Email send failed', error);
+      logger.error('orders.notifications.email_send_failed', { error, orderNumber: payload.orderNumber });
     }),
   ]);
 
@@ -133,7 +134,11 @@ export async function notifyNewOrder(payload: NotifyNewOrderPayload): Promise<vo
       filename: payload.customerImageFile.name || 'customer-upload.bin',
       caption: `Исходник клиента к заказу ${payload.orderNumber}`,
     }).catch((error) => {
-      console.error('[orders] Telegram document send failed', error);
+      logger.error('orders.notifications.telegram_document_failed', {
+        error,
+        orderNumber: payload.orderNumber,
+        filename: payload.customerImageFile?.name,
+      });
     });
   }
 }

@@ -3,6 +3,7 @@ import { requireAdminApiAuth } from '@/lib/admin/api-auth';
 import { handleAdminApiError } from '@/lib/admin/api-errors';
 import { deleteMediaAsset, updateMediaAsset } from '@/lib/admin/media-assets-service';
 import { revalidateAfterMediaChange } from '@/lib/admin/media-revalidation';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 
@@ -16,7 +17,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     revalidateAfterMediaChange(item);
     return NextResponse.json({ ok: true, item });
   } catch (error) {
-    console.error('[api][admin][media][update] failed', { id: params.id, error });
+    logger.error('api.admin.media.update.failed', { id: params.id, error });
     return handleAdminApiError(error) ?? NextResponse.json({ ok: false, error: 'Не удалось обновить запись изображения.' }, { status: 500 });
   }
 }
@@ -30,7 +31,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     revalidateAfterMediaChange(deleted);
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('[api][admin][media][delete] failed', { id: params.id, error });
+    logger.error('api.admin.media.delete.failed', { id: params.id, error });
     const fallback = error instanceof Error ? error.message : 'Не удалось удалить изображение.';
     return handleAdminApiError(error) ?? NextResponse.json({ ok: false, error: fallback }, { status: 400 });
   }
