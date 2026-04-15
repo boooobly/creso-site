@@ -35,6 +35,20 @@ model Order {
   updatedAt       DateTime @updatedAt
 }
 
+model PaymentWebhookEvent {
+  id          String   @id @default(cuid())
+  provider    String
+  eventId     String   @unique
+  orderNumber String
+  status      String
+  receivedAt  DateTime @default(now())
+  processedAt DateTime?
+  payloadJson Json
+
+  @@index([provider, receivedAt])
+  @@index([orderNumber, receivedAt])
+}
+
 model Review {
   id          String   @id @default(cuid())
   name        String?

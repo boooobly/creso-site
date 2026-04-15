@@ -57,6 +57,13 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 - **Customer blob privacy — Partially resolved (documented limitation):** customer image blobs remain `public` to keep existing admin/order link behavior working without redesign; risk is reduced via unguessable random path IDs and minimizing URL exposure to required admin/order contexts.
 - **Regression coverage — Resolved for this scope:** added tests for valid/invalid image signatures, extension/MIME mismatch, admin folder allowlist rejection, and safe customer blob path generation.
 
+## PR 6 resolution status (this PR)
+
+- **Webhook idempotency and replay safety — Resolved:** `/api/payments/webhook` now persists a lightweight `PaymentWebhookEvent` record with unique `eventId` (or deterministic SHA-256 fallback key) and short-circuits duplicate event processing safely.
+- **Payment status downgrade protection — Resolved:** repeated `paid` events are idempotent, and `failed` events no longer downgrade orders that are already marked `paid`.
+- **Invalid order handling — Resolved:** signed events for unknown order numbers are logged and rejected safely (`404`) without changing payment state.
+- **Signature hardening preserved — Confirmed:** existing webhook HMAC signature verification remains mandatory and unchanged.
+
 ## PR 5 resolution status (this PR)
 
 - **Calculator/pricing drift risk — Partially addressed:** added regression tests that cross-check quote endpoints, order endpoint server-side recomputation, and shared calculation modules for wide format, heat transfer, plotter cutting, print/business cards, and baguette fallback configs.
@@ -90,7 +97,7 @@ The highest-risk issues are concentrated in **order and payment flows** and **pu
 2. **Webhook mismatch with UI flow** (**High**): mock page sends wrong payload and lacks required signature; buttons likely never work. (`src/app/(public)/pay/mock/page.tsx`, `src/app/api/payments/webhook/route.ts`)
 3. **Order page PDF link currently unusable for customer** (**High**): missing token in link. (`src/app/(public)/order/[number]/page.tsx`, `src/app/api/orders/[number]/pdf/route.ts`)
 4. **Payment webhook accepts client-provided `paidAmount`** (**Medium**): signed source mitigates risk, but safer to always use computed amount unless trusted gateway amount is separately verified. (`src/app/api/payments/webhook/route.ts`)
-5. **Needs verification: idempotency/replay handling for webhook** (**Medium, Needs verification**): no explicit replay nonce/timestamp check observed; repeated signed events could rewrite state. (`src/app/api/payments/webhook/route.ts`)
+5. **Webhook idempotency/replay handling** (**Addressed**): webhook events are now deduplicated via unique event persistence (`PaymentWebhookEvent.eventId`) with deterministic fallback id derivation when event ID is absent, preventing duplicate signed payload replay from reapplying state. (`src/app/api/payments/webhook/route.ts`, `prisma/schema.prisma`)
 
 ### 4. File uploads and media
 
