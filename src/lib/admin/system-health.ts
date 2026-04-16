@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
-import { getBagetCatalogSnapshotStatus } from '@/lib/baget/catalogSnapshot';
-import { loadLatestBagetPageLoadDiagnostics } from '@/lib/baget/pageLoadDiagnostics';
+import { getBagetCatalogAutoSyncStatus, getBagetCatalogSnapshotStatus } from '@/lib/baget/catalogSnapshot';
 
 export type HealthStatusLevel = 'ok' | 'warning' | 'error';
 
@@ -30,18 +29,12 @@ type SystemHealthOptions = {
     itemCount: number;
     syncedAt: string;
     error: string | null;
+    lastAutoSyncedAt: string | null;
   } | null>;
-  loadLatestBagetPageLoadDiagnostics?: () => Promise<{
-    totalDurationMs: number;
-    loadPublicBagetCatalogMs: number;
-    getPageContentMapMs: number;
-    getBaguetteExtrasPricingConfigMs: number;
-    catalogSource: 'snapshot' | 'sheet' | 'fallback';
-    bagetItemsCount: number;
-    snapshotExists: boolean;
-    snapshotSyncedAt: string | null;
-    createdAt: string;
-  } | null>;
+  loadBagetCatalogAutoSyncStatus?: () => {
+    lastAutoSyncedAt: string | null;
+    autoSyncedRecently: boolean;
+  };
 };
 
 const ADMIN_PASSWORD_FALLBACK = 'change-me-admin-password';
@@ -377,7 +370,7 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
   const checkDbConnection = options.checkDbConnection ?? defaultCheckDbConnection;
   const loadPricingEntryCount = options.loadPricingEntryCount ?? defaultLoadPricingEntryCount;
   const loadBagetCatalogSnapshotStatus = options.loadBagetCatalogSnapshotStatus ?? getBagetCatalogSnapshotStatus;
-  const loadLatestBagetDiagnostics = options.loadLatestBagetPageLoadDiagnostics ?? loadLatestBagetPageLoadDiagnostics;
+  const loadBagetCatalogAutoSyncStatus = options.loadBagetCatalogAutoSyncStatus ?? getBagetCatalogAutoSyncStatus;
 
   const databaseState = resolveDatabaseItem(env);
   const items: SystemHealthItem[] = [];
@@ -419,66 +412,28 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
   items.push(resolveBaguetteCatalogItem(env));
   if (databaseState.dbEnabled && databaseState.dbConfigured) {
     try {
-      const [bagetSnapshot, latestBagetDiagnostics] = await Promise.all([
-        loadBagetCatalogSnapshotStatus(),
-        loadLatestBagetDiagnostics(),
-      ]);
-
-      if (latestBagetDiagnostics) {
-        const slowestPart = getSlowestPartLabel(latestBagetDiagnostics);
-        const maxServerTimingMs = Math.max(
-          latestBagetDiagnostics.loadPublicBagetCatalogMs,
-          latestBagetDiagnostics.getPageContentMapMs,
-          latestBagetDiagnostics.getBaguetteExtrasPricingConfigMs,
-        );
-
-        let diagnosticsStatus: HealthStatusLevel = 'ok';
-        let diagnosticsHint = 'Серверные тайминги в норме.';
-
-        if (latestBagetDiagnostics.catalogSource !== 'snapshot') {
-          diagnosticsStatus = 'warning';
-          diagnosticsHint = 'Каталог загружен не из snapshot — страница может ждать runtime-запрос к Google Sheets.';
-        } else if (latestBagetDiagnostics.getBaguetteExtrasPricingConfigMs === slowestPart.value && slowestPart.value >= 1000) {
-          diagnosticsStatus = 'warning';
-          diagnosticsHint = 'Узкое место: загрузка getBaguetteExtrasPricingConfig. Проверьте доступность БД и fallback-путь прайса.';
-        } else if (maxServerTimingMs <= 500) {
-          diagnosticsHint = 'Серверные тайминги низкие; если страница всё ещё ощущается медленной, вероятно узкое место в клиентском рендеринге.';
-        }
-
-        items.push(createItem({
-          key: 'baget_page_performance',
-          title: 'Производительность страницы Багет',
-          status: diagnosticsStatus,
-          summary: `Последняя серверная загрузка /baget: ${latestBagetDiagnostics.totalDurationMs} мс`,
-          details: `Замер: ${new Date(latestBagetDiagnostics.createdAt).toLocaleString('ru-RU')}. totalDurationMs=${latestBagetDiagnostics.totalDurationMs} мс, loadPublicBagetCatalogMs=${latestBagetDiagnostics.loadPublicBagetCatalogMs} мс, getPageContentMapMs=${latestBagetDiagnostics.getPageContentMapMs} мс, getBaguetteExtrasPricingConfigMs=${latestBagetDiagnostics.getBaguetteExtrasPricingConfigMs} мс. Самая медленная часть: ${slowestPart.label} (${slowestPart.value} мс). Источник каталога: ${latestBagetDiagnostics.catalogSource}. Позиции: ${latestBagetDiagnostics.bagetItemsCount}. Snapshot: ${latestBagetDiagnostics.snapshotExists ? 'есть' : 'нет'}${latestBagetDiagnostics.snapshotSyncedAt ? `, syncedAt ${new Date(latestBagetDiagnostics.snapshotSyncedAt).toLocaleString('ru-RU')}` : ''}. ${diagnosticsHint}`,
-        }));
-      } else {
-        items.push(createItem({
-          key: 'baget_page_performance',
-          title: 'Производительность страницы Багет',
-          status: 'warning',
-          summary: 'Нет свежих диагностик /baget',
-          details: 'Откройте страницу /baget хотя бы один раз, затем обновите эту страницу: появятся последние серверные тайминги загрузки.',
-        }));
-      }
-
+      const bagetSnapshot = await loadBagetCatalogSnapshotStatus();
+      const autoSyncStatus = loadBagetCatalogAutoSyncStatus();
+      const autoSyncDetails = autoSyncStatus.lastAutoSyncedAt
+        ? ` Автосинхронизация выполнялась: ${new Date(autoSyncStatus.lastAutoSyncedAt).toLocaleString('ru-RU')}.`
+        : ' Автосинхронизация в текущем рантайме ещё не запускалась.';
       if (bagetSnapshot) {
         items.push(createItem({
           key: 'baguette_catalog_snapshot',
           title: 'Снимок каталога багета (локальный)',
           status: bagetSnapshot.error ? 'warning' : 'ok',
           summary: bagetSnapshot.error
-            ? 'Есть снимок: страница /baget должна брать snapshot, но синк завершился с ошибкой'
-            : 'Есть снимок: страница /baget ожидаемо использует snapshot',
-          details: `Позиций: ${bagetSnapshot.itemCount}. Синхронизировано: ${new Date(bagetSnapshot.syncedAt).toLocaleString('ru-RU')}. Источник: ${bagetSnapshot.sheetId}/${bagetSnapshot.tab}. Эндпоинт синхронизации: POST /api/admin/baget-catalog/sync.${bagetSnapshot.error ? ` Последняя ошибка синка: ${bagetSnapshot.error}` : ''}`,
+            ? 'Есть снимок, но последняя синхронизация завершилась ошибкой'
+            : 'Локальный снимок каталога доступен',
+          details: `Позиций: ${bagetSnapshot.itemCount}. Синхронизировано: ${new Date(bagetSnapshot.syncedAt).toLocaleString('ru-RU')}. Источник: ${bagetSnapshot.sheetId}/${bagetSnapshot.tab}.${bagetSnapshot.error ? ` Ошибка: ${bagetSnapshot.error}` : ''}${autoSyncDetails}`,
         }));
       } else {
         items.push(createItem({
           key: 'baguette_catalog_snapshot',
           title: 'Снимок каталога багета (локальный)',
           status: 'warning',
-          summary: 'Снимок не создан: страница /baget всё ещё может грузить каталог из Google Sheets',
-          details: '⚠️ Внимание: нет локального snapshot. Выполните синхронизацию через POST /api/admin/baget-catalog/sync, чтобы /baget использовал snapshot и не ждал runtime-загрузку из Google Sheets.',
+          summary: 'Локальный снимок каталога ещё не создан',
+          details: `После первого успешного автоматического или ручного обновления каталог будет загружаться без ожидания Google Sheets при холодном рендере страницы /baget.${autoSyncDetails}`,
         }));
       }
     } catch {

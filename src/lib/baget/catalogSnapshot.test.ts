@@ -23,6 +23,7 @@ vi.mock('@/lib/baget/sheetsCatalog', () => ({
 
 describe('baget catalog snapshot flow', () => {
   beforeEach(() => {
+    vi.resetModules();
     snapshotFindUniqueMock.mockReset();
     snapshotUpsertMock.mockReset();
     snapshotUpdateMock.mockReset();
@@ -49,6 +50,7 @@ describe('baget catalog snapshot flow', () => {
     expect(result.snapshotExists).toBe(true);
     expect(result.snapshotSyncedAt).toBe('2026-04-16T10:00:00.000Z');
     expect(loadBagetCatalogMock).not.toHaveBeenCalled();
+    expect(loadBagetCatalogUncachedMock).not.toHaveBeenCalled();
   });
 
   it('successful sync saves snapshot', async () => {
@@ -87,14 +89,39 @@ describe('baget catalog snapshot flow', () => {
     }));
   });
 
-  it('falls back to existing behavior when no snapshot exists', async () => {
+  it('auto-syncs and persists snapshot when cached snapshot is missing', async () => {
     snapshotFindUniqueMock.mockResolvedValueOnce(null);
+    loadBagetCatalogUncachedMock.mockResolvedValueOnce({
+      source: 'sheet',
+      sheetId: 'sheet-id',
+      tab: 'baget_catalog',
+      items: [{ id: 'sheet-item' }],
+      error: null,
+    });
+
+    const { loadPublicBagetCatalog } = await import('./catalogSnapshot');
+    const result = await loadPublicBagetCatalog();
+
+    expect(result.source).toBe('snapshot');
+    expect(result.autoSyncedSnapshot).toBe(true);
+    expect(snapshotUpsertMock).toHaveBeenCalledTimes(1);
+    expect(loadBagetCatalogMock).not.toHaveBeenCalled();
+  });
+
+  it('falls back to runtime loader when auto-sync fails unexpectedly', async () => {
     snapshotFindUniqueMock.mockResolvedValueOnce(null);
+    loadBagetCatalogUncachedMock.mockResolvedValueOnce({
+      source: 'fallback',
+      sheetId: 'sheet-id',
+      tab: 'baget_catalog',
+      items: [],
+      error: 'sheet unavailable',
+    });
     loadBagetCatalogMock.mockResolvedValueOnce({
       source: 'fallback',
       sheetId: 'sheet-id',
       tab: 'baget_catalog',
-      items: [{ id: 'fallback' }],
+      items: [{ id: 'runtime-fallback' }],
       error: null,
     });
 
@@ -102,8 +129,7 @@ describe('baget catalog snapshot flow', () => {
     const result = await loadPublicBagetCatalog();
 
     expect(result.source).toBe('fallback');
-    expect(result.snapshotExists).toBe(false);
-    expect(result.snapshotSyncedAt).toBeNull();
+    expect(result.items[0]?.id).toBe('runtime-fallback');
     expect(loadBagetCatalogMock).toHaveBeenCalledTimes(1);
   });
 });

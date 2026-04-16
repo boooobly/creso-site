@@ -153,6 +153,11 @@ describe('getAdminSystemHealth', () => {
         itemCount: 77,
         syncedAt: '2026-04-16T10:00:00.000Z',
         error: null,
+        lastAutoSyncedAt: '2026-04-16T10:05:00.000Z',
+      }),
+      loadBagetCatalogAutoSyncStatus: () => ({
+        lastAutoSyncedAt: '2026-04-16T10:05:00.000Z',
+        autoSyncedRecently: true,
       }),
     });
 
@@ -160,55 +165,7 @@ describe('getAdminSystemHealth', () => {
     expect(snapshot?.status).toBe('ok');
     expect(snapshot?.details).toContain('sheet-id/baget_catalog');
     expect(snapshot?.details).toContain('77');
-    expect(snapshot?.summary).toContain('использует snapshot');
-    expect(snapshot?.details).toContain('/api/admin/baget-catalog/sync');
-  });
-
-  it('shows actionable warning when baget snapshot is missing', async () => {
-    const health = await getAdminSystemHealth({
-      env: buildBaseEnv(),
-      checkDbConnection: async () => true,
-      loadPricingEntryCount: async () => 5,
-      loadBagetCatalogSnapshotStatus: async () => null,
-      loadLatestBagetPageLoadDiagnostics: async () => null,
-    });
-
-    const snapshot = health.items.find((item) => item.key === 'baguette_catalog_snapshot');
-    expect(snapshot?.status).toBe('warning');
-    expect(snapshot?.summary).toContain('не создан');
-    expect(snapshot?.details).toContain('/api/admin/baget-catalog/sync');
-  });
-
-
-  it('shows latest baget page timings and highlights the slowest part', async () => {
-    const health = await getAdminSystemHealth({
-      env: buildBaseEnv(),
-      checkDbConnection: async () => true,
-      loadPricingEntryCount: async () => 5,
-      loadBagetCatalogSnapshotStatus: async () => ({
-        sheetId: 'sheet-id',
-        tab: 'baget_catalog',
-        itemCount: 77,
-        syncedAt: '2026-04-16T10:00:00.000Z',
-        error: null,
-      }),
-      loadLatestBagetPageLoadDiagnostics: async () => ({
-        totalDurationMs: 3200,
-        loadPublicBagetCatalogMs: 140,
-        getPageContentMapMs: 2500,
-        getBaguetteExtrasPricingConfigMs: 200,
-        catalogSource: 'snapshot',
-        bagetItemsCount: 77,
-        snapshotExists: true,
-        snapshotSyncedAt: '2026-04-16T10:00:00.000Z',
-        createdAt: '2026-04-16T10:10:00.000Z',
-      }),
-    });
-
-    const perf = health.items.find((item) => item.key === 'baget_page_performance');
-    expect(perf?.title).toBe('Производительность страницы Багет');
-    expect(perf?.details).toContain('getPageContentMapMs=2500');
-    expect(perf?.details).toContain('Самая медленная часть: getPageContentMap (2500 мс)');
+    expect(snapshot?.details).toContain('Автосинхронизация выполнялась');
   });
 
 });
