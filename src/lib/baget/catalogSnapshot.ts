@@ -75,6 +75,14 @@ async function loadSnapshotUncached(): Promise<BagetCatalogSnapshotRecord | null
   }
 }
 
+async function loadSnapshotStatusUncached(): Promise<SnapshotStatus> {
+  const snapshot = await loadSnapshotUncached();
+  return {
+    exists: Boolean(snapshot),
+    syncedAt: snapshot?.syncedAt ?? null,
+  };
+}
+
 async function loadSnapshotCached(): Promise<BagetCatalogSnapshotRecord | null> {
   const load = unstable_cache(
     async () => loadSnapshotUncached(),
