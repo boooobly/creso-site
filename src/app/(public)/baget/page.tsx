@@ -1,7 +1,7 @@
 import BagetConfigurator from '@/components/baget/BagetConfigurator';
 import { isWideFormatCanvasBagetTransfer } from '@/lib/baget/transfer';
 import type { BagetTransferSource } from '@/lib/baget/printRequirement';
-import { loadBagetCatalog } from '@/lib/baget/sheetsCatalog';
+import { loadPublicBagetCatalog } from '@/lib/baget/catalogSnapshot';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { logger } from '@/lib/logger';
@@ -28,7 +28,7 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
   const pageLoadStartedAt = Date.now();
 
   const [catalogResult, contentResult, pricingResult] = await Promise.all([
-    measureAsync(() => loadBagetCatalog()),
+    measureAsync(() => loadPublicBagetCatalog()),
     measureAsync(() => getPageContentMap('baget')),
     measureAsync(() => getBaguetteExtrasPricingConfig()),
   ]);

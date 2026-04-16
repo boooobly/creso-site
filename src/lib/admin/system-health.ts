@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
+import { getBagetCatalogSnapshotStatus } from '@/lib/baget/catalogSnapshot';
 
 export type HealthStatusLevel = 'ok' | 'warning' | 'error';
 
@@ -22,6 +23,13 @@ type SystemHealthOptions = {
   env?: EnvSource;
   checkDbConnection?: () => Promise<boolean>;
   loadPricingEntryCount?: () => Promise<number>;
+  loadBagetCatalogSnapshotStatus?: () => Promise<{
+    sheetId: string;
+    tab: string;
+    itemCount: number;
+    syncedAt: string;
+    error: string | null;
+  } | null>;
 };
 
 const ADMIN_PASSWORD_FALLBACK = 'change-me-admin-password';
@@ -340,6 +348,7 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
   const isProduction = isProductionEnv(env);
   const checkDbConnection = options.checkDbConnection ?? defaultCheckDbConnection;
   const loadPricingEntryCount = options.loadPricingEntryCount ?? defaultLoadPricingEntryCount;
+  const loadBagetCatalogSnapshotStatus = options.loadBagetCatalogSnapshotStatus ?? getBagetCatalogSnapshotStatus;
 
   const databaseState = resolveDatabaseItem(env);
   const items: SystemHealthItem[] = [];
@@ -379,6 +388,38 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
     loadPricingEntryCount,
   }));
   items.push(resolveBaguetteCatalogItem(env));
+  if (databaseState.dbEnabled && databaseState.dbConfigured) {
+    try {
+      const bagetSnapshot = await loadBagetCatalogSnapshotStatus();
+      if (bagetSnapshot) {
+        items.push(createItem({
+          key: 'baguette_catalog_snapshot',
+          title: 'Снимок каталога багета (локальный)',
+          status: bagetSnapshot.error ? 'warning' : 'ok',
+          summary: bagetSnapshot.error
+            ? 'Есть снимок, но последняя синхронизация завершилась ошибкой'
+            : 'Локальный снимок каталога доступен',
+          details: `Позиций: ${bagetSnapshot.itemCount}. Синхронизировано: ${new Date(bagetSnapshot.syncedAt).toLocaleString('ru-RU')}. Источник: ${bagetSnapshot.sheetId}/${bagetSnapshot.tab}.${bagetSnapshot.error ? ` Ошибка: ${bagetSnapshot.error}` : ''}`,
+        }));
+      } else {
+        items.push(createItem({
+          key: 'baguette_catalog_snapshot',
+          title: 'Снимок каталога багета (локальный)',
+          status: 'warning',
+          summary: 'Локальный снимок каталога ещё не создан',
+          details: 'После первого успешного ручного обновления каталог будет загружаться без ожидания Google Sheets при холодном рендере страницы /baget.',
+        }));
+      }
+    } catch {
+      items.push(createItem({
+        key: 'baguette_catalog_snapshot',
+        title: 'Снимок каталога багета (локальный)',
+        status: 'warning',
+        summary: 'Не удалось прочитать статус снимка каталога',
+        details: 'Проверка снимка завершилась ошибкой. Страница /baget продолжит использовать существующий fallback-путь загрузки.',
+      }));
+    }
+  }
 
   return {
     checkedAt: new Date().toISOString(),

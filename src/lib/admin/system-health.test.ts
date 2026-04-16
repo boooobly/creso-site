@@ -125,4 +125,24 @@ describe('getAdminSystemHealth', () => {
     expect(pricingSource?.status).toBe('warning');
     expect(pricingSource?.details).toContain('Предупреждение для владельца');
   });
+
+  it('includes baget snapshot metadata in health output', async () => {
+    const health = await getAdminSystemHealth({
+      env: buildBaseEnv(),
+      checkDbConnection: async () => true,
+      loadPricingEntryCount: async () => 5,
+      loadBagetCatalogSnapshotStatus: async () => ({
+        sheetId: 'sheet-id',
+        tab: 'baget_catalog',
+        itemCount: 77,
+        syncedAt: '2026-04-16T10:00:00.000Z',
+        error: null,
+      }),
+    });
+
+    const snapshot = health.items.find((item) => item.key === 'baguette_catalog_snapshot');
+    expect(snapshot?.status).toBe('ok');
+    expect(snapshot?.details).toContain('sheet-id/baget_catalog');
+    expect(snapshot?.details).toContain('77');
+  });
 });
