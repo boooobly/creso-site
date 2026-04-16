@@ -3,12 +3,22 @@ import { logger } from '@/lib/logger';
 
 const BAGET_PAGE_DIAGNOSTICS_SOURCE_KEY = 'public_baget_page_latest';
 
+export type BagetCatalogSource = 'snapshot' | 'sheet' | 'fallback';
+
+function parseBagetCatalogSource(value: unknown): BagetCatalogSource {
+  if (value === 'snapshot' || value === 'sheet' || value === 'fallback') {
+    return value;
+  }
+
+  return 'fallback';
+}
+
 export type BagetPageLoadDiagnosticsInput = {
   totalDurationMs: number;
   loadPublicBagetCatalogMs: number;
   getPageContentMapMs: number;
   getBaguetteExtrasPricingConfigMs: number;
-  catalogSource: 'snapshot' | 'sheet' | 'fallback';
+  catalogSource: BagetCatalogSource;
   bagetItemsCount: number;
   snapshotExists: boolean;
   snapshotSyncedAt: string | null;
@@ -67,7 +77,7 @@ export async function loadLatestBagetPageLoadDiagnostics(): Promise<BagetPageLoa
       loadPublicBagetCatalogMs: record.loadPublicBagetCatalogMs,
       getPageContentMapMs: record.getPageContentMapMs,
       getBaguetteExtrasPricingConfigMs: record.getBaguetteExtrasPricingConfigMs,
-      catalogSource: record.catalogSource,
+      catalogSource: parseBagetCatalogSource(record.catalogSource),
       bagetItemsCount: record.bagetItemsCount,
       snapshotExists: record.snapshotExists,
       snapshotSyncedAt: record.snapshotSyncedAt,

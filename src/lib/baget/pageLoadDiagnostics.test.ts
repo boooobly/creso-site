@@ -42,6 +42,50 @@ describe('baget page load diagnostics storage', () => {
     }));
   });
 
+  it('preserves valid catalogSource values from DB', async () => {
+    const { loadLatestBagetPageLoadDiagnostics } = await import('./pageLoadDiagnostics');
+
+    for (const source of ['snapshot', 'sheet', 'fallback'] as const) {
+      findUniqueMock.mockResolvedValueOnce({
+        sourceKey: 'public_baget_page_latest',
+        totalDurationMs: 3100,
+        loadPublicBagetCatalogMs: 100,
+        getPageContentMapMs: 2700,
+        getBaguetteExtrasPricingConfigMs: 300,
+        catalogSource: source,
+        bagetItemsCount: 70,
+        snapshotExists: true,
+        snapshotSyncedAt: '2026-04-16T12:10:00.000Z',
+        createdAt: new Date('2026-04-16T12:10:30.000Z'),
+        updatedAt: new Date('2026-04-16T12:10:30.000Z'),
+      });
+
+      const result = await loadLatestBagetPageLoadDiagnostics();
+      expect(result?.catalogSource).toBe(source);
+    }
+  });
+
+  it('normalizes unknown catalogSource from DB to fallback', async () => {
+    findUniqueMock.mockResolvedValueOnce({
+      sourceKey: 'public_baget_page_latest',
+      totalDurationMs: 3100,
+      loadPublicBagetCatalogMs: 100,
+      getPageContentMapMs: 2700,
+      getBaguetteExtrasPricingConfigMs: 300,
+      catalogSource: 'unexpected-source',
+      bagetItemsCount: 70,
+      snapshotExists: true,
+      snapshotSyncedAt: '2026-04-16T12:10:00.000Z',
+      createdAt: new Date('2026-04-16T12:10:30.000Z'),
+      updatedAt: new Date('2026-04-16T12:10:30.000Z'),
+    });
+
+    const { loadLatestBagetPageLoadDiagnostics } = await import('./pageLoadDiagnostics');
+    const result = await loadLatestBagetPageLoadDiagnostics();
+
+    expect(result?.catalogSource).toBe('fallback');
+  });
+
   it('loads latest diagnostics without exposing sensitive fields', async () => {
     findUniqueMock.mockResolvedValueOnce({
       sourceKey: 'public_baget_page_latest',
