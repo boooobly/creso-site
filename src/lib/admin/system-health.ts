@@ -397,17 +397,17 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
           title: 'Снимок каталога багета (локальный)',
           status: bagetSnapshot.error ? 'warning' : 'ok',
           summary: bagetSnapshot.error
-            ? 'Есть снимок, но последняя синхронизация завершилась ошибкой'
-            : 'Локальный снимок каталога доступен',
-          details: `Позиций: ${bagetSnapshot.itemCount}. Синхронизировано: ${new Date(bagetSnapshot.syncedAt).toLocaleString('ru-RU')}. Источник: ${bagetSnapshot.sheetId}/${bagetSnapshot.tab}.${bagetSnapshot.error ? ` Ошибка: ${bagetSnapshot.error}` : ''}`,
+            ? 'Есть снимок: страница /baget должна брать snapshot, но синк завершился с ошибкой'
+            : 'Есть снимок: страница /baget ожидаемо использует snapshot',
+          details: `Позиций: ${bagetSnapshot.itemCount}. Синхронизировано: ${new Date(bagetSnapshot.syncedAt).toLocaleString('ru-RU')}. Источник: ${bagetSnapshot.sheetId}/${bagetSnapshot.tab}. Эндпоинт синхронизации: POST /api/admin/baget-catalog/sync.${bagetSnapshot.error ? ` Последняя ошибка синка: ${bagetSnapshot.error}` : ''}`,
         }));
       } else {
         items.push(createItem({
           key: 'baguette_catalog_snapshot',
           title: 'Снимок каталога багета (локальный)',
           status: 'warning',
-          summary: 'Локальный снимок каталога ещё не создан',
-          details: 'После первого успешного ручного обновления каталог будет загружаться без ожидания Google Sheets при холодном рендере страницы /baget.',
+          summary: 'Снимок не создан: страница /baget всё ещё может грузить каталог из Google Sheets',
+          details: '⚠️ Внимание: нет локального snapshot. Выполните синхронизацию через POST /api/admin/baget-catalog/sync, чтобы /baget использовал snapshot и не ждал runtime-загрузку из Google Sheets.',
         }));
       }
     } catch {

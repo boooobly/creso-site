@@ -36,17 +36,16 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
   const contentMap = contentResult.data;
   const pricingConfigData = pricingResult.data;
 
-  const shouldLogDiagnostics = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview';
-  if (shouldLogDiagnostics) {
-    logger.info('baget.page.load_diagnostics', {
-      totalDurationMs: Date.now() - pageLoadStartedAt,
-      loadBagetCatalogMs: catalogResult.durationMs,
-      getPageContentMapMs: contentResult.durationMs,
-      getBaguetteExtrasPricingConfigMs: pricingResult.durationMs,
-      catalogSource,
-      bagetItemsCount: items.length,
-    });
-  }
+  logger.info('baget.page.load_diagnostics', {
+    totalDurationMs: Date.now() - pageLoadStartedAt,
+    loadPublicBagetCatalogMs: catalogResult.durationMs,
+    getPageContentMapMs: contentResult.durationMs,
+    getBaguetteExtrasPricingConfigMs: pricingResult.durationMs,
+    catalogSource,
+    bagetItemsCount: items.length,
+    snapshotExists: catalogResult.data.snapshotExists,
+    snapshotSyncedAt: catalogResult.data.snapshotSyncedAt,
+  });
 
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Конфигуратор багета');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Подберите профиль, оцените превью и получите точный расчёт стоимости.');

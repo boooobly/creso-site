@@ -46,6 +46,8 @@ describe('baget catalog snapshot flow', () => {
 
     expect(result.source).toBe('snapshot');
     expect(result.items).toHaveLength(1);
+    expect(result.snapshotExists).toBe(true);
+    expect(result.snapshotSyncedAt).toBe('2026-04-16T10:00:00.000Z');
     expect(loadBagetCatalogMock).not.toHaveBeenCalled();
   });
 
@@ -87,6 +89,7 @@ describe('baget catalog snapshot flow', () => {
 
   it('falls back to existing behavior when no snapshot exists', async () => {
     snapshotFindUniqueMock.mockResolvedValueOnce(null);
+    snapshotFindUniqueMock.mockResolvedValueOnce(null);
     loadBagetCatalogMock.mockResolvedValueOnce({
       source: 'fallback',
       sheetId: 'sheet-id',
@@ -99,6 +102,8 @@ describe('baget catalog snapshot flow', () => {
     const result = await loadPublicBagetCatalog();
 
     expect(result.source).toBe('fallback');
+    expect(result.snapshotExists).toBe(false);
+    expect(result.snapshotSyncedAt).toBeNull();
     expect(loadBagetCatalogMock).toHaveBeenCalledTimes(1);
   });
 });

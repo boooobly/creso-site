@@ -144,5 +144,22 @@ describe('getAdminSystemHealth', () => {
     expect(snapshot?.status).toBe('ok');
     expect(snapshot?.details).toContain('sheet-id/baget_catalog');
     expect(snapshot?.details).toContain('77');
+    expect(snapshot?.summary).toContain('использует snapshot');
+    expect(snapshot?.details).toContain('/api/admin/baget-catalog/sync');
   });
+
+  it('shows actionable warning when baget snapshot is missing', async () => {
+    const health = await getAdminSystemHealth({
+      env: buildBaseEnv(),
+      checkDbConnection: async () => true,
+      loadPricingEntryCount: async () => 5,
+      loadBagetCatalogSnapshotStatus: async () => null,
+    });
+
+    const snapshot = health.items.find((item) => item.key === 'baguette_catalog_snapshot');
+    expect(snapshot?.status).toBe('warning');
+    expect(snapshot?.summary).toContain('не создан');
+    expect(snapshot?.details).toContain('/api/admin/baget-catalog/sync');
+  });
+
 });
