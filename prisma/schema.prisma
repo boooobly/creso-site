@@ -217,3 +217,16 @@ model MediaAsset {
   @@index([kind, isActive, sortOrder])
   @@index([scope, kind, isActive, sortOrder])
 }
+
+model BagetCatalogSnapshot {
+  id        String   @id @default(cuid())
+  sourceKey String   @unique
+  sheetId   String
+  tab       String
+  itemCount Int
+  itemsJson Json
+  syncedAt  DateTime
+  error     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
