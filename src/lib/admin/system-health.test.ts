@@ -137,6 +137,11 @@ describe('getAdminSystemHealth', () => {
         itemCount: 77,
         syncedAt: '2026-04-16T10:00:00.000Z',
         error: null,
+        lastAutoSyncedAt: '2026-04-16T10:05:00.000Z',
+      }),
+      loadBagetCatalogAutoSyncStatus: () => ({
+        lastAutoSyncedAt: '2026-04-16T10:05:00.000Z',
+        autoSyncedRecently: true,
       }),
     });
 
@@ -144,5 +149,6 @@ describe('getAdminSystemHealth', () => {
     expect(snapshot?.status).toBe('ok');
     expect(snapshot?.details).toContain('sheet-id/baget_catalog');
     expect(snapshot?.details).toContain('77');
+    expect(snapshot?.details).toContain('Автосинхронизация выполнялась');
   });
 });

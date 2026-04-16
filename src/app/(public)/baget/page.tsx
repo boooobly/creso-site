@@ -2,8 +2,8 @@ import BagetConfigurator from '@/components/baget/BagetConfigurator';
 import { isWideFormatCanvasBagetTransfer } from '@/lib/baget/transfer';
 import type { BagetTransferSource } from '@/lib/baget/printRequirement';
 import { loadPublicBagetCatalog } from '@/lib/baget/catalogSnapshot';
-import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
-import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
+import { getPageContentValue } from '@/lib/page-content';
+import { getCachedBagetPageContentMap, getCachedBaguetteExtrasPricingConfig } from '@/lib/baget/pageData';
 import { logger } from '@/lib/logger';
 
 type BagetPageProps = {
@@ -29,12 +29,12 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
 
   const [catalogResult, contentResult, pricingResult] = await Promise.all([
     measureAsync(() => loadPublicBagetCatalog()),
-    measureAsync(() => getPageContentMap('baget')),
-    measureAsync(() => getBaguetteExtrasPricingConfig()),
+    measureAsync(() => getCachedBagetPageContentMap()),
+    measureAsync(() => getCachedBaguetteExtrasPricingConfig()),
   ]);
   const { items, source: catalogSource } = catalogResult.data;
   const contentMap = contentResult.data;
-  const pricingConfigData = pricingResult.data;
+  const pricingConfig = pricingResult.data;
 
   const shouldLogDiagnostics = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview';
   if (shouldLogDiagnostics) {
@@ -44,6 +44,7 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
       getPageContentMapMs: contentResult.durationMs,
       getBaguetteExtrasPricingConfigMs: pricingResult.durationMs,
       catalogSource,
+      autoSyncedSnapshot: Boolean(catalogResult.data.autoSyncedSnapshot),
       bagetItemsCount: items.length,
     });
   }
@@ -64,7 +65,7 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
           initialHeight={resolvedSearchParams?.height}
           initialWorkType={shouldUseStretchedCanvasPreset ? 'stretchedCanvas' : undefined}
           initialTransferSource={initialTransferSource}
-          pricingConfig={pricingConfigData.config}
+          pricingConfig={pricingConfig}
         />
       </main>
     </div>

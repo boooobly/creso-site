@@ -14,6 +14,7 @@ type BagetCatalogSnapshotRecord = {
   itemCount: number;
   syncedAt: string;
   error: string | null;
+  lastAutoSyncedAt: string | null;
 };
 
 type PublicBagetCatalogResult = {
@@ -24,7 +25,10 @@ type PublicBagetCatalogResult = {
   error: string | null;
   itemCount?: number;
   syncedAt?: string;
+  autoSyncedSnapshot?: boolean;
 };
+
+let lastAutoSyncedAt: string | null = null;
 
 function mapSnapshotItems(itemsJson: unknown): BagetSheetItem[] {
   if (!Array.isArray(itemsJson)) return [];
@@ -50,12 +54,17 @@ async function loadSnapshotUncached(): Promise<BagetCatalogSnapshotRecord | null
       itemCount: snapshot.itemCount,
       syncedAt: snapshot.syncedAt.toISOString(),
       error: snapshot.error,
+      lastAutoSyncedAt,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown DB read failure';
     logger.warn('baget.catalog_snapshot.read_failed', { error: message });
     return null;
   }
+}
+
+async function loadSnapshotStatusUncached(): Promise<BagetCatalogSnapshotRecord | null> {
+  return loadSnapshotUncached();
 }
 
 async function loadSnapshotCached(): Promise<BagetCatalogSnapshotRecord | null> {
@@ -78,16 +87,99 @@ async function loadSnapshotCached(): Promise<BagetCatalogSnapshotRecord | null> 
   }
 }
 
+async function upsertSnapshotFromSheet(result: {
+  sheetId: string;
+  tab: string;
+  items: BagetSheetItem[];
+}): Promise<BagetCatalogSnapshotRecord> {
+  const now = new Date();
+
+  await prisma.bagetCatalogSnapshot.upsert({
+    where: { sourceKey: BAGET_SNAPSHOT_SOURCE_KEY },
+    update: {
+      sheetId: result.sheetId,
+      tab: result.tab,
+      itemCount: result.items.length,
+      itemsJson: result.items,
+      syncedAt: now,
+      error: null,
+    },
+    create: {
+      sourceKey: BAGET_SNAPSHOT_SOURCE_KEY,
+      sheetId: result.sheetId,
+      tab: result.tab,
+      itemCount: result.items.length,
+      itemsJson: result.items,
+      syncedAt: now,
+      error: null,
+    },
+  });
+
+  return {
+    source: 'snapshot',
+    sheetId: result.sheetId,
+    tab: result.tab,
+    items: result.items,
+    itemCount: result.items.length,
+    syncedAt: now.toISOString(),
+    error: null,
+    lastAutoSyncedAt,
+  };
+}
+
+export async function ensureBagetCatalogSnapshot(): Promise<BagetCatalogSnapshotRecord> {
+  const existingSnapshot = await loadSnapshotUncached();
+  if (existingSnapshot && existingSnapshot.items.length > 0 && !existingSnapshot.error) {
+    return existingSnapshot;
+  }
+
+  const result = await loadBagetCatalogUncached();
+  if (result.source !== 'sheet') {
+    const reason = result.error || 'Google Sheets runtime load did not return sheet source';
+    throw new Error(reason);
+  }
+
+  lastAutoSyncedAt = new Date().toISOString();
+  const snapshot = await upsertSnapshotFromSheet(result);
+
+  logger.info('baget.catalog_snapshot.auto_synced', {
+    itemCount: snapshot.itemCount,
+    syncedAt: snapshot.syncedAt,
+    autoSyncedAt: lastAutoSyncedAt,
+    sheetId: snapshot.sheetId,
+    tab: snapshot.tab,
+  });
+
+  return {
+    ...snapshot,
+    lastAutoSyncedAt,
+  };
+}
+
 export async function loadPublicBagetCatalog(): Promise<PublicBagetCatalogResult> {
-  const snapshot = await loadSnapshotCached();
-  if (snapshot) {
-    logger.info('baget.catalog_snapshot.used_for_public', {
-      itemCount: snapshot.itemCount,
-      syncedAt: snapshot.syncedAt,
-      sheetId: snapshot.sheetId,
-      tab: snapshot.tab,
-    });
-    return snapshot;
+  try {
+    const snapshot = await loadSnapshotCached();
+    if (snapshot) {
+      logger.info('baget.catalog_snapshot.used_for_public', {
+        itemCount: snapshot.itemCount,
+        syncedAt: snapshot.syncedAt,
+        sheetId: snapshot.sheetId,
+        tab: snapshot.tab,
+      });
+      return {
+        ...snapshot,
+        autoSyncedSnapshot: false,
+      };
+    }
+
+    const autoSyncedSnapshot = await ensureBagetCatalogSnapshot();
+    return {
+      ...autoSyncedSnapshot,
+      autoSyncedSnapshot: true,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown catalog snapshot failure';
+    logger.warn('baget.catalog_snapshot.auto_sync_failed_runtime_fallback', { error: message });
   }
 
   const fallback = await loadBagetCatalog();
@@ -149,27 +241,7 @@ export async function syncBagetCatalogSnapshot(): Promise<
   }
 
   const now = new Date();
-
-  await prisma.bagetCatalogSnapshot.upsert({
-    where: { sourceKey: BAGET_SNAPSHOT_SOURCE_KEY },
-    update: {
-      sheetId: result.sheetId,
-      tab: result.tab,
-      itemCount: result.items.length,
-      itemsJson: result.items,
-      syncedAt: now,
-      error: null,
-    },
-    create: {
-      sourceKey: BAGET_SNAPSHOT_SOURCE_KEY,
-      sheetId: result.sheetId,
-      tab: result.tab,
-      itemCount: result.items.length,
-      itemsJson: result.items,
-      syncedAt: now,
-      error: null,
-    },
-  });
+  await upsertSnapshotFromSheet(result);
 
   logger.info('baget.catalog_snapshot.synced', {
     itemCount: result.items.length,
@@ -188,5 +260,12 @@ export async function syncBagetCatalogSnapshot(): Promise<
 }
 
 export async function getBagetCatalogSnapshotStatus(): Promise<BagetCatalogSnapshotRecord | null> {
-  return loadSnapshotUncached();
+  return loadSnapshotStatusUncached();
+}
+
+export function getBagetCatalogAutoSyncStatus() {
+  return {
+    lastAutoSyncedAt,
+    autoSyncedRecently: Boolean(lastAutoSyncedAt),
+  };
 }
