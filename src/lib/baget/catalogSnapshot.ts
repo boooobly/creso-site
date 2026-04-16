@@ -44,7 +44,14 @@ async function loadSnapshotUncached(): Promise<BagetCatalogSnapshotRecord | null
     if (!snapshot) return null;
 
     const items = mapSnapshotItems(snapshot.itemsJson);
-    if (items.length === 0) return null;
+    if (items.length === 0) {
+      logger.warn('baget.catalog_snapshot.invalid_items_empty', {
+        sheetId: snapshot.sheetId,
+        tab: snapshot.tab,
+        syncedAt: snapshot.syncedAt.toISOString(),
+      });
+      return null;
+    }
 
     return {
       source: 'snapshot',
@@ -182,14 +189,22 @@ export async function loadPublicBagetCatalog(): Promise<PublicBagetCatalogResult
     logger.warn('baget.catalog_snapshot.auto_sync_failed_runtime_fallback', { error: message });
   }
 
+  const snapshotStatus = await loadSnapshotStatusUncached();
   const fallback = await loadBagetCatalog();
   logger.warn('baget.catalog_snapshot.missing_fallback_to_runtime_load', {
     source: fallback.source,
     itemCount: fallback.items.length,
     sheetId: fallback.sheetId,
     tab: fallback.tab,
+    snapshotExists: snapshotStatus.exists,
+    snapshotSyncedAt: snapshotStatus.syncedAt,
   });
-  return fallback;
+
+  return {
+    ...fallback,
+    snapshotExists: snapshotStatus.exists,
+    snapshotSyncedAt: snapshotStatus.syncedAt,
+  };
 }
 
 export async function syncBagetCatalogSnapshot(): Promise<
@@ -261,6 +276,13 @@ export async function syncBagetCatalogSnapshot(): Promise<
 
 export async function getBagetCatalogSnapshotStatus(): Promise<BagetCatalogSnapshotRecord | null> {
   return loadSnapshotStatusUncached();
+}
+
+export function getBagetCatalogAutoSyncStatus() {
+  return {
+    lastAutoSyncedAt,
+    autoSyncedRecently: Boolean(lastAutoSyncedAt),
+  };
 }
 
 export function getBagetCatalogAutoSyncStatus() {

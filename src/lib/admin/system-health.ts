@@ -325,6 +325,22 @@ async function resolvePricingItem(options: {
   }
 }
 
+
+
+function getSlowestPartLabel(input: {
+  loadPublicBagetCatalogMs: number;
+  getPageContentMapMs: number;
+  getBaguetteExtrasPricingConfigMs: number;
+}) {
+  const timings: Array<{ key: 'catalog' | 'content' | 'pricing'; label: string; value: number }> = [
+    { key: 'catalog', label: 'loadPublicBagetCatalog', value: input.loadPublicBagetCatalogMs },
+    { key: 'content', label: 'getPageContentMap', value: input.getPageContentMapMs },
+    { key: 'pricing', label: 'getBaguetteExtrasPricingConfig', value: input.getBaguetteExtrasPricingConfigMs },
+  ];
+
+  return timings.reduce((slowest, current) => (current.value > slowest.value ? current : slowest), timings[0]);
+}
+
 function resolveBaguetteCatalogItem(env: EnvSource) {
   const hasSheetId = hasValue(env.BAGET_SHEET_ID);
   const hasSheetTab = hasValue(env.BAGET_SHEET_TAB);
@@ -422,6 +438,13 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
       }
     } catch {
       items.push(createItem({
+        key: 'baget_page_performance',
+        title: 'Производительность страницы Багет',
+        status: 'warning',
+        summary: 'Не удалось прочитать диагностику /baget',
+        details: 'Проверка последних серверных таймингов завершилась ошибкой. Откройте /baget и попробуйте снова.',
+      }));
+      items.push(createItem({
         key: 'baguette_catalog_snapshot',
         title: 'Снимок каталога багета (локальный)',
         status: 'warning',
@@ -430,6 +453,7 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
       }));
     }
   }
+
 
   return {
     checkedAt: new Date().toISOString(),

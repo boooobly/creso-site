@@ -5,6 +5,7 @@ import { loadPublicBagetCatalog } from '@/lib/baget/catalogSnapshot';
 import { getPageContentValue } from '@/lib/page-content';
 import { getCachedBagetPageContentMap, getCachedBaguetteExtrasPricingConfig } from '@/lib/baget/pageData';
 import { logger } from '@/lib/logger';
+import { saveLatestBagetPageLoadDiagnostics } from '@/lib/baget/pageLoadDiagnostics';
 
 type BagetPageProps = {
   searchParams?: Promise<{
