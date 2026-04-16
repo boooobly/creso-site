@@ -5,6 +5,7 @@ import { loadPublicBagetCatalog } from '@/lib/baget/catalogSnapshot';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { logger } from '@/lib/logger';
+import { saveLatestBagetPageLoadDiagnostics } from '@/lib/baget/pageLoadDiagnostics';
 
 type BagetPageProps = {
   searchParams?: Promise<{
@@ -36,7 +37,7 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
   const contentMap = contentResult.data;
   const pricingConfigData = pricingResult.data;
 
-  logger.info('baget.page.load_diagnostics', {
+  const diagnosticsPayload = {
     totalDurationMs: Date.now() - pageLoadStartedAt,
     loadPublicBagetCatalogMs: catalogResult.durationMs,
     getPageContentMapMs: contentResult.durationMs,
@@ -45,7 +46,16 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
     bagetItemsCount: items.length,
     snapshotExists: catalogResult.data.snapshotExists,
     snapshotSyncedAt: catalogResult.data.snapshotSyncedAt,
-  });
+  };
+
+  logger.info('baget.page.load_diagnostics', diagnosticsPayload);
+
+  try {
+    await saveLatestBagetPageLoadDiagnostics(diagnosticsPayload);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown diagnostics write failure';
+    logger.warn('baget.page.load_diagnostics.persist_failed', { error: message });
+  }
 
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Конфигуратор багета');
   const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Подберите профиль, оцените превью и получите точный расчёт стоимости.');

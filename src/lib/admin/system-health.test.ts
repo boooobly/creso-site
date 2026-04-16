@@ -37,6 +37,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 0,
+      loadLatestBagetPageLoadDiagnostics: async () => null,
     });
 
     const database = health.items.find((item) => item.key === 'database');
@@ -63,6 +64,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 12,
+      loadLatestBagetPageLoadDiagnostics: async () => null,
     });
 
     expect(health.items.find((item) => item.key === 'smtp')?.status).toBe('ok');
@@ -79,6 +81,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 4,
+      loadLatestBagetPageLoadDiagnostics: async () => null,
     });
 
     expect(health.items.find((item) => item.key === 'admin_auth')?.status).toBe('error');
@@ -97,6 +100,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 1,
+      loadLatestBagetPageLoadDiagnostics: async () => null,
     });
 
     const combined = health.items.map((item) => `${item.summary} ${item.details}`).join(' ');
@@ -115,6 +119,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 0,
+      loadLatestBagetPageLoadDiagnostics: async () => null,
     });
 
     const database = health.items.find((item) => item.key === 'database');
@@ -131,6 +136,17 @@ describe('getAdminSystemHealth', () => {
       env: buildBaseEnv(),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 5,
+      loadLatestBagetPageLoadDiagnostics: async () => ({
+        totalDurationMs: 3400,
+        loadPublicBagetCatalogMs: 120,
+        getPageContentMapMs: 2800,
+        getBaguetteExtrasPricingConfigMs: 480,
+        catalogSource: 'snapshot',
+        bagetItemsCount: 77,
+        snapshotExists: true,
+        snapshotSyncedAt: '2026-04-16T10:00:00.000Z',
+        createdAt: '2026-04-16T10:05:00.000Z',
+      }),
       loadBagetCatalogSnapshotStatus: async () => ({
         sheetId: 'sheet-id',
         tab: 'baget_catalog',
@@ -154,12 +170,45 @@ describe('getAdminSystemHealth', () => {
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 5,
       loadBagetCatalogSnapshotStatus: async () => null,
+      loadLatestBagetPageLoadDiagnostics: async () => null,
     });
 
     const snapshot = health.items.find((item) => item.key === 'baguette_catalog_snapshot');
     expect(snapshot?.status).toBe('warning');
     expect(snapshot?.summary).toContain('не создан');
     expect(snapshot?.details).toContain('/api/admin/baget-catalog/sync');
+  });
+
+
+  it('shows latest baget page timings and highlights the slowest part', async () => {
+    const health = await getAdminSystemHealth({
+      env: buildBaseEnv(),
+      checkDbConnection: async () => true,
+      loadPricingEntryCount: async () => 5,
+      loadBagetCatalogSnapshotStatus: async () => ({
+        sheetId: 'sheet-id',
+        tab: 'baget_catalog',
+        itemCount: 77,
+        syncedAt: '2026-04-16T10:00:00.000Z',
+        error: null,
+      }),
+      loadLatestBagetPageLoadDiagnostics: async () => ({
+        totalDurationMs: 3200,
+        loadPublicBagetCatalogMs: 140,
+        getPageContentMapMs: 2500,
+        getBaguetteExtrasPricingConfigMs: 200,
+        catalogSource: 'snapshot',
+        bagetItemsCount: 77,
+        snapshotExists: true,
+        snapshotSyncedAt: '2026-04-16T10:00:00.000Z',
+        createdAt: '2026-04-16T10:10:00.000Z',
+      }),
+    });
+
+    const perf = health.items.find((item) => item.key === 'baget_page_performance');
+    expect(perf?.title).toBe('Производительность страницы Багет');
+    expect(perf?.details).toContain('getPageContentMapMs=2500');
+    expect(perf?.details).toContain('Самая медленная часть: getPageContentMap (2500 мс)');
   });
 
 });
