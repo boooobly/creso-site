@@ -47,6 +47,8 @@ describe('baget catalog snapshot flow', () => {
 
     expect(result.source).toBe('snapshot');
     expect(result.items).toHaveLength(1);
+    expect(result.snapshotExists).toBe(true);
+    expect(result.snapshotSyncedAt).toBe('2026-04-16T10:00:00.000Z');
     expect(loadBagetCatalogMock).not.toHaveBeenCalled();
     expect(loadBagetCatalogUncachedMock).not.toHaveBeenCalled();
   });

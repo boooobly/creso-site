@@ -230,3 +230,19 @@ model BagetCatalogSnapshot {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+model BagetPageLoadDiagnostics {
+  id                               String   @id @default(cuid())
+  sourceKey                        String   @unique
+  totalDurationMs                  Int
+  loadPublicBagetCatalogMs         Int
+  getPageContentMapMs              Int
+  getBaguetteExtrasPricingConfigMs Int
+  catalogSource                    String
+  bagetItemsCount                  Int
+  snapshotExists                   Boolean
+  snapshotSyncedAt                 String?
+  createdAt                        DateTime @default(now())
+  updatedAt                        DateTime @updatedAt
+}

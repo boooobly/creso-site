@@ -1,10 +1,46 @@
+import { unstable_cache } from 'next/cache';
 import { listPageContentByPageKey, toPageContentStringMap } from '@/lib/admin/page-content-service';
+
+type SerializedPageContentEntry = {
+  key: string;
+  value: string;
+};
+
+const PAGE_CONTENT_CACHE_SECONDS = 30;
+
+function serializeMap(map: Map<string, string>): SerializedPageContentEntry[] {
+  return Array.from(map.entries()).map(([key, value]) => ({ key, value }));
+}
+
+export function deserializePageContentMap(entries: SerializedPageContentEntry[]): Map<string, string> {
+  return new Map(entries.map((entry) => [entry.key, entry.value]));
+}
+
+const loadSerializedPageContentCached = unstable_cache(
+  async (pageKey: string): Promise<SerializedPageContentEntry[]> => {
+    const items = await listPageContentByPageKey(pageKey);
+    const map = toPageContentStringMap(items);
+    return serializeMap(map);
+  },
+  ['page-content-map.serialized'],
+  { revalidate: PAGE_CONTENT_CACHE_SECONDS },
+);
 
 export async function getPageContentMap(pageKey: string) {
   try {
-    const items = await listPageContentByPageKey(pageKey);
-    return toPageContentStringMap(items);
-  } catch {
+    const serializedEntries = await loadSerializedPageContentCached(pageKey);
+    return deserializePageContentMap(serializedEntries);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : '';
+    if (message.includes('incrementalCache missing')) {
+      try {
+        const items = await listPageContentByPageKey(pageKey);
+        return toPageContentStringMap(items);
+      } catch {
+        return new Map<string, string>();
+      }
+    }
+
     return new Map<string, string>();
   }
 }
