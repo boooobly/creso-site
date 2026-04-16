@@ -16,6 +16,11 @@ type BagetCatalogSnapshotRecord = {
   error: string | null;
 };
 
+type SnapshotStatus = {
+  exists: boolean;
+  syncedAt: string | null;
+};
+
 type PublicBagetCatalogResult = {
   source: 'snapshot' | 'sheet' | 'fallback';
   sheetId: string;
@@ -24,6 +29,8 @@ type PublicBagetCatalogResult = {
   error: string | null;
   itemCount?: number;
   syncedAt?: string;
+  snapshotExists: boolean;
+  snapshotSyncedAt: string | null;
 };
 
 function mapSnapshotItems(itemsJson: unknown): BagetSheetItem[] {
@@ -40,7 +47,14 @@ async function loadSnapshotUncached(): Promise<BagetCatalogSnapshotRecord | null
     if (!snapshot) return null;
 
     const items = mapSnapshotItems(snapshot.itemsJson);
-    if (items.length === 0) return null;
+    if (items.length === 0) {
+      logger.warn('baget.catalog_snapshot.invalid_items_empty', {
+        sheetId: snapshot.sheetId,
+        tab: snapshot.tab,
+        syncedAt: snapshot.syncedAt.toISOString(),
+      });
+      return null;
+    }
 
     return {
       source: 'snapshot',
@@ -78,6 +92,27 @@ async function loadSnapshotCached(): Promise<BagetCatalogSnapshotRecord | null> 
   }
 }
 
+async function loadSnapshotStatusUncached(): Promise<SnapshotStatus> {
+  try {
+    const snapshot = await prisma.bagetCatalogSnapshot.findUnique({
+      where: { sourceKey: BAGET_SNAPSHOT_SOURCE_KEY },
+      select: { syncedAt: true },
+    });
+
+    return {
+      exists: Boolean(snapshot),
+      syncedAt: snapshot?.syncedAt.toISOString() ?? null,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown DB read failure';
+    logger.warn('baget.catalog_snapshot.status_read_failed', { error: message });
+    return {
+      exists: false,
+      syncedAt: null,
+    };
+  }
+}
+
 export async function loadPublicBagetCatalog(): Promise<PublicBagetCatalogResult> {
   const snapshot = await loadSnapshotCached();
   if (snapshot) {
@@ -87,17 +122,30 @@ export async function loadPublicBagetCatalog(): Promise<PublicBagetCatalogResult
       sheetId: snapshot.sheetId,
       tab: snapshot.tab,
     });
-    return snapshot;
+
+    return {
+      ...snapshot,
+      snapshotExists: true,
+      snapshotSyncedAt: snapshot.syncedAt,
+    };
   }
 
+  const snapshotStatus = await loadSnapshotStatusUncached();
   const fallback = await loadBagetCatalog();
   logger.warn('baget.catalog_snapshot.missing_fallback_to_runtime_load', {
     source: fallback.source,
     itemCount: fallback.items.length,
     sheetId: fallback.sheetId,
     tab: fallback.tab,
+    snapshotExists: snapshotStatus.exists,
+    snapshotSyncedAt: snapshotStatus.syncedAt,
   });
-  return fallback;
+
+  return {
+    ...fallback,
+    snapshotExists: snapshotStatus.exists,
+    snapshotSyncedAt: snapshotStatus.syncedAt,
+  };
 }
 
 export async function syncBagetCatalogSnapshot(): Promise<

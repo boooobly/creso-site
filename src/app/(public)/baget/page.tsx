@@ -5,6 +5,7 @@ import { loadPublicBagetCatalog } from '@/lib/baget/catalogSnapshot';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { logger } from '@/lib/logger';
+import { saveLatestBagetPageLoadDiagnostics } from '@/lib/baget/pageLoadDiagnostics';
 
 type BagetPageProps = {
   searchParams?: Promise<{
@@ -36,16 +37,24 @@ export default async function BagetPage({ searchParams }: BagetPageProps) {
   const contentMap = contentResult.data;
   const pricingConfigData = pricingResult.data;
 
-  const shouldLogDiagnostics = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview';
-  if (shouldLogDiagnostics) {
-    logger.info('baget.page.load_diagnostics', {
-      totalDurationMs: Date.now() - pageLoadStartedAt,
-      loadBagetCatalogMs: catalogResult.durationMs,
-      getPageContentMapMs: contentResult.durationMs,
-      getBaguetteExtrasPricingConfigMs: pricingResult.durationMs,
-      catalogSource,
-      bagetItemsCount: items.length,
-    });
+  const diagnosticsPayload = {
+    totalDurationMs: Date.now() - pageLoadStartedAt,
+    loadPublicBagetCatalogMs: catalogResult.durationMs,
+    getPageContentMapMs: contentResult.durationMs,
+    getBaguetteExtrasPricingConfigMs: pricingResult.durationMs,
+    catalogSource,
+    bagetItemsCount: items.length,
+    snapshotExists: catalogResult.data.snapshotExists,
+    snapshotSyncedAt: catalogResult.data.snapshotSyncedAt,
+  };
+
+  logger.info('baget.page.load_diagnostics', diagnosticsPayload);
+
+  try {
+    await saveLatestBagetPageLoadDiagnostics(diagnosticsPayload);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown diagnostics write failure';
+    logger.warn('baget.page.load_diagnostics.persist_failed', { error: message });
   }
 
   const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Конфигуратор багета');
