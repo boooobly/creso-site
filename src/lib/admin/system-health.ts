@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
-import { getBagetCatalogSnapshotStatus } from '@/lib/baget/catalogSnapshot';
+import { getBagetCatalogAutoSyncStatus, getBagetCatalogSnapshotStatus } from '@/lib/baget/catalogSnapshot';
 
 export type HealthStatusLevel = 'ok' | 'warning' | 'error';
 
@@ -29,7 +29,12 @@ type SystemHealthOptions = {
     itemCount: number;
     syncedAt: string;
     error: string | null;
+    lastAutoSyncedAt: string | null;
   } | null>;
+  loadBagetCatalogAutoSyncStatus?: () => {
+    lastAutoSyncedAt: string | null;
+    autoSyncedRecently: boolean;
+  };
 };
 
 const ADMIN_PASSWORD_FALLBACK = 'change-me-admin-password';
@@ -349,6 +354,7 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
   const checkDbConnection = options.checkDbConnection ?? defaultCheckDbConnection;
   const loadPricingEntryCount = options.loadPricingEntryCount ?? defaultLoadPricingEntryCount;
   const loadBagetCatalogSnapshotStatus = options.loadBagetCatalogSnapshotStatus ?? getBagetCatalogSnapshotStatus;
+  const loadBagetCatalogAutoSyncStatus = options.loadBagetCatalogAutoSyncStatus ?? getBagetCatalogAutoSyncStatus;
 
   const databaseState = resolveDatabaseItem(env);
   const items: SystemHealthItem[] = [];
@@ -391,6 +397,10 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
   if (databaseState.dbEnabled && databaseState.dbConfigured) {
     try {
       const bagetSnapshot = await loadBagetCatalogSnapshotStatus();
+      const autoSyncStatus = loadBagetCatalogAutoSyncStatus();
+      const autoSyncDetails = autoSyncStatus.lastAutoSyncedAt
+        ? ` Автосинхронизация выполнялась: ${new Date(autoSyncStatus.lastAutoSyncedAt).toLocaleString('ru-RU')}.`
+        : ' Автосинхронизация в текущем рантайме ещё не запускалась.';
       if (bagetSnapshot) {
         items.push(createItem({
           key: 'baguette_catalog_snapshot',
@@ -399,7 +409,7 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
           summary: bagetSnapshot.error
             ? 'Есть снимок, но последняя синхронизация завершилась ошибкой'
             : 'Локальный снимок каталога доступен',
-          details: `Позиций: ${bagetSnapshot.itemCount}. Синхронизировано: ${new Date(bagetSnapshot.syncedAt).toLocaleString('ru-RU')}. Источник: ${bagetSnapshot.sheetId}/${bagetSnapshot.tab}.${bagetSnapshot.error ? ` Ошибка: ${bagetSnapshot.error}` : ''}`,
+          details: `Позиций: ${bagetSnapshot.itemCount}. Синхронизировано: ${new Date(bagetSnapshot.syncedAt).toLocaleString('ru-RU')}. Источник: ${bagetSnapshot.sheetId}/${bagetSnapshot.tab}.${bagetSnapshot.error ? ` Ошибка: ${bagetSnapshot.error}` : ''}${autoSyncDetails}`,
         }));
       } else {
         items.push(createItem({
@@ -407,7 +417,7 @@ export async function getAdminSystemHealth(options: SystemHealthOptions = {}): P
           title: 'Снимок каталога багета (локальный)',
           status: 'warning',
           summary: 'Локальный снимок каталога ещё не создан',
-          details: 'После первого успешного ручного обновления каталог будет загружаться без ожидания Google Sheets при холодном рендере страницы /baget.',
+          details: `После первого успешного автоматического или ручного обновления каталог будет загружаться без ожидания Google Sheets при холодном рендере страницы /baget.${autoSyncDetails}`,
         }));
       }
     } catch {
