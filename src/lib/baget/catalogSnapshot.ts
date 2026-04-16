@@ -31,6 +31,8 @@ type PublicBagetCatalogResult = {
   itemCount?: number;
   syncedAt?: string;
   autoSyncedSnapshot?: boolean;
+  snapshotExists?: boolean;
+  snapshotSyncedAt?: string | null;
 };
 
 let lastAutoSyncedAt: string | null = null;
@@ -185,6 +187,8 @@ export async function loadPublicBagetCatalog(): Promise<PublicBagetCatalogResult
       return {
         ...snapshot,
         autoSyncedSnapshot: false,
+        snapshotExists: true,
+        snapshotSyncedAt: snapshot.syncedAt,
       };
     }
 
@@ -192,6 +196,8 @@ export async function loadPublicBagetCatalog(): Promise<PublicBagetCatalogResult
     return {
       ...autoSyncedSnapshot,
       autoSyncedSnapshot: true,
+      snapshotExists: true,
+      snapshotSyncedAt: autoSyncedSnapshot.syncedAt,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown catalog snapshot failure';
@@ -211,6 +217,7 @@ export async function loadPublicBagetCatalog(): Promise<PublicBagetCatalogResult
 
   return {
     ...fallback,
+    autoSyncedSnapshot: false,
     snapshotExists: snapshotStatus.exists,
     snapshotSyncedAt: snapshotStatus.syncedAt,
   };
