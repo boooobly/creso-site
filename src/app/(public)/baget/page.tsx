@@ -1,11 +1,7 @@
-import BagetConfigurator from '@/components/baget/BagetConfigurator';
+import React, { Suspense } from 'react';
+import { BagetConfiguratorSection, BagetConfiguratorSkeleton } from '@/components/baget/BagetConfiguratorSection';
 import { isWideFormatCanvasBagetTransfer } from '@/lib/baget/transfer';
 import type { BagetTransferSource } from '@/lib/baget/printRequirement';
-import { loadPublicBagetCatalog } from '@/lib/baget/catalogSnapshot';
-import { getPageContentValue } from '@/lib/page-content';
-import { getCachedBagetPageContentMap, getCachedBaguetteExtrasPricingConfig } from '@/lib/baget/pageData';
-import { logger } from '@/lib/logger';
-import { saveLatestBagetPageLoadDiagnostics } from '@/lib/baget/pageLoadDiagnostics';
 
 type BagetPageProps = {
   searchParams?: Promise<{
@@ -15,59 +11,24 @@ type BagetPageProps = {
   }>;
 };
 
-async function measureAsync<T>(action: () => Promise<T>) {
-  const startedAt = Date.now();
-  const data = await action();
-  return {
-    data,
-    durationMs: Date.now() - startedAt,
-  };
-}
-
 export default async function BagetPage({ searchParams }: BagetPageProps) {
   const resolvedSearchParams = await searchParams;
-  const pageLoadStartedAt = Date.now();
-
-  const [catalogResult, contentResult, pricingResult] = await Promise.all([
-    measureAsync(() => loadPublicBagetCatalog()),
-    measureAsync(() => getCachedBagetPageContentMap()),
-    measureAsync(() => getCachedBaguetteExtrasPricingConfig()),
-  ]);
-  const { items, source: catalogSource } = catalogResult.data;
-  const contentMap = contentResult.data;
-  const pricingConfig = pricingResult.data;
-
-  const shouldLogDiagnostics = process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'preview';
-  if (shouldLogDiagnostics) {
-    logger.info('baget.page.load_diagnostics', {
-      totalDurationMs: Date.now() - pageLoadStartedAt,
-      loadBagetCatalogMs: catalogResult.durationMs,
-      getPageContentMapMs: contentResult.durationMs,
-      getBaguetteExtrasPricingConfigMs: pricingResult.durationMs,
-      catalogSource,
-      autoSyncedSnapshot: Boolean(catalogResult.data.autoSyncedSnapshot),
-      bagetItemsCount: items.length,
-    });
-  }
-
-  const heroTitle = getPageContentValue(contentMap, 'hero', 'title', 'Конфигуратор багета');
-  const heroDescription = getPageContentValue(contentMap, 'hero', 'description', 'Подберите профиль, оцените превью и получите точный расчёт стоимости.');
   const shouldUseStretchedCanvasPreset = isWideFormatCanvasBagetTransfer(resolvedSearchParams?.transferSource);
   const initialTransferSource: BagetTransferSource = shouldUseStretchedCanvasPreset ? 'wide-format' : 'manual';
 
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 space-y-6">
-        <h1 className="text-2xl font-bold md:text-3xl">{heroTitle}</h1>
-        <p className="text-neutral-700">{heroDescription}</p>
-        <BagetConfigurator
-          items={items}
-          initialWidth={resolvedSearchParams?.width}
-          initialHeight={resolvedSearchParams?.height}
-          initialWorkType={shouldUseStretchedCanvasPreset ? 'stretchedCanvas' : undefined}
-          initialTransferSource={initialTransferSource}
-          pricingConfig={pricingConfig}
-        />
+        <h1 className="text-2xl font-bold md:text-3xl">Конфигуратор багета</h1>
+        <p className="text-neutral-700">Подберите профиль, оцените превью и получите точный расчёт стоимости.</p>
+        <Suspense fallback={<BagetConfiguratorSkeleton />}>
+          <BagetConfiguratorSection
+            initialWidth={resolvedSearchParams?.width}
+            initialHeight={resolvedSearchParams?.height}
+            initialWorkType={shouldUseStretchedCanvasPreset ? 'stretchedCanvas' : undefined}
+            initialTransferSource={initialTransferSource}
+          />
+        </Suspense>
       </main>
     </div>
   );
