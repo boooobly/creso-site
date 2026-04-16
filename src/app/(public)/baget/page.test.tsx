@@ -73,7 +73,7 @@ describe('/baget page progressive rendering', () => {
   });
 
   it('loads async configurator data and forwards props to BagetConfigurator', async () => {
-    const { BagetConfiguratorSection } = await import('./page');
+    const { BagetConfiguratorSection } = await import('@/components/baget/BagetConfiguratorSection');
 
     const element = await BagetConfiguratorSection({
       initialWidth: '150',
