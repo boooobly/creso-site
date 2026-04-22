@@ -8,11 +8,14 @@
   --brand-bg: #f7f7f7;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
 body { @apply bg-white text-neutral-900 font-normal transition-colors dark:bg-neutral-950 dark:text-neutral-100; }
 
 :root {
-  --public-floating-bar-space: 88px;
+  --public-floating-bar-space: 96px;
 }
 
 @layer base {
@@ -365,8 +368,23 @@ a { @apply underline-offset-4; }
   padding-top: 0;
 }
 
+.public-site-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  overflow-x: clip;
+}
+
 .public-layout-main {
+  flex: 1;
+  width: 100%;
   padding-bottom: calc(2rem + var(--public-floating-bar-space) + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 480px) {
+  :root {
+    --public-floating-bar-space: 88px;
+  }
 }
 
 @media (min-width: 768px) {
