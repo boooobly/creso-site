@@ -63,12 +63,12 @@ async function loadApprovedReviews(): Promise<PublicReviewItem[]> {
 export default async function ReviewsPage() {
   const reviews = await loadApprovedReviews();
   return (
-    <div className="space-y-7 md:space-y-8">
-      <section className="card rounded-3xl border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/80 to-red-50/[0.18] p-6 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:p-8">
+    <div className="space-y-6 md:space-y-8">
+      <section className="card rounded-3xl border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/80 to-red-50/[0.18] p-5 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:p-8">
         <RevealOnScroll>
-          <div className="space-y-3 text-center md:space-y-4">
+          <div className="space-y-2.5 text-center md:space-y-4">
             <p className="t-eyebrow mx-auto">Социальное доказательство</p>
-            <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-4xl">Отзывы реальных клиентов</h1>
+            <h1 className="text-[1.9rem] font-bold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-4xl">Отзывы реальных клиентов</h1>
             <p className="mx-auto max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
               Собрали живую обратную связь о качестве, сроках и коммуникации — чтобы вы могли оценить наш подход до старта проекта.
             </p>
@@ -76,7 +76,7 @@ export default async function ReviewsPage() {
         </RevealOnScroll>
       </section>
       <ReviewsClient reviews={reviews} />
-      <section className="card relative z-10 rounded-2xl p-6 md:p-8">
+      <section className="card relative z-10 rounded-2xl p-5 md:p-8">
         <RevealOnScroll>
           <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-7">
             <div className="space-y-2">
@@ -89,14 +89,14 @@ export default async function ReviewsPage() {
                 Для дополнительной проверки можно открыть карточку компании в Яндекс Картах и посмотреть полный список оценок.
               </p>
             </div>
-            <a href={yandexReviewsUrl} target="_blank" rel="noreferrer" className="btn-primary inline-flex items-center gap-2 no-underline md:justify-self-end">
+            <a href={yandexReviewsUrl} target="_blank" rel="noreferrer" className="btn-primary inline-flex min-h-11 w-full items-center justify-center gap-2 no-underline sm:w-auto md:justify-self-end">
               Открыть Яндекс Карты
               <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
         </RevealOnScroll>
       </section>
-      <section className="card relative z-10 rounded-2xl p-6 md:p-8">
+      <section className="card relative z-10 rounded-2xl p-5 md:p-8">
         <RevealOnScroll>
           <div className="mb-4 flex items-center gap-2.5 md:mb-5">
             <span className="public-icon-badge">
@@ -128,7 +128,7 @@ export default async function ReviewsPage() {
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="space-y-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Следующий шаг</p>
-                <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">Готовы обсудить ваш проект?</h2>
+                <h2 className="text-[1.65rem] font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-2xl">Готовы обсудить ваш проект?</h2>
                 <p className="max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
                   Расскажите о задаче — предложим формат, материалы и сроки под ваш бюджет и площадку.
                 </p>

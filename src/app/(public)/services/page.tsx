@@ -47,7 +47,7 @@ export default async function ServicesPage() {
   };
 
   return (
-    <div className="-mt-8">
+    <div className="-mt-6 md:-mt-8">
       <Section spacing="compact" background="muted" fullBleed className="border-y border-neutral-200/70">
         <div className="section-header">
           <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>
@@ -72,7 +72,7 @@ export default async function ServicesPage() {
               <h2 className="t-h3">Поможем подобрать оптимальный формат под вашу задачу</h2>
               <p className="t-body text-muted-foreground max-w-2xl">Подскажем материалы, технологию производства и сроки, чтобы вы быстро перешли от идеи к готовому результату.</p>
             </div>
-            <Link href="/contacts" className="btn-secondary no-underline">Связаться с менеджером</Link>
+            <Link href="/contacts" className="btn-secondary w-full justify-center no-underline sm:w-auto">Связаться с менеджером</Link>
           </div>
         </div>
       </Section>

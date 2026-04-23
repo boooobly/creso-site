@@ -121,17 +121,17 @@ export default function HomePageContent({
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent dark:hidden"
         />
-        <div className="relative z-10 grid items-center gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-          <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-8">
-            <div className="space-y-5">
+        <div className="relative z-10 grid items-center gap-7 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+          <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-6 md:space-y-8">
+            <div className="space-y-4 md:space-y-5">
               <p className="hero-eyebrow">
                 {heroEyebrow}
               </p>
-              <AnimatedBlurHeadline className="t-h1 max-w-[20ch] md:max-w-none" text={heroTitle} breakAfterWord={1} />
+              <AnimatedBlurHeadline className="t-h1 max-w-[19ch] md:max-w-none" text={heroTitle} breakAfterWord={1} />
               <p className="t-lead max-w-[39rem] text-muted-foreground">{heroDescription}</p>
             </div>
 
-            <div className="hero-actions flex-col sm:flex-row sm:items-end">
+            <div className="hero-actions sm:items-end">
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
                 <Link className="btn-primary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
                   {heroPrimaryButtonText}
@@ -144,7 +144,7 @@ export default function HomePageContent({
               </motion.div>
             </div>
 
-            <motion.ul className="hero-chip-list max-w-none gap-2.5 xl:grid-cols-4" initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+            <motion.ul className="hero-chip-list max-w-none gap-2 xl:grid-cols-4" initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
               {heroTrustBadges.map((badge, index) => (
                 <BadgeChip key={`${badge.label}-${index}`} label={badge.label} index={index} variants={heroChipVariants} />
               ))}
@@ -161,7 +161,7 @@ export default function HomePageContent({
               aria-hidden="true"
               className="pointer-events-none absolute inset-x-[12%] top-[16%] h-[58%] rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.14)_0%,rgba(212,28,28,0.06)_40%,transparent_75%)] blur-2xl"
             />
-            <div className="relative ml-1 px-2 sm:ml-5 sm:px-3 lg:ml-9 lg:px-4">
+            <div className="relative px-1 sm:ml-5 sm:px-3 lg:ml-9 lg:px-4">
               <ProtectedImage
                 src={heroImageSrc}
                 alt={heroImageAlt}

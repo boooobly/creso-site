@@ -22,8 +22,8 @@ export default function ServiceCard({
         featured ? 'bg-[rgba(212,28,28,0.04)] dark:bg-[rgba(212,28,28,0.08)]' : 'bg-white dark:bg-neutral-900'
       }`}
     >
-      <div className="mb-4 overflow-hidden rounded-xl border border-neutral-200/80 transition-colors duration-300 group-hover:border-neutral-300 dark:border-neutral-800 dark:group-hover:border-neutral-700">
-        <div className="relative aspect-[16/5] w-full overflow-hidden rounded-xl">
+      <div className="mb-3 overflow-hidden rounded-xl border border-neutral-200/80 transition-colors duration-300 group-hover:border-neutral-300 dark:border-neutral-800 dark:group-hover:border-neutral-700 md:mb-4">
+        <div className="relative aspect-[16/7] w-full overflow-hidden rounded-xl sm:aspect-[16/6] md:aspect-[16/5]">
           {imageSrc ? <ProtectedImage src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 20vw, (min-width: 768px) 35vw, 90vw" /> : null}
           <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-45 transition-opacity duration-300 group-hover:opacity-20" />
         </div>
@@ -35,14 +35,14 @@ export default function ServiceCard({
         </span>
       )}
       <div className="card-title-stack">
-        <h3 className={`t-h3 leading-snug transition-colors group-hover:text-[var(--brand-red)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
+        <h3 className={`t-h3 text-[1.2rem] leading-snug transition-colors group-hover:text-[var(--brand-red)] md:text-[clamp(1.25rem,2.1vw,1.5rem)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
         <p className="t-caption inline-flex items-center gap-2 uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">
           <span className="card-dot" />
           Услуга
         </p>
       </div>
-      <p className="t-body text-muted-foreground mt-3 line-clamp-3">{desc}</p>
-      <div className="t-link mt-auto pt-5">
+      <p className="t-body text-muted-foreground mt-2.5 line-clamp-4 md:mt-3 md:line-clamp-3">{desc}</p>
+      <div className="t-link mt-auto pt-4 md:pt-5">
         Подробнее <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
       </div>
     </Link>

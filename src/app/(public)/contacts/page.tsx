@@ -88,11 +88,11 @@ export default async function ContactsPage() {
   ];
 
   return (
-    <div className="space-y-8 pb-10 md:space-y-9 md:pb-12">
-      <section className="space-y-4">
-        <h1 className="text-2xl font-bold">{heroTitle}</h1>
-        <p className="text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+    <div className="space-y-6 pb-10 md:space-y-9 md:pb-12">
+      <section className="space-y-3.5">
+        <h1 className="text-[1.75rem] font-bold leading-tight md:text-3xl">{heroTitle}</h1>
+        <p className="break-words text-sm text-neutral-700 dark:text-neutral-300 md:text-base">Адрес: {settings.address}</p>
+        <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-5">
           {quickContacts.map((item) => {
             const Icon = item.icon;
 
@@ -116,14 +116,14 @@ export default async function ContactsPage() {
 
             if ('href' in item) {
               return (
-                <a key={item.title} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined} className="card flex h-full flex-col gap-3 rounded-xl p-5 no-underline transition hover:-translate-y-0.5 hover:shadow-md">
+                <a key={item.title} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined} className="card flex h-full min-h-[160px] flex-col gap-3 rounded-xl p-4 no-underline transition hover:-translate-y-0.5 hover:shadow-md md:p-5">
                   {cardContent}
                 </a>
               );
             }
 
             return (
-              <div key={item.title} className="card flex h-full flex-col gap-3 rounded-xl p-5">
+              <div key={item.title} className="card flex h-full min-h-[160px] flex-col gap-3 rounded-xl p-4 md:p-5">
                 {cardContent}
               </div>
             );
@@ -131,22 +131,22 @@ export default async function ContactsPage() {
         </div>
       </section>
 
-      <section className="card space-y-4 rounded-xl p-6">
+      <section className="card space-y-4 rounded-xl p-5 md:p-6">
         <h2 className="text-xl font-semibold">Работаем официально</h2>
         <div className="flex flex-wrap gap-2">
           {trustItems.map((item) => (
-            <span key={item} className="rounded-full bg-neutral-100 px-3 py-1 text-sm dark:bg-neutral-800 dark:text-neutral-200">{item}</span>
+            <span key={item} className="rounded-full bg-neutral-100 px-3 py-1 text-xs dark:bg-neutral-800 dark:text-neutral-200 sm:text-sm">{item}</span>
           ))}
         </div>
       </section>
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Как мы работаем</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
           {processSteps.map((step, index) => (
             <div
               key={step.title}
-              className="relative flex h-full flex-col rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:hover:border-neutral-700 dark:hover:shadow-none"
+              className="relative flex h-full flex-col rounded-2xl border border-neutral-200 bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:hover:border-neutral-700 dark:hover:shadow-none md:p-6"
             >
               <span className="absolute right-5 top-5 text-xs font-semibold text-neutral-400">0{index + 1}</span>
               <div className="public-icon-badge mb-3">
@@ -159,28 +159,28 @@ export default async function ContactsPage() {
         </div>
       </section>
 
-      <section className="card rounded-xl p-6">
+      <section className="card rounded-xl p-5 md:p-6">
         <h2 className="mb-2 text-2xl font-bold">{messages.lead.title}</h2>
         <p className="mb-4 text-neutral-700 dark:text-neutral-300">Оставьте контакты и короткое описание задачи.</p>
         <div id="contact-form"><ContactsLeadCapture t={messages} /></div>
       </section>
 
-      <section className="space-y-5 md:space-y-6">
+      <section className="space-y-4.5 md:space-y-6">
         <div className="grid items-start gap-5 md:grid-cols-2 md:gap-6">
-          <div className="card h-full rounded-2xl border-neutral-200/85 bg-white/90 p-6 dark:border-neutral-800/90 dark:bg-neutral-900/85">
+          <div className="card h-full rounded-2xl border-neutral-200/85 bg-white/90 p-5 dark:border-neutral-800/90 dark:bg-neutral-900/85 md:p-6">
             <h2 className="text-2xl font-bold">Как нас найти</h2>
-            <p className="mt-2 text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
+            <p className="mt-2 break-words text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
             <p className="text-neutral-700 dark:text-neutral-300">Тел: {settings.phone}</p>
             <p className="text-neutral-700 dark:text-neutral-300">E-mail: {settings.email}</p>
-            <a className="btn-secondary mt-4 inline-block no-underline" href={BRAND.yandexRoute} target="_blank" rel="noreferrer">Маршрут в Яндекс.Картах</a>
+            <a className="btn-secondary mt-4 inline-flex w-full no-underline sm:w-auto" href={BRAND.yandexRoute} target="_blank" rel="noreferrer">Маршрут в Яндекс.Картах</a>
           </div>
           <MapSection />
         </div>
 
-        <div className="card rounded-2xl border border-red-200/70 bg-gradient-to-br from-white via-red-50/70 to-red-100/40 p-6 text-center dark:border-red-500/30 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:p-7">
+        <div className="card rounded-2xl border border-red-200/70 bg-gradient-to-br from-white via-red-50/70 to-red-100/40 p-5 text-center dark:border-red-500/30 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:p-7">
           <h2 className="text-2xl font-bold">{ctaTitle}</h2>
           <p className="mt-2 text-neutral-700 dark:text-neutral-300">{ctaDescription}</p>
-          <Link href="/contacts#contact-form" className="btn-primary mt-4 inline-flex no-underline">{ctaButtonText}</Link>
+          <Link href="/contacts#contact-form" className="btn-primary mt-4 inline-flex w-full justify-center no-underline sm:w-auto">{ctaButtonText}</Link>
         </div>
       </section>
     </div>

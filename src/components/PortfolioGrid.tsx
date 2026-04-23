@@ -81,8 +81,8 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
   }, [activeGallery.length, activeItem]);
 
   return (
-    <div className="space-y-6 md:space-y-7">
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-neutral-200/80 bg-gradient-to-r from-white/95 via-neutral-50/90 to-white/95 p-2.5 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.45)] dark:border-neutral-800/90 dark:from-neutral-900/95 dark:via-neutral-900/88 dark:to-neutral-900/95 dark:shadow-[0_14px_28px_-28px_rgba(0,0,0,0.55)]">
+    <div className="space-y-5 md:space-y-7">
+      <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-neutral-200/80 bg-gradient-to-r from-white/95 via-neutral-50/90 to-white/95 p-2 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.45)] dark:border-neutral-800/90 dark:from-neutral-900/95 dark:via-neutral-900/88 dark:to-neutral-900/95 dark:shadow-[0_14px_28px_-28px_rgba(0,0,0,0.55)] sm:gap-2 sm:p-2.5">
         {categories.map((category) => {
           const isActive = category === activeCategory;
 
@@ -92,7 +92,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
               type="button"
               onClick={() => setActiveCategory(category)}
               className={cn(
-                'inline-flex min-h-9 items-center rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all duration-200 md:text-sm',
+                'inline-flex min-h-10 items-center rounded-xl border px-3 py-2 text-xs font-semibold transition-all duration-200 sm:px-3.5 md:text-sm',
                 isActive
                   ? 'border-red-200/80 bg-red-50 text-red-700 shadow-[0_10px_20px_-16px_rgba(220,38,38,0.6)] dark:border-red-500/45 dark:bg-red-500/15 dark:text-red-200'
                   : 'border-transparent bg-transparent text-neutral-600 hover:border-neutral-200/85 hover:bg-white/90 hover:text-neutral-900 dark:text-neutral-300 dark:hover:border-neutral-700/80 dark:hover:bg-neutral-800/85 dark:hover:text-neutral-100'
@@ -106,7 +106,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
       </div>
 
       {filteredItems.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
           {filteredItems.map((item) => {
             const description = getItemDescription(item);
 
@@ -135,7 +135,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                     </span>
                   </div>
 
-                  <div className="space-y-3 p-4 md:p-5">
+                  <div className="space-y-2.5 p-4 md:space-y-3 md:p-5">
                     <h3 className="text-lg font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-[1.2rem]">{item.title}</h3>
                     <p className="line-clamp-3 text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-[0.95rem]">
                       {description || 'Описание проекта добавляется. Откройте карточку, чтобы посмотреть детали и изображения.'}
