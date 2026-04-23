@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import Image from 'next/image';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import type { BaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
@@ -164,11 +165,13 @@ export default function BagetConfigurator({
   const [previewHighlighted, setPreviewHighlighted] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isMobileSelectorOpen, setIsMobileSelectorOpen] = useState(false);
   const [isPreviewZoomed, setIsPreviewZoomed] = useState(false);
   const [previewZoomOrigin, setPreviewZoomOrigin] = useState({ xPct: 50, yPct: 50 });
   const [hoverZoomEnabled, setHoverZoomEnabled] = useState(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const previewTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const mobileSelectorTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const storedPayload = localStorage.getItem(BAGET_TRANSFER_IMAGE_KEY);
@@ -224,6 +227,27 @@ export default function BagetConfigurator({
       previewTrigger?.focus();
     };
   }, [isPreviewOpen]);
+
+  useEffect(() => {
+    if (!isMobileSelectorOpen) return;
+    const selectorTrigger = mobileSelectorTriggerRef.current;
+
+    const onEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileSelectorOpen(false);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onEsc);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', onEsc);
+      selectorTrigger?.focus();
+    };
+  }, [isMobileSelectorOpen]);
 
   const widthMm = Number(widthInput);
   const heightMm = Number(heightInput);
@@ -666,9 +690,56 @@ export default function BagetConfigurator({
     widthMm,
   ]);
 
+  const renderPagination = (containerClassName = '') => (
+    totalPages > 1 ? (
+      <div className={`flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900/85 dark:text-neutral-200 ${containerClassName}`.trim()}>
+        <button
+          type="button"
+          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          disabled={page === 1}
+          className="btn-secondary min-w-[6rem] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Назад
+        </button>
+        <span className="text-center text-neutral-700 dark:text-neutral-300">
+          Страница {page} из {totalPages}
+        </span>
+        <button
+          type="button"
+          onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          disabled={page === totalPages}
+          className="btn-secondary min-w-[6rem] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Вперёд
+        </button>
+      </div>
+    ) : null
+  );
+
+  const renderImageUploadCard = () => (
+    <div className="card rounded-2xl p-4 shadow-md">
+      <h2 className="mb-2 text-base font-semibold">Изображение</h2>
+      <input id="baget-image-upload" type="file" accept="image/*" onChange={onImageUpload} className="hidden" />
+      <label
+        htmlFor="baget-image-upload"
+        className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 transition-all duration-200 hover:bg-neutral-50 hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+      >
+        {fileName ? 'Изменить изображение' : 'Загрузить изображение'}
+      </label>
+      {fileName ? (
+        <div className="mt-2 rounded-lg bg-green-50 px-3 py-2 text-xs dark:bg-green-900/20">
+          <p className="truncate text-neutral-700 dark:text-neutral-200">{fileName}</p>
+          <p className="text-green-600 dark:text-green-400">Файл загружен</p>
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-300">Поддерживаются изображения JPG, PNG, WEBP.</p>
+      )}
+    </div>
+  );
+
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[18%_52%_30%] lg:items-start">
-      <aside className="space-y-4 lg:sticky lg:top-24">
+    <>
+      <div className="space-y-4 lg:hidden">
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-3 text-base font-semibold">Размер изделия (мм)</h2>
           <div className="space-y-3">
@@ -695,7 +766,6 @@ export default function BagetConfigurator({
             {!validSize && <p className="text-xs text-red-600">Введите корректные значения не менее 50 мм.</p>}
           </div>
         </div>
-
         <BagetFilters
           filters={filters}
           setFilters={setFilters}
@@ -718,66 +788,7 @@ export default function BagetConfigurator({
           }
           glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
         />
-      </aside>
-
-      <main className="space-y-3 lg:pr-1">
-        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {pagedItems.map((item) => (
-            <BagetCard
-              key={item.id}
-              item={item}
-              selected={selectedBaget?.id === item.id}
-              onSelect={handleSelectBaget}
-            />
-          ))}
-        </div>
-        {pagedItems.length === 0 && (
-          <div className="card rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">По заданным фильтрам ничего не найдено.</div>
-        )}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-3 text-sm dark:border-neutral-700 dark:bg-neutral-900/85 dark:text-neutral-200">
-            <button
-              type="button"
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              disabled={page === 1}
-              className="btn-secondary min-w-[7rem] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Назад
-            </button>
-            <span className="text-neutral-700 dark:text-neutral-300">
-              Страница {page} из {totalPages}
-            </span>
-            <button
-              type="button"
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={page === totalPages}
-              className="btn-secondary min-w-[7rem] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Вперёд
-            </button>
-          </div>
-        )}
-      </main>
-
-      <aside className="space-y-4 lg:sticky lg:top-24">
-        <div className="card rounded-2xl p-4 shadow-md">
-          <h2 className="mb-2 text-base font-semibold">Изображение</h2>
-          <input id="baget-image-upload" type="file" accept="image/*" onChange={onImageUpload} className="hidden" />
-          <label
-            htmlFor="baget-image-upload"
-            className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 transition-all duration-200 hover:bg-neutral-50 hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-          >
-            {fileName ? 'Изменить изображение' : 'Загрузить изображение'}
-          </label>
-          {fileName ? (
-            <div className="mt-2 rounded-lg bg-green-50 px-3 py-2 text-xs dark:bg-green-900/20">
-              <p className="truncate text-neutral-700 dark:text-neutral-200">{fileName}</p>
-              <p className="text-green-600 dark:text-green-400">Файл загружен</p>
-            </div>
-          ) : (
-            <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-300">Поддерживаются изображения JPG, PNG, WEBP.</p>
-          )}
-        </div>
+        {renderImageUploadCard()}
 
         <button
           ref={previewTriggerRef}
@@ -793,6 +804,42 @@ export default function BagetConfigurator({
             />
           </div>
         </button>
+
+        {!isNoFrameStretchedCanvas ? (
+          <div className="card rounded-2xl p-4 shadow-md">
+            <h2 className="mb-3 text-base font-semibold">Выбор багета</h2>
+            {selectedBagetForQuote ? (
+              <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
+                <Image
+                  src={selectedBagetForQuote.cardImage || selectedBagetForQuote.fallbackImage || BAGET_PLACEHOLDER_IMAGE}
+                  alt={`Миниатюра багета ${selectedBagetForQuote.name}`}
+                  width={64}
+                  height={64}
+                  className="h-16 w-16 shrink-0 rounded-lg object-cover"
+                />
+                <div className="min-w-0 flex-1 text-sm">
+                  <p className="truncate font-medium">{selectedBagetForQuote.name}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-300">Артикул: {selectedBagetForQuote.article}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-300">{selectedBagetForQuote.width_mm} мм · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">Багет пока не выбран. Откройте каталог, чтобы выбрать профиль.</p>
+            )}
+            <button
+              ref={mobileSelectorTriggerRef}
+              type="button"
+              onClick={() => setIsMobileSelectorOpen(true)}
+              className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700"
+            >
+              {selectedBagetForQuote ? 'Изменить багет' : 'Выбрать багет'}
+            </button>
+          </div>
+        ) : (
+          <div className="card rounded-2xl p-4 text-sm text-neutral-600 shadow-md dark:text-neutral-300">
+            Для режима «Холст на подрамнике без рамки» декоративный багет не используется.
+          </div>
+        )}
 
         <div className="card rounded-2xl bg-white/90 p-4 shadow-md ring-1 ring-neutral-200/70 backdrop-blur-sm dark:bg-neutral-900/80 dark:ring-neutral-700/70">
           <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
@@ -863,6 +910,229 @@ export default function BagetConfigurator({
             Оформить заказ
           </button>
         </div>
+      </div>
+
+      <div className="hidden grid-cols-1 gap-6 lg:grid lg:grid-cols-[18%_52%_30%] lg:items-start">
+        <aside className="space-y-4 lg:sticky lg:top-24">
+          <div className="card rounded-2xl p-4 shadow-md">
+            <h2 className="mb-3 text-base font-semibold">Размер изделия (мм)</h2>
+            <div className="space-y-3">
+              <label className="block space-y-1 text-sm">
+                <span>Ширина (мм)</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={widthInput}
+                  onChange={(e) => setWidthInput(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+              <label className="block space-y-1 text-sm">
+                <span>Высота (мм)</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={heightInput}
+                  onChange={(e) => setHeightInput(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+              {!validSize && <p className="text-xs text-red-600">Введите корректные значения не менее 50 мм.</p>}
+            </div>
+          </div>
+          <BagetFilters
+            filters={filters}
+            setFilters={setFilters}
+            materials={materials}
+            setMaterials={setMaterials}
+            printRequirement={printRequirement}
+            setPrintRequirement={setPrintRequirement}
+            colors={colors}
+            styles={styles}
+            standAllowed={standAllowed}
+            stretcherNarrowAllowed={stretcherNarrowAllowed}
+            passepartoutAllowed={isPassepartoutAllowed}
+            glazingAllowed={isGlazingAllowed}
+            passepartoutDisabledReason={
+              isNoFrameStretchedCanvas
+                ? 'Паспарту недоступно для холста на подрамнике без рамки.'
+                : !isPassepartoutSizeAllowed
+                  ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
+                  : undefined
+            }
+            glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
+          />
+        </aside>
+
+        <main className="space-y-3 lg:pr-1">
+          <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {pagedItems.map((item) => (
+              <BagetCard
+                key={item.id}
+                item={item}
+                selected={selectedBaget?.id === item.id}
+                onSelect={handleSelectBaget}
+              />
+            ))}
+          </div>
+          {pagedItems.length === 0 && (
+            <div className="card rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">По заданным фильтрам ничего не найдено.</div>
+          )}
+          {renderPagination()}
+        </main>
+
+        <aside className="space-y-4 lg:sticky lg:top-24">
+          {renderImageUploadCard()}
+          <button
+            ref={previewTriggerRef}
+            type="button"
+            aria-label="Open preview"
+            onClick={() => setIsPreviewOpen(true)}
+            className="block w-full cursor-zoom-in text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2"
+          >
+            <div ref={previewRef}>
+              <BagetPreview
+                {...previewProps}
+                highlighted={previewHighlighted}
+              />
+            </div>
+          </button>
+          <div className="card rounded-2xl bg-white/90 p-4 shadow-md ring-1 ring-neutral-200/70 backdrop-blur-sm dark:bg-neutral-900/80 dark:ring-neutral-700/70">
+            <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
+            {selectedBagetForQuote || isNoFrameStretchedCanvas ? (
+              <ul className="space-y-2 text-sm transition-all duration-300">
+                {!isNoFrameStretchedCanvas ? (
+                  <>
+                    <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                      <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
+                    </li>
+                    <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                      <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_mm} мм
+                    </li>
+                  </>
+                ) : (
+                  <li className="border-b border-neutral-200/70 pb-2 text-sm text-neutral-600 dark:border-neutral-700/70 dark:text-neutral-300">
+                    Режим оформления: <b>Без рамки</b>
+                  </li>
+                )}
+                <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                  <span className="text-neutral-500 dark:text-neutral-300">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
+                </li>
+                {materials.passepartout ? (
+                  <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                    <span className="text-neutral-500 dark:text-neutral-300">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
+                  </li>
+                ) : null}
+                {!isNoFrameStretchedCanvas ? (
+                  <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                    <span className="text-neutral-500 dark:text-neutral-300">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
+                  </li>
+                ) : null}
+                <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                  <span className="text-neutral-500 dark:text-neutral-300">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
+                </li>
+                {!isNoFrameStretchedCanvas ? (
+                  <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                    <span className="text-neutral-500 dark:text-neutral-300">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
+                    {selectedBagetForQuote?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
+                  </li>
+                ) : null}
+                {summaryCostRows.map((row) => (
+                  <li key={row.key} className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                    <span className="text-neutral-500 dark:text-neutral-300">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
+                    {row.note ?? null}
+                  </li>
+                ))}
+                {autoAdditions?.forceCardboard ? (
+                  <li className="text-xs text-neutral-500 dark:text-neutral-300">Картон (задник): Добавлено автоматически</li>
+                ) : null}
+                {autoAdditions?.stretchingRequired ? (
+                  <li className="text-xs text-neutral-500 dark:text-neutral-300">Требуется натяжка: Добавлено автоматически</li>
+                ) : null}
+                <li className="mt-1 border-t border-neutral-300 pt-3 text-xl font-bold text-neutral-900 dark:border-neutral-600 dark:text-neutral-100">
+                  Итого: {quote.total.toLocaleString('ru-RU')} ₽
+                </li>
+              </ul>
+            ) : (
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">Выберите багет для расчёта.</p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setIsOrderModalOpen(true)}
+              disabled={(!selectedBagetForQuote && !isNoFrameStretchedCanvas) || !validSize}
+              className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
+            >
+              Оформить заказ
+            </button>
+          </div>
+        </aside>
+      </div>
+
+      {isMobileSelectorOpen && !isNoFrameStretchedCanvas ? (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-white px-4 pb-6 pt-4 dark:bg-neutral-950 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Мобильный выбор багета"
+        >
+          <div className="mx-auto w-full max-w-xl space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold">Выбор багета</h2>
+              <button
+                type="button"
+                onClick={() => setIsMobileSelectorOpen(false)}
+                className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-neutral-300 text-neutral-700 dark:border-neutral-700 dark:text-neutral-200"
+                aria-label="Закрыть выбор багета"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              {selectedBagetForQuote ? `Сейчас выбран: ${selectedBagetForQuote.article}` : 'Выберите подходящий багет из каталога.'}
+            </p>
+            <BagetFilters
+              filters={filters}
+              setFilters={setFilters}
+              materials={materials}
+              setMaterials={setMaterials}
+              printRequirement={printRequirement}
+              setPrintRequirement={setPrintRequirement}
+              colors={colors}
+              styles={styles}
+              standAllowed={standAllowed}
+              stretcherNarrowAllowed={stretcherNarrowAllowed}
+              passepartoutAllowed={isPassepartoutAllowed}
+              glazingAllowed={isGlazingAllowed}
+              passepartoutDisabledReason={
+                isNoFrameStretchedCanvas
+                  ? 'Паспарту недоступно для холста на подрамнике без рамки.'
+                  : !isPassepartoutSizeAllowed
+                    ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
+                    : undefined
+              }
+              glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
+            />
+            <div className="grid grid-cols-1 gap-2.5 min-[430px]:grid-cols-2">
+              {pagedItems.map((item) => (
+                <BagetCard
+                  key={item.id}
+                  item={item}
+                  selected={selectedBaget?.id === item.id}
+                  onSelect={(baget) => {
+                    handleSelectBaget(baget);
+                    setIsMobileSelectorOpen(false);
+                  }}
+                />
+              ))}
+            </div>
+            {pagedItems.length === 0 && (
+              <div className="card rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">По заданным фильтрам ничего не найдено.</div>
+            )}
+            {renderPagination()}
+          </div>
+        </div>
+      ) : null}
 
         {isPreviewOpen ? (
           <div
@@ -949,7 +1219,6 @@ export default function BagetConfigurator({
                 hMm: Math.round(Number(calcMeta.framedHeightMm ?? 0)),
               }}
         />
-      </aside>
-    </div>
+    </>
   );
 }
