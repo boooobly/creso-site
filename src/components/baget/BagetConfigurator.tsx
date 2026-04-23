@@ -169,6 +169,8 @@ export default function BagetConfigurator({
   const [isMobileSelectorOpen, setIsMobileSelectorOpen] = useState(false);
   const [mobileSelectorDraftId, setMobileSelectorDraftId] = useState<string | null>(null);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [isMobileSecondaryOpen, setIsMobileSecondaryOpen] = useState(false);
+  const [isMobileCostOpen, setIsMobileCostOpen] = useState(false);
   const [isPreviewZoomed, setIsPreviewZoomed] = useState(false);
   const [previewZoomOrigin, setPreviewZoomOrigin] = useState({ xPct: 50, yPct: 50 });
   const [hoverZoomEnabled, setHoverZoomEnabled] = useState(false);
@@ -552,6 +554,23 @@ export default function BagetConfigurator({
     return materialItems;
   }, [autoAdditions, materials.backPanel, materials.frameMode, materials.glazing, materials.stretcherType, materials.workType]);
 
+  const mobileSecondarySummary = useMemo(() => {
+    const chips: string[] = [];
+    chips.push(GLAZING_LABELS[materials.glazing]);
+    chips.push(materials.passepartout ? `Паспарту ${materials.passepartoutMm}/${materials.passepartoutBottomMm} мм` : 'Без паспарту');
+    chips.push(materials.backPanel ? 'С задником' : 'Без задника');
+    chips.push(materials.hanging === 'crocodile' ? 'Подвес: крокодильчик' : 'Подвес: тросик');
+    if (standAllowed) {
+      chips.push(materials.stand ? 'Ножка: да' : 'Ножка: нет');
+    }
+    if (printRequirement.requiresPrint) {
+      chips.push(`Печать: ${printRequirement.printMaterial === 'paper' ? 'бумага' : 'холст'}`);
+    } else {
+      chips.push('Печать не требуется');
+    }
+    return chips;
+  }, [materials.backPanel, materials.glazing, materials.hanging, materials.passepartout, materials.passepartoutBottomMm, materials.passepartoutMm, materials.stand, printRequirement.printMaterial, printRequirement.requiresPrint, standAllowed]);
+
   const orderSummary = useMemo<BagetOrderSummary>(() => {
     const hangingQuantity = Number(calcMeta.hangingQuantity ?? 1);
     const effectiveHangingType = (calcMeta.hangingType as MaterialsState['hanging'] | undefined) ?? materials.hanging;
@@ -752,173 +771,241 @@ export default function BagetConfigurator({
 
   return (
     <>
-      <div className="space-y-4 lg:hidden">
+      <div className="space-y-3 lg:hidden">
+        <div className="card rounded-2xl p-4 shadow-sm">
+          <h1 className="text-lg font-semibold">Конфигуратор багета</h1>
+          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Задайте параметры, проверьте превью и подтвердите заказ.</p>
+        </div>
+
         <div className="card rounded-2xl p-4 shadow-md">
-          <h2 className="mb-3 text-base font-semibold">Размер изделия (мм)</h2>
+          <h2 className="mb-3 text-base font-semibold">1. Основные параметры</h2>
           <div className="space-y-3">
-            <label className="block space-y-1 text-sm">
-              <span>Ширина (мм)</span>
-              <input
-                type="number"
-                min={50}
-                value={widthInput}
-                onChange={(e) => setWidthInput(e.target.value)}
-                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-              />
-            </label>
-            <label className="block space-y-1 text-sm">
-              <span>Высота (мм)</span>
-              <input
-                type="number"
-                min={50}
-                value={heightInput}
-                onChange={(e) => setHeightInput(e.target.value)}
-                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-              />
-            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block space-y-1 text-sm">
+                <span>Ширина (мм)</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={widthInput}
+                  onChange={(e) => setWidthInput(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+              <label className="block space-y-1 text-sm">
+                <span>Высота (мм)</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={heightInput}
+                  onChange={(e) => setHeightInput(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+            </div>
             {!validSize && <p className="text-xs text-red-600">Введите корректные значения не менее 50 мм.</p>}
+            <div className="space-y-2 rounded-xl border border-neutral-200 p-3 text-sm dark:border-neutral-700">
+              <p className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Тип работы</p>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст на подрамнике</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'embroidery'} onChange={() => setMaterials({ ...materials, workType: 'embroidery' })} />Вышивка</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'beads'} onChange={() => setMaterials({ ...materials, workType: 'beads' })} />Бисер</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'photo'} onChange={() => setMaterials({ ...materials, workType: 'photo' })} />Фото</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'other'} onChange={() => setMaterials({ ...materials, workType: 'other' })} />Другое</label>
+            </div>
           </div>
         </div>
-        <BagetFilters
-          filters={filters}
-          setFilters={setFilters}
-          materials={materials}
-          setMaterials={setMaterials}
-          printRequirement={printRequirement}
-          setPrintRequirement={setPrintRequirement}
-          colors={colors}
-          styles={styles}
-          standAllowed={standAllowed}
-          stretcherNarrowAllowed={stretcherNarrowAllowed}
-          passepartoutAllowed={isPassepartoutAllowed}
-          glazingAllowed={isGlazingAllowed}
-          passepartoutDisabledReason={
-            isNoFrameStretchedCanvas
-              ? 'Паспарту недоступно для холста на подрамнике без рамки.'
-              : !isPassepartoutSizeAllowed
-                ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
-                : undefined
-          }
-          glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
-        />
+
+        <div className="card rounded-2xl p-4 shadow-md">
+          <button
+            type="button"
+            onClick={() => setIsMobileSecondaryOpen((prev) => !prev)}
+            className="flex w-full items-center justify-between gap-3 text-left"
+            aria-expanded={isMobileSecondaryOpen}
+            aria-controls="mobile-secondary-options"
+          >
+            <div>
+              <h2 className="text-base font-semibold">2. Дополнительные опции</h2>
+              <p className="text-xs text-neutral-500 dark:text-neutral-300">{isMobileSecondaryOpen ? 'Свернуть блок' : 'Развернуть и изменить материалы'}</p>
+            </div>
+            <span className="text-sm text-neutral-500 dark:text-neutral-300">{isMobileSecondaryOpen ? '▲' : '▼'}</span>
+          </button>
+          {!isMobileSecondaryOpen ? (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {mobileSecondarySummary.slice(0, 5).map((chip) => (
+                <span key={chip} className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
+                  {chip}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div id="mobile-secondary-options" className="mt-3">
+              <BagetFilters
+                filters={filters}
+                setFilters={setFilters}
+                materials={materials}
+                setMaterials={setMaterials}
+                printRequirement={printRequirement}
+                setPrintRequirement={setPrintRequirement}
+                colors={colors}
+                styles={styles}
+                standAllowed={standAllowed}
+                stretcherNarrowAllowed={stretcherNarrowAllowed}
+                passepartoutAllowed={isPassepartoutAllowed}
+                glazingAllowed={isGlazingAllowed}
+                showCatalogFilters={false}
+                showWorkType={false}
+                passepartoutDisabledReason={
+                  isNoFrameStretchedCanvas
+                    ? 'Паспарту недоступно для холста на подрамнике без рамки.'
+                    : !isPassepartoutSizeAllowed
+                      ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
+                      : undefined
+                }
+                glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
+              />
+            </div>
+          )}
+        </div>
+
         {renderImageUploadCard()}
 
-        <button
-          ref={previewTriggerRef}
-          type="button"
-          aria-label="Open preview"
-          onClick={() => setIsPreviewOpen(true)}
-          className="block w-full cursor-zoom-in text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2"
-        >
-          <div ref={previewRef}>
-            <BagetPreview
-              {...previewProps}
-              highlighted={previewHighlighted}
-            />
-          </div>
-        </button>
-
-        {!isNoFrameStretchedCanvas ? (
-          <div className="card rounded-2xl p-4 shadow-md">
-            <h2 className="mb-3 text-base font-semibold">Выбор багета</h2>
-            {selectedBagetForQuote ? (
-              <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
-                <Image
-                  src={selectedBagetForQuote.cardImage || selectedBagetForQuote.fallbackImage || BAGET_PLACEHOLDER_IMAGE}
-                  alt={`Миниатюра багета ${selectedBagetForQuote.name}`}
-                  width={64}
-                  height={64}
-                  className="h-16 w-16 shrink-0 rounded-lg object-cover"
-                />
-                <div className="min-w-0 flex-1 text-sm">
-                  <p className="truncate font-medium">{selectedBagetForQuote.name}</p>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-300">Артикул: {selectedBagetForQuote.article}</p>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-300">{selectedBagetForQuote.width_mm} мм · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
+        <div className="card rounded-2xl p-4 shadow-md">
+          <h2 className="mb-3 text-base font-semibold">3. Превью и выбор багета</h2>
+          <button
+            ref={previewTriggerRef}
+            type="button"
+            aria-label="Open preview"
+            onClick={() => setIsPreviewOpen(true)}
+            className="block w-full cursor-zoom-in text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2"
+          >
+            <div ref={previewRef}>
+              <BagetPreview
+                {...previewProps}
+                highlighted={previewHighlighted}
+              />
+            </div>
+          </button>
+          {!isNoFrameStretchedCanvas ? (
+            <div className="mt-3 space-y-3">
+              {selectedBagetForQuote ? (
+                <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
+                  <Image
+                    src={selectedBagetForQuote.cardImage || selectedBagetForQuote.fallbackImage || BAGET_PLACEHOLDER_IMAGE}
+                    alt={`Миниатюра багета ${selectedBagetForQuote.name}`}
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 shrink-0 rounded-lg object-cover"
+                  />
+                  <div className="min-w-0 flex-1 text-sm">
+                    <p className="truncate font-medium">{selectedBagetForQuote.name}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-300">Артикул: {selectedBagetForQuote.article}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-300">{selectedBagetForQuote.width_mm} мм · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">Багет пока не выбран. Откройте каталог, чтобы выбрать профиль.</p>
-            )}
-            <button
-              ref={mobileSelectorTriggerRef}
-              type="button"
-              onClick={() => setIsMobileSelectorOpen(true)}
-              className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700"
-            >
-              {selectedBagetForQuote ? 'Изменить багет' : 'Выбрать багет'}
-            </button>
-          </div>
-        ) : (
-          <div className="card rounded-2xl p-4 text-sm text-neutral-600 shadow-md dark:text-neutral-300">
-            Для режима «Холст на подрамнике без рамки» декоративный багет не используется.
-          </div>
-        )}
+              ) : (
+                <p className="rounded-xl border border-dashed border-neutral-300 p-3 text-sm text-neutral-600 dark:border-neutral-700 dark:text-neutral-300">
+                  Багет пока не выбран. Откройте каталог, чтобы выбрать профиль.
+                </p>
+              )}
+              <button
+                ref={mobileSelectorTriggerRef}
+                type="button"
+                onClick={() => setIsMobileSelectorOpen(true)}
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700"
+              >
+                {selectedBagetForQuote ? 'Изменить багет' : 'Выбрать багет'}
+              </button>
+            </div>
+          ) : (
+            <p className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+              Для режима «Холст на подрамнике без рамки» декоративный багет не используется.
+            </p>
+          )}
+        </div>
 
         <div className="card rounded-2xl bg-white/90 p-4 shadow-md ring-1 ring-neutral-200/70 backdrop-blur-sm dark:bg-neutral-900/80 dark:ring-neutral-700/70">
-          <h2 className="mb-3 text-base font-semibold">Расчёт</h2>
+          <h2 className="text-base font-semibold">4. Стоимость</h2>
           {selectedBagetForQuote || isNoFrameStretchedCanvas ? (
-            <ul className="space-y-2 text-sm transition-all duration-300">
-              {!isNoFrameStretchedCanvas ? (
-                <>
+            <>
+              <div className="mt-3 rounded-xl bg-red-50 p-3 dark:bg-red-900/20">
+                <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Итого</p>
+                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{quote.total.toLocaleString('ru-RU')} ₽</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileCostOpen((prev) => !prev)}
+                aria-expanded={isMobileCostOpen}
+                className="mt-3 text-sm font-medium text-red-600 dark:text-red-400"
+              >
+                {isMobileCostOpen ? 'Скрыть детализацию' : 'Показать детализацию'}
+              </button>
+              {isMobileCostOpen ? (
+                <ul className="mt-3 space-y-2 text-sm transition-all duration-300">
+                  {!isNoFrameStretchedCanvas ? (
+                    <>
+                      <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                        <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
+                      </li>
+                      <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                        <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_mm} мм
+                      </li>
+                    </>
+                  ) : (
+                    <li className="border-b border-neutral-200/70 pb-2 text-sm text-neutral-600 dark:border-neutral-700/70 dark:text-neutral-300">
+                      Режим оформления: <b>Без рамки</b>
+                    </li>
+                  )}
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
+                    <span className="text-neutral-500 dark:text-neutral-300">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
                   </li>
+                  {materials.passepartout ? (
+                    <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                      <span className="text-neutral-500 dark:text-neutral-300">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
+                    </li>
+                  ) : null}
+                  {!isNoFrameStretchedCanvas ? (
+                    <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                      <span className="text-neutral-500 dark:text-neutral-300">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
+                    </li>
+                  ) : null}
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_mm} мм
+                    <span className="text-neutral-500 dark:text-neutral-300">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
                   </li>
-                </>
-              ) : (
-                <li className="border-b border-neutral-200/70 pb-2 text-sm text-neutral-600 dark:border-neutral-700/70 dark:text-neutral-300">
-                  Режим оформления: <b>Без рамки</b>
-                </li>
-              )}
-              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500 dark:text-neutral-300">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
-              </li>
-              {materials.passepartout ? (
-                <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500 dark:text-neutral-300">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
-                </li>
+                  {!isNoFrameStretchedCanvas ? (
+                    <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                      <span className="text-neutral-500 dark:text-neutral-300">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
+                      {selectedBagetForQuote?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
+                    </li>
+                  ) : null}
+                  {summaryCostRows.map((row) => (
+                    <li key={row.key} className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
+                      <span className="text-neutral-500 dark:text-neutral-300">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
+                      {row.note ?? null}
+                    </li>
+                  ))}
+                  {autoAdditions?.forceCardboard ? (
+                    <li className="text-xs text-neutral-500 dark:text-neutral-300">Картон (задник): Добавлено автоматически</li>
+                  ) : null}
+                  {autoAdditions?.stretchingRequired ? (
+                    <li className="text-xs text-neutral-500 dark:text-neutral-300">Требуется натяжка: Добавлено автоматически</li>
+                  ) : null}
+                </ul>
               ) : null}
-              {!isNoFrameStretchedCanvas ? (
-                <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500 dark:text-neutral-300">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
-                </li>
-              ) : null}
-              <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                <span className="text-neutral-500 dark:text-neutral-300">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
-              </li>
-              {!isNoFrameStretchedCanvas ? (
-                <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500 dark:text-neutral-300">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
-                  {selectedBagetForQuote?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
-                </li>
-              ) : null}
-              {summaryCostRows.map((row) => (
-                <li key={row.key} className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500 dark:text-neutral-300">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
-                  {row.note ?? null}
-                </li>
-              ))}
-              {autoAdditions?.forceCardboard ? (
-                <li className="text-xs text-neutral-500 dark:text-neutral-300">Картон (задник): Добавлено автоматически</li>
-              ) : null}
-              {autoAdditions?.stretchingRequired ? (
-                <li className="text-xs text-neutral-500 dark:text-neutral-300">Требуется натяжка: Добавлено автоматически</li>
-              ) : null}
-              <li className="mt-1 border-t border-neutral-300 pt-3 text-xl font-bold text-neutral-900 dark:border-neutral-600 dark:text-neutral-100">
-                Итого: {quote.total.toLocaleString('ru-RU')} ₽
-              </li>
-            </ul>
+            </>
           ) : (
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">Выберите багет для расчёта.</p>
+            <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">Выберите багет для расчёта.</p>
           )}
+        </div>
 
+        <div className="card rounded-2xl p-4 shadow-md">
+          <h2 className="text-base font-semibold">5. Завершение</h2>
+          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-300">Перед запуском заказа менеджер проверит параметры и итоговую стоимость.</p>
           <button
             type="button"
             onClick={() => setIsOrderModalOpen(true)}
             disabled={(!selectedBagetForQuote && !isNoFrameStretchedCanvas) || !validSize}
-            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
+            className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
           >
             Оформить заказ
           </button>

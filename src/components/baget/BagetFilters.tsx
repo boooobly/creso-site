@@ -82,6 +82,9 @@ type BagetFiltersProps = {
   glazingAllowed: boolean;
   passepartoutDisabledReason?: string;
   glazingDisabledReason?: string;
+  showCatalogFilters?: boolean;
+  showWorkType?: boolean;
+  showMaterials?: boolean;
 };
 
 const selectClassName =
@@ -120,104 +123,112 @@ export default function BagetFilters({
   glazingAllowed,
   passepartoutDisabledReason,
   glazingDisabledReason,
+  showCatalogFilters = true,
+  showWorkType = true,
+  showMaterials = true,
 }: BagetFiltersProps) {
   return (
     <div className="space-y-4">
-      <div className="card rounded-2xl p-4 shadow-md">
-        <h2 className="mb-3 text-base font-semibold">Фильтры</h2>
-        <div className="space-y-3">
-          <label className="block space-y-1 text-sm">
-            <span>Цвет</span>
-            <SelectWithChevron
-              value={filters.color}
-              onChange={(e) => setFilters({ ...filters, color: e.target.value })}
-            >
-              <option value="all">Все</option>
-              {colors.map((color) => (
-                <option key={color} value={color}>
-                  {COLOR_LABELS[color] ?? color}
-                </option>
-              ))}
-            </SelectWithChevron>
-          </label>
+      {showCatalogFilters ? (
+        <div className="card rounded-2xl p-4 shadow-md">
+          <h2 className="mb-3 text-base font-semibold">Фильтры</h2>
+          <div className="space-y-3">
+            <label className="block space-y-1 text-sm">
+              <span>Цвет</span>
+              <SelectWithChevron
+                value={filters.color}
+                onChange={(e) => setFilters({ ...filters, color: e.target.value })}
+              >
+                <option value="all">Все</option>
+                {colors.map((color) => (
+                  <option key={color} value={color}>
+                    {COLOR_LABELS[color] ?? color}
+                  </option>
+                ))}
+              </SelectWithChevron>
+            </label>
 
-          <label className="block space-y-1 text-sm">
-            <span>Стиль</span>
-            <SelectWithChevron
-              value={filters.style}
-              onChange={(e) => setFilters({ ...filters, style: e.target.value })}
-            >
-              <option value="all">Все</option>
-              {styles.map((style) => (
-                <option key={style} value={style}>
-                  {STYLE_LABELS[style] ?? style}
-                </option>
-              ))}
-            </SelectWithChevron>
-          </label>
+            <label className="block space-y-1 text-sm">
+              <span>Стиль</span>
+              <SelectWithChevron
+                value={filters.style}
+                onChange={(e) => setFilters({ ...filters, style: e.target.value })}
+              >
+                <option value="all">Все</option>
+                {styles.map((style) => (
+                  <option key={style} value={style}>
+                    {STYLE_LABELS[style] ?? style}
+                  </option>
+                ))}
+              </SelectWithChevron>
+            </label>
 
-          <div className="grid grid-cols-2 gap-2">
-            <label className="space-y-1 text-sm">
-              <span>Ширина от, мм</span>
-              <input
-                type="number"
-                min={0}
-                value={filters.widthMin}
-                onChange={(e) => setFilters({ ...filters, widthMin: Number(e.target.value || 0) })}
-                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-              />
-            </label>
-            <label className="space-y-1 text-sm">
-              <span>до, мм</span>
-              <input
-                type="number"
-                min={0}
-                value={filters.widthMax}
-                onChange={(e) => setFilters({ ...filters, widthMax: Number(e.target.value || 0) })}
-                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-              />
-            </label>
-          </div>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="space-y-1 text-sm">
+                <span>Ширина от, мм</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={filters.widthMin}
+                  onChange={(e) => setFilters({ ...filters, widthMin: Number(e.target.value || 0) })}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+              <label className="space-y-1 text-sm">
+                <span>до, мм</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={filters.widthMax}
+                  onChange={(e) => setFilters({ ...filters, widthMax: Number(e.target.value || 0) })}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+            </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <label className="space-y-1 text-sm">
-              <span>Цена от, ₽</span>
-              <input
-                type="number"
-                min={0}
-                value={filters.priceMin}
-                onChange={(e) => setFilters({ ...filters, priceMin: Number(e.target.value || 0) })}
-                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-              />
-            </label>
-            <label className="space-y-1 text-sm">
-              <span>до, ₽</span>
-              <input
-                type="number"
-                min={0}
-                value={filters.priceMax}
-                onChange={(e) => setFilters({ ...filters, priceMax: Number(e.target.value || 0) })}
-                className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-              />
-            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="space-y-1 text-sm">
+                <span>Цена от, ₽</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={filters.priceMin}
+                  onChange={(e) => setFilters({ ...filters, priceMin: Number(e.target.value || 0) })}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+              <label className="space-y-1 text-sm">
+                <span>до, ₽</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={filters.priceMax}
+                  onChange={(e) => setFilters({ ...filters, priceMax: Number(e.target.value || 0) })}
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+              </label>
+            </div>
           </div>
         </div>
-      </div>
+      ) : null}
 
-      <div className="card rounded-2xl p-4 shadow-md">
-        <h2 className="mb-3 text-base font-semibold">Тип работы</h2>
-        <div className="space-y-2 text-sm">
-          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
-          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст на подрамнике</label>
-          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
-          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'embroidery'} onChange={() => setMaterials({ ...materials, workType: 'embroidery' })} />Вышивка</label>
-          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'beads'} onChange={() => setMaterials({ ...materials, workType: 'beads' })} />Бисер</label>
-          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'photo'} onChange={() => setMaterials({ ...materials, workType: 'photo' })} />Фото</label>
-          <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'other'} onChange={() => setMaterials({ ...materials, workType: 'other' })} />Другое</label>
+      {showWorkType ? (
+        <div className="card rounded-2xl p-4 shadow-md">
+          <h2 className="mb-3 text-base font-semibold">Тип работы</h2>
+          <div className="space-y-2 text-sm">
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст на подрамнике</label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'embroidery'} onChange={() => setMaterials({ ...materials, workType: 'embroidery' })} />Вышивка</label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'beads'} onChange={() => setMaterials({ ...materials, workType: 'beads' })} />Бисер</label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'photo'} onChange={() => setMaterials({ ...materials, workType: 'photo' })} />Фото</label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'other'} onChange={() => setMaterials({ ...materials, workType: 'other' })} />Другое</label>
+          </div>
         </div>
-      </div>
+      ) : null}
 
-      <div className="card rounded-2xl p-4 shadow-md">
+      {showMaterials ? (
+        <div className="card rounded-2xl p-4 shadow-md">
         <h2 className="mb-3 text-base font-semibold">Материалы (за м²)</h2>
         <div className="space-y-3 text-sm">
           {materials.workType === 'stretchedCanvas' ? (
@@ -441,6 +452,7 @@ export default function BagetFilters({
           {!standAllowed && <p className="text-xs text-amber-700">Ножка доступна только для работ до 30x30 см</p>}
         </div>
       </div>
+      ) : null}
     </div>
   );
 }
