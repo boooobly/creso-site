@@ -12,7 +12,7 @@ export default function FAQ({ items }: { items: FaqItem[] }) {
           <summary className="accordion-trigger t-faq">
             <span className="flex items-start gap-2">
               <span className="card-dot mt-[0.45em] shrink-0" />
-              {f.q}
+              <span className="break-words">{f.q}</span>
             </span>
             <ChevronDown
               aria-hidden="true"
@@ -20,7 +20,7 @@ export default function FAQ({ items }: { items: FaqItem[] }) {
               strokeWidth={2.3}
             />
           </summary>
-          <p className="accordion-content t-body text-muted-foreground pl-8 sm:pl-9">{f.a}</p>
+          <p className="accordion-content t-body text-muted-foreground break-words pl-8 sm:pl-9">{f.a}</p>
         </details>
       ))}
     </div>

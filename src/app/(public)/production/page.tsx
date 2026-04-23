@@ -146,10 +146,10 @@ export default async function ProductionPage() {
       <Section>
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"
-          contentClassName="max-w-[38.5rem] space-y-6 lg:pr-3"
+          contentClassName="max-w-[38.5rem] space-y-5 lg:pr-3"
           media={
             <HeroMediaPanel className="border-neutral-200/90 bg-neutral-100/95 dark:border-neutral-800/90 dark:bg-neutral-900/90">
-              <div className="relative aspect-[6/5] w-full overflow-hidden rounded-[1.45rem]">
+              <div className="relative aspect-[5/4] w-full overflow-hidden rounded-[1.2rem] sm:aspect-[6/5] sm:rounded-[1.45rem]">
                 <Image src={heroImageSrc} alt={heroImageAlt} fill className="object-cover" priority />
               </div>
               <div className="pointer-events-none absolute bottom-4 left-4 right-4 rounded-2xl border border-white/30 bg-black/35 px-4 py-3 backdrop-blur-sm shadow-[0_14px_34px_-24px_rgba(2,6,23,0.9)] md:bottom-5 md:left-5 md:right-auto">
@@ -161,7 +161,7 @@ export default async function ProductionPage() {
         >
           <HeroEyebrow>ПРОИЗВОДСТВЕННАЯ БАЗА</HeroEyebrow>
           <div className="space-y-4">
-            <HeroTitle className="max-w-[15ch] text-3xl leading-[1.06] md:text-5xl">{heroTitle}</HeroTitle>
+            <HeroTitle className="max-w-[15ch] text-[2rem] leading-[1.06] md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[33rem] text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
           </div>
 
@@ -174,14 +174,14 @@ export default async function ProductionPage() {
             ))}
           </HeroChipList>
 
-          <HeroActions className="gap-3.5 pt-1">
+          <HeroActions className="gap-2.5 pt-1 sm:gap-3.5">
             <Link
               href="/contacts"
-              className={`${heroCtaBaseClass} border border-red-600 bg-red-600 text-white shadow-[0_8px_20px_rgba(220,38,38,0.24)] no-underline hover:border-red-700 hover:bg-red-700 hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]`}
+              className={`${heroCtaBaseClass} w-full border border-red-600 bg-red-600 text-white shadow-[0_8px_20px_rgba(220,38,38,0.24)] no-underline hover:border-red-700 hover:bg-red-700 hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)] sm:w-auto`}
             >{heroPrimaryButtonText}</Link>
             <a
               href="#production-equipment"
-              className={`${heroCtaBaseClass} border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-800`}
+              className={`${heroCtaBaseClass} w-full border border-neutral-300 bg-white text-neutral-800 shadow-[0_4px_14px_rgba(17,24,39,0.06)] hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-[0_6px_18px_rgba(17,24,39,0.08)] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-800 sm:w-auto`}
             >
               {heroSecondaryButtonText}
             </a>

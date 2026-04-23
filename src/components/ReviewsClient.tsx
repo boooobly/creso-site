@@ -42,10 +42,10 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
   }, [reviews]);
 
   return (
-    <div className="space-y-6 md:space-y-7">
-      <section className="card rounded-2xl p-5 md:p-6">
+    <div className="space-y-5 md:space-y-7">
+      <section className="card rounded-2xl p-4 sm:p-5 md:p-6">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-5">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-4">
             <div className="rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-4 dark:border-neutral-700 dark:bg-neutral-800/60">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500">Средняя оценка</p>
               <p className="mt-2 text-2xl font-bold text-neutral-900 dark:text-neutral-100">{averageRating ? averageRating.toFixed(1) : '—'}</p>
@@ -84,10 +84,10 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
             <p className="hidden text-sm text-neutral-500 md:block">Сначала новые</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
+          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 md:gap-5">
             {visibleReviews.map((review) => (
               <RevealOnScroll key={review.id}>
-                <article className="premium-card h-full rounded-2xl border-neutral-200/90 bg-white p-5 dark:border-neutral-800/95 dark:bg-neutral-900 md:p-6">
+                <article className="premium-card h-full rounded-2xl border-neutral-200/90 bg-white p-4 dark:border-neutral-800/95 dark:bg-neutral-900 sm:p-5 md:p-6">
                   <div className="mb-3 flex items-start justify-between gap-3 border-b border-neutral-100 pb-3 dark:border-neutral-800/90">
                     <div>
                       <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{getPublicName(review)}</p>
@@ -114,7 +114,7 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
             <div className="flex justify-center pt-1">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
                 onClick={() => setVisibleCount((current) => current + 9)}
               >
                 Показать ещё
