@@ -18,6 +18,7 @@ import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
 import { getInitialBagetPrintRequirement, type BagetPrintRequirement, type BagetTransferSource } from '@/lib/baget/printRequirement';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
+import BagetMobileSelectorCard from './BagetMobileSelectorCard';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
 import BagetPreview, { type BagetPreviewProps } from './BagetPreview';
 import InfoTooltip from './InfoTooltip';
@@ -166,6 +167,8 @@ export default function BagetConfigurator({
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isMobileSelectorOpen, setIsMobileSelectorOpen] = useState(false);
+  const [mobileSelectorDraftId, setMobileSelectorDraftId] = useState<string | null>(null);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [isPreviewZoomed, setIsPreviewZoomed] = useState(false);
   const [previewZoomOrigin, setPreviewZoomOrigin] = useState({ xPct: 50, yPct: 50 });
   const [hoverZoomEnabled, setHoverZoomEnabled] = useState(false);
@@ -248,6 +251,12 @@ export default function BagetConfigurator({
       selectorTrigger?.focus();
     };
   }, [isMobileSelectorOpen]);
+
+  useEffect(() => {
+    if (!isMobileSelectorOpen) return;
+    setMobileSelectorDraftId(selectedBaget?.id ?? null);
+    setIsMobileFiltersOpen(false);
+  }, [isMobileSelectorOpen, selectedBaget?.id]);
 
   const widthMm = Number(widthInput);
   const heightMm = Number(heightInput);
@@ -456,6 +465,10 @@ export default function BagetConfigurator({
     const start = (page - 1) * ITEMS_PER_PAGE;
     return filteredItems.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredItems, page]);
+  const mobileDraftBaget = useMemo(
+    () => catalogItems.find((item) => item.id === mobileSelectorDraftId) ?? null,
+    [catalogItems, mobileSelectorDraftId],
+  );
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
@@ -1071,14 +1084,17 @@ export default function BagetConfigurator({
 
       {isMobileSelectorOpen && !isNoFrameStretchedCanvas ? (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-white px-4 pb-6 pt-4 dark:bg-neutral-950 lg:hidden"
+          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-white dark:bg-neutral-950 lg:hidden"
           role="dialog"
           aria-modal="true"
           aria-label="Мобильный выбор багета"
         >
-          <div className="mx-auto w-full max-w-xl space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold">Выбор багета</h2>
+          <div className="sticky top-0 z-10 border-b border-neutral-200/80 bg-white/95 px-4 py-3 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
+            <div className="mx-auto flex w-full max-w-xl items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-base font-semibold">Выбор багета</h2>
+                <p className="truncate text-xs text-neutral-500 dark:text-neutral-300">{filteredItems.length} вариантов</p>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsMobileSelectorOpen(false)}
@@ -1088,48 +1104,89 @@ export default function BagetConfigurator({
                 ✕
               </button>
             </div>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">
-              {selectedBagetForQuote ? `Сейчас выбран: ${selectedBagetForQuote.article}` : 'Выберите подходящий багет из каталога.'}
-            </p>
-            <BagetFilters
-              filters={filters}
-              setFilters={setFilters}
-              materials={materials}
-              setMaterials={setMaterials}
-              printRequirement={printRequirement}
-              setPrintRequirement={setPrintRequirement}
-              colors={colors}
-              styles={styles}
-              standAllowed={standAllowed}
-              stretcherNarrowAllowed={stretcherNarrowAllowed}
-              passepartoutAllowed={isPassepartoutAllowed}
-              glazingAllowed={isGlazingAllowed}
-              passepartoutDisabledReason={
-                isNoFrameStretchedCanvas
-                  ? 'Паспарту недоступно для холста на подрамнике без рамки.'
-                  : !isPassepartoutSizeAllowed
-                    ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
-                    : undefined
-              }
-              glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
-            />
-            <div className="grid grid-cols-1 gap-2.5 min-[430px]:grid-cols-2">
-              {pagedItems.map((item) => (
-                <BagetCard
-                  key={item.id}
-                  item={item}
-                  selected={selectedBaget?.id === item.id}
-                  onSelect={(baget) => {
-                    handleSelectBaget(baget);
-                    setIsMobileSelectorOpen(false);
-                  }}
-                />
-              ))}
+          </div>
+          <div className="mx-auto flex w-full max-w-xl flex-1 flex-col overflow-hidden px-4 pb-4 pt-3">
+            <div className="mb-3">
+              <button
+                type="button"
+                onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                className="inline-flex min-h-9 items-center rounded-lg border border-neutral-300 px-3 text-sm font-medium text-neutral-700 dark:border-neutral-700 dark:text-neutral-200"
+                aria-expanded={isMobileFiltersOpen}
+                aria-controls="mobile-baget-filters"
+              >
+                Фильтры {isMobileFiltersOpen ? '▲' : '▼'}
+              </button>
+              {isMobileFiltersOpen ? (
+                <div id="mobile-baget-filters" className="mt-3">
+                  <BagetFilters
+                    filters={filters}
+                    setFilters={setFilters}
+                    materials={materials}
+                    setMaterials={setMaterials}
+                    printRequirement={printRequirement}
+                    setPrintRequirement={setPrintRequirement}
+                    colors={colors}
+                    styles={styles}
+                    standAllowed={standAllowed}
+                    stretcherNarrowAllowed={stretcherNarrowAllowed}
+                    passepartoutAllowed={isPassepartoutAllowed}
+                    glazingAllowed={isGlazingAllowed}
+                    passepartoutDisabledReason={
+                      isNoFrameStretchedCanvas
+                        ? 'Паспарту недоступно для холста на подрамнике без рамки.'
+                        : !isPassepartoutSizeAllowed
+                          ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
+                          : undefined
+                    }
+                    glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
+                  />
+                </div>
+              ) : null}
             </div>
-            {pagedItems.length === 0 && (
-              <div className="card rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">По заданным фильтрам ничего не найдено.</div>
-            )}
-            {renderPagination()}
+            <div className="flex-1 overflow-y-auto pb-36">
+              <div className="grid grid-cols-2 gap-2.5">
+                {pagedItems.map((item) => (
+                  <BagetMobileSelectorCard
+                    key={item.id}
+                    item={item}
+                    selected={mobileSelectorDraftId === item.id}
+                    onSelect={(baget) => setMobileSelectorDraftId(baget.id)}
+                  />
+                ))}
+              </div>
+              {pagedItems.length === 0 && (
+                <div className="card mt-2 rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">По заданным фильтрам ничего не найдено.</div>
+              )}
+              <div className="pt-3">{renderPagination()}</div>
+            </div>
+          </div>
+          <div className="sticky bottom-0 z-10 border-t border-neutral-200/80 bg-white/95 px-4 py-3 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
+            <div className="mx-auto flex w-full max-w-xl items-center gap-3">
+              <div className="min-w-0 flex-1">
+                {mobileDraftBaget ? (
+                  <>
+                    <p className="truncate text-xs text-neutral-500 dark:text-neutral-300">
+                      {mobileDraftBaget.article} · {mobileDraftBaget.width_mm} мм
+                    </p>
+                    <p className="truncate text-sm font-medium">{mobileDraftBaget.name}</p>
+                  </>
+                ) : (
+                  <p className="text-sm text-neutral-500 dark:text-neutral-300">Выберите багет, чтобы применить выбор.</p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!mobileDraftBaget) return;
+                  handleSelectBaget(mobileDraftBaget);
+                  setIsMobileSelectorOpen(false);
+                }}
+                disabled={!mobileDraftBaget}
+                className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Выбрать багет
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
