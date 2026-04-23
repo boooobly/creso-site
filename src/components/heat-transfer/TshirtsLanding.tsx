@@ -242,7 +242,7 @@ export default function TshirtsLanding({
               contentClassName="max-w-[580px]"
               mediaClassName="lg:min-h-[420px]"
               media={
-                <HeroMediaPanel className="relative min-h-[250px] p-0 shadow-[0_16px_36px_rgba(15,23,42,0.14)] sm:min-h-[320px] lg:min-h-[420px]">
+                <HeroMediaPanel className="relative min-h-[220px] p-0 shadow-[0_16px_36px_rgba(15,23,42,0.14)] sm:min-h-[300px] lg:min-h-[420px]">
                   <Image
                     src={galleryImages['tshirts.hero.main']?.url ?? '/images/t-shirt/tshirt_hero.png'}
                     alt={galleryImages['tshirts.hero.main']?.altText || 'Брендированные футболки для команды'}
@@ -250,7 +250,7 @@ export default function TshirtsLanding({
                     className="object-cover object-center"
                     sizes="(min-width: 1280px) 540px, (min-width: 1024px) 44vw, 100vw"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-5 py-4">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 sm:px-5 sm:py-4">
                     <p className="text-sm font-semibold text-white">Печать для мерча, формы и промо</p>
                     <p className="mt-0.5 text-xs text-white/85">Стабильная цветопередача и аккуратная посадка принта</p>
                   </div>
@@ -258,7 +258,7 @@ export default function TshirtsLanding({
               }
             >
               <HeroEyebrow className="text-xs tracking-[0.18em]">Брендированная одежда</HeroEyebrow>
-              <HeroTitle className="mt-3 max-w-[15ch] text-3xl font-extrabold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">{heroTitle}</HeroTitle>
+              <HeroTitle className="mt-3 max-w-[15ch] text-[1.9rem] font-extrabold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">{heroTitle}</HeroTitle>
               <HeroLead className="mt-3 max-w-2xl text-sm leading-6 dark:text-neutral-300 md:text-[1.03rem] md:leading-7">
                 {heroDescription}
               </HeroLead>
@@ -266,14 +266,14 @@ export default function TshirtsLanding({
                 <p className="mt-6 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
                   Работаем с тиражами от 1 изделия: подойдёт для мерча, формы и корпоративных запусков.
                 </p>
-                <HeroChipList className="mt-3 gap-2 sm:grid-cols-2">
+                <HeroChipList className="mt-3 gap-1.5 sm:grid-cols-2 sm:gap-2">
                   {kpiChips.map((chip, index) => (
                     <HeroChip
                       key={chip}
                       style={delayStyle(index, heroReveal.prefersReducedMotion)}
-                      className={`rounded-xl border border-neutral-200 bg-white px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+                      className={`rounded-xl border border-neutral-200 bg-white px-2.5 py-1.5 dark:border-neutral-800 dark:bg-neutral-900 sm:px-3 sm:py-2 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
                     >
-                      <p className="flex items-center gap-2 text-xs font-semibold leading-none text-neutral-900 dark:text-neutral-100">
+                      <p className="flex items-center gap-2 text-[11px] font-semibold leading-tight text-neutral-900 dark:text-neutral-100 sm:text-xs">
                         <span className="size-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
                         {chip}
                       </p>
@@ -281,7 +281,7 @@ export default function TshirtsLanding({
                   ))}
                 </HeroChipList>
 
-                <HeroActions className="mt-6">
+                <HeroActions className="mt-5 sm:mt-6">
                   <Link
                     href="#tshirts-order"
                     className="btn-primary h-11 px-6 text-sm no-underline"

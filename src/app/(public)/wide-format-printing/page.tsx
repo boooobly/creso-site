@@ -85,7 +85,7 @@ export default async function WideFormatPrintingPage() {
     <div className="pb-12 md:pb-16">
       <Section spacing="compact">
         <PageHero className="border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50/65 to-red-50/[0.16] p-5 shadow-sm shadow-neutral-200/60 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] dark:shadow-none md:p-7 lg:p-9" contentClassName="flex h-full flex-col lg:min-h-[29rem]" mediaClassName="h-full" media={
-          <HeroMediaPanel className="flex h-full flex-col border-neutral-200/90 bg-neutral-100/90 p-4 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm dark:border-neutral-800/90 dark:bg-neutral-900/90 dark:shadow-none md:p-5">
+          <HeroMediaPanel className="flex h-full flex-col border-neutral-200/90 bg-neutral-100/90 p-3.5 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm dark:border-neutral-800/90 dark:bg-neutral-900/90 dark:shadow-none md:p-5">
             <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3.5 dark:border-neutral-800/80">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Производственный профиль</p>
@@ -95,14 +95,14 @@ export default async function WideFormatPrintingPage() {
               </div>
             </div>
 
-            <div className="mt-4 grid flex-1 content-between gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="mt-3 grid flex-1 content-start gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
               {heroHighlights.map((item) => {
                 const Icon = item.icon;
 
                 return (
                   <article
                     key={item.title}
-                    className="card-structured rounded-xl border-neutral-200/90 bg-white/80 p-4 transition-colors duration-200 hover:border-neutral-300 hover:bg-white/90 dark:bg-neutral-900/70"
+                    className="card-structured rounded-xl border-neutral-200/90 bg-white/80 p-3 transition-colors duration-200 hover:border-neutral-300 hover:bg-white/90 dark:bg-neutral-900/70 md:p-4"
                   >
                     <div className="flex items-center gap-3">
                       <span className="public-icon-badge shrink-0">
@@ -110,7 +110,7 @@ export default async function WideFormatPrintingPage() {
                       </span>
                       <div className="space-y-1.5">
                         <h3 className="text-sm font-semibold leading-5 text-neutral-900 dark:text-neutral-100">{item.title}</h3>
-                        <p className="text-sm leading-[1.45] text-neutral-600 dark:text-neutral-300">{item.description}</p>
+                        <p className="text-xs leading-[1.45] text-neutral-600 dark:text-neutral-300 md:text-sm">{item.description}</p>
                       </div>
                     </div>
                   </article>
@@ -121,14 +121,14 @@ export default async function WideFormatPrintingPage() {
         }>
           <div className="space-y-4">
             <HeroEyebrow>Экосольвентная печать</HeroEyebrow>
-            <HeroTitle className="max-w-3xl text-3xl md:text-5xl">{heroTitle}</HeroTitle>
+            <HeroTitle className="max-w-3xl text-[1.9rem] leading-[1.08] md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[41rem] text-sm leading-6 md:text-[1.05rem] md:leading-7">
               {heroDescription} Поможем согласовать материал, формат и постобработку под вашу задачу.
             </HeroLead>
           </div>
 
-          <div className="mt-7 flex flex-1 flex-col justify-end gap-4 lg:pt-7">
-            <div className="space-y-4 border-t border-neutral-200/80 pt-4 dark:border-neutral-800/80">
+          <div className="mt-6 flex flex-1 flex-col justify-end gap-4 lg:pt-7">
+            <div className="space-y-3.5 border-t border-neutral-200/80 pt-4 dark:border-neutral-800/80">
               <p className="max-w-xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                 Подскажем по материалам, постобработке и требованиям к файлу перед печатью.
               </p>
@@ -136,9 +136,9 @@ export default async function WideFormatPrintingPage() {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400 dark:text-neutral-500">Подходит для</p>
                 <span className="h-px flex-1 bg-neutral-200/80 dark:bg-neutral-800/80" aria-hidden="true" />
               </div>
-              <HeroChipList className="max-w-[34rem] gap-2">
+              <HeroChipList className="max-w-[34rem] gap-1.5 sm:gap-2">
                 {trustMarkers.map((marker) => (
-                  <HeroChip key={marker} className="chip-elevated min-h-8 gap-1.5 border-neutral-200/80 bg-white/75 py-1.5 text-[11px] shadow-none dark:border-neutral-700/80 dark:bg-neutral-900/80 dark:text-neutral-200 md:text-xs">
+                  <HeroChip key={marker} className="chip-elevated min-h-8 gap-1.5 border-neutral-200/80 bg-white/75 px-2.5 py-1.5 text-[10px] shadow-none dark:border-neutral-700/80 dark:bg-neutral-900/80 dark:text-neutral-200 sm:text-[11px] md:text-xs">
                     <span className="card-dot h-1.5 w-1.5" aria-hidden="true" />
                     {marker}
                   </HeroChip>
@@ -200,7 +200,7 @@ export default async function WideFormatPrintingPage() {
             </div>
           </div>
 
-          <section className="card p-6 md:p-8">
+          <section className="card p-5 md:p-8">
             <div className="space-y-2">
               <p className="t-eyebrow">Преимущества</p>
               <h3 className="text-xl font-semibold tracking-tight md:text-2xl">Почему выбирают нас</h3>

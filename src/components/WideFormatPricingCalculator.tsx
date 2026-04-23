@@ -324,8 +324,8 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-stretch">
-      <section className="card flex h-full flex-col space-y-6 border-neutral-200/85 bg-white/90 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-stretch">
+      <section className="card flex h-full flex-col space-y-5 border-neutral-200/85 bg-white/90 p-4 shadow-sm shadow-neutral-200/50 md:space-y-6 md:p-6">
         <header className="space-y-2 border-b border-neutral-200/75 pb-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Конфигурация</p>
           <h2 className="text-xl font-semibold tracking-tight">Параметры заказа</h2>
@@ -338,7 +338,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           </div>
         ) : null}
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
           <div className="space-y-2">
             <label htmlFor="material-category" className="text-sm font-medium">Категория</label>
             <Select value={category} onValueChange={(value) => handleCategoryChange(value as WideFormatCategory)} disabled={visibleCategoryOptions.length === 0}>
@@ -378,7 +378,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
           <div className="space-y-2">
             <label htmlFor="width" className="text-sm font-medium">Ширина (м)</label>
             <input
@@ -476,7 +476,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
         )}
       </section>
 
-      <aside className="card flex h-full flex-col space-y-5 border-neutral-200/85 bg-white/90 p-5 shadow-sm shadow-neutral-200/50 md:p-6">
+        <aside className="card flex h-full flex-col space-y-4 border-neutral-200/85 bg-white/90 p-4 shadow-sm shadow-neutral-200/50 md:space-y-5 md:p-6">
         <header className="space-y-2 border-b border-neutral-200/75 pb-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Стоимость</p>
           <h2 className="text-xl font-semibold tracking-tight">Расчёт</h2>
@@ -507,11 +507,11 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
           )}
         </div>
 
-        <div className="rounded-2xl border border-red-500/25 bg-gradient-to-b from-red-50/35 via-white to-white p-5 shadow-[0_20px_36px_-30px_rgba(220,38,38,0.5)] dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-900">
+        <div className="rounded-2xl border border-red-500/25 bg-gradient-to-b from-red-50/35 via-white to-white p-4 shadow-[0_20px_36px_-30px_rgba(220,38,38,0.5)] dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-900 sm:p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-red-500/90">Итог по заказу</p>
           <div className="space-y-2 border-t border-neutral-200 pt-3 dark:border-neutral-700">
             <p className="text-sm text-neutral-600 dark:text-neutral-300">Итого</p>
-            <p className={`text-[2.55rem] font-semibold leading-none tracking-tight text-neutral-900 transition-transform duration-300 dark:text-neutral-50 ${pricePulse ? 'scale-[1.02]' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
+            <p className={`break-words text-[2.05rem] font-semibold leading-none tracking-tight text-neutral-900 transition-transform duration-300 dark:text-neutral-50 sm:text-[2.55rem] ${pricePulse ? 'scale-[1.02]' : 'scale-100'}`}>{quote.totalCost.toLocaleString('ru-RU')} ₽</p>
             <p className="mt-2 text-sm text-muted-foreground">
               Цена за 1 шт: {totalPerUnit ? totalPerUnit.toLocaleString('ru-RU') : '—'} ₽
             </p>
@@ -551,9 +551,9 @@ function CheckboxRow({ label, checked, onChange }: { label: string; checked: boo
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <p className="flex items-center text-sm leading-6">
+    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-6">
       <span className="text-neutral-600 dark:text-neutral-300">{label}</span>
-      <span className="mx-3 flex-1 border-b border-dashed border-neutral-300 dark:border-neutral-700" />
+      <span className="mx-1 hidden flex-1 border-b border-dashed border-neutral-300 dark:border-neutral-700 sm:block" />
       <b className="font-semibold text-neutral-900 dark:text-neutral-50">{value}</b>
     </p>
   );
