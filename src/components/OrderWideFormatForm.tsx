@@ -211,15 +211,15 @@ export default function OrderWideFormatForm() {
   const inputClass = (field: keyof FormValues) => publicInputClass(Boolean(errors[field]));
 
   return (
-    <div id="wide-format-form" className={`${publicFormStyles.shell} border-neutral-200/85 transition-all duration-300 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
+    <div id="wide-format-form" className={`${publicFormStyles.shell} border-neutral-200/85 p-4 transition-all duration-300 sm:p-5 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
       <div className={`${publicFormStyles.heading} space-y-2 border-b border-neutral-200/80 pb-5`}>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Заявка</p>
         <h2 id="wide-format-form-title" className="text-2xl font-semibold tracking-tight">Рассчитать стоимость</h2>
         <p className="text-sm leading-6 text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
       </div>
 
-      <form className={`${publicFormStyles.fieldsStack} mt-6`} onSubmit={handleSubmit} noValidate>
-        <div className="grid gap-4 md:grid-cols-2 md:items-start">
+      <form className={`${publicFormStyles.fieldsStack} mt-5 md:mt-6`} onSubmit={handleSubmit} noValidate>
+        <div className="grid gap-3.5 md:grid-cols-2 md:items-start md:gap-4">
           <div className="space-y-4">
             <label className="space-y-2">
               <span className="text-sm font-medium">Имя *</span>
@@ -272,7 +272,7 @@ export default function OrderWideFormatForm() {
           </div>
         </div>
 
-        <div className="grid gap-4 border-t border-neutral-200/80 pt-5 md:grid-cols-2">
+        <div className="grid gap-3.5 border-t border-neutral-200/80 pt-5 md:grid-cols-2 md:gap-4">
           <label className="space-y-2">
             <span className="text-sm font-medium">Ширина (мм)</span>
             <input className={inputClass('width')} inputMode="numeric" value={values.width} onChange={(e) => setValues((prev) => ({ ...prev, width: e.target.value }))} />
@@ -327,10 +327,13 @@ export default function OrderWideFormatForm() {
         {errors.privacyConsent && <p className="-mt-3 text-xs text-red-600">{errors.privacyConsent}</p>}
 
         <div className={publicFormStyles.actionRow}>
+          <p className="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+            Проверим макет и свяжемся для подтверждения параметров и срока.
+          </p>
           <button
             type="submit"
             disabled={isSending}
-            className={`${publicFormStyles.submitButton} hover:opacity-90 md:min-w-[180px]`}
+            className={`${publicFormStyles.submitButton} w-full hover:opacity-90 md:min-w-[180px] md:w-auto`}
           >
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
