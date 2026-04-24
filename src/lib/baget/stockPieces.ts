@@ -46,6 +46,38 @@ export function parseResiduesToPieces(residuesText: string): number[] {
   return pieces;
 }
 
+function canAllocateSidesFromPieces(remainingPieces: number[], sides: number[], sideIndex: number): boolean {
+  if (sideIndex >= sides.length) {
+    return true;
+  }
+
+  const side = sides[sideIndex];
+  const triedCapacities = new Set<number>();
+
+  for (let pieceIndex = 0; pieceIndex < remainingPieces.length; pieceIndex += 1) {
+    const piece = remainingPieces[pieceIndex];
+    if (piece < side) {
+      continue;
+    }
+
+    const roundedPiece = Number(piece.toFixed(6));
+    if (triedCapacities.has(roundedPiece)) {
+      continue;
+    }
+    triedCapacities.add(roundedPiece);
+
+    const nextPieces = [...remainingPieces];
+    nextPieces[pieceIndex] = piece - side;
+    nextPieces.sort((a, b) => b - a);
+
+    if (canAllocateSidesFromPieces(nextPieces, sides, sideIndex + 1)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export function canFulfillFrameFromPieces(piecesMeters: number[], requiredSidesMeters: number[]): boolean {
   if (requiredSidesMeters.length !== 4) {
     return false;
@@ -61,26 +93,25 @@ export function canFulfillFrameFromPieces(piecesMeters: number[], requiredSidesM
 
   const availablePieces = piecesMeters
     .filter((value) => Number.isFinite(value) && value > 0)
-    .sort((a, b) => a - b);
+    .sort((a, b) => b - a);
 
-  for (const side of sides) {
-    const pieceIndex = availablePieces.findIndex((piece) => piece >= side);
-    if (pieceIndex === -1) {
-      return false;
-    }
-
-    availablePieces.splice(pieceIndex, 1);
+  if (availablePieces.length === 0) {
+    return false;
   }
 
-  return true;
+  return canAllocateSidesFromPieces(availablePieces, sides, 0);
 }
 
-export function computeRequiredSidesMeters(widthMm: number, heightMm: number, reserveMmPerSide: number): number[] {
-  const reserveMeters = reserveMmPerSide / 1000;
-  const widthMeters = widthMm / 1000 + reserveMeters;
-  const heightMeters = heightMm / 1000 + reserveMeters;
+export function computeRequiredSidesMeters(
+  effectiveWidthMm: number,
+  effectiveHeightMm: number,
+  bagetProfileWidthMm: number,
+  reserveMmPerSide: number,
+): number[] {
+  const sideWidthMeters = (effectiveWidthMm + 2 * bagetProfileWidthMm + reserveMmPerSide) / 1000;
+  const sideHeightMeters = (effectiveHeightMm + 2 * bagetProfileWidthMm + reserveMmPerSide) / 1000;
 
-  return [widthMeters, widthMeters, heightMeters, heightMeters];
+  return [sideWidthMeters, sideWidthMeters, sideHeightMeters, sideHeightMeters];
 }
 
 function runSanityChecks(): void {
@@ -93,13 +124,13 @@ function runSanityChecks(): void {
     throw new Error('[baget/stockPieces] sanity check failed: short pieces should not fulfill frame.');
   }
 
-  const fulfillsWithMixedPieces = canFulfillFrameFromPieces(
-    [2.9, 1.23, 0.69, 0.61, 0.54, 0.4, 0.3, 0.3],
-    [0.61, 0.61, 0.51, 0.51],
+  const fulfillsByCuttingLongPieces = canFulfillFrameFromPieces(
+    [1.5, 1.2],
+    [0.672, 0.672, 0.472, 0.472],
   );
 
-  if (!fulfillsWithMixedPieces) {
-    throw new Error('[baget/stockPieces] sanity check failed: mixed pieces should fulfill frame.');
+  if (!fulfillsByCuttingLongPieces) {
+    throw new Error('[baget/stockPieces] sanity check failed: long pieces should allow multi-cut fulfillment.');
   }
 }
 

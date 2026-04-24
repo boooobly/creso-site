@@ -453,12 +453,17 @@ export default function BagetConfigurator({
 
         const canFulfillFromStock = !validSize || canFulfillFrameFromPieces(
           parseResiduesToPieces(item.residues_text),
-          computeRequiredSidesMeters(widthMm, heightMm, Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10),
+          computeRequiredSidesMeters(
+            effectiveWidthMm,
+            effectiveHeightMm,
+            Number.isFinite(item.width_mm) ? item.width_mm : 0,
+            Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10,
+          ),
         );
 
         return colorMatch && styleMatch && widthMatch && priceMatch && visibleOnSite && canFulfillFromStock;
       }),
-    [catalogItems, filters, heightMm, validSize, widthMm],
+    [catalogItems, effectiveHeightMm, effectiveWidthMm, filters, validSize],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
