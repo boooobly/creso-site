@@ -41,49 +41,49 @@ export default async function SiteFooter() {
                 <Image src="/images/logo-light.png" alt="CredoMir logo" width={222} height={78} className="block h-14 w-auto dark:hidden" />
                 <Image src="/images/logo-dark.png" alt="CredoMir logo" width={222} height={78} className="hidden h-14 w-auto dark:block" />
               </Link>
-              <p className="t-small text-neutral-600 dark:text-neutral-400">{settings.address}</p>
+              <p className="t-small text-wrap-safe text-neutral-600 dark:text-neutral-400">{settings.address}</p>
             </div>
 
             <div className="grid gap-2 sm:grid-cols-2">
               <a
                 href={`tel:${settings.phoneHref}`}
-                className="group rounded-xl border border-[color:var(--brand-red)]/35 bg-white px-3.5 py-2.5 text-sm font-semibold text-neutral-800 no-underline shadow-[0_8px_18px_-18px_rgba(212,28,28,0.9)] transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-[color:var(--brand-red)]/45 dark:bg-neutral-900 dark:text-neutral-100"
+                className="group min-h-11 rounded-xl border border-[color:var(--brand-red)]/35 bg-white px-3.5 py-2.5 text-sm font-semibold text-neutral-800 no-underline shadow-[0_8px_18px_-18px_rgba(212,28,28,0.9)] transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-[color:var(--brand-red)]/45 dark:bg-neutral-900 dark:text-neutral-100"
               >
                 <span className="block text-[11px] uppercase tracking-[0.09em] text-[var(--brand-red)]/85 transition-colors group-hover:text-[var(--brand-red)] dark:text-[var(--brand-red)]/80">
                   Телефон
                 </span>
-                <span className="mt-0.5 block">{settings.phone}</span>
+                <span className="text-wrap-safe mt-0.5 block">{settings.phone}</span>
               </a>
               <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noreferrer"
-                className="group rounded-xl border border-[color:var(--brand-red)]/35 bg-white px-3.5 py-2.5 text-sm font-semibold text-neutral-800 no-underline shadow-[0_8px_18px_-18px_rgba(212,28,28,0.9)] transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-[color:var(--brand-red)]/45 dark:bg-neutral-900 dark:text-neutral-100"
+                className="group min-h-11 rounded-xl border border-[color:var(--brand-red)]/35 bg-white px-3.5 py-2.5 text-sm font-semibold text-neutral-800 no-underline shadow-[0_8px_18px_-18px_rgba(212,28,28,0.9)] transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-[color:var(--brand-red)]/45 dark:bg-neutral-900 dark:text-neutral-100"
               >
                 <span className="block text-[11px] uppercase tracking-[0.09em] text-[var(--brand-red)]/85 transition-colors group-hover:text-[var(--brand-red)] dark:text-[var(--brand-red)]/80">
                   WhatsApp
                 </span>
-                <span className="mt-0.5 block">{settings.whatsapp}</span>
+                <span className="text-wrap-safe mt-0.5 block">{settings.whatsapp}</span>
               </a>
               <a
                 href={telegramHref}
                 target="_blank"
                 rel="noreferrer"
-                className="group rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-[color:var(--brand-red)]/60 hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
+                className="group min-h-11 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-[color:var(--brand-red)]/60 hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
               >
                 <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red)]/90 dark:text-neutral-400">
                   Telegram
                 </span>
-                <span className="mt-0.5 block">{settings.telegram}</span>
+                <span className="text-wrap-safe mt-0.5 block">{settings.telegram}</span>
               </a>
               <a
                 href={`mailto:${settings.email}`}
-                className="group rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-[color:var(--brand-red)]/60 hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
+                className="group min-h-11 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-[color:var(--brand-red)]/60 hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
               >
                 <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red)]/90 dark:text-neutral-400">
                   Email
                 </span>
-                <span className="mt-0.5 block">{settings.email}</span>
+                <span className="text-wrap-safe mt-0.5 block">{settings.email}</span>
               </a>
             </div>
           </section>
@@ -94,7 +94,7 @@ export default async function SiteFooter() {
             </h3>
             <div className="space-y-1.5">
               <p className="text-sm font-semibold tracking-[0.01em] text-neutral-900 dark:text-neutral-100">{settings.companyName}</p>
-              <p className="t-small text-neutral-600 dark:text-neutral-400">{settings.companyShortInfo}</p>
+              <p className="t-small text-wrap-safe text-neutral-600 dark:text-neutral-400">{settings.companyShortInfo}</p>
             </div>
             <div className="space-y-1.5 border-t border-neutral-200 pt-2.5 dark:border-neutral-800">
               <p className="t-small font-medium text-neutral-700 dark:text-neutral-300">Режим работы: {settings.workingHours}</p>
@@ -111,7 +111,7 @@ export default async function SiteFooter() {
               {trustPoints.map((point) => (
                 <li key={point} className="flex items-start gap-2">
                   <span className="card-dot mt-1.5" aria-hidden="true" />
-                  <span>{point}</span>
+                  <span className="text-wrap-safe">{point}</span>
                 </li>
               ))}
             </ul>
@@ -126,7 +126,7 @@ export default async function SiteFooter() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-md px-2 py-1.5 leading-5 no-underline transition-colors hover:bg-white hover:text-[var(--brand-red)] dark:hover:bg-neutral-900 dark:hover:text-red-300"
+                  className="text-wrap-safe min-h-11 rounded-md px-2 py-2 leading-5 no-underline transition-colors hover:bg-white hover:text-[var(--brand-red)] dark:hover:bg-neutral-900 dark:hover:text-red-300"
                 >
                   {item.label}
                 </Link>
@@ -136,7 +136,7 @@ export default async function SiteFooter() {
         </div>
 
         <div className="mt-6 flex flex-col gap-2.5 border-t border-neutral-200/90 pt-4 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400 md:flex-row md:items-center md:justify-between">
-          <p className="leading-5">{settings.footerText}</p>
+          <p className="text-wrap-safe leading-5">{settings.footerText}</p>
           <Link href="/privacy" className="w-fit font-medium no-underline transition-colors hover:text-[var(--brand-red)] dark:hover:text-red-300">
             Политика конфиденциальности
           </Link>
