@@ -125,24 +125,23 @@ export default async function WideFormatPrintingPage() {
             <HeroLead className="max-w-[41rem] text-[13px] leading-5 text-neutral-600 dark:text-neutral-300 sm:text-sm sm:leading-6 md:text-[1.05rem] md:leading-7">
               {heroDescription} Поможем согласовать материал, формат и постобработку под вашу задачу.
             </HeroLead>
-          </div>
-
-          <div className="mt-4 flex flex-1 flex-col justify-end gap-3.5 sm:mt-5 lg:mt-6 lg:gap-4 lg:pt-7">
-            <HeroActions className="gap-2.5 sm:gap-3">
+            <HeroActions className="pt-1 lg:hidden">
               <Link
                 href="#wide-format-calculator"
-                className="btn-primary min-h-11 w-full gap-2 px-5 py-3 text-sm font-semibold no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)] sm:w-auto"
+                className="btn-primary min-h-11 w-full gap-2 px-5 py-3 text-sm font-semibold no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
               >
                 Рассчитать стоимость
               </Link>
               <Link
                 href="#wide-format-form"
-                className="min-h-11 w-full rounded-xl border border-neutral-200/90 bg-white/75 px-5 py-3 text-center text-sm font-medium text-neutral-700 no-underline transition-colors hover:bg-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200 dark:hover:bg-neutral-900 sm:w-auto"
+                className="min-h-11 w-full rounded-xl border border-neutral-200/90 bg-white/75 px-5 py-3 text-center text-sm font-medium text-neutral-700 no-underline transition-colors hover:bg-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200 dark:hover:bg-neutral-900"
               >
                 Отправить параметры
               </Link>
             </HeroActions>
+          </div>
 
+          <div className="mt-4 hidden flex-1 flex-col justify-end gap-3.5 sm:mt-5 lg:mt-6 lg:flex lg:gap-4 lg:pt-7">
             <div className="space-y-2.5 border-t border-neutral-200/80 pt-3 dark:border-neutral-800/80 sm:space-y-3 sm:pt-4">
               <p className="max-w-xl text-xs leading-5 text-neutral-500 dark:text-neutral-400 sm:text-sm sm:leading-6">
                 Подскажем по материалам, постобработке и требованиям к файлу перед печатью.
@@ -161,31 +160,63 @@ export default async function WideFormatPrintingPage() {
               </HeroChipList>
             </div>
 
-            <section className="rounded-2xl border border-neutral-200/80 bg-white/70 p-3.5 dark:border-neutral-800/85 dark:bg-neutral-900/65 lg:hidden">
-              <div className="mb-2.5 flex items-center justify-between gap-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">Производственный профиль</p>
-                <span className="public-icon-badge-sm">
-                  <Droplets size={14} strokeWidth={2} aria-hidden="true" />
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {heroHighlights.map((item) => {
-                  const Icon = item.icon;
-
-                  return (
-                    <article key={item.title} className="rounded-xl border border-neutral-200/80 bg-white/80 p-2.5 dark:border-neutral-800/90 dark:bg-neutral-900/70">
-                      <div className="mb-1.5 flex items-center gap-1.5">
-                        <Icon size={14} strokeWidth={2} className="text-[var(--brand-red)]" aria-hidden="true" />
-                        <h3 className="text-[11px] font-semibold leading-4 text-neutral-900 dark:text-neutral-100">{item.title}</h3>
-                      </div>
-                      <p className="text-[10px] leading-4 text-neutral-600 dark:text-neutral-300">{item.description}</p>
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
+            <HeroActions className="gap-2.5 sm:gap-3">
+              <Link
+                href="#wide-format-calculator"
+                className="btn-primary min-h-11 gap-2 px-5 py-3 text-sm font-semibold no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
+              >
+                Рассчитать стоимость
+              </Link>
+              <Link
+                href="#wide-format-form"
+                className="min-h-11 rounded-xl border border-neutral-200/90 bg-white/75 px-5 py-3 text-center text-sm font-medium text-neutral-700 no-underline transition-colors hover:bg-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200 dark:hover:bg-neutral-900"
+              >
+                Отправить параметры
+              </Link>
+            </HeroActions>
           </div>
         </PageHero>
+
+        <div className="mt-3 space-y-3 lg:hidden">
+          <section className="rounded-2xl border border-neutral-200/80 bg-white/70 p-3 dark:border-neutral-800/85 dark:bg-neutral-900/65">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400 dark:text-neutral-500">Подходит для</p>
+              <span className="h-px flex-1 bg-neutral-200/80 dark:bg-neutral-800/80" aria-hidden="true" />
+            </div>
+            <HeroChipList className="max-w-none gap-1.5">
+              {trustMarkers.map((marker) => (
+                <HeroChip key={marker} className="chip-elevated min-h-7 gap-1.5 border-neutral-200/70 bg-white/70 px-2 py-1 text-[10px] font-medium text-neutral-600 shadow-none dark:border-neutral-700/80 dark:bg-neutral-900/75 dark:text-neutral-200">
+                  <span className="card-dot h-1 w-1" aria-hidden="true" />
+                  {marker}
+                </HeroChip>
+              ))}
+            </HeroChipList>
+          </section>
+
+          <section className="rounded-2xl border border-neutral-200/80 bg-white/70 p-3.5 dark:border-neutral-800/85 dark:bg-neutral-900/65">
+            <div className="mb-2.5 flex items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">Производственный профиль</p>
+              <span className="public-icon-badge-sm">
+                <Droplets size={14} strokeWidth={2} aria-hidden="true" />
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {heroHighlights.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <article key={item.title} className="rounded-xl border border-neutral-200/80 bg-white/80 p-2.5 dark:border-neutral-800/90 dark:bg-neutral-900/70">
+                    <div className="mb-1.5 flex items-center gap-1.5">
+                      <Icon size={14} strokeWidth={2} className="text-[var(--brand-red)]" aria-hidden="true" />
+                      <h3 className="text-[11px] font-semibold leading-4 text-neutral-900 dark:text-neutral-100">{item.title}</h3>
+                    </div>
+                    <p className="text-[10px] leading-4 text-neutral-600 dark:text-neutral-300">{item.description}</p>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        </div>
       </Section>
 
       <Section spacing="tight">
