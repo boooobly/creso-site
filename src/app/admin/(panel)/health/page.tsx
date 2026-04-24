@@ -1,4 +1,5 @@
 import { getAdminSystemHealth, type HealthStatusLevel } from '@/lib/admin/system-health';
+import BagetCatalogSyncButton from './BagetCatalogSyncButton';
 
 const statusStyles: Record<HealthStatusLevel, string> = {
   ok: 'border-emerald-200 bg-emerald-50 text-emerald-800',
@@ -43,16 +44,7 @@ export default async function AdminHealthPage() {
             </div>
             <p className="mt-2 text-sm font-medium text-slate-800">{item.summary}</p>
             <p className="mt-1 text-xs leading-5 text-slate-600">{item.details}</p>
-            {item.key === 'baguette_catalog_snapshot' ? (
-              <form method="post" action="/api/admin/baget-catalog/sync" className="mt-3">
-                <button
-                  type="submit"
-                  className="inline-flex items-center rounded-md border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-                >
-                  Обновить snapshot каталога багета
-                </button>
-              </form>
-            ) : null}
+            {item.key === 'baguette_catalog_snapshot' ? <BagetCatalogSyncButton /> : null}
           </article>
         ))}
       </section>
