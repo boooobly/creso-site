@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Menu, Moon, Sun, X } from 'lucide-react';
 import { messages } from '@/lib/messages';
 
@@ -40,7 +41,14 @@ export default function SiteHeader() {
   const [isServicesMenuOpen, setIsServicesMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
+  const [isClientMounted, setIsClientMounted] = useState(false);
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const previousMobileMenuState = useRef(false);
   const isServicesActive = pathname === '/services' || serviceDropdownItems.some((item) => pathname === item.href);
+
+  useEffect(() => {
+    setIsClientMounted(true);
+  }, []);
 
   useEffect(() => {
     let rafId: number | null = null;
@@ -102,6 +110,129 @@ export default function SiteHeader() {
       document.body.style.overflow = previousOverflow;
     };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (previousMobileMenuState.current && !isMobileMenuOpen) {
+      mobileMenuButtonRef.current?.focus();
+    }
+
+    previousMobileMenuState.current = isMobileMenuOpen;
+  }, [isMobileMenuOpen]);
+
+  const mobileMenuOverlay = (
+    <div
+      className={`fixed inset-0 z-[60] md:hidden ${
+        isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'
+      }`}
+      aria-hidden={!isMobileMenuOpen}
+    >
+      <button
+        type="button"
+        className={`absolute inset-0 bg-neutral-950/55 transition-opacity duration-200 ${
+          isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+        }`}
+        aria-label="Закрыть меню"
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+      <aside
+        id="mobile-site-menu"
+        className={`absolute right-0 top-0 flex h-dvh w-[min(22rem,calc(100%_-_0.75rem_-_env(safe-area-inset-right,0px)))] max-w-full flex-col border-l border-neutral-200 bg-white pb-[env(safe-area-inset-bottom,0px)] pr-[env(safe-area-inset-right,0px)] pt-[env(safe-area-inset-top,0px)] shadow-2xl transition-transform duration-200 dark:border-neutral-800 dark:bg-neutral-950 ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Навигация по сайту"
+      >
+        <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+          <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Меню</span>
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-300 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/35 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            aria-label="Закрыть меню"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3 py-3 pb-5" aria-label="Мобильная навигация">
+          <ul className="space-y-1.5">
+            {nav.map((item) => {
+              if (item.href === '/services') {
+                return (
+                  <li key={item.href} className="rounded-xl border border-neutral-200/90 bg-neutral-50/80 p-1.5 dark:border-neutral-800/90 dark:bg-neutral-900/60">
+                    <div className="flex items-center gap-1.5">
+                      <Link
+                        href={item.href}
+                        className={`flex min-h-11 flex-1 items-center rounded-lg px-3 text-sm font-medium no-underline transition-colors ${
+                          isServicesActive
+                            ? 'text-[var(--brand-red)]'
+                            : 'text-neutral-700 hover:text-[var(--brand-red)] dark:text-neutral-300'
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setIsMobileServicesOpen((prev) => !prev)}
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-300 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/35 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                        aria-expanded={isMobileServicesOpen}
+                        aria-controls="mobile-services-list"
+                        aria-label="Показать услуги"
+                      >
+                        <ChevronDown className={`size-4 transition-transform ${isMobileServicesOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                    </div>
+                    {isMobileServicesOpen ? (
+                      <ul id="mobile-services-list" className="mt-1.5 space-y-1.5 px-1 pb-1" aria-label="Список услуг">
+                        {serviceDropdownItems.map((service) => {
+                          const isServiceActive = pathname === service.href;
+                          return (
+                            <li key={service.href}>
+                              <Link
+                                href={service.href}
+                                className={`flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm no-underline transition-colors ${
+                                  isServiceActive
+                                    ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
+                                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-300 dark:hover:bg-neutral-800'
+                                }`}
+                              >
+                                <span className="text-wrap-safe">{service.label}</span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : null}
+                  </li>
+                );
+              }
+
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm font-medium no-underline transition-colors ${
+                      isActive
+                        ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
+                        : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-300 dark:hover:bg-neutral-800'
+                    }`}
+                  >
+                    <span className="text-wrap-safe">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className="border-t border-neutral-200 px-4 py-3 dark:border-neutral-800">
+          <ThemeToggle className="h-11 w-11" />
+        </div>
+      </aside>
+    </div>
+  );
 
   return (
     <header
@@ -219,6 +350,7 @@ export default function SiteHeader() {
         </nav>
         <div className="flex items-center gap-2">
           <button
+            ref={mobileMenuButtonRef}
             type="button"
             onClick={() => setIsMobileMenuOpen(true)}
             className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-300 bg-white/80 text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/35 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200 dark:hover:bg-neutral-800 md:hidden"
@@ -233,119 +365,7 @@ export default function SiteHeader() {
           </div>
         </div>
       </div>
-
-      <div
-        className={`fixed inset-0 z-[60] md:hidden ${
-          isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'
-        }`}
-        aria-hidden={!isMobileMenuOpen}
-      >
-        <button
-          type="button"
-          className={`absolute inset-0 bg-neutral-950/55 transition-opacity duration-200 ${
-            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
-          }`}
-          aria-label="Закрыть меню"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-        <aside
-          id="mobile-site-menu"
-          className={`absolute right-0 top-0 flex h-dvh w-[min(22rem,calc(100%_-_0.75rem_-_env(safe-area-inset-right,0px)))] max-w-full flex-col border-l border-neutral-200 bg-white pb-[env(safe-area-inset-bottom,0px)] pr-[env(safe-area-inset-right,0px)] pt-[env(safe-area-inset-top,0px)] shadow-2xl transition-transform duration-200 dark:border-neutral-800 dark:bg-neutral-950 ${
-            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Навигация по сайту"
-        >
-          <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
-            <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Меню</span>
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-300 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/35 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
-              aria-label="Закрыть меню"
-            >
-              <X className="size-5" />
-            </button>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto px-3 py-3 pb-5" aria-label="Мобильная навигация">
-            <ul className="space-y-1.5">
-              {nav.map((item) => {
-                if (item.href === '/services') {
-                  return (
-                    <li key={item.href} className="rounded-xl border border-neutral-200/90 bg-neutral-50/80 p-1.5 dark:border-neutral-800/90 dark:bg-neutral-900/60">
-                      <div className="flex items-center gap-1.5">
-                        <Link
-                          href={item.href}
-                          className={`flex min-h-11 flex-1 items-center rounded-lg px-3 text-sm font-medium no-underline transition-colors ${
-                            isServicesActive
-                              ? 'text-[var(--brand-red)]'
-                              : 'text-neutral-700 hover:text-[var(--brand-red)] dark:text-neutral-300'
-                          }`}
-                        >
-                          {item.label}
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => setIsMobileServicesOpen((prev) => !prev)}
-                          className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-300 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/35 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
-                          aria-expanded={isMobileServicesOpen}
-                          aria-controls="mobile-services-list"
-                          aria-label="Показать услуги"
-                        >
-                          <ChevronDown className={`size-4 transition-transform ${isMobileServicesOpen ? 'rotate-180' : ''}`} />
-                        </button>
-                      </div>
-                      {isMobileServicesOpen ? (
-                        <ul id="mobile-services-list" className="mt-1.5 space-y-1.5 px-1 pb-1" aria-label="Список услуг">
-                          {serviceDropdownItems.map((service) => {
-                            const isServiceActive = pathname === service.href;
-                            return (
-                              <li key={service.href}>
-                                <Link
-                                  href={service.href}
-                                  className={`flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm no-underline transition-colors ${
-                                    isServiceActive
-                                      ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
-                                      : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-300 dark:hover:bg-neutral-800'
-                                  }`}
-                                >
-                                  <span className="text-wrap-safe">{service.label}</span>
-                                </Link>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      ) : null}
-                    </li>
-                  );
-                }
-
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={`flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm font-medium no-underline transition-colors ${
-                        isActive
-                          ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
-                          : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-300 dark:hover:bg-neutral-800'
-                      }`}
-                    >
-                      <span className="text-wrap-safe">{item.label}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          <div className="border-t border-neutral-200 px-4 py-3 dark:border-neutral-800">
-            <ThemeToggle className="h-11 w-11" />
-          </div>
-        </aside>
-      </div>
+      {isClientMounted ? createPortal(mobileMenuOverlay, document.body) : null}
     </header>
   );
 }
