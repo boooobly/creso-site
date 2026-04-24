@@ -114,32 +114,61 @@ export default async function MugsServicePage() {
   const resultImageAlt = resultImage?.altText || 'Печать на кружках — пример корпоративного тиража';
   const glassOverlayClassName =
     'absolute bottom-4 left-4 right-4 rounded-2xl border border-white/35 bg-black/34 p-4 shadow-[0_14px_34px_-24px_rgba(2,6,23,0.9)] backdrop-blur-sm sm:bottom-6 sm:left-6 sm:right-6 sm:p-5';
+  const heroMedia = (
+    <HeroMediaPanel className="min-h-[320px] rounded-2xl border-neutral-200 bg-neutral-100/70 p-0 lg:min-h-full">
+      <ProtectedImage
+        src={heroImageSrc}
+        alt={heroImageAlt}
+        fill
+        priority
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        className="object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+      <div className={glassOverlayClassName}>
+        <p className="text-sm font-semibold text-white">Готовый результат: аккуратная полноцветная печать</p>
+        <p className="mt-1 text-xs text-white/80 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
+      </div>
+    </HeroMediaPanel>
+  );
 
   return (
     <div>
       <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <PageHero
-            className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:p-10"
-            mediaClassName="h-full"
-            media={
-              <HeroMediaPanel className="min-h-[320px] rounded-2xl border-neutral-200 bg-neutral-100/70 p-0 lg:min-h-full">
-                <ProtectedImage
-                  src={heroImageSrc}
-                  alt={heroImageAlt}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover object-center"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-                <div className={glassOverlayClassName}>
-                  <p className="text-sm font-semibold text-white">Готовый результат: аккуратная полноцветная печать</p>
-                  <p className="mt-1 text-xs text-white/80 sm:text-sm">Белая керамика, объём 330 мл, круговая зона печати.</p>
-                </div>
-              </HeroMediaPanel>
-            }
-          >
+          <PageHero className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:hidden lg:p-10">
+            <HeroEyebrow>Печать на кружках</HeroEyebrow>
+            <HeroTitle className="hero-title-mobile-safe max-w-[20ch] lg:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
+            <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
+              Производим кружки для корпоративных подарков, мероприятий и розницы: от малых партий до крупных тиражей. На выходе — аккуратный брендированный продукт, готовый к выдаче и продажам.
+            </HeroLead>
+
+            <HeroChipList className="mt-6 gap-2.5">
+              {['Белая керамика AAA', 'Глянец или мат', 'Тираж от 1 шт', 'Логотипы и фото'].map((item) => (
+                <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                  <span>{item}</span>
+                </HeroChip>
+              ))}
+            </HeroChipList>
+
+            <HeroActions className="mt-8">
+              <a href="#mugs-order" className="btn-primary no-underline">
+                Оставить заявку
+              </a>
+              <a href="#mugs-prices" className="btn-secondary no-underline">
+                Цены и условия
+              </a>
+            </HeroActions>
+          </PageHero>
+
+          <div className="mt-4 lg:hidden">
+            <div className="overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-[0_18px_44px_-28px_rgba(15,23,42,0.42)] dark:border-neutral-800/80 dark:bg-neutral-900/80 dark:shadow-[0_20px_44px_-28px_rgba(0,0,0,0.72)]">
+              <div className="relative min-h-[260px]">{heroMedia}</div>
+            </div>
+          </div>
+
+          <PageHero className="hidden p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:block lg:p-10" mediaClassName="h-full" media={heroMedia}>
             <HeroEyebrow>Печать на кружках</HeroEyebrow>
             <HeroTitle className="max-w-[20ch] text-4xl tracking-tight sm:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
             <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
