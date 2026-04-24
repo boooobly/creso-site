@@ -250,7 +250,7 @@ export default function SiteHeader() {
         />
         <aside
           id="mobile-site-menu"
-          className={`absolute right-0 top-0 flex h-dvh w-[min(22rem,calc(100%-0.75rem))] flex-col border-l border-neutral-200 bg-white shadow-2xl transition-transform duration-200 dark:border-neutral-800 dark:bg-neutral-950 ${
+          className={`absolute right-0 top-0 flex h-dvh w-[min(22rem,calc(100%_-_0.75rem_-_env(safe-area-inset-right,0px)))] max-w-full flex-col border-l border-neutral-200 bg-white pb-[env(safe-area-inset-bottom,0px)] pr-[env(safe-area-inset-right,0px)] pt-[env(safe-area-inset-top,0px)] shadow-2xl transition-transform duration-200 dark:border-neutral-800 dark:bg-neutral-950 ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           role="dialog"
@@ -269,7 +269,7 @@ export default function SiteHeader() {
             </button>
           </div>
 
-          <nav className="flex-1 overflow-y-auto px-3 py-3" aria-label="Мобильная навигация">
+          <nav className="flex-1 overflow-y-auto px-3 py-3 pb-5" aria-label="Мобильная навигация">
             <ul className="space-y-1.5">
               {nav.map((item) => {
                 if (item.href === '/services') {
@@ -305,13 +305,13 @@ export default function SiteHeader() {
                               <li key={service.href}>
                                 <Link
                                   href={service.href}
-                                  className={`flex min-h-11 items-center rounded-lg px-3 text-sm no-underline transition-colors ${
+                                  className={`flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm no-underline transition-colors ${
                                     isServiceActive
                                       ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
                                       : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-300 dark:hover:bg-neutral-800'
                                   }`}
                                 >
-                                  {service.label}
+                                  <span className="text-wrap-safe">{service.label}</span>
                                 </Link>
                               </li>
                             );
@@ -327,13 +327,13 @@ export default function SiteHeader() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className={`flex min-h-11 items-center rounded-lg px-3 text-sm font-medium no-underline transition-colors ${
+                      className={`flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm font-medium no-underline transition-colors ${
                         isActive
                           ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
                           : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-300 dark:hover:bg-neutral-800'
                       }`}
                     >
-                      {item.label}
+                      <span className="text-wrap-safe">{item.label}</span>
                     </Link>
                   </li>
                 );

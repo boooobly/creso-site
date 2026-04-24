@@ -12,7 +12,10 @@ html {
   scroll-behavior: smooth;
   overflow-x: clip;
 }
-body { @apply bg-white text-neutral-900 font-normal transition-colors dark:bg-neutral-950 dark:text-neutral-100; }
+body {
+  @apply bg-white text-neutral-900 font-normal transition-colors dark:bg-neutral-950 dark:text-neutral-100;
+  overflow-x: clip;
+}
 
 :root {
   --public-floating-bar-space: 96px;
@@ -102,7 +105,7 @@ a { @apply underline-offset-4; }
   }
 
   .t-helper {
-    @apply t-small text-neutral-500 dark:text-neutral-400;
+    @apply t-small break-words text-neutral-500 dark:text-neutral-400;
   }
 
   .t-value {
@@ -159,6 +162,12 @@ a { @apply underline-offset-4; }
 
   .form-shell {
     @apply rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 sm:p-5 md:p-6 lg:p-7 dark:border-neutral-700/80 dark:bg-neutral-900/75;
+  }
+
+  .text-wrap-safe {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
   }
 }
 
@@ -303,7 +312,7 @@ a { @apply underline-offset-4; }
 }
 
 .hero-title {
-  @apply t-h1 max-w-[16ch] text-[clamp(2rem,8vw,4rem)];
+  @apply t-h1 text-wrap-safe max-w-[16ch] text-[clamp(1.85rem,7.6vw,4rem)];
 }
 
 .hero-title-mobile-safe {
@@ -329,7 +338,7 @@ a { @apply underline-offset-4; }
 }
 
 .hero-lead {
-  @apply t-body max-w-[42rem] text-neutral-600 dark:text-neutral-300;
+  @apply t-body text-wrap-safe max-w-[42rem] text-neutral-600 dark:text-neutral-300;
 }
 
 .hero-actions {
@@ -409,6 +418,7 @@ a { @apply underline-offset-4; }
 .public-layout-main {
   flex: 1;
   width: 100%;
+  min-width: 0;
   padding-bottom: calc(2rem + var(--public-floating-bar-space) + env(safe-area-inset-bottom, 0px));
 }
 

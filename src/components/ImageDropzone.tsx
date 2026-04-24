@@ -72,7 +72,7 @@ export default function ImageDropzone({
 
   return (
     <div
-      className={`min-h-[120px] rounded-xl border-2 border-dashed p-3 transition-colors md:p-4 ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/25' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700/85 dark:bg-neutral-950/55'} ${className}`.trim()}
+      className={`min-h-[120px] overflow-hidden rounded-xl border-2 border-dashed p-3 transition-colors md:p-4 ${isDragging ? 'border-red-500 bg-red-50/60 dark:bg-red-950/25' : 'border-neutral-300 bg-neutral-50/70 dark:border-neutral-700/85 dark:bg-neutral-950/55'} ${className}`.trim()}
       onDragEnter={(event) => {
         event.preventDefault();
         setIsDragging(true);
@@ -99,27 +99,27 @@ export default function ImageDropzone({
         onChange={(event) => validateAndSetFile(event.target.files?.[0] ?? null)}
       />
 
-      <div className="flex min-h-[120px] flex-wrap items-center justify-between gap-4">
+      <div className="flex min-h-[120px] flex-wrap items-center justify-between gap-3.5 sm:gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             {icon}
-            <p className="text-sm font-medium">{title}</p>
+            <p className="text-wrap-safe text-sm font-medium">{title}</p>
           </div>
-          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-200">{description}</p>
+          <p className="text-wrap-safe mt-1 text-xs text-neutral-600 dark:text-neutral-200">{description}</p>
         </div>
 
-        <div className="ml-auto flex w-full flex-col items-end gap-2 sm:w-auto sm:min-w-[220px]">
+        <div className="ml-auto flex w-full flex-col items-stretch gap-2 sm:w-auto sm:min-w-[220px] sm:items-end">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="btn-secondary w-full rounded-lg px-4 py-2 text-sm sm:w-auto"
+            className="btn-secondary min-h-11 w-full rounded-lg px-4 py-2 text-sm sm:w-auto"
           >
             {buttonText}
           </button>
-          {!value && <span className="mt-1 text-right text-xs text-neutral-500 dark:text-neutral-300">Файл не выбран</span>}
+          {!value && <span className="text-wrap-safe mt-1 text-left text-xs text-neutral-500 dark:text-neutral-300 sm:text-right">Файл не выбран</span>}
           {value && (
-            <div className="mt-1 text-right">
-              <p className="max-w-[200px] truncate text-xs font-medium">{value.name}</p>
+            <div className="mt-1 text-left sm:text-right">
+              <p className="text-wrap-safe max-w-full text-xs font-medium sm:max-w-[220px]">{value.name}</p>
               <p className="text-xs text-neutral-500 dark:text-neutral-300">{formatFileSize(value.size)}</p>
             </div>
           )}
@@ -139,8 +139,8 @@ export default function ImageDropzone({
         </button>
       )}
 
-      <p className={helperTextClassName}>{helperText}</p>
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      <p className={`text-wrap-safe ${helperTextClassName}`.trim()}>{helperText}</p>
+      {error && <p className="text-wrap-safe mt-2 text-xs text-red-600">{error}</p>}
     </div>
   );
 }

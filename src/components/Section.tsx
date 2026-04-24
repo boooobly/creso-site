@@ -36,7 +36,7 @@ export default function Section({
   spacing = 'default',
 }: SectionProps) {
   const shouldReduceMotion = useReducedMotion();
-  const bleedClassName = fullBleed ? 'relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]' : '';
+  const bleedClassName = fullBleed ? 'relative overflow-x-clip ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]' : '';
 
   return (
     <motion.section

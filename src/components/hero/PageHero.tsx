@@ -38,9 +38,9 @@ const cn = (...classes: Array<string | undefined | false>) => classes.filter(Boo
 
 export function PageHero({ className, contentClassName, mediaClassName, media, children }: PageHeroProps) {
   return (
-    <div className={cn('hero-shell', className)}>
+    <div className={cn('hero-shell min-w-0', className)}>
       <div className={cn('hero-grid', media ? undefined : 'hero-grid-single')}>
-        <div className={cn('hero-content', contentClassName)}>{children}</div>
+        <div className={cn('hero-content min-w-0', contentClassName)}>{children}</div>
         {media ? <div className={cn('hero-media', mediaClassName)}>{media}</div> : null}
       </div>
     </div>
@@ -52,11 +52,11 @@ export function HeroEyebrow({ children, className }: HeroEyebrowProps) {
 }
 
 export function HeroTitle({ as: Tag = 'h1', children, className }: HeroTitleProps) {
-  return <Tag className={cn('hero-title', className)}>{children}</Tag>;
+  return <Tag className={cn('hero-title text-wrap-safe', className)}>{children}</Tag>;
 }
 
 export function HeroLead({ children, className }: HeroLeadProps) {
-  return <p className={cn('hero-lead', className)}>{children}</p>;
+  return <p className={cn('hero-lead text-wrap-safe', className)}>{children}</p>;
 }
 
 export function HeroActions({ className, children }: HeroActionsProps) {
