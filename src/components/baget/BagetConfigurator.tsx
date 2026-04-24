@@ -769,12 +769,14 @@ export default function BagetConfigurator({
     </div>
   );
 
+  const canOrder = Boolean(selectedBagetForQuote || isNoFrameStretchedCanvas) && validSize;
+
   return (
     <>
-      <div className="space-y-3 lg:hidden">
-        <div className="card rounded-2xl p-4 shadow-sm">
+      <div className="space-y-3 pb-32 lg:hidden">
+        <div className="rounded-2xl border border-neutral-200/80 bg-white/70 px-4 py-3 shadow-sm dark:border-neutral-700/70 dark:bg-neutral-900/60">
           <h1 className="text-lg font-semibold">Конфигуратор багета</h1>
-          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Задайте параметры, проверьте превью и подтвердите заказ.</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">Заполните параметры и подтвердите заказ.</p>
         </div>
 
         <div className="card rounded-2xl p-4 shadow-md">
@@ -912,7 +914,7 @@ export default function BagetConfigurator({
                 ref={mobileSelectorTriggerRef}
                 type="button"
                 onClick={() => setIsMobileSelectorOpen(true)}
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
               >
                 {selectedBagetForQuote ? 'Изменить багет' : 'Выбрать багет'}
               </button>
@@ -1000,12 +1002,31 @@ export default function BagetConfigurator({
 
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="text-base font-semibold">5. Завершение</h2>
-          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-300">Перед запуском заказа менеджер проверит параметры и итоговую стоимость.</p>
+          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-300">Проверьте итог и отправьте заявку — менеджер подтвердит детали.</p>
           <button
             type="button"
             onClick={() => setIsOrderModalOpen(true)}
-            disabled={(!selectedBagetForQuote && !isNoFrameStretchedCanvas) || !validSize}
-            className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
+            disabled={!canOrder}
+            className="mt-2 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-2.5 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Оформить заказ
+          </button>
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200/80 bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 shadow-[0_-6px_24px_rgba(0,0,0,0.08)] backdrop-blur lg:hidden dark:border-neutral-800 dark:bg-neutral-950/95">
+        <div className="mx-auto flex w-full max-w-xl items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Итого</p>
+            <p className="truncate text-lg font-bold text-neutral-900 dark:text-neutral-100">
+              {(selectedBagetForQuote || isNoFrameStretchedCanvas) ? `${quote.total.toLocaleString('ru-RU')} ₽` : 'Выберите багет'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsOrderModalOpen(true)}
+            disabled={!canOrder}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Оформить заказ
           </button>
@@ -1160,7 +1181,7 @@ export default function BagetConfigurator({
             <button
               type="button"
               onClick={() => setIsOrderModalOpen(true)}
-              disabled={(!selectedBagetForQuote && !isNoFrameStretchedCanvas) || !validSize}
+              disabled={!canOrder}
               className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center text-white no-underline transition-all duration-200 hover:scale-[1.02] hover:bg-red-700 hover:shadow-lg active:scale-[0.98]"
             >
               Оформить заказ
