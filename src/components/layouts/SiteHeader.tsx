@@ -250,7 +250,7 @@ export default function SiteHeader() {
         />
         <aside
           id="mobile-site-menu"
-          className={`absolute right-0 top-0 flex h-dvh w-[min(22rem,calc(100%-0.75rem-env(safe-area-inset-right,0px)))] max-w-full flex-col border-l border-neutral-200 bg-white pb-[env(safe-area-inset-bottom,0px)] pr-[env(safe-area-inset-right,0px)] pt-[env(safe-area-inset-top,0px)] shadow-2xl transition-transform duration-200 dark:border-neutral-800 dark:bg-neutral-950 ${
+          className={`absolute right-0 top-0 flex h-dvh w-[min(22rem,calc(100%_-_0.75rem_-_env(safe-area-inset-right,0px)))] max-w-full flex-col border-l border-neutral-200 bg-white pb-[env(safe-area-inset-bottom,0px)] pr-[env(safe-area-inset-right,0px)] pt-[env(safe-area-inset-top,0px)] shadow-2xl transition-transform duration-200 dark:border-neutral-800 dark:bg-neutral-950 ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           role="dialog"
