@@ -121,7 +121,7 @@ export default async function WideFormatPrintingPage() {
         }>
           <div className="space-y-3 md:space-y-4">
             <HeroEyebrow>Экосольвентная печать</HeroEyebrow>
-            <HeroTitle className="max-w-3xl text-[1.75rem] leading-[1.06] sm:text-[1.9rem] md:text-5xl">{heroTitle}</HeroTitle>
+            <HeroTitle className="hero-title-mobile-safe max-w-3xl sm:text-[1.9rem] md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[41rem] text-[13px] leading-5 text-neutral-600 dark:text-neutral-300 sm:text-sm sm:leading-6 md:text-[1.05rem] md:leading-7">
               {heroDescription} Поможем согласовать материал, формат и постобработку под вашу задачу.
             </HeroLead>
@@ -131,12 +131,6 @@ export default async function WideFormatPrintingPage() {
                 className="btn-primary min-h-11 w-full gap-2 px-5 py-3 text-sm font-semibold no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
               >
                 Рассчитать стоимость
-              </Link>
-              <Link
-                href="#wide-format-form"
-                className="min-h-11 w-full rounded-xl border border-neutral-200/90 bg-white/75 px-5 py-3 text-center text-sm font-medium text-neutral-700 no-underline transition-colors hover:bg-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200 dark:hover:bg-neutral-900"
-              >
-                Отправить параметры
               </Link>
             </HeroActions>
           </div>
@@ -179,6 +173,15 @@ export default async function WideFormatPrintingPage() {
 
         <div className="mt-3 space-y-3 lg:hidden">
           <section className="rounded-2xl border border-neutral-200/80 bg-white/70 p-3 dark:border-neutral-800/85 dark:bg-neutral-900/65">
+            <p className="mb-2 text-xs leading-5 text-neutral-500 dark:text-neutral-400">
+              Подскажем по материалам, постобработке и требованиям к файлу перед печатью.
+            </p>
+            <Link
+              href="#wide-format-form"
+              className="mb-2.5 inline-flex text-xs font-medium text-neutral-700 underline decoration-neutral-300 underline-offset-4 transition-colors hover:text-neutral-900 dark:text-neutral-200 dark:decoration-neutral-600 dark:hover:text-neutral-100"
+            >
+              Отправить параметры
+            </Link>
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400 dark:text-neutral-500">Подходит для</p>
               <span className="h-px flex-1 bg-neutral-200/80 dark:bg-neutral-800/80" aria-hidden="true" />
