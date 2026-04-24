@@ -65,26 +65,60 @@ export default async function StandsServicePage() {
   const siteImages = await getSiteImages(STANDS_SITE_IMAGE_SLOTS.map((slot) => slot.key));
   const heroImageSrc = siteImages['stands.hero.main']?.url ?? '/images/stands/hero.png';
   const heroImageAlt = siteImages['stands.hero.main']?.altText || 'Изготовление информационных стендов';
+  const heroMedia = (
+    <HeroMediaPanel className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-0 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="relative aspect-[5/4] min-h-[320px] overflow-hidden rounded-3xl">
+        <ProtectedImage
+          src={heroImageSrc}
+          alt={heroImageAlt}
+          fill
+          className="object-cover"
+          sizes="(min-width: 1024px) 45vw, 100vw"
+          priority
+        />
+      </div>
+    </HeroMediaPanel>
+  );
 
   return (
     <div>
       <Section className="pb-8 pt-8 md:pb-10 md:pt-10" background="default" id="stands-hero">
+        <PageHero className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-950 dark:to-neutral-900/80 lg:hidden">
+          <HeroEyebrow>Изготовление стендов</HeroEyebrow>
+          <HeroTitle className="hero-title-mobile-safe max-w-2xl lg:text-5xl">Изготовление информационных стендов</HeroTitle>
+          <HeroLead>
+            Делаем стенды для навигации, инструкций и обязательной информации. В результате вы получаете готовую к установке конструкцию
+            с понятной подачей материалов и удобным обновлением листов.
+          </HeroLead>
+
+          <HeroChipList className="mt-5 max-w-xl gap-2.5">
+            {heroChips.map((chip) => (
+              <HeroChip key={chip} className="chip-elevated gap-2 px-3 py-1.5 text-xs">
+                <span className="size-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                <span>{chip}</span>
+              </HeroChip>
+            ))}
+          </HeroChipList>
+
+          <HeroActions className="mt-7">
+            <Link href="#stands-lead-form" className="btn-primary no-underline">
+              Рассчитать стоимость
+            </Link>
+            <Link href="#stands-catalog" className="btn-secondary no-underline">
+              Смотреть варианты
+            </Link>
+          </HeroActions>
+        </PageHero>
+
+        <div className="mt-4 lg:hidden">
+          <div className="overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-[0_18px_44px_-28px_rgba(15,23,42,0.42)] dark:border-neutral-800/80 dark:bg-neutral-900/80 dark:shadow-[0_20px_44px_-28px_rgba(0,0,0,0.72)]">
+            {heroMedia}
+          </div>
+        </div>
+
         <PageHero
-          className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-950 dark:to-neutral-900/80"
-          media={
-            <HeroMediaPanel className="overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-100 p-0 dark:border-neutral-800 dark:bg-neutral-900">
-              <div className="relative aspect-[5/4] min-h-[320px] overflow-hidden rounded-3xl">
-                <ProtectedImage
-                  src={heroImageSrc}
-                  alt={heroImageAlt}
-                  fill
-                  className="object-cover"
-                  sizes="(min-width: 1024px) 45vw, 100vw"
-                  priority
-                />
-              </div>
-            </HeroMediaPanel>
-          }
+          className="hidden bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-950 dark:to-neutral-900/80 lg:block"
+          media={heroMedia}
         >
           <HeroEyebrow>Изготовление стендов</HeroEyebrow>
           <HeroTitle className="max-w-2xl text-3xl tracking-tight md:text-5xl">Изготовление информационных стендов</HeroTitle>

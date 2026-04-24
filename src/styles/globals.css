@@ -307,17 +307,24 @@ a { @apply underline-offset-4; }
 }
 
 .hero-title-mobile-safe {
-  font-size: clamp(1.58rem, 7.4vw, 1.85rem);
-  line-height: 1.08;
+  font-size: clamp(1.6rem, 6.8vw, 2.1rem);
+  line-height: 1.1;
+  letter-spacing: -0.018em;
   max-width: 100%;
   overflow-wrap: anywhere;
-  word-break: normal;
+  word-break: break-word;
   hyphens: auto;
+  text-wrap: balance;
 }
-@media (min-width: 640px) {
+@media (min-width: 1024px) {
   .hero-title-mobile-safe {
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
     overflow-wrap: normal;
+    word-break: normal;
     hyphens: manual;
+    text-wrap: pretty;
   }
 }
 
