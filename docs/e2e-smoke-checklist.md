@@ -4,12 +4,12 @@ Use this checklist after deploys (preview and production) to verify the most imp
 
 ## 1) Customer order flow
 - [ ] Create a **test order** from the public baguette/order flow.
-- [ ] Confirm order creation response includes order number and secure order/PDF links.
+- [ ] Confirm order creation response includes order number and secure order link/token.
 - [ ] Open the tokenized order page (`/order/{number}?token=...`).
 - [ ] Validate order status is visible and localized correctly.
-- [ ] Create a mock payment from the order page (or `/api/payments/create` with order token).
-- [ ] Complete mock payment (`/api/payments/mock/complete`) and verify status changes to **paid**.
-- [ ] Open PDF link and verify the order PDF renders/downloads.
+- [ ] Verify there are **no online payment controls** on public order pages.
+- [ ] Verify `/pay/mock` does not provide demo payment actions and shows that online payment is disabled.
+- [ ] Confirm payment/prepayment is handled manually by the manager after order verification.
 
 ## 2) Notifications (when env is configured)
 - [ ] Verify Telegram notification for new order (if `TELEGRAM_*` envs are configured).
@@ -28,6 +28,8 @@ Use this checklist after deploys (preview and production) to verify the most imp
 
 ## 5) Failure-path sanity checks
 - [ ] Invalid order token returns 403 on `/api/orders/{number}`.
-- [ ] Invalid payment token returns 403 on `/api/payments/create`.
+- [ ] `POST /api/payments/create` returns 410 (online payment disabled).
+- [ ] `POST /api/payments/mock/complete` returns 410 (online payment disabled).
+- [ ] `POST /api/payments/webhook` returns 410 (online payment disabled).
 - [ ] Legacy moderation endpoint `/api/reviews/{id}/moderate` returns 410.
 - [ ] Legacy lead endpoint `/api/lead` responds with deprecation headers and canonical target `/api/leads`.

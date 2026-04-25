@@ -17,11 +17,11 @@ Use this matrix when configuring variables in Vercel:
 | `MAIL_TO` | Required at runtime | Required at runtime | Required at runtime | Primary recipient for incoming request notifications. |
 | `PUBLIC_BASE_URL` | Optional (falls back to `http://localhost:3000` for local/non-production contexts) | Optional (fallback applies in preview/non-production contexts) | **Required at runtime** | Required in production deploy/runtime (`NODE_ENV=production` + `VERCEL_ENV=production`). |
 | `SEND_CUSTOMER_EMAILS` | Optional | Optional | Optional | Boolean flag, defaults to `false` when omitted. |
-| `PAYMENT_WEBHOOK_SECRET` | Optional* | Optional* | Optional* | Set this if/when payment webhook signature verification is enabled in your deployment. |
+| `PAYMENT_WEBHOOK_SECRET` | Deprecated (unused) | Deprecated (unused) | Deprecated (unused) | Online payment is disabled; keep unset. |
 | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Optional | Optional | Optional | If Telegram sending is enabled, both values must be set together. |
 | `BLOB_READ_WRITE_TOKEN` | Optional for local image upload testing | Required if admin image uploads are enabled | Required if admin image uploads are enabled | Vercel Blob token used by `/api/admin/upload-image` for portfolio and site images. |
 
-\* `PAYMENT_WEBHOOK_SECRET` is included here for deployment completeness, but only needs to be configured if your project/environment uses payment webhook signing.
+`PAYMENT_WEBHOOK_SECRET` is kept only for backward compatibility in env templates and is not used while online payment is disabled.
 
 ## Quick setup notes
 
