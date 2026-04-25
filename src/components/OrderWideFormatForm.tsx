@@ -211,7 +211,7 @@ export default function OrderWideFormatForm() {
   const inputClass = (field: keyof FormValues) => publicInputClass(Boolean(errors[field]));
 
   return (
-    <div id="wide-format-form" className={`${publicFormStyles.shell} border-neutral-200/85 p-4 transition-all duration-300 sm:p-5 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
+    <div id="wide-format-form" data-floating-cta-hide className={`${publicFormStyles.shell} border-neutral-200/85 p-4 transition-all duration-300 sm:p-5 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
       <div className={`${publicFormStyles.heading} space-y-2 border-b border-neutral-200/80 pb-5`}>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Заявка</p>
         <h2 id="wide-format-form-title" className="text-2xl font-semibold tracking-tight">Рассчитать стоимость</h2>

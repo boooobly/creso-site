@@ -4,7 +4,6 @@ import { BadgeCheck, Building2, Clock3, Construction, FileCheck2, ShieldCheck, T
 import Section from '@/components/Section';
 import LeadForm from '@/components/LeadForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
-import OutdoorFloatingCtas from '@/components/OutdoorFloatingCtas';
 import ProductionTrustBlock from '@/components/ProductionTrustBlock';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
@@ -191,8 +190,6 @@ export default async function OutdoorAdvertisingPage() {
 
   return (
     <div className="pb-24 md:pb-12">
-      <OutdoorFloatingCtas />
-
       <Section className="pb-6 md:pb-10" id="outdoor-hero" background="default" spacing="compact">
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"
@@ -236,6 +233,7 @@ export default async function OutdoorAdvertisingPage() {
           <HeroActions className="gap-3.5 pt-1">
             <Link
               href="#outdoor-form-section"
+              data-floating-cta-hide
               className="btn-primary px-5 no-underline shadow-[0_8px_20px_rgba(220,38,38,0.24)] hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]"
             >{heroPrimaryButtonText}</Link>
             <Link
@@ -396,7 +394,7 @@ export default async function OutdoorAdvertisingPage() {
 
       <Section className="pt-0" id="outdoor-form-section" background="default">
         <RevealOnScroll>
-          <div className="form-shell card">
+          <div data-floating-cta-hide className="form-shell card">
             <div className="section-header-tight">
               <p className="t-eyebrow">ЗАЯВКА НА РАСЧЁТ</p>
               <h2 className={sectionTitleClassName}>Получить бесплатный расчет наружной рекламы</h2>

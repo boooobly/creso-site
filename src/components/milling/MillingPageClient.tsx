@@ -96,7 +96,6 @@ export default function MillingPageClient({
 }: MillingPageClientProps) {
   const [heroVisible, setHeroVisible] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [showFloatingCta, setShowFloatingCta] = useState(false);
 
   const howReveal = useRevealOnScroll<HTMLDivElement>();
   const servicesReveal = useRevealOnScroll<HTMLDivElement>();
@@ -125,32 +124,6 @@ export default function MillingPageClient({
     });
 
     return () => window.cancelAnimationFrame(rafId);
-  }, []);
-
-  useEffect(() => {
-    const updateFloatingCtaVisibility = () => {
-      const orderSection = document.getElementById('milling-order');
-      if (!orderSection) {
-        setShowFloatingCta(false);
-        return;
-      }
-
-      const scrolledPastHero = window.scrollY > 200;
-      const rect = orderSection.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const orderSectionVisible = rect.top <= viewportHeight * 0.85 && rect.bottom >= 120;
-
-      setShowFloatingCta(scrolledPastHero && !orderSectionVisible);
-    };
-
-    updateFloatingCtaVisibility();
-    window.addEventListener('scroll', updateFloatingCtaVisibility, { passive: true });
-    window.addEventListener('resize', updateFloatingCtaVisibility);
-
-    return () => {
-      window.removeEventListener('scroll', updateFloatingCtaVisibility);
-      window.removeEventListener('resize', updateFloatingCtaVisibility);
-    };
   }, []);
 
   const revealClass = (isVisible: boolean) =>
@@ -219,6 +192,7 @@ export default function MillingPageClient({
           <HeroActions>
             <button
               type="button"
+              data-floating-cta-hide
               onClick={scrollToOrderSection}
               className="inline-flex w-fit items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-all hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
             >
@@ -377,21 +351,13 @@ export default function MillingPageClient({
         </div>
       </Section>
 
-      {showFloatingCta && (
-        <button
-          type="button"
-          onClick={scrollToOrderSection}
-          className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)] right-4 z-40 inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(220,38,38,0.3)] transition-all hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 md:bottom-6 md:right-6 md:px-5 md:py-3"
-        >
-          Рассчитать заказ
-        </button>
-      )}
-
       <Section id="milling-order" className="pt-0">
-        <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 dark:border-neutral-700/90 dark:bg-neutral-900/80 dark:text-neutral-200">
+        <div data-floating-cta-hide className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 dark:border-neutral-700/90 dark:bg-neutral-900/80 dark:text-neutral-200">
           <p className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-red-500" aria-hidden="true" /><span>Подтверждаем стоимость перед запуском. Макет проверяется инженером.</span></p>
         </div>
-        <OrderMillingForm />
+        <div data-floating-cta-hide>
+          <OrderMillingForm />
+        </div>
       </Section>
     </div>
   );

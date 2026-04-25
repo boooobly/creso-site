@@ -128,6 +128,7 @@ export default async function WideFormatPrintingPage() {
             <HeroActions className="pt-1 lg:hidden">
               <Link
                 href="#wide-format-calculator"
+                data-floating-cta-hide
                 className="btn-primary min-h-11 w-full gap-2 px-5 py-3 text-sm font-semibold no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
               >
                 Рассчитать стоимость
@@ -157,12 +158,14 @@ export default async function WideFormatPrintingPage() {
             <HeroActions className="gap-2.5 sm:gap-3">
               <Link
                 href="#wide-format-calculator"
+                data-floating-cta-hide
                 className="btn-primary min-h-11 gap-2 px-5 py-3 text-sm font-semibold no-underline shadow-[0_12px_24px_-18px_rgba(220,38,38,0.55)]"
               >
                 Рассчитать стоимость
               </Link>
               <Link
                 href="#wide-format-form"
+                data-floating-cta-hide
                 className="min-h-11 rounded-xl border border-neutral-200/90 bg-white/75 px-5 py-3 text-center text-sm font-medium text-neutral-700 no-underline transition-colors hover:bg-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200 dark:hover:bg-neutral-900"
               >
                 Отправить параметры
@@ -178,6 +181,7 @@ export default async function WideFormatPrintingPage() {
             </p>
             <Link
               href="#wide-format-form"
+              data-floating-cta-hide
               className="mb-2.5 inline-flex text-xs font-medium text-neutral-700 underline decoration-neutral-300 underline-offset-4 transition-colors hover:text-neutral-900 dark:text-neutral-200 dark:decoration-neutral-600 dark:hover:text-neutral-100"
             >
               Отправить параметры

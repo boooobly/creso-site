@@ -167,7 +167,7 @@ export default function PrintPricingCalculator() {
         <p className="text-xs leading-5 text-neutral-500 dark:text-neutral-400">Чтобы добавить расчёт, отметьте «Добавить расчёт флаеров» в форме ниже.</p>
       </section>
 
-      <div id="print-order-form" className="min-w-0 scroll-mt-24">
+      <div id="print-order-form" data-floating-cta-hide className="min-w-0 scroll-mt-24">
         <OrderBusinessCardsForm
           summary={{
             quantity,
