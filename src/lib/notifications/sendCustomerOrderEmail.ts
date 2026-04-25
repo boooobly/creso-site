@@ -14,9 +14,6 @@ export async function sendCustomerOrderEmail(params: {
   customerName?: string | null;
   orderNumber: string;
   total: number;
-  prepayRequired: boolean;
-  prepayAmount?: number | null;
-  pdfUrl: string;
   orderUrl: string;
 }): Promise<void> {
   const greetingName = formatValue(params.customerName);
@@ -26,12 +23,9 @@ export async function sendCustomerOrderEmail(params: {
     '',
     `Ваш заказ №${params.orderNumber} принят в работу.`,
     `Сумма заказа: ${formatMoneyRub(params.total)}.`,
-    params.prepayRequired
-      ? `Предоплата (50%): ${formatMoneyRub(params.prepayAmount)}. Мы уточним удобный способ оплаты.`
-      : 'Предоплата не требуется. Детали оплаты согласуем при подтверждении.',
+    'Оплата и предоплата согласуются с менеджером после проверки заказа.',
     '',
     `Страница заказа: ${params.orderUrl}`,
-    `PDF-документ заказа: ${params.pdfUrl}`,
     '',
     'Если у вас есть вопросы, ответьте на это письмо или свяжитесь с нами по телефону на сайте.',
   ];

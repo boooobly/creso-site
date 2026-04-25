@@ -106,8 +106,6 @@ type FormErrors = {
 type OrderResponse = {
   orderNumber: string;
   quote: BagetQuoteResult;
-  prepayRequired: boolean;
-  prepayAmount: number | null;
   secureOrderUrl?: string;
 };
 
@@ -193,11 +191,6 @@ export default function BagetOrderModal({
   }, [consent, sending]);
 
   const finalTotalRub = serverResult?.quote.total ?? totalPriceRub;
-  const prepayNow = useMemo(() => {
-    if (serverResult) return serverResult.prepayAmount ?? 0;
-    return Math.round(totalPriceRub * 0.5);
-  }, [serverResult, totalPriceRub]);
-  const remainderAtPickup = useMemo(() => finalTotalRub - prepayNow, [finalTotalRub, prepayNow]);
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -330,11 +323,12 @@ export default function BagetOrderModal({
                 {serverResult?.secureOrderUrl ? (
                   <p className="mt-2 text-xs sm:text-sm">
                     <Link href={serverResult.secureOrderUrl} className="text-red-700 underline underline-offset-2 hover:text-red-800">
-                      Открыть защищённую страницу заказа
+                      Открыть страницу заказа
                     </Link>
                   </p>
                 ) : null}
                 <p className="mt-1 text-xs sm:text-sm">Итог по расчёту сервера: {serverResult?.quote.total.toLocaleString('ru-RU')} ₽</p>
+                <p className="mt-1 text-xs sm:text-sm">Оплата и предоплата согласуются с менеджером после проверки заказа.</p>
               </div>
               <button
                 type="button"
@@ -463,12 +457,6 @@ export default function BagetOrderModal({
                       ))}
                     </dl>
                   ) : null}
-                  <p className="mt-3 text-sm text-neutral-700 dark:text-neutral-200">
-                    К оплате сейчас: <span className="font-semibold">{prepayNow.toLocaleString('ru-RU')} ₽</span>
-                  </p>
-                  <p className="text-sm text-neutral-700 dark:text-neutral-200">
-                    Остаток при получении: <span className="font-semibold">{remainderAtPickup.toLocaleString('ru-RU')} ₽</span>
-                  </p>
                 </div>
               </section>
 
