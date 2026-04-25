@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
+const COOKIE_NOTICE_VISIBILITY_EVENT = 'creso-cookie-notice-visibility';
+
 type RouteFloatingCtaConfig = {
   href: string;
   label: string;
@@ -25,8 +27,25 @@ export default function FloatingLeadCta() {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [shouldShow, setShouldShow] = useState(false);
+  const [isCookieNoticeVisible, setIsCookieNoticeVisible] = useState(false);
 
   const config = useMemo(() => ROUTE_CONFIG[pathname ?? ''], [pathname]);
+
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleCookieNoticeVisibility = (event: Event) => {
+      const customEvent = event as CustomEvent<{ visible?: boolean }>;
+      setIsCookieNoticeVisible(Boolean(customEvent.detail?.visible));
+    };
+
+    window.addEventListener(COOKIE_NOTICE_VISIBILITY_EVENT, handleCookieNoticeVisibility as EventListener);
+
+    return () => {
+      window.removeEventListener(COOKIE_NOTICE_VISIBILITY_EVENT, handleCookieNoticeVisibility as EventListener);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -111,16 +130,19 @@ export default function FloatingLeadCta() {
 
   if (!config || !isMobile) return null;
 
+  const isCtaVisible = shouldShow && !isCookieNoticeVisible;
+
   return (
     <div className="pointer-events-none fixed bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)] right-4 z-40">
       <Link
         href={config.href}
-        aria-hidden={!shouldShow}
-        tabIndex={shouldShow ? 0 : -1}
+        aria-hidden={!isCtaVisible}
+        tabIndex={isCtaVisible ? 0 : -1}
         className={[
           'pointer-events-auto inline-flex min-h-11 items-center justify-center rounded-2xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white no-underline',
           'shadow-[0_12px_26px_rgba(220,38,38,0.28)] transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/45',
-          shouldShow ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0',
+          isCtaVisible ? 'translate-y-0 opacity-100'
+            : 'pointer-events-none translate-y-3 opacity-0',
         ].join(' ')}
       >
         {config.label}
