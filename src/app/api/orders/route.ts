@@ -255,8 +255,8 @@ export async function POST(request: NextRequest) {
       uploadedImage,
     };
 
-    const prepayRequired = parsed.data.fulfillmentType === 'pickup' || parsed.data.fulfillmentType === 'selfPickup';
-    const prepayAmount = prepayRequired ? Math.round(quote.total * 0.5) : null;
+    const prepayRequired = false;
+    const prepayAmount = null;
 
     const orderNumber = await createOrderWithRetry({
       payloadJson: normalizedPayload as unknown as Prisma.InputJsonValue,
@@ -282,7 +282,6 @@ export async function POST(request: NextRequest) {
     const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
     const accessToken = createOrderAccessToken(orderNumber, tokenSecret);
     const secureOrderUrl = `${getBaseUrl()}/order/${encodeURIComponent(orderNumber)}?token=${encodeURIComponent(accessToken)}`;
-    const securePdfUrl = `${getBaseUrl()}/api/orders/${orderNumber}/pdf?token=${encodeURIComponent(accessToken)}`;
 
     if (shouldSendCustomerEmail && customerEmail) {
       await sendCustomerOrderEmail({
@@ -290,9 +289,6 @@ export async function POST(request: NextRequest) {
         customerName: parsed.data.customer.name,
         orderNumber,
         total: quote.total,
-        prepayRequired,
-        prepayAmount,
-        pdfUrl: securePdfUrl,
         orderUrl: secureOrderUrl,
       }).catch((error) => {
         logger.error('orders.customer_email.send_failed', { error, orderNumber, customerEmail });
@@ -304,7 +300,6 @@ export async function POST(request: NextRequest) {
       prepayRequired,
       prepayAmount,
       secureOrderUrl,
-      securePdfUrl,
       accessToken,
     });
   } catch (error) {
