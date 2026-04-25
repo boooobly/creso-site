@@ -271,8 +271,6 @@ export async function POST(request: NextRequest) {
       customer: normalizedPayload.customer,
       effectiveSize: quote.effectiveSize,
       quote,
-      prepayRequired,
-      prepayAmount,
       orderSummary: normalizedPayload.orderSummary,
       customerImageFile: safeCustomerImageFile,
     });
