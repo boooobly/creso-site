@@ -233,7 +233,7 @@ describe('critical customer/admin integration smoke flows', () => {
     process.env.PUBLIC_BASE_URL = 'http://localhost:3000';
   });
 
-  it('runs customer order → payment → paid status → PDF flow and validates token failures', async () => {
+  it('runs customer request-only order flow and confirms payment endpoints are disabled', async () => {
     const { POST: createOrder } = await import('@/app/api/orders/route');
     const orderRequest = new NextRequest('http://localhost:3000/api/orders', {
       method: 'POST',
@@ -280,18 +280,14 @@ describe('critical customer/admin integration smoke flows', () => {
     const orderStatusJson = await orderStatusResponse.json();
 
     expect(orderStatusResponse.status).toBe(200);
+    expect(orderStatusJson.number).toBe(orderJson.orderNumber);
     expect(orderStatusJson.paymentStatus).toBe('unpaid');
+    expect(orderStatusJson.customerName).toBe('Иван');
+    expect(orderStatusJson.phone).toContain('79991234567');
+    expect(orderStatusJson.securePdfUrl).toContain('/api/orders/');
+    expect(orderStatusJson.securePdfUrl).toContain('token=');
 
     const { POST: createPayment } = await import('@/app/api/payments/create/route');
-    const invalidPaymentTokenResponse = await createPayment(
-      new NextRequest('http://localhost:3000/api/payments/create', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderNumber: orderJson.orderNumber, token: 'bad-token' }),
-      }),
-    );
-    expect(invalidPaymentTokenResponse.status).toBe(403);
-
     const createPaymentResponse = await createPayment(
       new NextRequest('http://localhost:3000/api/payments/create', {
         method: 'POST',
@@ -300,10 +296,8 @@ describe('critical customer/admin integration smoke flows', () => {
       }),
     );
     const createPaymentJson = await createPaymentResponse.json();
-
-    expect(createPaymentResponse.status).toBe(200);
-    expect(createPaymentJson.paymentStatus).toBe('pending');
-    expect(createPaymentJson.paymentRef).toMatch(/^pay_/);
+    expect(createPaymentResponse.status).toBe(410);
+    expect(createPaymentJson).toEqual({ ok: false, error: 'Онлайн-оплата на сайте отключена.' });
 
     const { POST: completeMockPayment } = await import('@/app/api/payments/mock/complete/route');
     const completePaymentResponse = await completeMockPayment(
@@ -312,34 +306,27 @@ describe('critical customer/admin integration smoke flows', () => {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           orderNumber: orderJson.orderNumber,
-          paymentRef: createPaymentJson.paymentRef,
+          paymentRef: 'pay_disabled',
           status: 'paid',
           token: orderJson.accessToken,
         }),
       }),
     );
+    const completePaymentJson = await completePaymentResponse.json();
+    expect(completePaymentResponse.status).toBe(410);
+    expect(completePaymentJson).toEqual({ ok: false, error: 'Онлайн-оплата на сайте отключена.' });
 
-    expect(completePaymentResponse.status).toBe(200);
-
-    const paidOrderResponse = await getOrder(
-      new NextRequest(`http://localhost:3000/api/orders/${orderJson.orderNumber}?token=${encodeURIComponent(orderJson.accessToken)}`),
-      { params: { number: orderJson.orderNumber } },
+    const { POST: paymentWebhook } = await import('@/app/api/payments/webhook/route');
+    const paymentWebhookResponse = await paymentWebhook(
+      new NextRequest('http://localhost:3000/api/payments/webhook', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ orderNumber: orderJson.orderNumber, status: 'paid', eventId: 'evt_1' }),
+      }),
     );
-    const paidOrderJson = await paidOrderResponse.json();
-
-    expect(paidOrderResponse.status).toBe(200);
-    expect(paidOrderJson.paymentStatus).toBe('paid');
-    expect(paidOrderJson.securePdfUrl).toContain('/api/orders/');
-    expect(paidOrderJson.securePdfUrl).toContain('token=');
-
-    const { GET: getOrderPdf } = await import('@/app/api/orders/[number]/pdf/route');
-    const pdfResponse = await getOrderPdf(
-      new NextRequest(paidOrderJson.securePdfUrl),
-      { params: { number: orderJson.orderNumber } },
-    );
-
-    expect(pdfResponse.status).toBe(200);
-    expect(pdfResponse.headers.get('content-type')).toBe('application/pdf');
+    const paymentWebhookJson = await paymentWebhookResponse.json();
+    expect(paymentWebhookResponse.status).toBe(410);
+    expect(paymentWebhookJson).toEqual({ ok: false, error: 'Онлайн-оплата на сайте отключена.' });
   });
 
   it('runs admin auth/session smoke flow across protected endpoints and moderation/content pricing updates', async () => {

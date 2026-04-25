@@ -1,15 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
 import { NextRequest } from 'next/server';
 
-vi.mock('@/lib/env', () => ({
-  getServerEnv: () => ({
-    ADMIN_TOKEN: 'admin-token',
-    ORDER_TOKEN_SECRET: 'order-secret',
-  }),
-}));
-
 describe('POST /api/payments/create', () => {
-  it('denies request without token and without admin auth', async () => {
+  it('returns 410 when online payment is disabled', async () => {
     const { POST } = await import('@/app/api/payments/create/route');
     const request = new NextRequest('http://localhost:3000/api/payments/create', {
       method: 'POST',
@@ -18,7 +12,9 @@ describe('POST /api/payments/create', () => {
     });
 
     const response = await POST(request);
+    const json = await response.json();
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(410);
+    expect(json).toEqual({ ok: false, error: 'Онлайн-оплата на сайте отключена.' });
   });
 });
