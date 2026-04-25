@@ -4,18 +4,16 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
-import { ORDER_STATUSES, PAYMENT_STATUSES } from '@/lib/admin/orders';
+import { MANAGER_ORDER_STATUSES } from '@/lib/admin/orders';
 
 const updateOrderSchema = z.object({
-  status: z.enum(ORDER_STATUSES),
-  paymentStatus: z.enum(PAYMENT_STATUSES),
+  status: z.enum(MANAGER_ORDER_STATUSES),
   managerNote: z.string().max(5000).optional()
 });
 
 export async function updateOrderAdminAction(orderId: string, formData: FormData) {
   const parsed = updateOrderSchema.safeParse({
     status: String(formData.get('status') ?? ''),
-    paymentStatus: String(formData.get('paymentStatus') ?? ''),
     managerNote: String(formData.get('managerNote') ?? '').trim()
   });
 
@@ -27,7 +25,6 @@ export async function updateOrderAdminAction(orderId: string, formData: FormData
     where: { id: orderId },
     data: {
       status: parsed.data.status,
-      paymentStatus: parsed.data.paymentStatus,
       managerNote: parsed.data.managerNote || null
     }
   });
