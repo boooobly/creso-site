@@ -55,14 +55,15 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
     ...(paymentStatusFilter ? { paymentStatus: paymentStatusFilter } : {})
   };
 
-  const [orders, totalCount] = await Promise.all([
+  const [orders, totalCount, newOrdersCount] = await Promise.all([
     prisma.order.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: PAGE_SIZE,
       skip: (page - 1) * PAGE_SIZE
     }),
-    prisma.order.count({ where })
+    prisma.order.count({ where }),
+    prisma.order.count({ where: { status: 'new' } })
   ]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -86,6 +87,21 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
         title="Заказы"
         description="Все заявки в одном месте: быстрый поиск, фильтрация и переход в карточку заказа."
       >
+        {newOrdersCount > 0 ? (
+          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <p className="text-sm font-semibold text-amber-900">Новые заявки</p>
+            <p className="mt-1 text-sm text-amber-800">Есть новые заявки, которые ещё не взяты в работу.</p>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <p className="text-sm font-medium text-amber-900">Новых заявок: {newOrdersCount}</p>
+              <Link href="/admin/orders?status=new">
+                <AdminButton variant="secondary" className="border-amber-300 bg-white text-amber-900 hover:bg-amber-100">
+                  Показать новые
+                </AdminButton>
+              </Link>
+            </div>
+          </div>
+        ) : null}
+
         <form className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[1.4fr_1fr_1fr_auto]" method="GET">
           <label className="space-y-1">
             <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Поиск</span>
@@ -168,7 +184,7 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
                 {orders.map((order) => (
-                  <tr key={order.id} className="align-top hover:bg-slate-50">
+                  <tr key={order.id} className={`align-top ${order.status === 'new' ? 'bg-amber-50/70 hover:bg-amber-100/70' : 'hover:bg-slate-50'}`}>
                     <td className="whitespace-nowrap px-3 py-3">
                       <Link href={`/admin/orders/${order.id}`} className="text-sm font-semibold text-slate-900 underline-offset-2 hover:underline">
                         #{order.number}
@@ -191,9 +207,16 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-3 py-3">
-                      <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${getOrderStatusBadgeClass(order.status)}`}>
-                        {getOrderStatusLabel(order.status)}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {order.status === 'new' ? (
+                          <span className="inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+                            Новая заявка
+                          </span>
+                        ) : null}
+                        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${getOrderStatusBadgeClass(order.status)}`}>
+                          {getOrderStatusLabel(order.status)}
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 ))}

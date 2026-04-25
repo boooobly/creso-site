@@ -22,6 +22,10 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
     title: 'Портфолио',
     subtitle: 'Примеры выполненных работ для сайта'
   },
+  '/admin/orders': {
+    title: 'Заказы',
+    subtitle: 'Все заявки клиентов и их текущие статусы'
+  },
   '/admin/site-images': {
     title: 'Изображения сайта',
     subtitle: 'Изображения и визуальные материалы сайта'
@@ -42,6 +46,7 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
 
 type AdminShellProps = {
   children: ReactNode;
+  newOrdersCount: number;
 };
 
 function resolvePageMeta(pathname: string) {
@@ -56,14 +61,14 @@ function resolvePageMeta(pathname: string) {
   );
 }
 
-export default function AdminShell({ children }: AdminShellProps) {
+export default function AdminShell({ children, newOrdersCount }: AdminShellProps) {
   const pathname = usePathname();
   const pageMeta = resolvePageMeta(pathname);
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-slate-100">
       <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col lg:flex-row">
-        <AdminSidebar />
+        <AdminSidebar newOrdersCount={newOrdersCount} />
 
         <div className="flex min-w-0 flex-1 flex-col">
           <AdminTopbar title={pageMeta.title} subtitle={pageMeta.subtitle} />
