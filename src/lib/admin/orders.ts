@@ -7,13 +7,15 @@ export const ORDER_STATUSES = [
   'cancelled'
 ] as const;
 
+export const MANAGER_ORDER_STATUSES = ['new', 'in_progress', 'completed', 'cancelled'] as const;
+
 export const PAYMENT_STATUSES = ['unpaid', 'pending', 'paid', 'failed', 'refunded'] as const;
 
 const ORDER_STATUS_LABELS: Record<string, string> = {
   new: 'Новый',
   in_progress: 'В работе',
-  awaiting_payment: 'Ожидает оплату',
-  paid: 'Оплачен',
+  awaiting_payment: 'Архивный: awaiting_payment',
+  paid: 'Архивный: paid',
   completed: 'Выполнен',
   cancelled: 'Отменен'
 };

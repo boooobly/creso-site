@@ -9,10 +9,7 @@ import {
   formatNullableText,
   getOrderStatusBadgeClass,
   getOrderStatusLabel,
-  getPaymentStatusBadgeClass,
-  getPaymentStatusLabel,
-  ORDER_STATUSES,
-  PAYMENT_STATUSES
+  MANAGER_ORDER_STATUSES
 } from '@/lib/admin/orders';
 
 const PAGE_SIZE = 20;
@@ -21,7 +18,6 @@ type OrdersPageProps = {
   searchParams?: Promise<{
     q?: string;
     status?: string;
-    paymentStatus?: string;
     page?: string;
   }>;
 };
@@ -36,9 +32,8 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
   const resolvedSearchParams = await searchParams;
   const query = resolvedSearchParams?.q?.trim() ?? '';
   const statusFilter = resolvedSearchParams?.status?.trim() ?? '';
-  const paymentStatusFilter = resolvedSearchParams?.paymentStatus?.trim() ?? '';
   const page = getPageNumber(resolvedSearchParams?.page);
-  const hasFilters = Boolean(query || statusFilter || paymentStatusFilter);
+  const hasFilters = Boolean(query || statusFilter);
 
   const where: Prisma.OrderWhereInput = {
     ...(query
@@ -51,8 +46,7 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
           ]
         }
       : {}),
-    ...(statusFilter ? { status: statusFilter } : {}),
-    ...(paymentStatusFilter ? { paymentStatus: paymentStatusFilter } : {})
+    ...(statusFilter ? { status: statusFilter } : {})
   };
 
   const [orders, totalCount, newOrdersCount] = await Promise.all([
@@ -75,7 +69,6 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
     const params = new URLSearchParams();
     if (query) params.set('q', query);
     if (statusFilter) params.set('status', statusFilter);
-    if (paymentStatusFilter) params.set('paymentStatus', paymentStatusFilter);
     if (targetPage > 1) params.set('page', String(targetPage));
     const stringified = params.toString();
     return `/admin/orders${stringified ? `?${stringified}` : ''}`;
@@ -102,7 +95,7 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
           </div>
         ) : null}
 
-        <form className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[1.4fr_1fr_1fr_auto]" method="GET">
+        <form className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[1.4fr_1fr_auto]" method="GET">
           <label className="space-y-1">
             <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Поиск</span>
             <input
@@ -122,22 +115,8 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
               className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
             >
               <option value="">Все</option>
-              {ORDER_STATUSES.map((status) => (
+              {MANAGER_ORDER_STATUSES.map((status) => (
                 <option key={status} value={status}>{getOrderStatusLabel(status)}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1">
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Статус оплаты</span>
-            <select
-              name="paymentStatus"
-              defaultValue={paymentStatusFilter}
-              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-slate-300 transition focus:ring"
-            >
-              <option value="">Все</option>
-              {PAYMENT_STATUSES.map((status) => (
-                <option key={status} value={status}>{getPaymentStatusLabel(status)}</option>
               ))}
             </select>
           </label>
@@ -177,8 +156,6 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
                   <th className="px-3 py-2">Клиент</th>
                   <th className="px-3 py-2">Источник</th>
                   <th className="px-3 py-2">Сумма</th>
-                  <th className="px-3 py-2">Предоплата</th>
-                  <th className="px-3 py-2">Оплата</th>
                   <th className="px-3 py-2">Статус</th>
                 </tr>
               </thead>
@@ -198,14 +175,6 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
                     </td>
                     <td className="whitespace-nowrap px-3 py-3 text-slate-600">{formatNullableText(order.source)}</td>
                     <td className="whitespace-nowrap px-3 py-3 text-sm font-semibold text-slate-900">{formatMoneyRub(order.total)}</td>
-                    <td className="whitespace-nowrap px-3 py-3 text-slate-700">
-                      {order.prepayRequired ? `Да · ${formatMoneyRub(order.prepayAmount)}` : 'Нет'}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-3">
-                      <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${getPaymentStatusBadgeClass(order.paymentStatus)}`}>
-                        {getPaymentStatusLabel(order.paymentStatus)}
-                      </span>
-                    </td>
                     <td className="whitespace-nowrap px-3 py-3">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {order.status === 'new' ? (
