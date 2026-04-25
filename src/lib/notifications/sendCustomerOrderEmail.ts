@@ -21,9 +21,9 @@ export async function sendCustomerOrderEmail(params: {
   const lines = [
     `Здравствуйте, ${greetingName}!`,
     '',
-    `Ваш заказ №${params.orderNumber} принят в работу.`,
+    `Ваша заявка №${params.orderNumber} принята.`,
     `Сумма заказа: ${formatMoneyRub(params.total)}.`,
-    'Оплата и предоплата согласуются с менеджером после проверки заказа.',
+    'Оплата согласуется с менеджером после проверки заказа.',
     '',
     `Страница заказа: ${params.orderUrl}`,
     '',
@@ -32,7 +32,7 @@ export async function sendCustomerOrderEmail(params: {
 
   await sendSmtpEmail({
     to: params.toEmail,
-    subject: `Your order #${params.orderNumber} received`,
+    subject: `Заявка №${params.orderNumber} принята`,
     text: lines.join('\n'),
   });
 }

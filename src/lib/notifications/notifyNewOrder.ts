@@ -19,8 +19,6 @@ type NotifyNewOrderPayload = {
     height: number;
   };
   quote: BagetQuoteResult;
-  prepayRequired: boolean;
-  prepayAmount: number | null;
   orderSummary: BagetOrderSummaryData;
   customerImageFile?: File | null;
 };
@@ -100,8 +98,7 @@ function buildNotificationText(payload: NotifyNewOrderPayload): string {
     'Стоимость:',
     buildItemsText(payload.quote),
     `• Итого: ${formatMoney(payload.quote.total)}`,
-    `• Предоплата обязательна: ${payload.prepayRequired ? 'Да' : 'Нет'}`,
-    `• Сумма предоплаты: ${payload.prepayAmount ? formatMoney(payload.prepayAmount) : '—'}`,
+    '• Оплата: согласуется менеджером после проверки заказа',
   ].join('\n');
 }
 
