@@ -83,8 +83,8 @@ export default async function PrintPage() {
       </Section>
 
       <Section spacing="tight" className="pt-0">
-        <div id="print-calculator" className="scroll-mt-24 space-y-4 md:space-y-5">
-          <div className="space-y-2">
+        <div id="print-calculator" className="min-w-0 scroll-mt-24 space-y-4 md:space-y-5">
+          <div className="min-w-0 space-y-2">
             <p className="t-eyebrow">Калькулятор и тарифы</p>
             <h2 className="t-h2">Рассчитайте стоимость и сразу передайте параметры в заявку</h2>
             <p className="max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">

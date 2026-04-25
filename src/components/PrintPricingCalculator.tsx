@@ -40,44 +40,44 @@ export default function PrintPricingCalculator() {
   );
 
   return (
-    <div className="space-y-6 md:space-y-7">
-      <div className="grid gap-5 md:gap-6 lg:grid-cols-[1fr_360px]">
-        <section className="space-y-4 md:space-y-5">
-          <div className="card space-y-4 rounded-2xl border-neutral-200/80 p-3.5 shadow-sm md:p-6">
-            <h2 className="text-lg font-semibold">Тарифы на визитки (офсет)</h2>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">Фиксированные параметры: формат 90×50 мм, мелованный картон 300 г/м².</p>
-            <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
-              <table className="w-full min-w-[360px] text-sm">
+    <div className="min-w-0 space-y-6 md:space-y-7">
+      <div className="grid min-w-0 gap-5 md:gap-6 lg:grid-cols-[1fr_360px]">
+        <section className="min-w-0 space-y-4 md:space-y-5">
+          <div className="card min-w-0 space-y-4 rounded-2xl border-neutral-200/80 p-3.5 shadow-sm md:p-6">
+            <h2 className="break-words text-lg font-semibold">Тарифы на визитки (офсет)</h2>
+            <p className="break-words text-sm text-neutral-600 dark:text-neutral-300">Фиксированные параметры: формат 90×50 мм, мелованный картон 300 г/м².</p>
+            <div className="w-full max-w-full overflow-x-auto rounded-xl border border-neutral-200 [-webkit-overflow-scrolling:touch] dark:border-neutral-700">
+              <table className="w-full min-w-[320px] text-sm sm:min-w-[360px]">
                 <thead className="bg-neutral-100/90 dark:bg-neutral-800/80">
                   <tr className="border-b border-neutral-200 dark:border-neutral-700">
-                    <th className="px-3 py-2 text-left font-semibold">Тираж</th>
-                    <th className="px-3 py-2 text-left font-semibold">Цена за шт.</th>
-                    <th className="px-3 py-2 text-left font-semibold">Итого</th>
+                    <th className="px-2.5 py-2 text-left font-semibold sm:px-3">Тираж</th>
+                    <th className="px-2.5 py-2 text-left font-semibold sm:px-3">Цена за шт.</th>
+                    <th className="px-2.5 py-2 text-left font-semibold sm:px-3">Итого</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pricingRows.map((row) => (
                     <tr key={row.quantity} className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900/60 last:border-b-0">
-                      <td className="px-3 py-2 font-semibold whitespace-nowrap">{row.quantity.toLocaleString('ru-RU')} шт.</td>
-                      <td className="px-3 py-2">{row.unitPrice.toLocaleString('ru-RU')} ₽</td>
-                      <td className="px-3 py-2">{row.total.toLocaleString('ru-RU')} ₽</td>
+                      <td className="whitespace-nowrap px-2.5 py-2 font-semibold sm:px-3">{row.quantity.toLocaleString('ru-RU')} шт.</td>
+                      <td className="px-2.5 py-2 whitespace-nowrap sm:px-3">{row.unitPrice.toLocaleString('ru-RU')} ₽</td>
+                      <td className="px-2.5 py-2 whitespace-nowrap sm:px-3">{row.total.toLocaleString('ru-RU')} ₽</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-xs leading-5 text-neutral-500 dark:text-neutral-400">Цены в таблице указаны без ламинации.</p>
+            <p className="break-words text-xs leading-5 text-neutral-500 dark:text-neutral-400">Цены в таблице указаны без ламинации.</p>
           </div>
 
-          <div className="card space-y-4 rounded-2xl border-neutral-200/80 p-4 shadow-sm md:p-6">
-            <h2 className="text-xl font-semibold">Конфигуратор</h2>
+          <div className="card min-w-0 space-y-4 rounded-2xl border-neutral-200/80 p-4 shadow-sm md:p-6">
+            <h2 className="break-words text-xl font-semibold">Конфигуратор</h2>
             <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300">
               Выберите параметры — стоимость пересчитается автоматически.
             </p>
 
             <div className="space-y-2.5">
               <p className="font-medium">Тираж</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex min-w-0 flex-wrap gap-2">
                 {BUSINESS_CARD_ALLOWED_QUANTITIES.map((value) => (
                   <button
                     key={value}
@@ -138,8 +138,8 @@ export default function PrintPricingCalculator() {
           </div>
         </section>
 
-        <aside className="card h-fit space-y-4 rounded-2xl border-neutral-200/80 p-4 shadow-sm sm:p-5 lg:sticky lg:top-24">
-          <h3 className="text-lg font-semibold">Итог</h3>
+        <aside className="card min-w-0 h-fit space-y-4 rounded-2xl border-neutral-200/80 p-4 shadow-sm sm:p-5 lg:sticky lg:top-24">
+          <h3 className="break-words text-lg font-semibold">Итог</h3>
           <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
             <li>Продукт: <b>Визитки</b></li>
             <li>Печать: <b>{printType === 'single' ? 'Односторонняя' : 'Двусторонняя'}</b></li>
@@ -161,13 +161,13 @@ export default function PrintPricingCalculator() {
         </aside>
       </div>
 
-      <section className="card rounded-2xl border-neutral-200/80 bg-neutral-50/70 p-4 md:p-5 shadow-sm space-y-2 dark:border-neutral-800 dark:bg-neutral-900/40">
-        <h2 className="text-lg font-semibold">Флаеры</h2>
-        <p className="text-sm text-neutral-700 dark:text-neutral-300">Флаеры считаем индивидуально по формату, бумаге и тиражу.</p>
+      <section className="card min-w-0 rounded-2xl border-neutral-200/80 bg-neutral-50/70 p-4 md:p-5 shadow-sm space-y-2 dark:border-neutral-800 dark:bg-neutral-900/40">
+        <h2 className="break-words text-lg font-semibold">Флаеры</h2>
+        <p className="break-words text-sm text-neutral-700 dark:text-neutral-300">Флаеры считаем индивидуально по формату, бумаге и тиражу.</p>
         <p className="text-xs leading-5 text-neutral-500 dark:text-neutral-400">Чтобы добавить расчёт, отметьте «Добавить расчёт флаеров» в форме ниже.</p>
       </section>
 
-      <div id="print-order-form" className="scroll-mt-24">
+      <div id="print-order-form" className="min-w-0 scroll-mt-24">
         <OrderBusinessCardsForm
           summary={{
             quantity,
