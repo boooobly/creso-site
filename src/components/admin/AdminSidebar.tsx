@@ -4,7 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { adminNavigation } from './admin-navigation';
 
-export default function AdminSidebar() {
+type AdminSidebarProps = {
+  newOrdersCount: number;
+};
+
+export default function AdminSidebar({ newOrdersCount }: AdminSidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -32,6 +36,16 @@ export default function AdminSidebar() {
               >
                 <Icon size={16} />
                 <span>{item.label}</span>
+                {item.href === '/admin/orders' && newOrdersCount > 0 ? (
+                  <span
+                    className={`ml-auto inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700'
+                    }`}
+                    aria-label={`Новых заявок: ${newOrdersCount}`}
+                  >
+                    {newOrdersCount}
+                  </span>
+                ) : null}
               </Link>
             );
           })}

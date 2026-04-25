@@ -83,6 +83,11 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Ord
           Не удалось сохранить изменения. Проверьте выбранные статусы и повторите попытку.
         </p>
       ) : null}
+      {order.status === 'new' ? (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Новая заявка. Проверьте параметры и переведите заказ в работу после связи с клиентом.
+        </p>
+      ) : null}
 
       <AdminPageSection
         title={`Заказ #${order.number}`}
