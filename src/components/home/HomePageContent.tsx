@@ -250,7 +250,6 @@ export default function HomePageContent({
                 variants={fadeUp(16)}
                 className="card-info card-interactive relative h-full border-neutral-200/90 p-6 dark:border-neutral-700/85 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-[#1b1b1f]"
               >
-                <span className="t-caption absolute right-5 top-5 rounded-full border border-neutral-200 bg-white/80 px-2.5 py-1 dark:border-neutral-600 dark:bg-neutral-800/90 dark:text-neutral-300">0{index + 1}</span>
                 <div className="public-icon-badge mb-3">
                   <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
