@@ -284,6 +284,7 @@ export default function TshirtsLanding({
                 <HeroActions className="mt-5 sm:mt-6">
                   <Link
                     href="#tshirts-order"
+                    data-floating-cta-hide
                     className="btn-primary h-11 px-6 text-sm no-underline"
                   >
                     {heroPrimaryButtonText}
@@ -455,7 +456,9 @@ export default function TshirtsLanding({
       </SectionBlock>
 
       <Section id="tshirts-order" spacing="tight" className="scroll-mt-24">
-        <OrderTshirtsForm />
+        <div data-floating-cta-hide>
+          <OrderTshirtsForm />
+        </div>
       </Section>
     </div>
   );

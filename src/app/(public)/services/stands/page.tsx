@@ -101,7 +101,7 @@ export default async function StandsServicePage() {
           </HeroChipList>
 
           <HeroActions className="mt-7">
-            <Link href="#stands-lead-form" className="btn-primary no-underline">
+            <Link href="#stands-lead-form" data-floating-cta-hide className="btn-primary no-underline">
               Рассчитать стоимость
             </Link>
             <Link href="#stands-catalog" className="btn-secondary no-underline">
@@ -137,7 +137,7 @@ export default async function StandsServicePage() {
           </HeroChipList>
 
           <HeroActions className="mt-7">
-            <Link href="#stands-lead-form" className="btn-primary no-underline">
+            <Link href="#stands-lead-form" data-floating-cta-hide className="btn-primary no-underline">
               Рассчитать стоимость
             </Link>
             <Link href="#stands-catalog" className="btn-secondary no-underline">
@@ -252,7 +252,7 @@ export default async function StandsServicePage() {
       </Section>
 
       <Section id="stands-lead-form" background="muted" fullBleed className="pt-0">
-        <div className="card rounded-2xl border border-neutral-200/80 bg-white p-6 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-neutral-900/80 dark:shadow-[0_16px_36px_-26px_rgba(0,0,0,0.8)] md:p-8">
+        <div data-floating-cta-hide className="card rounded-2xl border border-neutral-200/80 bg-white p-6 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:to-neutral-900/80 dark:shadow-[0_16px_36px_-26px_rgba(0,0,0,0.8)] md:p-8">
           <h2 className="text-2xl font-bold dark:text-neutral-100">Рассчитать стоимость стенда</h2>
           <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">
             Укажите тип стенда, размеры, место установки и желаемую комплектацию. После заявки уточним детали и отправим расчёт с вариантами исполнения.

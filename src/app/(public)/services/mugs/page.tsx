@@ -153,7 +153,7 @@ export default async function MugsServicePage() {
             </HeroChipList>
 
             <HeroActions className="mt-8">
-              <a href="#mugs-order" className="btn-primary no-underline">
+              <a href="#mugs-order" data-floating-cta-hide className="btn-primary no-underline">
                 Оставить заявку
               </a>
               <a href="#mugs-prices" className="btn-secondary no-underline">
@@ -185,7 +185,7 @@ export default async function MugsServicePage() {
             </HeroChipList>
 
             <HeroActions className="mt-8">
-              <a href="#mugs-order" className="btn-primary no-underline">
+              <a href="#mugs-order" data-floating-cta-hide className="btn-primary no-underline">
                 Оставить заявку
               </a>
               <a href="#mugs-prices" className="btn-secondary no-underline">
@@ -292,7 +292,7 @@ export default async function MugsServicePage() {
 
       <Section id="mugs-order" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
         <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-gradient-to-br dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-7">
+          <div data-floating-cta-hide className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-gradient-to-br dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-7">
             <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 dark:border-neutral-800/90 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-2xl">
                 <p className="t-eyebrow">Оформление заказа</p>

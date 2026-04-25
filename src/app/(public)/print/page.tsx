@@ -68,12 +68,14 @@ export default async function PrintPage() {
           <HeroActions className="gap-3.5">
             <Link
               href="#print-calculator"
+              data-floating-cta-hide
               className="btn-primary px-5 py-3 text-sm no-underline shadow-[0_8px_20px_rgba(220,38,38,0.24)] hover:shadow-[0_10px_24px_rgba(220,38,38,0.28)]"
             >
               Рассчитать стоимость
             </Link>
             <Link
               href="#print-order-form"
+              data-floating-cta-hide
               className="btn-secondary border-neutral-200 bg-white/80 px-5 py-3 text-sm text-neutral-700 no-underline dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-200"
             >
               Отправить заявку

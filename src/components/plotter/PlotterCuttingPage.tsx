@@ -244,6 +244,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               <div className="mt-7 flex flex-wrap items-center gap-4">
                 <button
                   type="button"
+                  data-floating-cta-hide
                   onClick={() => document.getElementById('plotter-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className="btn-primary px-5 py-3"
                 >
@@ -474,7 +475,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       </Section>
 
       <Section className="pt-0">
-        <div id="plotter-request" className={`${publicFormStyles.shell} border-neutral-200/90 dark:border-neutral-700/85`}>
+        <div id="plotter-request" data-floating-cta-hide className={`${publicFormStyles.shell} border-neutral-200/90 dark:border-neutral-700/85`}>
           <div className="section-header-tight mb-6">
             <p className="t-eyebrow">Заявка</p>
             <h2 className="t-h3">Отправьте заявку на плоттерную резку</h2>

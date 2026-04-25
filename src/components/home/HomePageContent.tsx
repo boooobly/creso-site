@@ -133,7 +133,7 @@ export default function HomePageContent({
 
             <div className="hero-actions sm:items-end">
               <motion.div whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.01 }} transition={{ duration: 0.2 }}>
-                <Link className="btn-primary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
+                <Link data-floating-cta-hide className="btn-primary w-full no-underline text-center shadow-sm hover:shadow-md focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 sm:w-auto" href="/#lead-form" aria-label="Рассчитать стоимость и отправить заявку">
                   {heroPrimaryButtonText}
                 </Link>
               </motion.div>
@@ -277,7 +277,7 @@ export default function HomePageContent({
       </Section>
 
       <Section id="lead-form" spacing="tight">
-        <motion.div className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 dark:border-neutral-700/90 dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_26px_58px_-36px_rgba(0,0,0,0.72)] sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div data-floating-cta-hide className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 dark:border-neutral-700/90 dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_26px_58px_-36px_rgba(0,0,0,0.72)] sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-20 top-1/2 z-0 h-[19rem] w-[25rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.16)_0%,rgba(212,28,28,0.07)_34%,rgba(212,28,28,0.02)_58%,transparent_76%)] blur-3xl"
