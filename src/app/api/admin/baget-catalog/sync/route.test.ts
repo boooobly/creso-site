@@ -44,4 +44,36 @@ describe('POST /api/admin/baget-catalog/sync', () => {
     expect(json.itemCount).toBe(42);
     expect(json.message).toContain('Каталог багета обновлён');
   });
+
+  it('returns diagnostics on failed sync', async () => {
+    requireAdminApiAuthMock.mockResolvedValueOnce(null);
+    syncBagetCatalogSnapshotMock.mockResolvedValueOnce({
+      ok: false,
+      error: 'Zero valid parsed items from sheet.',
+      sheetId: 'sheet-id',
+      tab: 'baget_catalog',
+      preservedSnapshot: true,
+      diagnostics: {
+        rowsCount: 3,
+        headers: ['ID', 'Цена'],
+        skipped: {
+          hidden: 1,
+          missingResidues: 1,
+          invalidWidth: 1,
+          invalidPrice: 0,
+          other: 0,
+        },
+      },
+    });
+
+    const { POST } = await import('./route');
+    const response = await POST(new NextRequest('http://localhost:3000/api/admin/baget-catalog/sync', { method: 'POST' }));
+    const json = (await response.json()) as { ok: boolean; rowsCount?: number; headers?: string[]; skipped?: { hidden: number } };
+
+    expect(response.status).toBe(500);
+    expect(json.ok).toBe(false);
+    expect(json.rowsCount).toBe(3);
+    expect(json.headers).toEqual(['ID', 'Цена']);
+    expect(json.skipped?.hidden).toBe(1);
+  });
 });

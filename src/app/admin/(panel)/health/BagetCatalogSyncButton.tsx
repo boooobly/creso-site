@@ -10,16 +10,31 @@ type SyncResponse = {
   ok?: boolean;
   message?: string;
   error?: string;
+  rowsCount?: number;
+  headers?: string[];
+  skipped?: {
+    missingResidues: number;
+    hidden: number;
+    invalidWidth: number;
+    invalidPrice: number;
+    other: number;
+  };
 };
 
 export default function BagetCatalogSyncButton() {
   const router = useRouter();
   const [state, setState] = useState<SyncState>('idle');
   const [feedback, setFeedback] = useState('');
+  const [diagnostics, setDiagnostics] = useState<SyncResponse['skipped'] | null>(null);
+  const [rowsCount, setRowsCount] = useState<number | null>(null);
+  const [headers, setHeaders] = useState<string[]>([]);
 
   const handleSync = async () => {
     setState('loading');
     setFeedback('Обновляем snapshot каталога багета…');
+    setDiagnostics(null);
+    setRowsCount(null);
+    setHeaders([]);
 
     try {
       const response = await fetch('/api/admin/baget-catalog/sync', {
@@ -32,6 +47,9 @@ export default function BagetCatalogSyncButton() {
         const errorText = payload.error || 'Не удалось обновить snapshot каталога багета.';
         setState('error');
         setFeedback(errorText);
+        setDiagnostics(payload.skipped ?? null);
+        setRowsCount(typeof payload.rowsCount === 'number' ? payload.rowsCount : null);
+        setHeaders(Array.isArray(payload.headers) ? payload.headers : []);
         return;
       }
 
@@ -57,9 +75,21 @@ export default function BagetCatalogSyncButton() {
         {state === 'loading' ? 'Обновляем snapshot…' : 'Обновить snapshot каталога багета'}
       </AdminButton>
       {state !== 'idle' ? (
-        <p role={state === 'error' ? 'alert' : 'status'} className={`text-xs ${feedbackClassName}`}>
-          {feedback}
-        </p>
+        <div className="space-y-1">
+          <p role={state === 'error' ? 'alert' : 'status'} className={`text-xs ${feedbackClassName}`}>
+            {feedback}
+          </p>
+          {state === 'error' && diagnostics ? (
+            <div className="rounded border border-rose-200 bg-rose-50 p-2 text-[11px] text-rose-800">
+              <p>Диагностика: строк {rowsCount ?? '—'}.</p>
+              <p className="truncate">Заголовки: {headers.length > 0 ? headers.join(', ') : '—'}</p>
+              <p>
+                Пропуски: hidden={diagnostics.hidden}, missingResidues={diagnostics.missingResidues}, invalidWidth=
+                {diagnostics.invalidWidth}, invalidPrice={diagnostics.invalidPrice}, other={diagnostics.other}
+              </p>
+            </div>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );
