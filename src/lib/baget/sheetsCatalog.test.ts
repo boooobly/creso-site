@@ -63,8 +63,8 @@ describe('loadBagetCatalog caching and fallback', () => {
 
     const csv = [
       'id,Поставщик,Артикул багета,Наименование,Ширина в мм,Цена,Остаток по нарядам м.п.,"Запас, мм",Показать на сайте,Фото плети,Фото уголка,Стиль,Цвет,Комментарий',
-      'A2,Supplier,A-002,Багет 2,35 мм,"1 200 ₽",12*20,15,да,https://example.com/a2.jpg,,modern,black,ok',
-      'A3,Supplier,A-003,Багет 3,40,"1,5",9*10,10,✓,https://example.com/a3.jpg,,classic,white,note',
+      'A2,Supplier,A-002,Багет 2,35 мм,"1 200 ₽",12*20,15,ИСТИНА,https://example.com/a2.jpg,,modern,black,ok',
+      'A3,Supplier,A-003,Багет 3,40,"1,5",9*10,10,"включено",https://example.com/a3.jpg,,classic,white,note',
       'A4,Supplier,A-004,Багет 4,50,900,8*10,10,показать,https://example.com/a4.jpg,,loft,brown,note',
     ].join('\n');
 
@@ -103,6 +103,13 @@ describe('loadBagetCatalog caching and fallback', () => {
     expect(result.diagnostics?.skipped.missingResidues).toBe(1);
     expect(result.diagnostics?.skipped.hidden).toBe(1);
     expect(result.diagnostics?.skipped.invalidWidth).toBe(1);
+    expect(result.diagnostics?.showOnSiteHeader).toBe('Показывать на сайте');
+    expect(result.diagnostics?.showOnSiteValues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'да', count: 2 }),
+        expect.objectContaining({ value: 'нет', count: 1 }),
+      ])
+    );
   });
 });
 

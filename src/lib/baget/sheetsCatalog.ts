@@ -97,6 +97,8 @@ export type BagetCatalogLoadResult = {
       invalidPrice: number;
       other: number;
     };
+    showOnSiteHeader?: string | null;
+    showOnSiteValues?: Array<{ value: string; count: number }>;
   };
 };
 
@@ -122,10 +124,57 @@ function toNumber(input: string, fallback?: number): number {
 }
 
 function toBoolean(input: string): boolean {
-  const normalized = input.trim().toLowerCase();
-  if (['true', '1', 'yes', 'да', 'д', 'y', 'показать', 'показывать', 'опубликовано', 'on', 'x', '✓', '+'].includes(normalized)) return true;
+  const normalized = input
+    .trim()
+    .replace(/\u00A0/g, ' ')
+    .replace(/^['"]+|['"]+$/g, '')
+    .toLowerCase()
+    .replace(/ё/g, 'е');
+  if (
+    [
+      'true',
+      '1',
+      'yes',
+      'да',
+      'д',
+      'y',
+      'показать',
+      'показывать',
+      'опубликовано',
+      'on',
+      'x',
+      '✓',
+      '+',
+      'истина',
+      'истинно',
+      'вкл',
+      'включено',
+      'checked',
+      'show',
+      'visible',
+    ].includes(normalized)
+  ) return true;
   if (!normalized) return false;
-  if (['false', '0', 'no', 'нет', 'н', 'скрыть', 'не показывать', 'off', '-'].includes(normalized)) return false;
+  if (
+    [
+      'false',
+      '0',
+      'no',
+      'нет',
+      'н',
+      'скрыть',
+      'не показывать',
+      'off',
+      '-',
+      'ложь',
+      'ложно',
+      'выкл',
+      'выключено',
+      'unchecked',
+      'hide',
+      'hidden',
+    ].includes(normalized)
+  ) return false;
   return false;
 }
 
@@ -284,6 +333,18 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
       invalidPrice: 0,
       other: 0,
     };
+    const showOnSiteHeader = getFirstPresentHeader(headers, HEADER_ALIASES.showOnSite);
+    const showOnSiteHistogram = new Map<string, number>();
+    for (const row of records) {
+      const rawValue = (showOnSiteHeader ? row[showOnSiteHeader] : undefined) ?? '';
+      const normalizedValue = rawValue.trim().replace(/\u00A0/g, ' ').replace(/^['"]+|['"]+$/g, '');
+      const key = normalizedValue || '(empty)';
+      showOnSiteHistogram.set(key, (showOnSiteHistogram.get(key) ?? 0) + 1);
+    }
+    const showOnSiteValues = Array.from(showOnSiteHistogram.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([value, count]) => ({ value, count }));
 
     const items = records
       .map((row) => mapRowToItem(row, skipped))
@@ -293,6 +354,8 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
       rowsCount: records.length,
       headers,
       skipped,
+      showOnSiteHeader,
+      showOnSiteValues,
     };
 
     if (items.length === 0) {
@@ -312,6 +375,7 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
           residues: getFirstPresentHeader(headers, HEADER_ALIASES.residues),
           showOnSite: getFirstPresentHeader(headers, HEADER_ALIASES.showOnSite),
         },
+        showOnSiteValues,
       });
       return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error, diagnostics };
     }
