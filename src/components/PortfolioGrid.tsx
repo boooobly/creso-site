@@ -181,15 +181,15 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                   <span className="inline-flex items-center rounded-full border border-red-200/80 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 dark:border-red-500/45 dark:bg-red-500/15 dark:text-red-200">
                     {getItemCategory(activeItem)}
                   </span>
-                  <h3 className="text-2xl font-semibold tracking-tight text-neutral-900">{activeItem.title}</h3>
-                  <p className="text-sm leading-6 text-neutral-600">
+                  <h3 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">{activeItem.title}</h3>
+                  <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300">
                     {getItemDescription(activeItem) || 'Подробное описание проекта пока не добавлено.'}
                   </p>
                 </div>
 
                 {activeGallery.length > 1 ? (
                   <div className="space-y-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400">Галерея проекта</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500">Галерея проекта</p>
                     <div className="grid grid-cols-4 gap-2">
                       {activeGallery.map((image, index) => {
                         const isCurrent = index === activeImageIndex;
@@ -201,7 +201,9 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                             onClick={() => setActiveImageIndex(index)}
                             className={cn(
                               'relative overflow-hidden rounded-lg border transition-colors',
-                              isCurrent ? 'border-red-300 ring-1 ring-red-300/80' : 'border-neutral-200 hover:border-neutral-400'
+                              isCurrent
+                                ? 'border-red-300 ring-1 ring-red-300/80 dark:border-red-500 dark:ring-red-500/70'
+                                : 'border-neutral-200 hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-500'
                             )}
                             aria-label={`Показать изображение ${index + 1}`}
                             aria-pressed={isCurrent}
