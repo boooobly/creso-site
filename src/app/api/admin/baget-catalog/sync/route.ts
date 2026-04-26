@@ -20,6 +20,10 @@ export async function POST(request: NextRequest) {
         sheetId: result.sheetId,
         tab: result.tab,
         preservedSnapshot: result.preservedSnapshot,
+        diagnostics: result.diagnostics,
+        rowsCount: result.diagnostics?.rowsCount,
+        headers: result.diagnostics?.headers,
+        skipped: result.diagnostics?.skipped,
       }, { status: 500 });
     }
 
