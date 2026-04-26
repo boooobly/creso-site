@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
         rowsCount: result.diagnostics?.rowsCount,
         headers: result.diagnostics?.headers,
         skipped: result.diagnostics?.skipped,
+        showOnSiteHeader: result.diagnostics?.showOnSiteHeader,
+        showOnSiteValues: result.diagnostics?.showOnSiteValues,
       }, { status: 500 });
     }
 

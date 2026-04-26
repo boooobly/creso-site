@@ -19,6 +19,8 @@ type SyncResponse = {
     invalidPrice: number;
     other: number;
   };
+  showOnSiteHeader?: string | null;
+  showOnSiteValues?: Array<{ value: string; count: number }>;
 };
 
 export default function BagetCatalogSyncButton() {
@@ -28,6 +30,8 @@ export default function BagetCatalogSyncButton() {
   const [diagnostics, setDiagnostics] = useState<SyncResponse['skipped'] | null>(null);
   const [rowsCount, setRowsCount] = useState<number | null>(null);
   const [headers, setHeaders] = useState<string[]>([]);
+  const [showOnSiteHeader, setShowOnSiteHeader] = useState<string | null>(null);
+  const [showOnSiteValues, setShowOnSiteValues] = useState<Array<{ value: string; count: number }>>([]);
 
   const handleSync = async () => {
     setState('loading');
@@ -35,6 +39,8 @@ export default function BagetCatalogSyncButton() {
     setDiagnostics(null);
     setRowsCount(null);
     setHeaders([]);
+    setShowOnSiteHeader(null);
+    setShowOnSiteValues([]);
 
     try {
       const response = await fetch('/api/admin/baget-catalog/sync', {
@@ -50,6 +56,8 @@ export default function BagetCatalogSyncButton() {
         setDiagnostics(payload.skipped ?? null);
         setRowsCount(typeof payload.rowsCount === 'number' ? payload.rowsCount : null);
         setHeaders(Array.isArray(payload.headers) ? payload.headers : []);
+        setShowOnSiteHeader(typeof payload.showOnSiteHeader === 'string' ? payload.showOnSiteHeader : null);
+        setShowOnSiteValues(Array.isArray(payload.showOnSiteValues) ? payload.showOnSiteValues : []);
         return;
       }
 
@@ -83,6 +91,13 @@ export default function BagetCatalogSyncButton() {
             <div className="rounded border border-rose-200 bg-rose-50 p-2 text-[11px] text-rose-800">
               <p>Диагностика: строк {rowsCount ?? '—'}.</p>
               <p className="truncate">Заголовки: {headers.length > 0 ? headers.join(', ') : '—'}</p>
+              <p>Колонка показа: {showOnSiteHeader || '—'}</p>
+              <p className="truncate">
+                Значения в колонке:{' '}
+                {showOnSiteValues.length > 0
+                  ? showOnSiteValues.map((item) => `${item.value}=${item.count}`).join(', ')
+                  : '—'}
+              </p>
               <p>
                 Пропуски: hidden={diagnostics.hidden}, missingResidues={diagnostics.missingResidues}, invalidWidth=
                 {diagnostics.invalidWidth}, invalidPrice={diagnostics.invalidPrice}, other={diagnostics.other}

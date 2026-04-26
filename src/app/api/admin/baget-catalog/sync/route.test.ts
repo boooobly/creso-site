@@ -56,6 +56,11 @@ describe('POST /api/admin/baget-catalog/sync', () => {
       diagnostics: {
         rowsCount: 3,
         headers: ['ID', 'Цена'],
+        showOnSiteHeader: 'Показывать на сайте',
+        showOnSiteValues: [
+          { value: 'ИСТИНА', count: 12 },
+          { value: 'ЛОЖЬ', count: 444 },
+        ],
         skipped: {
           hidden: 1,
           missingResidues: 1,
@@ -68,12 +73,24 @@ describe('POST /api/admin/baget-catalog/sync', () => {
 
     const { POST } = await import('./route');
     const response = await POST(new NextRequest('http://localhost:3000/api/admin/baget-catalog/sync', { method: 'POST' }));
-    const json = (await response.json()) as { ok: boolean; rowsCount?: number; headers?: string[]; skipped?: { hidden: number } };
+    const json = (await response.json()) as {
+      ok: boolean;
+      rowsCount?: number;
+      headers?: string[];
+      skipped?: { hidden: number };
+      showOnSiteHeader?: string;
+      showOnSiteValues?: Array<{ value: string; count: number }>;
+    };
 
     expect(response.status).toBe(500);
     expect(json.ok).toBe(false);
     expect(json.rowsCount).toBe(3);
     expect(json.headers).toEqual(['ID', 'Цена']);
     expect(json.skipped?.hidden).toBe(1);
+    expect(json.showOnSiteHeader).toBe('Показывать на сайте');
+    expect(json.showOnSiteValues).toEqual([
+      { value: 'ИСТИНА', count: 12 },
+      { value: 'ЛОЖЬ', count: 444 },
+    ]);
   });
 });
