@@ -268,6 +268,9 @@ export default async function WideFormatPrintingPage() {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Связанная услуга</p>
                 <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">{ctaTitle}</h2>
                 <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">{ctaDescription}</p>
+                <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
+                  Для локальных кампаний в Невинномысске также доступна <Link href="/banner-printing" className="underline decoration-neutral-300 underline-offset-4">печать баннеров</Link>.
+                </p>
               </div>
               <div className="flex w-full md:w-auto md:justify-end">
                 <Link href="/plotter-cutting" className="btn-primary w-full text-center no-underline md:w-auto">{ctaButtonText}</Link>
