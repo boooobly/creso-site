@@ -6,6 +6,9 @@ import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPa
 import { ClipboardCheck, Cog, Factory, FileText, Frame, Lightbulb, PanelsTopLeft, PencilRuler, Printer, Ruler, ShieldCheck, Sparkles, Type, Wrench } from 'lucide-react';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getSiteImage, getSiteImages } from '@/lib/site-images';
+import type { Metadata } from 'next';
+import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 
 const capabilityBadges = ['Фрезерный станок 2×4 м', 'Печать до 3.2 м', 'Плоттерная резка', 'Багетная мастерская'] as const;
 
@@ -120,6 +123,13 @@ const trustPoints = [
   { title: 'Гарантия на изделия', text: 'Сопровождаем проект и после монтажа.', icon: ShieldCheck },
 ] as const;
 
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Производство рекламных конструкций | CredoMir',
+  description: 'Собственное производство CredoMir: фрезеровка, печать, плоттерная резка и багетная мастерская.',
+  path: '/production',
+});
+
 export default async function ProductionPage() {
   const [contentMap, heroImage, equipmentImages] = await Promise.all([
     getPageContentMap('production'),
@@ -143,6 +153,8 @@ export default async function ProductionPage() {
 
   return (
     <div>
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Производство рекламных конструкций', path: '/production' }])} />
+      <JsonLd data={buildServiceJsonLd('Производство рекламных конструкций', 'Собственное производство рекламных конструкций, печати и обработки материалов.', '/production')} />
       <Section>
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"

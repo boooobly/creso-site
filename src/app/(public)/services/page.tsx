@@ -5,6 +5,9 @@ import ServiceCard from '@/components/ServiceCard';
 import Link from 'next/link';
 import { getSiteImages } from '@/lib/site-images';
 import { SERVICE_CARD_IMAGE_SLOT_BY_ID } from '@/lib/site-service-image-slots';
+import JsonLd from '@/components/seo/JsonLd';
+import type { Metadata } from 'next';
+import { buildBreadcrumbJsonLd, buildPublicPageMetadata } from '@/lib/seo';
 
 const serviceImageById: Record<string, string> = {
   baget: '/images/services/bagget.png',
@@ -17,6 +20,13 @@ const serviceImageById: Record<string, string> = {
   outdoor: '/images/services/outdoor.png',
   polygraphy: '/images/services/cards.png',
 };
+
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Услуги CredoMir — реклама и производство',
+  description: 'Каталог услуг CredoMir: багет, печать, фрезеровка, плоттерная резка, наружная реклама и другое.',
+  path: '/services',
+});
 
 export default async function ServicesPage() {
   const [sCMS, serviceCardImages] = await Promise.all([
@@ -48,6 +58,7 @@ export default async function ServicesPage() {
 
   return (
     <div className="-mt-6 md:-mt-8">
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }])} />
       <Section spacing="compact" background="muted" fullBleed className="border-y border-neutral-200/70">
         <div className="section-header">
           <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>

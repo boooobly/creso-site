@@ -7,6 +7,8 @@ import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { messages } from '@/lib/messages';
 import { getPublicSiteSettings } from '@/lib/site-settings';
 import { BRAND } from '@/lib/constants';
+import type { Metadata } from 'next';
+import { buildPublicPageMetadata } from '@/lib/seo';
 
 type LinkedQuickContact = {
   title: string;
@@ -65,6 +67,13 @@ function toWhatsAppLink(value: string) {
   const digits = value.replace(/\D/g, '');
   return digits ? `https://wa.me/${digits}` : '#';
 }
+
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Контакты CredoMir',
+  description: 'Контакты, адрес, график работы и способы связи с компанией CredoMir в Невинномысске.',
+  path: '/contacts',
+});
 
 export default async function ContactsPage() {
   const [contentMap, settings] = await Promise.all([getPageContentMap('contacts'), getPublicSiteSettings()]);

@@ -9,6 +9,9 @@ import ProtectedImage from '@/components/ui/ProtectedImage';
 import { messages } from '@/lib/messages';
 import { getSiteImages } from '@/lib/site-images';
 import { STANDS_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
+import type { Metadata } from 'next';
+import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 
 const heroChips = ['Для помещений и улицы', 'Структура под ваши документы', 'Согласование макета перед запуском', 'От 1 стенда до серии'] as const;
 
@@ -61,6 +64,13 @@ const revealDelayClasses = [
 
 const getRevealDelayClass = (index: number) => revealDelayClasses[index] ?? revealDelayClasses[revealDelayClasses.length - 1];
 
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Изготовление информационных стендов | CredoMir',
+  description: 'Проектирование и изготовление информационных стендов для помещений и улицы с доставкой и монтажом.',
+  path: '/services/stands',
+});
+
 export default async function StandsServicePage() {
   const siteImages = await getSiteImages(STANDS_SITE_IMAGE_SLOTS.map((slot) => slot.key));
   const heroImageSrc = siteImages['stands.hero.main']?.url ?? '/images/stands/hero.png';
@@ -82,6 +92,8 @@ export default async function StandsServicePage() {
 
   return (
     <div>
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Изготовление информационных стендов', path: '/services/stands' }])} />
+      <JsonLd data={buildServiceJsonLd('Изготовление информационных стендов', 'Изготавливаем информационные стенды для помещений и улицы с подбором материалов под задачу.', '/services/stands')} />
       <Section className="pb-8 pt-8 md:pb-10 md:pt-10" background="default" id="stands-hero">
         <PageHero className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-950 dark:to-neutral-900/80 lg:hidden">
           <HeroEyebrow>Изготовление стендов</HeroEyebrow>
