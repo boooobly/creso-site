@@ -5,9 +5,9 @@ import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroTitle, 
 import JsonLd from '@/components/seo/JsonLd';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
-const variants = ['Баннеры для фасадов и входных групп', 'Баннеры для акций и временных кампаний', 'Интерьерные баннеры для ТЦ и офисов', 'Баннеры с подготовкой под монтаж'] as const;
-const materials = ['ПВХ-баннеры разной плотности под условия эксплуатации.', 'Печать с учётом расстояния просмотра и задач по читаемости.', 'Постобработка: проклейка, люверсы, подрезка под формат монтажа.'] as const;
-const steps = ['Передаёте размеры, фото места и задачу.', 'Согласуем материал, макет и способ крепления.', 'Печатаем и подготавливаем изделие к установке.', 'Вы получаете готовый баннер или заказываете монтаж.'] as const;
+const variants = ['Баннеры для фасадов и входных групп', 'Баннеры для акций и сезонных предложений', 'Интерьерные баннеры для ТЦ, стоек и офисов', 'Баннеры для строительных ограждений и временных площадок'] as const;
+const materials = ['Подбираем баннерную ткань под улицу, интерьер или короткую рекламную кампанию.', 'Согласовываем размер, чтобы макет читался с реальной дистанции у точки размещения.', 'Делаем постобработку под ваш монтаж: люверсы, проклейка краёв, рез по нужному формату.'] as const;
+const steps = ['Вы присылаете размеры, фото места и кратко описываете задачу.', 'Предлагаем материал, проверяем макет и уточняем, как будет крепиться баннер.', 'Печатаем и подготавливаем изделие к установке.', 'Передаём заказ или подключаем монтажную бригаду при необходимости.'] as const;
 
 export const metadata: Metadata = buildPublicPageMetadata({
   title: 'Печать баннеров в Невинномысске | CredoMir',
@@ -39,14 +39,14 @@ export default function BannerPrintingPage() {
       </Section>
 
       <Section spacing="tight" background="muted" fullBleed>
-        <div className="section-header"><h2 className="t-h2">Варианты баннеров</h2></div>
+        <div className="section-header"><h2 className="t-h2">Какие баннеры чаще всего заказывают</h2></div>
         <div className="grid gap-4 md:grid-cols-2">{variants.map((item) => <article key={item} className="card p-5">{item}</article>)}</div>
       </Section>
 
       <Section spacing="tight">
         <div className="grid gap-4 lg:grid-cols-2">
-          <article className="card p-5 md:p-6"><h2 className="t-h3">Материалы и производство</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">{materials.map((item) => <li key={item}>• {item}</li>)}</ul></article>
-          <article className="card p-5 md:p-6"><h2 className="t-h3">Как проходит заказ</h2><ol className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">{steps.map((item, i) => <li key={item}><span className="font-semibold text-neutral-900 dark:text-neutral-100">{i + 1}.</span> {item}</li>)}</ol></article>
+          <article className="card p-5 md:p-6"><h2 className="t-h3">Что важно учесть до печати</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">{materials.map((item) => <li key={item}>• {item}</li>)}</ul></article>
+          <article className="card p-5 md:p-6"><h2 className="t-h3">Как мы ведём заказ</h2><ol className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">{steps.map((item, i) => <li key={item}><span className="font-semibold text-neutral-900 dark:text-neutral-100">{i + 1}.</span> {item}</li>)}</ol></article>
         </div>
       </Section>
 
@@ -62,7 +62,7 @@ export default function BannerPrintingPage() {
           <article className="card p-5 md:p-6"><h3 className="font-semibold">Можно напечатать срочный заказ?</h3><p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Сроки зависят от загруженности и параметров проекта. Подскажем реальный срок после уточнения задачи.</p></article>
           <article className="card p-5 md:p-6"><h3 className="font-semibold">Вы помогаете с макетом?</h3><p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Да, можем помочь с дизайном и технической подготовкой файла к печати.</p></article>
         </div>
-        <div className="cta-shell mt-6"><div className="section-header-split mb-0"><div><h2 className="t-h3">Нужен баннер под конкретную точку?</h2><p className="t-body text-muted-foreground max-w-2xl">Подберём формат и материал, чтобы баннер работал по задаче и условиям размещения.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row"><Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Оставить запрос</Link><Link href="/advertising-signs" className="btn-secondary w-full justify-center no-underline sm:w-auto">Изготовление вывесок</Link></div></div></div>
+        <div className="cta-shell mt-6"><div className="section-header-split mb-0"><div><h2 className="t-h3">Нужен баннер для новой акции или постоянной вывески?</h2><p className="t-body text-muted-foreground max-w-2xl">Подскажем оптимальный материал и подготовим макет под ваш адрес и формат крепления.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row"><Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Получить консультацию</Link><Link href="/wide-format-printing" className="btn-secondary w-full justify-center no-underline sm:w-auto">К широкоформатной печати</Link></div></div></div>
       </Section>
     </div>
   );

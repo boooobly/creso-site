@@ -13,9 +13,9 @@ const variants = [
 ] as const;
 
 const productionNotes = [
-  'Подбираем основу и облицовку под место установки и бюджет проекта.',
-  'Учитываем читаемость днём и вечером, формат крепления и обслуживание.',
-  'Помогаем с макетом и адаптацией фирменного стиля под фасад.',
+  'Подбираем основу и лицевую часть вывески под фасад, трафик и формат бизнеса.',
+  'Сразу учитываем, как вывеска будет смотреться днём и в вечернее время.',
+  'Помогаем адаптировать фирменный стиль, чтобы макет выглядел аккуратно на реальном объекте.',
 ] as const;
 
 const steps = [
@@ -77,7 +77,7 @@ export default function AdvertisingSignsPage() {
       <Section spacing="tight" background="muted" fullBleed>
         <div className="section-header">
           <h2 className="t-h2">Что мы изготавливаем</h2>
-          <p className="t-body text-muted-foreground max-w-3xl">Решения для локального бизнеса в Невинномысске и по Ставропольскому краю.</p>
+          <p className="t-body text-muted-foreground max-w-3xl">Подбираем формат под конкретный тип точки: улица, входная группа, ТЦ или производственный объект.</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {variants.map((item) => (
@@ -91,13 +91,13 @@ export default function AdvertisingSignsPage() {
       <Section spacing="tight">
         <div className="grid gap-4 lg:grid-cols-2">
           <article className="card p-5 md:p-6">
-            <h2 className="t-h3">Материалы и производство</h2>
+            <h2 className="t-h3">Как подбираем конструкцию</h2>
             <ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">
               {productionNotes.map((item) => <li key={item}>• {item}</li>)}
             </ul>
           </article>
           <article className="card p-5 md:p-6">
-            <h2 className="t-h3">Как проходит заказ</h2>
+            <h2 className="t-h3">Этапы работы по проекту</h2>
             <ol className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">
               {steps.map((item, index) => <li key={item}><span className="font-semibold text-neutral-900 dark:text-neutral-100">{index + 1}.</span> {item}</li>)}
             </ol>
@@ -132,12 +132,12 @@ export default function AdvertisingSignsPage() {
         <div className="cta-shell mt-6">
           <div className="section-header-split mb-0">
             <div>
-              <h2 className="t-h3">Нужна вывеска под ваш объект?</h2>
-              <p className="t-body text-muted-foreground max-w-2xl">Напишите задачу — предложим формат и подготовим расчёт. Также доступны световые короба и объёмные буквы.</p>
+              <h2 className="t-h3">Нужно оформить фасад или входную группу?</h2>
+              <p className="t-body text-muted-foreground max-w-2xl">Опишите, где размещается реклама и что важно для вашей точки — предложим понятный вариант изготовления и монтажа.</p>
             </div>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-              <Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Оставить заявку</Link>
-              <Link href="/lightboxes" className="btn-secondary w-full justify-center no-underline sm:w-auto">Световые короба</Link>
+              <Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Обсудить задачу с менеджером</Link>
+              <Link href="/outdoor-advertising" className="btn-secondary w-full justify-center no-underline sm:w-auto">Все решения по наружной рекламе</Link>
             </div>
           </div>
         </div>

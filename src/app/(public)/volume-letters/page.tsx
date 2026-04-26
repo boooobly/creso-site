@@ -23,20 +23,23 @@ export default function VolumeLettersPage() {
           <HeroTitle>Объёмные буквы в Невинномысске</HeroTitle>
           <HeroLead>Изготавливаем объёмные буквы для фасадов, ресепшенов и входных зон. Подбираем формат под задачу бренда и условия размещения на объекте.</HeroLead>
           <HeroChipList>
-            {['Световые и несветовые буквы', 'Фасадные и интерьерные решения', 'Помощь с дизайном и адаптацией макета', 'Производство и монтаж'].map((item) => (
+            {['Световые и несветовые буквы', 'Фасадные и интерьерные решения', 'Адаптация логотипа под реальный объект', 'Производство и монтаж без лишних подрядчиков'].map((item) => (
               <HeroChip key={item} className="chip-elevated text-xs sm:text-sm"><span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />{item}</HeroChip>
             ))}
           </HeroChipList>
           <HeroActions>
-            <Link href="/contacts" className="btn-primary no-underline">Запросить расчёт</Link>
-            <Link href="/lightboxes" className="btn-secondary no-underline">Световые короба</Link>
+            <Link href="/contacts" className="btn-primary no-underline">Обсудить проект букв</Link>
+            <Link href="/outdoor-advertising" className="btn-secondary no-underline">Наружная реклама под ключ</Link>
           </HeroActions>
         </PageHero>
       </Section>
 
       <Section spacing="tight" background="muted" fullBleed>
+        <div className="section-header">
+          <h2 className="t-h2">Какие задачи решают объёмные буквы</h2>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {['Буквы для фасадов магазинов и офисов', 'Буквы для бренд-зон и ресепшенов', 'Логотипы и знаки сложной формы'].map((item) => (
+          {['Выделяют вход и фасад среди соседних вывесок', 'Поддерживают единый стиль сети в разных точках', 'Делают бренд-зоны и ресепшены более узнаваемыми'].map((item) => (
             <article key={item} className="card p-5">{item}</article>
           ))}
         </div>
@@ -44,8 +47,8 @@ export default function VolumeLettersPage() {
 
       <Section spacing="tight">
         <div className="grid gap-4 lg:grid-cols-2">
-          <article className="card p-5 md:p-6"><h2 className="t-h3">Материалы и производство</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li>• Подбираем материалы под внешний вид, бюджет и условия эксплуатации.</li><li>• Производим элементы на собственной площадке с контролем качества.</li><li>• Готовим комплект для безопасного и аккуратного монтажа.</li></ul></article>
-          <article className="card p-5 md:p-6"><h2 className="t-h3">Порядок работы</h2><ol className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">1.</span> Получаем задачу и исходные данные по объекту.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">2.</span> Готовим предложение по формату, материалам и смете.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">3.</span> Согласуем макет и запускаем производство.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">4.</span> Выполняем монтаж и сдаём готовый результат.</li></ol></article>
+          <article className="card p-5 md:p-6"><h2 className="t-h3">Что обсуждаем до запуска</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li>• Подбираем материалы под внешний вид, бюджет и условия эксплуатации.</li><li>• Проверяем видимость с нужной дистанции и читаемость названия.</li><li>• Готовим комплект для безопасного и аккуратного монтажа.</li></ul></article>
+          <article className="card p-5 md:p-6"><h2 className="t-h3">Порядок работы</h2><ol className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">1.</span> Получаем задачу и исходные данные по объекту.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">2.</span> Предлагаем формат букв и материалы с понятным расчётом.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">3.</span> Согласуем макет и запускаем производство.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">4.</span> Выполняем монтаж и передаём готовый результат.</li></ol></article>
         </div>
       </Section>
 
@@ -61,7 +64,7 @@ export default function VolumeLettersPage() {
           <article className="card p-5 md:p-6"><h3 className="font-semibold">Можно ли изготовить буквы по моему макету?</h3><p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Да, работаем с готовыми макетами и при необходимости помогаем доработать их под производство.</p></article>
           <article className="card p-5 md:p-6"><h3 className="font-semibold">Сколько стоит заказ?</h3><p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Стоимость зависит от размера, материала и сложности проекта.</p></article>
         </div>
-        <div className="cta-shell mt-6"><div className="section-header-split mb-0"><div><h2 className="t-h3">Нужны объёмные буквы для вашего объекта?</h2><p className="t-body text-muted-foreground max-w-2xl">Опишете задачу — предложим рабочее решение для Невинномысска и Ставропольского края.</p></div><Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Обсудить задачу</Link></div></div>
+        <div className="cta-shell mt-6"><div className="section-header-split mb-0"><div><h2 className="t-h3">Нужны объёмные буквы для фасада или интерьера?</h2><p className="t-body text-muted-foreground max-w-2xl">Расскажите о вашей точке и задаче — подскажем подходящий формат и как лучше реализовать проект.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row"><Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Связаться по проекту</Link><Link href="/outdoor-advertising" className="btn-secondary w-full justify-center no-underline sm:w-auto">Все форматы наружной рекламы</Link></div></div></div>
       </Section>
     </div>
   );

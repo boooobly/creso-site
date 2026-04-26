@@ -29,7 +29,7 @@ export default function LightboxesPage() {
           <HeroTitle>Световые короба в Невинномысске</HeroTitle>
           <HeroLead>Производим световые короба для фасадов и входных групп. Подбираем конструкцию под место установки, помогаем с макетом и выполняем монтаж.</HeroLead>
           <HeroChipList>
-            {['Односторонние и двусторонние короба', 'Для улицы и входных групп', 'Производство и монтаж под ключ', 'Работаем по Невинномысску и краю'].map((item) => (
+            {['Односторонние и двусторонние короба', 'Для улицы, ТЦ и входных групп', 'Сборка и монтаж в одном проекте', 'Понятная коммуникация на каждом этапе'].map((item) => (
               <HeroChip key={item} className="chip-elevated text-xs sm:text-sm"><span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />{item}</HeroChip>
             ))}
           </HeroChipList>
@@ -42,19 +42,19 @@ export default function LightboxesPage() {
 
       <Section spacing="tight" background="muted" fullBleed>
         <div className="grid gap-4 md:grid-cols-2">
-          <article className="card p-5 md:p-6"><h2 className="t-h3">Варианты исполнения</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li>• Короба для фасадных вывесок</li><li>• Короба для входных групп</li><li>• Компактные решения для навигации</li><li>• Брендированные конструкции под фирменный стиль</li></ul></article>
-          <article className="card p-5 md:p-6"><h2 className="t-h3">Материалы и производство</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li>• Подбираем основу и лицевую поверхность под условия эксплуатации.</li><li>• Учитываем удобство обслуживания и читаемость с нужной дистанции.</li><li>• Собираем конструкцию на собственном производстве и проверяем перед монтажом.</li></ul></article>
+          <article className="card p-5 md:p-6"><h2 className="t-h3">Где такие короба особенно полезны</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li>• Фасады магазинов и аптек с вечерним потоком клиентов</li><li>• Входные группы салонов, пунктов выдачи и офисов</li><li>• Навигация внутри торговых центров и бизнес-центров</li><li>• Акцентные зоны в брендированных витринах</li></ul></article>
+          <article className="card p-5 md:p-6"><h2 className="t-h3">Что учитываем в производстве</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li>• Подбираем основу и лицевую поверхность под условия эксплуатации.</li><li>• Продумываем доступ к обслуживанию и читаемость с нужной дистанции.</li><li>• Проверяем подсветку и сборку перед установкой на объекте.</li></ul></article>
         </div>
       </Section>
 
       <Section spacing="tight">
-        <article className="card p-5 md:p-6"><h2 className="t-h3">Как проходит заказ</h2><ol className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">1.</span> Уточняем задачу, адрес и формат размещения.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">2.</span> Предлагаем конструкцию и готовим расчёт.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">3.</span> Согласуем макет и запускаем производство.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">4.</span> Организуем монтаж и сдаём проект.</li></ol></article>
+        <article className="card p-5 md:p-6"><h2 className="t-h3">Как обычно идёт проект</h2><ol className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base"><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">1.</span> Уточняем задачу, адрес и формат размещения.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">2.</span> Предлагаем конструкцию и ориентируем по стоимости.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">3.</span> Согласуем макет и запускаем производство.</li><li><span className="font-semibold text-neutral-900 dark:text-neutral-100">4.</span> Организуем монтаж и передаём готовую вывеску.</li></ol></article>
       </Section>
 
       <Section spacing="tight" background="muted" fullBleed>
         <div className="section-header"><h2 className="t-h2">FAQ</h2></div>
         <div className="space-y-3">{faq.map(([q, a]) => <article key={q} className="card p-5 md:p-6"><h3 className="font-semibold">{q}</h3><p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">{a}</p></article>)}</div>
-        <div className="cta-shell mt-6"><div className="section-header-split mb-0"><div><h2 className="t-h3">Нужен световой короб для точки продаж?</h2><p className="t-body text-muted-foreground max-w-2xl">Подготовим решение под ваш фасад и задачу. Также изготавливаем объёмные буквы.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row"><Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Связаться с менеджером</Link><Link href="/volume-letters" className="btn-secondary w-full justify-center no-underline sm:w-auto">Объёмные буквы</Link></div></div></div>
+        <div className="cta-shell mt-6"><div className="section-header-split mb-0"><div><h2 className="t-h3">Планируете новую вывеску с подсветкой?</h2><p className="t-body text-muted-foreground max-w-2xl">Поможем выбрать формат короба под вашу локацию и предложим удобный путь от макета до установки.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row"><Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Получить консультацию</Link><Link href="/outdoor-advertising" className="btn-secondary w-full justify-center no-underline sm:w-auto">К услугам наружной рекламы</Link></div></div></div>
       </Section>
     </div>
   );
