@@ -68,6 +68,20 @@ export type BagetSheetItem = {
   note: string;
 };
 
+export type BagetCatalogDiagnostics = {
+  rowsCount: number;
+  headers: string[];
+  skipped: {
+    missingResidues: number;
+    hidden: number;
+    invalidWidth: number;
+    invalidPrice: number;
+    other: number;
+  };
+  showOnSiteHeader?: string | null;
+  showOnSiteValues?: Array<{ value: string; count: number }>;
+};
+
 type CsvRow = Record<string, string>;
 
 type BagetCatalogItem = {
@@ -87,19 +101,7 @@ export type BagetCatalogLoadResult = {
   tab: string;
   items: BagetSheetItem[];
   error: string | null;
-  diagnostics?: {
-    rowsCount: number;
-    headers: string[];
-    skipped: {
-      missingResidues: number;
-      hidden: number;
-      invalidWidth: number;
-      invalidPrice: number;
-      other: number;
-    };
-    showOnSiteHeader?: string | null;
-    showOnSiteValues?: Array<{ value: string; count: number }>;
-  };
+  diagnostics?: BagetCatalogDiagnostics;
 };
 
 type BagetCatalogSourceConfig = {

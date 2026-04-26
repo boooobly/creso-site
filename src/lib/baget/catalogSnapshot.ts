@@ -1,7 +1,12 @@
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/db/prisma';
 import { logger } from '@/lib/logger';
-import { loadBagetCatalog, loadBagetCatalogUncached, type BagetSheetItem } from '@/lib/baget/sheetsCatalog';
+import {
+  loadBagetCatalog,
+  loadBagetCatalogUncached,
+  type BagetCatalogDiagnostics,
+  type BagetSheetItem,
+} from '@/lib/baget/sheetsCatalog';
 
 const BAGET_SNAPSHOT_SOURCE_KEY = 'public_baget_catalog';
 const BAGET_SNAPSHOT_CACHE_SECONDS = 120;
@@ -231,17 +236,7 @@ export async function syncBagetCatalogSnapshot(): Promise<
       sheetId: string;
       tab: string;
       preservedSnapshot: boolean;
-      diagnostics?: {
-        rowsCount: number;
-        headers: string[];
-        skipped: {
-          missingResidues: number;
-          hidden: number;
-          invalidWidth: number;
-          invalidPrice: number;
-          other: number;
-        };
-      };
+      diagnostics?: BagetCatalogDiagnostics;
     }
 > {
   const result = await loadBagetCatalogUncached();
