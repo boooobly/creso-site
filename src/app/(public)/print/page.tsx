@@ -105,7 +105,7 @@ export default async function PrintPage() {
               Используйте тарифную таблицу как ориентир, затем настройте заказ в конфигураторе.
             </p>
             <p className="max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
-              Для отдельной страницы под локальный запрос перейдите в раздел <Link href="/business-cards" className="underline decoration-neutral-300 underline-offset-4">печать визиток в Невинномысске</Link>.
+              Если нужен отдельный сценарий именно для визиток, перейдите на страницу <Link href="/business-cards" className="underline decoration-neutral-300 underline-offset-4">печати визиток в Невинномысске</Link> — там собраны варианты, подготовка макета и условия заказа.
             </p>
           </div>
           <PrintPricingCalculator />
