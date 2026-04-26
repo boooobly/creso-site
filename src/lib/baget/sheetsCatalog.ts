@@ -26,6 +26,31 @@ const HEADERS = {
   note: 'Примечание',
 } as const;
 
+const HEADER_ALIASES = {
+  id: [HEADERS.id, 'Id', 'id'],
+  supplier: [HEADERS.supplier],
+  article: [HEADERS.article, 'Артикул багета'],
+  name: [HEADERS.name, 'Название', 'Наименование'],
+  widthMm: [HEADERS.widthMm, 'Ширина в мм', 'Ширина, мм', 'Ширина', 'Ширина профиля'],
+  pricePerMeter: [HEADERS.pricePerMeter, 'Цена', 'Цена за м', 'Цена за пог.м', 'Цена за пог. м', 'Цена, ₽/м'],
+  residues: [
+    HEADERS.residues,
+    'Остатки',
+    'Остатки багета',
+    'Остаток',
+    'Остаток по нарядам м.п.',
+    'Остатки, м',
+    'Остатки м.п.',
+  ],
+  reserveMm: [HEADERS.reserveMm, 'Запас на распил', 'Запас, мм'],
+  showOnSite: [HEADERS.showOnSite, 'Показать на сайте', 'Отображать на сайте', 'Публиковать', 'Показ'],
+  imageUrl: [HEADERS.imageUrl, 'Изображение плети', 'URL плети', 'Фото плети', 'Плеть'],
+  cornerImageUrl: [HEADERS.cornerImageUrl, 'Изображение уголка', 'URL уголка', 'Фото уголка', 'Уголок'],
+  style: [HEADERS.style],
+  color: [HEADERS.color],
+  note: [HEADERS.note, 'Комментарий'],
+} as const;
+
 export type BagetSheetItem = {
   id: string;
   supplier: string;
@@ -62,6 +87,19 @@ export type BagetCatalogLoadResult = {
   tab: string;
   items: BagetSheetItem[];
   error: string | null;
+  diagnostics?: {
+    rowsCount: number;
+    headers: string[];
+    skipped: {
+      missingResidues: number;
+      hidden: number;
+      invalidWidth: number;
+      invalidPrice: number;
+      other: number;
+    };
+    showOnSiteHeader?: string | null;
+    showOnSiteValues?: Array<{ value: string; count: number }>;
+  };
 };
 
 type BagetCatalogSourceConfig = {
@@ -71,46 +109,144 @@ type BagetCatalogSourceConfig = {
 };
 
 function toNumber(input: string, fallback?: number): number {
-  const normalized = input.trim().replace(',', '.');
-  if (!normalized) return fallback ?? Number.NaN;
-  const value = Number(normalized);
+  const trimmed = input.trim();
+  if (!trimmed) return fallback ?? Number.NaN;
+
+  const normalized = trimmed.replace(/\u00A0/g, ' ').replace(/(?<=\d)\s+(?=\d)/g, '').replace(',', '.');
+  const directValue = Number(normalized);
+  if (Number.isFinite(directValue)) return directValue;
+
+  const match = normalized.match(/[-+]?\d*\.?\d+/);
+  if (!match) return fallback ?? Number.NaN;
+
+  const value = Number(match[0]);
   return Number.isFinite(value) ? value : (fallback ?? Number.NaN);
 }
 
 function toBoolean(input: string): boolean {
-  const normalized = input.trim().toLowerCase();
-  if (['true', '1', 'yes', 'да'].includes(normalized)) return true;
-  if (['false', '0', 'no', 'нет'].includes(normalized)) return false;
+  const normalized = input
+    .trim()
+    .replace(/\u00A0/g, ' ')
+    .replace(/^['"]+|['"]+$/g, '')
+    .toLowerCase()
+    .replace(/ё/g, 'е');
+  if (
+    [
+      'true',
+      '1',
+      'yes',
+      'да',
+      'д',
+      'y',
+      'показать',
+      'показывать',
+      'опубликовано',
+      'on',
+      'x',
+      '✓',
+      '+',
+      'истина',
+      'истинно',
+      'вкл',
+      'включено',
+      'checked',
+      'show',
+      'visible',
+    ].includes(normalized)
+  ) return true;
+  if (!normalized) return false;
+  if (
+    [
+      'false',
+      '0',
+      'no',
+      'нет',
+      'н',
+      'скрыть',
+      'не показывать',
+      'off',
+      '-',
+      'ложь',
+      'ложно',
+      'выкл',
+      'выключено',
+      'unchecked',
+      'hide',
+      'hidden',
+    ].includes(normalized)
+  ) return false;
   return false;
 }
 
-function mapRowToItem(row: CsvRow): BagetSheetItem | null {
-  const residuesText = (row[HEADERS.residues] ?? '').trim();
-  if (!residuesText) return null;
+function getFirstByAliases(row: CsvRow, aliases: readonly string[]): string {
+  for (const alias of aliases) {
+    const value = row[alias];
+    if (typeof value === 'string' && value.trim()) return value;
+  }
+  return '';
+}
 
-  const showOnSite = toBoolean(row[HEADERS.showOnSite] ?? '');
-  if (!showOnSite) return null;
+function getFirstPresentHeader(headers: string[], aliases: readonly string[]): string | null {
+  for (const alias of aliases) {
+    if (headers.includes(alias)) return alias;
+  }
+  return null;
+}
 
-  const widthMm = toNumber(row[HEADERS.widthMm] ?? '');
-  const pricePerMeter = toNumber(row[HEADERS.pricePerMeter] ?? '');
-  if (!Number.isFinite(widthMm) || !Number.isFinite(pricePerMeter)) return null;
+function mapRowToItem(
+  row: CsvRow,
+  skipped: {
+    missingResidues: number;
+    hidden: number;
+    invalidWidth: number;
+    invalidPrice: number;
+    other: number;
+  }
+): BagetSheetItem | null {
+  const residuesText = getFirstByAliases(row, HEADER_ALIASES.residues).trim();
+  if (!residuesText) {
+    skipped.missingResidues += 1;
+    return null;
+  }
 
-  return {
-    id: (row[HEADERS.id] ?? '').trim(),
-    supplier: (row[HEADERS.supplier] ?? '').trim(),
-    article: (row[HEADERS.article] ?? '').trim(),
-    name: (row[HEADERS.name] ?? '').trim(),
-    width_mm: widthMm,
-    price_per_meter: pricePerMeter,
-    residues_text: residuesText,
-    reserve_mm: toNumber(row[HEADERS.reserveMm] ?? '', DEFAULT_RESERVE_MM),
-    show_on_site: showOnSite,
-    image_url: normalizeBagetImageUrl(row[HEADERS.imageUrl] ?? ''),
-    corner_image_url: normalizeBagetImageUrl(row[HEADERS.cornerImageUrl] ?? ''),
-    style: (row[HEADERS.style] ?? '').trim(),
-    color: (row[HEADERS.color] ?? '').trim(),
-    note: (row[HEADERS.note] ?? '').trim(),
-  };
+  const showOnSite = toBoolean(getFirstByAliases(row, HEADER_ALIASES.showOnSite));
+  if (!showOnSite) {
+    skipped.hidden += 1;
+    return null;
+  }
+
+  const widthMm = toNumber(getFirstByAliases(row, HEADER_ALIASES.widthMm));
+  if (!Number.isFinite(widthMm)) {
+    skipped.invalidWidth += 1;
+    return null;
+  }
+  const pricePerMeter = toNumber(getFirstByAliases(row, HEADER_ALIASES.pricePerMeter));
+  if (!Number.isFinite(pricePerMeter)) {
+    skipped.invalidPrice += 1;
+    return null;
+  }
+
+  try {
+    return {
+      id: getFirstByAliases(row, HEADER_ALIASES.id).trim(),
+      supplier: getFirstByAliases(row, HEADER_ALIASES.supplier).trim(),
+      article: getFirstByAliases(row, HEADER_ALIASES.article).trim(),
+      name: getFirstByAliases(row, HEADER_ALIASES.name).trim(),
+      width_mm: widthMm,
+      price_per_meter: pricePerMeter,
+      residues_text: residuesText,
+      reserve_mm: toNumber(getFirstByAliases(row, HEADER_ALIASES.reserveMm), DEFAULT_RESERVE_MM),
+      show_on_site: showOnSite,
+      image_url: normalizeBagetImageUrl(getFirstByAliases(row, HEADER_ALIASES.imageUrl)),
+      corner_image_url: normalizeBagetImageUrl(getFirstByAliases(row, HEADER_ALIASES.cornerImageUrl)),
+      style: getFirstByAliases(row, HEADER_ALIASES.style).trim(),
+      color: getFirstByAliases(row, HEADER_ALIASES.color).trim(),
+      note: getFirstByAliases(row, HEADER_ALIASES.note).trim(),
+    };
+  } catch {
+    skipped.other += 1;
+    return null;
+  }
 }
 
 function getFallbackCatalog(): BagetSheetItem[] {
@@ -189,18 +325,63 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
       return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error: message };
     }
 
+    const headers = records.length > 0 ? Object.keys(records[0] ?? {}) : [];
+    const skipped = {
+      missingResidues: 0,
+      hidden: 0,
+      invalidWidth: 0,
+      invalidPrice: 0,
+      other: 0,
+    };
+    const showOnSiteHeader = getFirstPresentHeader(headers, HEADER_ALIASES.showOnSite);
+    const showOnSiteHistogram = new Map<string, number>();
+    for (const row of records) {
+      const rawValue = (showOnSiteHeader ? row[showOnSiteHeader] : undefined) ?? '';
+      const normalizedValue = rawValue.trim().replace(/\u00A0/g, ' ').replace(/^['"]+|['"]+$/g, '');
+      const key = normalizedValue || '(empty)';
+      showOnSiteHistogram.set(key, (showOnSiteHistogram.get(key) ?? 0) + 1);
+    }
+    const showOnSiteValues = Array.from(showOnSiteHistogram.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([value, count]) => ({ value, count }));
+
     const items = records
-      .map(mapRowToItem)
+      .map((row) => mapRowToItem(row, skipped))
       .filter((item): item is BagetSheetItem => item !== null);
 
+    const diagnostics = {
+      rowsCount: records.length,
+      headers,
+      skipped,
+      showOnSiteHeader,
+      showOnSiteValues,
+    };
+
     if (items.length === 0) {
-      const error = 'Zero valid parsed items from sheet.';
-      logger.error('baget.sheets_catalog.fallback.zero_valid_items', { error, sheetId, tab, url, rows: records.length });
-      return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error };
+      const headerPreview = headers.slice(0, 8).join(', ');
+      const error = `Zero valid parsed items from sheet. Rows: ${records.length}. Headers: ${headerPreview || 'none'}. Skipped: hidden=${skipped.hidden}, missingResidues=${skipped.missingResidues}, invalidWidth=${skipped.invalidWidth}, invalidPrice=${skipped.invalidPrice}, other=${skipped.other}.`;
+      logger.error('baget.sheets_catalog.fallback.zero_valid_items', {
+        error,
+        sheetId,
+        tab,
+        url,
+        rows: records.length,
+        headers,
+        skipped,
+        headerMatches: {
+          width: getFirstPresentHeader(headers, HEADER_ALIASES.widthMm),
+          price: getFirstPresentHeader(headers, HEADER_ALIASES.pricePerMeter),
+          residues: getFirstPresentHeader(headers, HEADER_ALIASES.residues),
+          showOnSite: getFirstPresentHeader(headers, HEADER_ALIASES.showOnSite),
+        },
+        showOnSiteValues,
+      });
+      return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error, diagnostics };
     }
 
-    logger.info('baget.sheets_catalog.loaded', { sheetId, tab, count: items.length });
-    return { source: 'sheet', sheetId, tab, items, error: null };
+    logger.info('baget.sheets_catalog.loaded', { sheetId, tab, count: items.length, ...diagnostics });
+    return { source: 'sheet', sheetId, tab, items, error: null, diagnostics };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown fetch error';
     logger.error('baget.sheets_catalog.fallback.fetch_failure', { error: message, sheetId, tab, url });

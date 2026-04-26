@@ -225,7 +225,24 @@ export async function loadPublicBagetCatalog(): Promise<PublicBagetCatalogResult
 
 export async function syncBagetCatalogSnapshot(): Promise<
   | { ok: true; itemCount: number; syncedAt: string; sheetId: string; tab: string }
-  | { ok: false; error: string; sheetId: string; tab: string; preservedSnapshot: boolean }
+  | {
+      ok: false;
+      error: string;
+      sheetId: string;
+      tab: string;
+      preservedSnapshot: boolean;
+      diagnostics?: {
+        rowsCount: number;
+        headers: string[];
+        skipped: {
+          missingResidues: number;
+          hidden: number;
+          invalidWidth: number;
+          invalidPrice: number;
+          other: number;
+        };
+      };
+    }
 > {
   const result = await loadBagetCatalogUncached();
 
@@ -268,6 +285,7 @@ export async function syncBagetCatalogSnapshot(): Promise<
       sheetId: result.sheetId,
       tab: result.tab,
       preservedSnapshot,
+      diagnostics: result.diagnostics,
     };
   }
 
