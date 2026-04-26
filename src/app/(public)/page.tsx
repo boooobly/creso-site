@@ -7,6 +7,15 @@ import { getFeaturedPortfolioItems } from '@/lib/public-portfolio';
 import { getFaqItemsFromContentMap, getPageContentList, getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getSiteImage, getSiteImages } from '@/lib/site-images';
 import { SERVICE_CARD_IMAGE_SLOT_BY_ID } from '@/lib/site-service-image-slots';
+import type { Metadata } from 'next';
+import { buildPublicPageMetadata } from '@/lib/seo';
+
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Главная — рекламно-производственная компания CredoMir',
+  description: 'Багет, широкоформатная печать, фрезеровка, наружная реклама и производство рекламных материалов в Невинномысске.',
+  path: '/',
+});
 
 export default async function Home() {
   const [sCMS, fCMS, featuredPortfolio, contentMap, homeHeroImage, homePortfolioImages, serviceCardImages] = await Promise.all([

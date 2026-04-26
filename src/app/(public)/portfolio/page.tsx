@@ -6,6 +6,8 @@ import localItems from '@/data/portfolio.json';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getPublicPortfolioItems } from '@/lib/public-portfolio';
 import type { PortfolioItem } from '@/types';
+import type { Metadata } from 'next';
+import { buildPublicPageMetadata } from '@/lib/seo';
 
 const PLACEHOLDER_IMAGE = '/og-image.png';
 const UNCATEGORIZED_LABEL = 'Без категории';
@@ -43,6 +45,13 @@ function normalizeItem(item: any, index: number): PortfolioItem {
     galleryImages,
   };
 }
+
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Портфолио выполненных работ | CredoMir',
+  description: 'Примеры реализованных проектов CredoMir: наружная реклама, печать, фрезеровка и оформление.',
+  path: '/portfolio',
+});
 
 export default async function PortfolioPage() {
   const [rawItems, contentMap] = await Promise.all([

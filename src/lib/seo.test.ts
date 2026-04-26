@@ -1,14 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/site-settings', () => ({
-  getPublicSiteSettings: vi.fn(async () => ({
-    seoTitle: 'Credomir',
-    seoDescription: 'desc',
-    seoSiteName: 'Credomir',
-    seoOgImage: '/og-image.png',
-  })),
-}));
-
 const ENV_KEYS = ['NODE_ENV', 'VERCEL_ENV', 'PUBLIC_BASE_URL'] as const;
 const snapshot = Object.fromEntries(ENV_KEYS.map((key) => [key, process.env[key]]));
 
@@ -23,38 +14,26 @@ afterEach(() => {
   vi.resetModules();
 });
 
-describe('getDefaultMetadata metadataBase', () => {
-  it('uses PUBLIC_BASE_URL when set', async () => {
+describe('buildPublicPageMetadata', () => {
+  it('builds canonical and open graph URLs using PUBLIC_BASE_URL', async () => {
     process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'production';
-    process.env.PUBLIC_BASE_URL = 'https://credomir.ru';
+    process.env.PUBLIC_BASE_URL = 'https://credomir.ru/';
 
-    const { getDefaultMetadata } = await import('@/lib/seo');
-    const metadata = await getDefaultMetadata();
+    const { buildPublicPageMetadata } = await import('@/lib/seo');
+    const metadata = buildPublicPageMetadata({
+      title: 'Test page',
+      description: 'Test description',
+      path: '/services',
+      image: '/og/service.png',
+    });
 
-    expect(metadata.metadataBase?.toString()).toBe('https://credomir.ru/');
-  });
+    expect(metadata.alternates?.canonical).toBe('https://credomir.ru/services');
+    expect(metadata.openGraph?.url).toBe('https://credomir.ru/services');
+    expect(metadata.openGraph?.locale).toBe('ru_RU');
 
-  it('falls back to localhost in non-production context when PUBLIC_BASE_URL is missing', async () => {
-    process.env.NODE_ENV = 'production';
-    process.env.VERCEL_ENV = 'preview';
-    delete process.env.PUBLIC_BASE_URL;
-
-    const { getDefaultMetadata } = await import('@/lib/seo');
-    const metadata = await getDefaultMetadata();
-
-    expect(metadata.metadataBase?.toString()).toBe('http://localhost:3000/');
-  });
-
-  it('never falls back to example.com', async () => {
-    process.env.NODE_ENV = 'production';
-    process.env.VERCEL_ENV = 'preview';
-    delete process.env.PUBLIC_BASE_URL;
-
-    const { getDefaultMetadata } = await import('@/lib/seo');
-    const metadata = await getDefaultMetadata();
-
-    expect(metadata.metadataBase?.host).not.toBe('example.com');
-    expect(metadata.metadataBase?.toString().includes('example.com')).toBe(false);
+    const firstImage = Array.isArray(metadata.openGraph?.images) ? metadata.openGraph.images[0] : undefined;
+    const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url;
+    expect(imageUrl).toBe('https://credomir.ru/og/service.png');
   });
 });

@@ -12,6 +12,9 @@ import ProtectedImage from '@/components/ui/ProtectedImage';
 import { messages } from '@/lib/messages';
 import { getSiteImages } from '@/lib/site-images';
 import { OUTDOOR_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
+import type { Metadata } from 'next';
+import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 
 const services: Array<{ title: string; image: string; slotKey: string; featured?: boolean }> = [
   { title: 'Световые короба', image: '/images/outdoor_examples/lightbox.png', slotKey: 'outdoor.services.lightbox', featured: true },
@@ -164,6 +167,13 @@ const portfolioProjects = [
   },
 ] as const;
 
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Наружная реклама под ключ | CredoMir',
+  description: 'Вывески, лайтбоксы, объёмные буквы и монтаж наружной рекламы под ключ в Невинномысске и регионе.',
+  path: '/outdoor-advertising',
+});
+
 export default async function OutdoorAdvertisingPage() {
   const [contentMap, siteImages] = await Promise.all([
     getPageContentMap('outdoor'),
@@ -190,6 +200,8 @@ export default async function OutdoorAdvertisingPage() {
 
   return (
     <div className="pb-24 md:pb-12">
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Наружная реклама', path: '/outdoor-advertising' }])} />
+      <JsonLd data={buildServiceJsonLd('Наружная реклама', 'Проектирование, изготовление и монтаж наружной рекламы под ключ.', '/outdoor-advertising')} />
       <Section className="pb-6 md:pb-10" id="outdoor-hero" background="default" spacing="compact">
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"

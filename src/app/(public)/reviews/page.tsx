@@ -4,6 +4,8 @@ import { ArrowUpRight, BadgeCheck, Building2, Clock3, MessagesSquare, ShieldChec
 import RevealOnScroll from '@/components/RevealOnScroll';
 import ReviewsClient, { type PublicReviewItem } from '@/components/ReviewsClient';
 import { prisma } from '@/lib/db/prisma';
+import type { Metadata } from 'next';
+import { buildPublicPageMetadata } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 type CredibilityItem = {
@@ -60,6 +62,13 @@ async function loadApprovedReviews(): Promise<PublicReviewItem[]> {
     return [];
   }
 }
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Отзывы клиентов о CredoMir',
+  description: 'Проверенные отзывы клиентов о сотрудничестве с CredoMir: сроки, качество и сервис.',
+  path: '/reviews',
+});
+
 export default async function ReviewsPage() {
   const reviews = await loadApprovedReviews();
   return (

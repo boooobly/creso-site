@@ -1,12 +1,23 @@
 import Link from 'next/link';
 import { Building2, ClipboardCheck, Clock3, Droplets, FileText, Ruler } from 'lucide-react';
+import JsonLd from '@/components/seo/JsonLd';
 import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 import OrderWideFormatForm from '@/components/OrderWideFormatForm';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import WideFormatTrustCards from '@/components/wide-format/WideFormatTrustCards';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
+import { buildBreadcrumbJsonLd, buildServiceJsonLd } from '@/lib/seo';
 import { getWideFormatPricingConfig } from '@/lib/wide-format/wideFormatPricing';
+import type { Metadata } from 'next';
+import { buildPublicPageMetadata } from '@/lib/seo';
+
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Широкоформатная печать до 3.2 м | CredoMir',
+  description: 'Широкоформатная интерьерная и уличная печать: баннеры, плёнка, холст, постобработка и подготовка к монтажу.',
+  path: '/wide-format-printing',
+});
 
 export default async function WideFormatPrintingPage() {
   const [contentMap, pricing] = await Promise.all([
@@ -83,6 +94,8 @@ export default async function WideFormatPrintingPage() {
 
   return (
     <div className="pb-12 md:pb-16">
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Широкоформатная печать', path: '/wide-format-printing' }])} />
+      <JsonLd data={buildServiceJsonLd('Широкоформатная печать', 'Интерьерная и уличная широкоформатная печать до 3.2 м с постобработкой.', '/wide-format-printing')} />
       <Section spacing="compact">
         <PageHero className="border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50/65 to-red-50/[0.16] p-5 shadow-sm shadow-neutral-200/60 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] dark:shadow-none md:p-7 lg:p-9" contentClassName="flex h-full flex-col lg:min-h-[29rem]" mediaClassName="h-full" media={
           <HeroMediaPanel className="hidden h-full flex-col border-neutral-200/90 bg-neutral-100/90 p-3.5 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm dark:border-neutral-800/90 dark:bg-neutral-900/90 dark:shadow-none md:p-5 lg:flex">

@@ -4,6 +4,9 @@ import PrintPricingCalculator from '@/components/PrintPricingCalculator';
 import Section from '@/components/Section';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getSiteImage } from '@/lib/site-images';
+import type { Metadata } from 'next';
+import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 
 const featureChips = [
   'Тиражи от 1 000 до 9 000 шт.',
@@ -11,6 +14,13 @@ const featureChips = [
   'Можно заказать дизайн',
   'Флаеры — по запросу',
 ] as const;
+
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Печать визиток и полиграфии | CredoMir',
+  description: 'Офсетная печать визиток и полиграфии с фиксированными параметрами и предсказуемыми сроками.',
+  path: '/print',
+});
 
 export default async function PrintPage() {
   const heroImage = await getSiteImage('print.hero.main');
@@ -20,6 +30,8 @@ export default async function PrintPage() {
 
   return (
     <div className="pb-12 md:pb-16">
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Печать полиграфии', path: '/print' }])} />
+      <JsonLd data={buildServiceJsonLd('Печать полиграфии', 'Офсетная печать визиток и другой полиграфии с прогнозируемыми сроками.', '/print')} />
       <Section spacing="compact" className="pb-4 md:pb-5">
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"

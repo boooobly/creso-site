@@ -1,3 +1,12 @@
+import type { Metadata } from 'next';
+import { buildPublicPageMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Политика обработки персональных данных | CredoMir',
+  description: 'Официальная политика обработки персональных данных и условия работы с заявками на сайте CredoMir.',
+  path: '/privacy',
+});
+
 export default function PrivacyPage() {
   return (
     <main className="container py-8">
