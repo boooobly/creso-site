@@ -1,0 +1,69 @@
+import Link from 'next/link';
+import type { Metadata } from 'next';
+import Section from '@/components/Section';
+import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import JsonLd from '@/components/seo/JsonLd';
+import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
+
+const variants = ['Баннеры для фасадов и входных групп', 'Баннеры для акций и временных кампаний', 'Интерьерные баннеры для ТЦ и офисов', 'Баннеры с подготовкой под монтаж'] as const;
+const materials = ['ПВХ-баннеры разной плотности под условия эксплуатации.', 'Печать с учётом расстояния просмотра и задач по читаемости.', 'Постобработка: проклейка, люверсы, подрезка под формат монтажа.'] as const;
+const steps = ['Передаёте размеры, фото места и задачу.', 'Согласуем материал, макет и способ крепления.', 'Печатаем и подготавливаем изделие к установке.', 'Вы получаете готовый баннер или заказываете монтаж.'] as const;
+
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Печать баннеров в Невинномысске | CredoMir',
+  description: 'Печать баннеров для фасадов, акций и навигации в Невинномысске. Подбор материала и подготовка под монтаж.',
+  path: '/banner-printing',
+});
+
+export default function BannerPrintingPage() {
+  return (
+    <div className="pb-12 md:pb-16">
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Печать баннеров', path: '/banner-printing' }])} />
+      <JsonLd data={buildServiceJsonLd('Печать баннеров в Невинномысске', 'Широкоформатная печать баннеров для улицы и интерьера с постобработкой.', '/banner-printing')} />
+
+      <Section spacing="compact">
+        <PageHero className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]">
+          <HeroEyebrow>Широкоформатная печать</HeroEyebrow>
+          <HeroTitle>Печать баннеров в Невинномысске</HeroTitle>
+          <HeroLead>Печатаем баннеры для бизнеса и частных клиентов: от локальных акций до постоянного оформления фасадов. Подскажем материал под вашу задачу и условия эксплуатации.</HeroLead>
+          <HeroChipList>
+            {variants.map((item) => (
+              <HeroChip key={item} className="chip-elevated text-xs sm:text-sm"><span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />{item}</HeroChip>
+            ))}
+          </HeroChipList>
+          <HeroActions>
+            <Link href="/contacts" className="btn-primary no-underline">Рассчитать баннер</Link>
+            <Link href="/wide-format-printing" className="btn-secondary no-underline">Все услуги печати</Link>
+          </HeroActions>
+        </PageHero>
+      </Section>
+
+      <Section spacing="tight" background="muted" fullBleed>
+        <div className="section-header"><h2 className="t-h2">Варианты баннеров</h2></div>
+        <div className="grid gap-4 md:grid-cols-2">{variants.map((item) => <article key={item} className="card p-5">{item}</article>)}</div>
+      </Section>
+
+      <Section spacing="tight">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <article className="card p-5 md:p-6"><h2 className="t-h3">Материалы и производство</h2><ul className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">{materials.map((item) => <li key={item}>• {item}</li>)}</ul></article>
+          <article className="card p-5 md:p-6"><h2 className="t-h3">Как проходит заказ</h2><ol className="mt-3 space-y-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">{steps.map((item, i) => <li key={item}><span className="font-semibold text-neutral-900 dark:text-neutral-100">{i + 1}.</span> {item}</li>)}</ol></article>
+        </div>
+      </Section>
+
+      <Section spacing="tight" background="muted" fullBleed>
+        <div className="section-header"><h2 className="t-h2">Почему выбирают CredoMir</h2></div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">{['Собственное производство в Невинномысске', 'Помощь с подготовкой макета', 'Печать и монтаж рекламных конструкций', 'Работаем по Невинномысску и Ставропольскому краю'].map((item) => <article key={item} className="card p-5 text-sm md:text-base">{item}</article>)}</div>
+      </Section>
+
+      <Section spacing="tight">
+        <div className="section-header"><h2 className="t-h2">FAQ</h2></div>
+        <div className="space-y-3">
+          <article className="card p-5 md:p-6"><h3 className="font-semibold">Какая цена на баннер?</h3><p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Стоимость зависит от размера, материала и сложности постобработки.</p></article>
+          <article className="card p-5 md:p-6"><h3 className="font-semibold">Можно напечатать срочный заказ?</h3><p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Сроки зависят от загруженности и параметров проекта. Подскажем реальный срок после уточнения задачи.</p></article>
+          <article className="card p-5 md:p-6"><h3 className="font-semibold">Вы помогаете с макетом?</h3><p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">Да, можем помочь с дизайном и технической подготовкой файла к печати.</p></article>
+        </div>
+        <div className="cta-shell mt-6"><div className="section-header-split mb-0"><div><h2 className="t-h3">Нужен баннер под конкретную точку?</h2><p className="t-body text-muted-foreground max-w-2xl">Подберём формат и материал, чтобы баннер работал по задаче и условиям размещения.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row"><Link href="/contacts" className="btn-primary w-full justify-center no-underline sm:w-auto">Оставить запрос</Link><Link href="/advertising-signs" className="btn-secondary w-full justify-center no-underline sm:w-auto">Изготовление вывесок</Link></div></div></div>
+      </Section>
+    </div>
+  );
+}

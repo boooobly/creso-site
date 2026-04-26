@@ -104,6 +104,9 @@ export default async function PrintPage() {
             <p className="max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
               Используйте тарифную таблицу как ориентир, затем настройте заказ в конфигураторе.
             </p>
+            <p className="max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
+              Для отдельной страницы под локальный запрос перейдите в раздел <Link href="/business-cards" className="underline decoration-neutral-300 underline-offset-4">печать визиток в Невинномысске</Link>.
+            </p>
           </div>
           <PrintPricingCalculator />
         </div>

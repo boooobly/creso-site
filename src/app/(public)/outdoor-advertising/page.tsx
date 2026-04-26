@@ -276,6 +276,12 @@ export default async function OutdoorAdvertisingPage() {
             <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>
             <h2 className={sectionTitleClassName}>Что изготавливаем</h2>
             <p className={sectionIntroClassName}>Форматы наружной рекламы, которые мы производим для коммерческих объектов.</p>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Link href="/advertising-signs" className="btn-secondary no-underline">Изготовление вывесок</Link>
+              <Link href="/banner-printing" className="btn-secondary no-underline">Печать баннеров</Link>
+              <Link href="/lightboxes" className="btn-secondary no-underline">Световые короба</Link>
+              <Link href="/volume-letters" className="btn-secondary no-underline">Объёмные буквы</Link>
+            </div>
           </div>
           <div className="grid-cards grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
