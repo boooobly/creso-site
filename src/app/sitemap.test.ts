@@ -18,7 +18,7 @@ describe('sitemap/robots base url', () => {
   it('uses PUBLIC_BASE_URL in production runtime/deploy', async () => {
     process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'production';
-    process.env.PUBLIC_BASE_URL = 'https://credomir.ru';
+    process.env.PUBLIC_BASE_URL = 'https://credomir.com';
 
     const { default: sitemap } = await import('@/app/sitemap');
     const { default: robots } = await import('@/app/robots');
@@ -26,8 +26,24 @@ describe('sitemap/robots base url', () => {
     const map = sitemap();
     const robotsConfig = robots();
 
-    expect(map[0]?.url).toBe('https://credomir.ru');
-    expect(robotsConfig.sitemap).toBe('https://credomir.ru/sitemap.xml');
+    expect(map[0]?.url).toBe('https://credomir.com');
+    expect(robotsConfig.sitemap).toBe('https://credomir.com/sitemap.xml');
+  });
+
+
+  it('includes only intended public routes in sitemap (including /blog) and excludes admin/api routes', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'production';
+    process.env.PUBLIC_BASE_URL = 'https://credomir.com';
+
+    const { default: sitemap } = await import('@/app/sitemap');
+
+    const map = sitemap();
+    const urls = map.map((entry) => entry.url);
+
+    expect(urls).toContain('https://credomir.com/blog');
+    expect(urls.some((url) => url.includes('/admin'))).toBe(false);
+    expect(urls.some((url) => url.includes('/api'))).toBe(false);
   });
 
   it('falls back to localhost in non-production contexts when PUBLIC_BASE_URL is missing', async () => {

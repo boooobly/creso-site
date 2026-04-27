@@ -15,6 +15,16 @@ afterEach(() => {
 });
 
 describe('getBaseUrl', () => {
+
+  it('normalizes www.credomir.com to canonical non-www domain', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'production';
+    process.env.PUBLIC_BASE_URL = 'https://www.credomir.com/';
+
+    const { getBaseUrl } = await import('@/lib/url/getBaseUrl');
+    expect(getBaseUrl()).toBe('https://credomir.com');
+  });
+
   it('throws in production runtime/deploy when PUBLIC_BASE_URL is missing', async () => {
     process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'production';

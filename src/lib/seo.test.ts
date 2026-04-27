@@ -18,7 +18,7 @@ describe('buildPublicPageMetadata', () => {
   it('builds canonical and open graph URLs using PUBLIC_BASE_URL', async () => {
     process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'production';
-    process.env.PUBLIC_BASE_URL = 'https://credomir.ru/';
+    process.env.PUBLIC_BASE_URL = 'https://credomir.com/';
 
     const { buildPublicPageMetadata } = await import('@/lib/seo');
     const metadata = buildPublicPageMetadata({
@@ -28,12 +28,12 @@ describe('buildPublicPageMetadata', () => {
       image: '/og/service.png',
     });
 
-    expect(metadata.alternates?.canonical).toBe('https://credomir.ru/services');
-    expect(metadata.openGraph?.url).toBe('https://credomir.ru/services');
+    expect(metadata.alternates?.canonical).toBe('https://credomir.com/services');
+    expect(metadata.openGraph?.url).toBe('https://credomir.com/services');
     expect(metadata.openGraph?.locale).toBe('ru_RU');
 
     const firstImage = Array.isArray(metadata.openGraph?.images) ? metadata.openGraph.images[0] : undefined;
     const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url;
-    expect(imageUrl).toBe('https://credomir.ru/og/service.png');
+    expect(imageUrl).toBe('https://credomir.com/og/service.png');
   });
 });
