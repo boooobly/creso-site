@@ -12,8 +12,8 @@ import { buildPublicPageMetadata } from '@/lib/seo';
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Главная — рекламно-производственная компания CredoMir',
-  description: 'Багет, широкоформатная печать, фрезеровка, наружная реклама и производство рекламных материалов в Невинномысске.',
+  title: 'CredoMir - наружная реклама и печать в Невинномысске',
+  description: 'CredoMir в Невинномысске - вывески, наружная реклама, широкоформатная печать, багет, стенды, фрезеровка и монтаж под ключ.',
   path: '/',
 });
 
