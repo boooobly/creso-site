@@ -10,6 +10,7 @@ import { postJSON } from '@/lib/fetcher';
 import type { SiteMessages } from '@/lib/messages';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles } from '@/lib/public-form-styles';
+import { reachGoal } from '@/lib/analytics/yandexMetrica';
 
 const optionalEmailSchema = z.preprocess(
   (value) => {
@@ -148,6 +149,7 @@ export default function LeadForm({
       });
       if (res.ok) {
         trackEvent('lead_form_submitted', { service: data.service });
+        reachGoal(source === 'main' ? 'main_lead_submit_success' : 'contact_form_submit_success', { source, service: data.service });
         reset({ ...DEFAULT_VALUES, service: resolvedService, message: initialMessage ?? '', consent: false });
       }
     } catch {
