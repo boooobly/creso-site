@@ -7,8 +7,32 @@ async function isRequestAuthenticated(request: NextRequest) {
   return verifyAdminSessionToken(sessionCookie);
 }
 
+function getCanonicalHost(): string | null {
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+  if (!isProduction) return null;
+
+  const baseUrl = process.env.PUBLIC_BASE_URL?.trim();
+  if (!baseUrl) return null;
+
+  try {
+    const parsed = new URL(baseUrl);
+    return parsed.hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const canonicalHost = getCanonicalHost();
+  const requestHost = request.nextUrl.hostname.toLowerCase();
+
+  if (canonicalHost && requestHost !== canonicalHost && requestHost === `www.${canonicalHost}`) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.hostname = canonicalHost;
+    redirectUrl.protocol = 'https:';
+    return NextResponse.redirect(redirectUrl, 308);
+  }
 
   if (pathname === '/api/admin' || pathname.startsWith('/api/admin/')) {
     if (!(await isRequestAuthenticated(request))) {
