@@ -7,6 +7,7 @@ import type { FrameMode } from './BagetFilters';
 import type { BagetPrintMaterial, BagetTransferSource } from '@/lib/baget/printRequirement';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import BagetPreview, { type BagetPreviewProps } from './BagetPreview';
+import { reachGoal } from '@/lib/analytics/yandexMetrica';
 
 type SizeMm = {
   wMm: number;
@@ -263,6 +264,7 @@ export default function BagetOrderModal({
         return;
       }
 
+      reachGoal('baget_order_submit_success');
       setServerResult(result);
       setSubmitted(true);
       setErrors({});

@@ -1,9 +1,12 @@
 import type { ReactNode } from 'react';
+import { Suspense } from 'react';
 import JsonLd from '@/components/seo/JsonLd';
 import SiteHeader from '@/components/layouts/SiteHeader';
 import SiteFooter from '@/components/layouts/SiteFooter';
 import FloatingLeadCta from '@/components/layouts/FloatingLeadCta';
 import CookieNotice from '@/components/layouts/CookieNotice';
+import YandexMetrica from '@/components/analytics/YandexMetrica';
+import PublicContactClickTracker from '@/components/analytics/PublicContactClickTracker';
 import { buildLocalBusinessJsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
@@ -12,6 +15,10 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <JsonLd data={buildOrganizationJsonLd()} />
       <JsonLd data={buildLocalBusinessJsonLd()} />
       <JsonLd data={buildWebSiteJsonLd()} />
+      <Suspense fallback={null}>
+        <YandexMetrica />
+      </Suspense>
+      <PublicContactClickTracker />
       <div className="public-site-shell">
         <SiteHeader />
         <main className="main-layout public-layout-main container min-w-0 py-6 sm:py-8">{children}</main>
