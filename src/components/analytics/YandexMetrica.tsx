@@ -7,7 +7,7 @@ import { trackHit } from '@/lib/analytics/yandexMetrica';
 
 const METRICA_SCRIPT_ID = 'yandex-metrica';
 
-function getCurrentUrl(pathname: string, searchParams: ReadonlyURLSearchParams | null) {
+function getCurrentUrl(pathname: string, searchParams: { toString(): string } | null) {
   const search = searchParams?.toString();
   return search ? `${pathname}?${search}` : pathname;
 }
@@ -75,6 +75,7 @@ export default function YandexMetrica() {
       </Script>
       <noscript>
         <div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- Yandex Metrica requires a plain <img> beacon in noscript fallback. */}
           <img src={`https://mc.yandex.ru/watch/${counterId}`} style={{ position: 'absolute', left: '-9999px' }} alt="" />
         </div>
       </noscript>
