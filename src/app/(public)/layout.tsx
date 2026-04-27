@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Suspense } from 'react';
 import JsonLd from '@/components/seo/JsonLd';
 import SiteHeader from '@/components/layouts/SiteHeader';
 import SiteFooter from '@/components/layouts/SiteFooter';
@@ -14,7 +15,9 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <JsonLd data={buildOrganizationJsonLd()} />
       <JsonLd data={buildLocalBusinessJsonLd()} />
       <JsonLd data={buildWebSiteJsonLd()} />
-      <YandexMetrica />
+      <Suspense fallback={null}>
+        <YandexMetrica />
+      </Suspense>
       <PublicContactClickTracker />
       <div className="public-site-shell">
         <SiteHeader />
