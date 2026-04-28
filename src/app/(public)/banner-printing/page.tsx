@@ -10,8 +10,8 @@ const materials = ['Подбираем баннерную ткань под ул
 const steps = ['Вы присылаете размеры, фото места и кратко описываете задачу.', 'Предлагаем материал, проверяем макет и уточняем, как будет крепиться баннер.', 'Печатаем и подготавливаем изделие к установке.', 'Передаём заказ или подключаем монтажную бригаду при необходимости.'] as const;
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Печать баннеров в Невинномысске | CredoMir',
-  description: 'Печать баннеров для фасадов, акций и навигации в Невинномысске. Подбор материала и подготовка под монтаж.',
+  title: 'Печать баннеров в Невинномысске — от 1 заказа | CredoMir',
+  description: 'Печать баннеров для фасадов, акций и навигации в Невинномысске: подбор материала, люверсы, проклейка и подготовка к монтажу.',
   path: '/banner-printing',
 });
 
@@ -19,7 +19,7 @@ export default function BannerPrintingPage() {
   return (
     <div className="pb-12 md:pb-16">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Печать баннеров', path: '/banner-printing' }])} />
-      <JsonLd data={buildServiceJsonLd('Печать баннеров в Невинномысске', 'Широкоформатная печать баннеров для улицы и интерьера с постобработкой.', '/banner-printing')} />
+      <JsonLd data={buildServiceJsonLd('Печать баннеров в Невинномысске', 'Широкоформатная печать баннеров для улицы и интерьера с люверсами и проклейкой.', '/banner-printing')} />
 
       <Section spacing="compact">
         <PageHero className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]">

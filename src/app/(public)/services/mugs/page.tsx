@@ -109,8 +109,8 @@ const faqItems = [
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Печать на кружках на заказ | CredoMir',
-  description: 'Печать на кружках от 1 штуки: логотипы, фото и брендирование для подарков, мероприятий и бизнеса.',
+  title: 'Печать на кружках в Невинномысске | CredoMir',
+  description: 'Печать на кружках от 1 штуки в Невинномысске: логотипы, фото и фирменная символика для подарков, мероприятий и бизнеса.',
   path: '/services/mugs',
 });
 
@@ -145,7 +145,7 @@ export default async function MugsServicePage() {
   return (
     <div>
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Печать на кружках', path: '/services/mugs' }])} />
-      <JsonLd data={buildServiceJsonLd('Печать на кружках', 'Печать на кружках для подарков, мероприятий и корпоративных заказов.', '/services/mugs')} />
+      <JsonLd data={buildServiceJsonLd('Печать на кружках в Невинномысске', 'Печать на кружках с логотипом и фото для подарков, промо и корпоративных заказов.', '/services/mugs')} />
       <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <PageHero className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:hidden lg:p-10">

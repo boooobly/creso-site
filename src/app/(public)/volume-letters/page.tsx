@@ -6,8 +6,8 @@ import JsonLd from '@/components/seo/JsonLd';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Объёмные буквы в Невинномысске | CredoMir',
-  description: 'Изготавливаем объёмные буквы для фасадов и интерьеров в Невинномысске. Подготовка макета, производство и монтаж.',
+  title: 'Объёмные буквы в Невинномысске — изготовление | CredoMir',
+  description: 'Изготавливаем объёмные буквы с подсветкой и без для фасадов и интерьеров в Невинномысске и Ставропольском крае.',
   path: '/volume-letters',
 });
 
@@ -15,7 +15,7 @@ export default function VolumeLettersPage() {
   return (
     <div className="pb-12 md:pb-16">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Объёмные буквы', path: '/volume-letters' }])} />
-      <JsonLd data={buildServiceJsonLd('Объёмные буквы в Невинномысске', 'Производство объёмных букв для наружной рекламы и интерьерного оформления.', '/volume-letters')} />
+      <JsonLd data={buildServiceJsonLd('Объёмные буквы в Невинномысске', 'Производство объёмных букв с подсветкой и без для наружной рекламы и интерьеров.', '/volume-letters')} />
 
       <Section spacing="compact">
         <PageHero className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]">

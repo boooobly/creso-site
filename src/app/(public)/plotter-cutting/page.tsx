@@ -6,8 +6,8 @@ import { getSiteImages } from '@/lib/site-images';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Плоттерная резка плёнки и стикеров | CredoMir',
-  description: 'Контурная и плоттерная резка самоклеящейся плёнки, наклеек и аппликаций. Подготовка макета и аккуратная выборка.',
+  title: 'Плоттерная резка в Невинномысске | CredoMir',
+  description: 'Плоттерная и контурная резка плёнки и стикеров в Невинномысске: подготовка макета, выборка и аккуратная выдача под монтаж.',
   path: '/plotter-cutting',
 });
 
@@ -25,7 +25,7 @@ export default async function PlotterCuttingRoute() {
       />
       <JsonLd
         data={buildServiceJsonLd(
-          'Плоттерная резка',
+          'Плоттерная резка в Невинномысске',
           'Контурная резка плёнки, наклеек и аппликаций для витрин, табличек и брендирования.',
           '/plotter-cutting'
         )}

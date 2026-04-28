@@ -64,8 +64,8 @@ async function loadApprovedReviews(): Promise<PublicReviewItem[]> {
 }
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Отзывы клиентов о CredoMir',
-  description: 'Проверенные отзывы клиентов о сотрудничестве с CredoMir: сроки, качество и сервис.',
+  title: 'Отзывы о CredoMir — Невинномысск',
+  description: 'Отзывы клиентов о работе CredoMir: сроки, качество изготовления и сопровождение рекламных проектов в Невинномысске.',
   path: '/reviews',
 });
 

@@ -169,8 +169,8 @@ const portfolioProjects = [
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Наружная реклама под ключ | CredoMir',
-  description: 'Вывески, лайтбоксы, объёмные буквы и монтаж наружной рекламы под ключ в Невинномысске и регионе.',
+  title: 'Наружная реклама в Невинномысске | CredoMir',
+  description: 'Изготовление наружной рекламы под ключ: вывески, световые короба, объёмные буквы и монтаж в Невинномысске, Ставропольском крае и по ЮФО.',
   path: '/outdoor-advertising',
 });
 
@@ -201,7 +201,7 @@ export default async function OutdoorAdvertisingPage() {
   return (
     <div className="pb-24 md:pb-12">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Наружная реклама', path: '/outdoor-advertising' }])} />
-      <JsonLd data={buildServiceJsonLd('Наружная реклама', 'Проектирование, изготовление и монтаж наружной рекламы под ключ.', '/outdoor-advertising')} />
+      <JsonLd data={buildServiceJsonLd('Наружная реклама в Невинномысске', 'Проектирование, изготовление и монтаж наружной рекламы: вывески, световые короба, объёмные буквы.', '/outdoor-advertising')} />
       <Section className="pb-6 md:pb-10" id="outdoor-hero" background="default" spacing="compact">
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"

@@ -70,8 +70,8 @@ function toWhatsAppLink(value: string) {
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Контакты CredoMir',
-  description: 'Контакты, адрес, график работы и способы связи с компанией CredoMir в Невинномысске.',
+  title: 'Контакты CredoMir в Невинномысске',
+  description: 'Адрес, телефон, мессенджеры и график работы CredoMir в Невинномысске. Консультация по наружной рекламе, печати и производству.',
   path: '/contacts',
 });
 
@@ -190,6 +190,20 @@ export default async function ContactsPage() {
           <h2 className="text-2xl font-bold">{ctaTitle}</h2>
           <p className="mt-2 text-neutral-700 dark:text-neutral-300">{ctaDescription}</p>
           <Link href="/contacts#contact-form" className="btn-primary mt-4 inline-flex w-full justify-center no-underline sm:w-auto">{ctaButtonText}</Link>
+        </div>
+      </section>
+
+      <section className="card rounded-xl p-5 md:p-6">
+        <h2 className="text-xl font-semibold">Полезные разделы</h2>
+        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 md:text-base">
+          Если хотите заранее изучить форматы и примеры работ, посмотрите профильные страницы услуг и портфолио.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2.5">
+          <Link href="/outdoor-advertising" className="btn-secondary no-underline">Наружная реклама</Link>
+          <Link href="/wide-format-printing" className="btn-secondary no-underline">Широкоформатная печать</Link>
+          <Link href="/print" className="btn-secondary no-underline">Полиграфия</Link>
+          <Link href="/milling" className="btn-secondary no-underline">Фрезеровка</Link>
+          <Link href="/portfolio" className="btn-secondary no-underline">Портфолио</Link>
         </div>
       </section>
     </div>
