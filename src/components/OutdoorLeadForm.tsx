@@ -3,7 +3,7 @@
 import { FormEvent, useMemo, useState } from 'react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles } from '@/lib/public-form-styles';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 type FormState = {
   address: string;
@@ -110,7 +110,7 @@ export default function OutdoorLeadForm() {
         return;
       }
 
-      reachGoal('outdoor_lead_submit_success');
+      reachGoal(YANDEX_GOALS.outdoorLeadSubmitSuccess);
       setStatus('success');
       setForm(initialState);
       setTouched({});

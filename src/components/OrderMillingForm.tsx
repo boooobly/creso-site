@@ -12,7 +12,7 @@ import {
   MILLING_MAX_UPLOAD_SIZE_MB,
   MILLING_THICKNESS_BY_MATERIAL,
 } from '@/lib/pricing-config/milling';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 type FormValues = {
   name: string;
@@ -147,7 +147,7 @@ export default function OrderMillingForm() {
         return;
       }
 
-      reachGoal('milling_order_submit_success');
+      reachGoal(YANDEX_GOALS.millingOrderSubmitSuccess);
       setSuccessMessage('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
       setValues(defaultValues);
       setFile(null);

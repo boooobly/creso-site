@@ -6,7 +6,7 @@ import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
@@ -97,7 +97,7 @@ export default function OrderTshirtsForm() {
         return;
       }
 
-      reachGoal('tshirts_order_submit_success');
+      reachGoal(YANDEX_GOALS.tshirtsOrderSubmitSuccess);
       setSuccessMessage('Спасибо! Мы свяжемся с вами в ближайшее время.');
       setValues(defaultValues);
       setFile(null);

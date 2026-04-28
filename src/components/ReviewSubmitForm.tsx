@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 const URL_PATTERN = /(https?:\/\/|www\.|\b[a-z0-9-]+\.(?:ru|com|net|org|io|dev|app|info|biz|me|co|su|рф)\b)/i;
 
@@ -81,7 +81,7 @@ export default function ReviewSubmitForm({ onSubmitted }: ReviewSubmitFormProps)
       return;
     }
 
-    reachGoal('review_submit_success');
+    reachGoal(YANDEX_GOALS.reviewSubmitSuccess);
     form.reset();
     setRating(5);
     setSubmitState({

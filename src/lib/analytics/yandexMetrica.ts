@@ -10,17 +10,21 @@ type YandexMetricaAction = 'hit' | 'reachGoal';
 type YandexGoalContactType = 'phone' | 'whatsapp' | 'telegram' | 'email';
 
 export const YANDEX_GOALS = {
+  mainLeadSubmitSuccess: 'main_lead_submit_success',
+  contactFormSubmitSuccess: 'contact_form_submit_success',
+  bagetOrderSubmitSuccess: 'baget_order_submit_success',
+  wideFormatOrderSubmitSuccess: 'wide_format_order_submit_success',
+  outdoorLeadSubmitSuccess: 'outdoor_lead_submit_success',
+  millingOrderSubmitSuccess: 'milling_order_submit_success',
+  businessCardsOrderSubmitSuccess: 'business_cards_order_submit_success',
+  tshirtsOrderSubmitSuccess: 'tshirts_order_submit_success',
+  mugsOrderSubmitSuccess: 'mugs_order_submit_success',
+  reviewSubmitSuccess: 'review_submit_success',
   phoneClick: 'phone_click',
   whatsappClick: 'whatsapp_click',
   telegramClick: 'telegram_click',
   emailClick: 'email_click',
-  leadFormSubmit: 'lead_form_submit',
-  wideFormatFormSubmit: 'wide_format_form_submit',
-  bagetOrderSubmit: 'baget_order_submit',
-  mugsOrderSubmit: 'mugs_order_submit',
-  calculatorStart: 'calculator_start',
-  calculatorSubmit: 'calculator_submit',
-  ctaClick: 'cta_click',
+  plotterOrderSubmitSuccess: 'plotter_order_submit_success',
 } as const;
 
 export type YandexGoalName = (typeof YANDEX_GOALS)[keyof typeof YANDEX_GOALS] | (string & {});
@@ -51,34 +55,6 @@ export function reachGoal(goalName: YandexGoalName, params?: Record<string, unkn
 
 export function trackGoal(goalName: YandexGoalName, params?: Record<string, unknown>) {
   reachGoal(goalName, params);
-}
-
-export function trackLeadFormSubmit(params?: Record<string, unknown>) {
-  reachGoal(YANDEX_GOALS.leadFormSubmit, params);
-}
-
-export function trackWideFormatFormSubmit(params?: Record<string, unknown>) {
-  reachGoal(YANDEX_GOALS.wideFormatFormSubmit, params);
-}
-
-export function trackBagetOrderSubmit(params?: Record<string, unknown>) {
-  reachGoal(YANDEX_GOALS.bagetOrderSubmit, params);
-}
-
-export function trackMugsOrderSubmit(params?: Record<string, unknown>) {
-  reachGoal(YANDEX_GOALS.mugsOrderSubmit, params);
-}
-
-export function trackCalculatorStart(params?: Record<string, unknown>) {
-  reachGoal(YANDEX_GOALS.calculatorStart, params);
-}
-
-export function trackCalculatorSubmit(params?: Record<string, unknown>) {
-  reachGoal(YANDEX_GOALS.calculatorSubmit, params);
-}
-
-export function trackCtaClick(params?: Record<string, unknown>) {
-  reachGoal(YANDEX_GOALS.ctaClick, params);
 }
 
 export function trackContactClick(type: YandexGoalContactType) {

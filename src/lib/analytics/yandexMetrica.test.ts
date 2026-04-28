@@ -30,10 +30,10 @@ describe('yandex metrica helpers', () => {
     const ym = vi.fn();
     (globalThis as { window: Window & { ym?: typeof ym } }).window = { ym } as Window & { ym?: typeof ym };
 
-    const { trackHit, reachGoal, trackContactClick } = await import('@/lib/analytics/yandexMetrica');
+    const { trackHit, reachGoal, trackContactClick, YANDEX_GOALS } = await import('@/lib/analytics/yandexMetrica');
 
     expect(() => trackHit('/services')).not.toThrow();
-    expect(() => reachGoal('cta_click')).not.toThrow();
+    expect(() => reachGoal(YANDEX_GOALS.contactFormSubmitSuccess)).not.toThrow();
     expect(() => trackContactClick('phone')).not.toThrow();
     expect(ym).not.toHaveBeenCalled();
   });
@@ -42,9 +42,9 @@ describe('yandex metrica helpers', () => {
     process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID = '123456';
     (globalThis as { window: Window & { ym?: undefined } }).window = {} as Window;
 
-    const { trackGoal } = await import('@/lib/analytics/yandexMetrica');
+    const { trackGoal, YANDEX_GOALS } = await import('@/lib/analytics/yandexMetrica');
 
-    expect(() => trackGoal('calculator_submit')).not.toThrow();
+    expect(() => trackGoal(YANDEX_GOALS.reviewSubmitSuccess)).not.toThrow();
   });
 
   it('sends goal events via typed helpers when configured', async () => {
@@ -52,34 +52,30 @@ describe('yandex metrica helpers', () => {
     const ym = vi.fn();
     (globalThis as { window: Window & { ym?: typeof ym } }).window = { ym } as Window & { ym?: typeof ym };
 
-    const {
-      YANDEX_GOALS,
-      trackLeadFormSubmit,
-      trackWideFormatFormSubmit,
-      trackBagetOrderSubmit,
-      trackMugsOrderSubmit,
-      trackCalculatorStart,
-      trackCalculatorSubmit,
-      trackCtaClick,
-      trackContactClick,
-    } = await import('@/lib/analytics/yandexMetrica');
+    const { YANDEX_GOALS, trackGoal, trackContactClick } = await import('@/lib/analytics/yandexMetrica');
 
-    trackLeadFormSubmit({ source: 'main' });
-    trackWideFormatFormSubmit();
-    trackBagetOrderSubmit();
-    trackMugsOrderSubmit();
-    trackCalculatorStart();
-    trackCalculatorSubmit();
-    trackCtaClick();
+    trackGoal(YANDEX_GOALS.mainLeadSubmitSuccess, { source: 'main' });
+    trackGoal(YANDEX_GOALS.wideFormatOrderSubmitSuccess);
+    trackGoal(YANDEX_GOALS.bagetOrderSubmitSuccess);
+    trackGoal(YANDEX_GOALS.mugsOrderSubmitSuccess);
+    trackGoal(YANDEX_GOALS.millingOrderSubmitSuccess);
+    trackGoal(YANDEX_GOALS.businessCardsOrderSubmitSuccess);
+    trackGoal(YANDEX_GOALS.tshirtsOrderSubmitSuccess);
+    trackGoal(YANDEX_GOALS.plotterOrderSubmitSuccess);
+    trackGoal(YANDEX_GOALS.outdoorLeadSubmitSuccess);
+    trackGoal(YANDEX_GOALS.reviewSubmitSuccess);
     trackContactClick('email');
 
-    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.leadFormSubmit, { source: 'main' });
-    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.wideFormatFormSubmit, undefined);
-    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.bagetOrderSubmit, undefined);
-    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.mugsOrderSubmit, undefined);
-    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.calculatorStart, undefined);
-    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.calculatorSubmit, undefined);
-    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.ctaClick, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.mainLeadSubmitSuccess, { source: 'main' });
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.wideFormatOrderSubmitSuccess, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.bagetOrderSubmitSuccess, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.mugsOrderSubmitSuccess, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.millingOrderSubmitSuccess, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.businessCardsOrderSubmitSuccess, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.tshirtsOrderSubmitSuccess, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.plotterOrderSubmitSuccess, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.outdoorLeadSubmitSuccess, undefined);
+    expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.reviewSubmitSuccess, undefined);
     expect(ym).toHaveBeenCalledWith(123456, 'reachGoal', YANDEX_GOALS.emailClick, undefined);
   });
 });
