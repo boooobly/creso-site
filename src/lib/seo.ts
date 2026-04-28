@@ -4,7 +4,7 @@ import { getBaseUrl } from '@/lib/url/getBaseUrl';
 
 const DEFAULT_OG_IMAGE = '/og-image.png';
 const DEFAULT_LOCALE = 'ru_RU';
-const DEFAULT_TWITTER_CARD: Metadata['twitter']['card'] = 'summary_large_image';
+const DEFAULT_TWITTER_CARD = 'summary_large_image' as const;
 
 function toAbsoluteUrl(path: string): string {
   const base = getBaseUrl();
@@ -15,14 +15,17 @@ function getVerificationMetadata(): Metadata['verification'] | undefined {
   const google = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
   const yandex = process.env.NEXT_PUBLIC_YANDEX_VERIFICATION?.trim();
 
-  if (!google && !yandex) {
-    return undefined;
+  const verification: NonNullable<Metadata['verification']> = {};
+
+  if (google) {
+    verification.google = google;
   }
 
-  return {
-    google,
-    yandex,
-  };
+  if (yandex) {
+    verification.yandex = yandex;
+  }
+
+  return Object.keys(verification).length > 0 ? verification : undefined;
 }
 
 export type PublicPageSeoInput = {
