@@ -26,7 +26,6 @@ const PUBLIC_ROUTES: PublicSitemapRoute[] = [
   { route: '/business-cards', changeFrequency: 'weekly', priority: 0.88 },
   { route: '/production', changeFrequency: 'monthly', priority: 0.8 },
   { route: '/portfolio', changeFrequency: 'weekly', priority: 0.85 },
-  { route: '/blog', changeFrequency: 'weekly', priority: 0.72 },
   { route: '/reviews', changeFrequency: 'weekly', priority: 0.75 },
   { route: '/contacts', changeFrequency: 'monthly', priority: 0.8 },
   { route: '/privacy', changeFrequency: 'yearly', priority: 0.3 },

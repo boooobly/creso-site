@@ -30,8 +30,7 @@ describe('sitemap/robots base url', () => {
     expect(robotsConfig.sitemap).toBe('https://credomir.com/sitemap.xml');
   });
 
-
-  it('includes only intended public routes in sitemap (including /blog) and excludes admin/api routes', async () => {
+  it('includes only indexable public routes and excludes redirects/private routes in sitemap', async () => {
     process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'production';
     process.env.PUBLIC_BASE_URL = 'https://credomir.com';
@@ -41,9 +40,37 @@ describe('sitemap/robots base url', () => {
     const map = sitemap();
     const urls = map.map((entry) => entry.url);
 
-    expect(urls).toContain('https://credomir.com/blog');
+    expect(urls).not.toContain('https://credomir.com/blog');
+    expect(urls).not.toContain('https://credomir.com/admin');
+    expect(urls).not.toContain('https://credomir.com/api');
+    expect(urls).not.toContain('https://credomir.com/pay/mock');
+    expect(urls).not.toContain('https://credomir.com/order');
+
     expect(urls.some((url) => url.includes('/admin'))).toBe(false);
     expect(urls.some((url) => url.includes('/api'))).toBe(false);
+    expect(urls.some((url) => url.includes('/pay/mock'))).toBe(false);
+    expect(urls.some((url) => url.includes('/order/'))).toBe(false);
+  });
+
+  it('adds explicit robots disallow rules for private routes', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'production';
+    process.env.PUBLIC_BASE_URL = 'https://credomir.com';
+
+    const { default: robots } = await import('@/app/robots');
+    const robotsConfig = robots();
+
+    const rule = Array.isArray(robotsConfig.rules) ? robotsConfig.rules[0] : robotsConfig.rules;
+    expect(rule).toBeDefined();
+    expect(rule && 'allow' in rule ? rule.allow : undefined).toBe('/');
+    expect(rule && 'disallow' in rule ? rule.disallow : undefined).toEqual([
+      '/admin',
+      '/admin/',
+      '/api',
+      '/api/',
+      '/pay/mock',
+      '/order/',
+    ]);
   });
 
   it('falls back to localhost in non-production contexts when PUBLIC_BASE_URL is missing', async () => {

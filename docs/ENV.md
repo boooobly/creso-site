@@ -20,6 +20,9 @@ Use this matrix when configuring variables in Vercel:
 | `PAYMENT_WEBHOOK_SECRET` | Deprecated (unused) | Deprecated (unused) | Deprecated (unused) | Online payment is disabled; keep unset. |
 | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Optional | Optional | Optional | If Telegram sending is enabled, both values must be set together. |
 | `BLOB_READ_WRITE_TOKEN` | Optional for local image upload testing | Required if admin image uploads are enabled | Required if admin image uploads are enabled | Vercel Blob token used by `/api/admin/upload-image` for portfolio and site images. |
+| `NEXT_PUBLIC_YANDEX_METRIKA_ID` | Optional | Optional | Optional | Public Yandex Metrica counter ID. When empty or invalid, metrica script/events are skipped safely. |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Optional | Optional | Optional | Public Google Search Console verification token for Next Metadata `verification.google`. |
+| `NEXT_PUBLIC_YANDEX_VERIFICATION` | Optional | Optional | Optional | Public Yandex Webmaster verification token for Next Metadata `verification.yandex`. |
 
 `PAYMENT_WEBHOOK_SECRET` is kept only for backward compatibility in env templates and is not used while online payment is disabled.
 
@@ -58,3 +61,9 @@ Use this matrix when configuring variables in Vercel:
 - In production deploy/runtime, set `PUBLIC_BASE_URL` explicitly. Missing value is treated as an error.
 - For local/test/non-production preview contexts, sitemap/robots generation falls back to `http://localhost:3000` when `PUBLIC_BASE_URL` is missing.
 - `https://example.com` is never used as a fallback base URL.
+
+## Public SEO/analytics variables
+
+- `NEXT_PUBLIC_YANDEX_METRIKA_ID`, `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, and `NEXT_PUBLIC_YANDEX_VERIFICATION` are optional.
+- Keep these values in Vercel per-environment scopes as needed (Local/Preview/Production).
+- Empty values do not break build/runtime: metadata omits verification fields, and Yandex helpers no-op when counter or `window.ym` is unavailable.
