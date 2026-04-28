@@ -6,7 +6,7 @@ import JsonLd from '@/components/seo/JsonLd';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Печать визиток в Невинномысске — офсет и цифра | CredoMir',
+  title: 'Печать визиток в Невинномысске - офсет и цифра | CredoMir',
   description: 'Печать визиток для компаний и частных клиентов в Невинномысске: помощь с макетом, выбор бумаги и аккуратный тираж.',
   path: '/business-cards',
 });

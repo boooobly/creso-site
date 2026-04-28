@@ -23,7 +23,7 @@ const serviceImageById: Record<string, string> = {
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Услуги CredoMir в Невинномысске — реклама и производство',
+  title: 'Услуги CredoMir в Невинномысске - реклама и производство',
   description: 'Каталог услуг CredoMir: наружная реклама, вывески, широкоформатная печать, фрезеровка, багет и полиграфия в Невинномысске и Ставропольском крае.',
   path: '/services',
 });

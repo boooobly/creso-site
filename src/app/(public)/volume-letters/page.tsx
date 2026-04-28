@@ -6,7 +6,7 @@ import JsonLd from '@/components/seo/JsonLd';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Объёмные буквы в Невинномысске — изготовление | CredoMir',
+  title: 'Объёмные буквы в Невинномысске - изготовление | CredoMir',
   description: 'Изготавливаем объёмные буквы с подсветкой и без для фасадов и интерьеров в Невинномысске и Ставропольском крае.',
   path: '/volume-letters',
 });

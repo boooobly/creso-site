@@ -41,7 +41,7 @@ const faq = [
 ] as const;
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Вывески в Невинномысске — изготовление и монтаж | CredoMir',
+  title: 'Вывески в Невинномысске - изготовление и монтаж | CredoMir',
   description: 'Изготавливаем рекламные вывески для магазинов, офисов и ТЦ в Невинномысске: проект, производство и монтаж под объект.',
   path: '/advertising-signs',
 });

@@ -1,11 +1,19 @@
 import './styles.css';
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
+import { Onest } from 'next/font/google';
 import { getDefaultMetadata } from '@/lib/seo';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getDefaultMetadata();
 }
+
+const onest = Onest({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-onest',
+  display: 'swap'
+});
 
 const themeInitScript = `(() => {
   try {
@@ -22,9 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body style={{ '--font-onest': 'ui-sans-serif' } as React.CSSProperties} className="font-sans bg-white dark:bg-neutral-950">
-        {children}
-      </body>
+      <body className={`${onest.variable} font-sans bg-white dark:bg-neutral-950`}>{children}</body>
     </html>
   );
 }

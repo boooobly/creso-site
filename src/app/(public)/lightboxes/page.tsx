@@ -6,7 +6,7 @@ import JsonLd from '@/components/seo/JsonLd';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Световые короба в Невинномысске — изготовление | CredoMir',
+  title: 'Световые короба в Невинномысске - изготовление | CredoMir',
   description: 'Производство световых коробов для фасадов и входных групп в Невинномысске: расчёт, макет, изготовление и монтаж.',
   path: '/lightboxes',
 });
