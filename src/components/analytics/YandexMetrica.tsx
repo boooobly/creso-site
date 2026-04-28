@@ -12,6 +12,16 @@ function getCurrentUrl(pathname: string, searchParams: { toString(): string } | 
   return search ? `${pathname}?${search}` : pathname;
 }
 
+function toAbsoluteUrl(url: string) {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    return new URL(url, window.location.origin).href;
+  } catch {
+    return null;
+  }
+}
+
 function getCounterId() {
   const value = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID?.trim();
   if (!value) return null;
@@ -40,7 +50,10 @@ export default function YandexMetrica() {
 
     if (lastTrackedUrlRef.current === currentUrl) return;
 
-    trackHit(currentUrl);
+    const absoluteUrl = toAbsoluteUrl(currentUrl);
+    if (!absoluteUrl) return;
+
+    trackHit(absoluteUrl);
     lastTrackedUrlRef.current = currentUrl;
   }, [counterId, currentUrl]);
 
@@ -62,15 +75,14 @@ export default function YandexMetrica() {
           })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
 
           ym(${counterId}, 'init', {
-            ssr: true,
-            webvisor: true,
             clickmap: true,
-            ecommerce: 'dataLayer',
-            referrer: document.referrer,
-            url: location.href,
+            trackLinks: true,
             accurateTrackBounce: true,
-            trackLinks: true
+            webvisor: true,
+            defer: true
           });
+
+          ym(${counterId}, 'hit', window.location.href);
         `}
       </Script>
       <noscript>
