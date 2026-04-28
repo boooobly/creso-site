@@ -5,7 +5,7 @@ import { Upload } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 type PrintSide = 'single' | 'double';
 
@@ -155,7 +155,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
         throw new Error(result.error || 'Не удалось отправить заявку');
       }
 
-      reachGoal('business_cards_order_submit_success');
+      reachGoal(YANDEX_GOALS.businessCardsOrderSubmitSuccess);
 
       if (result.fileSent === false && result.reason === 'too_large') {
         setSuccessMessage('Заявка отправлена. Файл слишком большой для Telegram-бота, менеджер свяжется с вами для получения исходника.');

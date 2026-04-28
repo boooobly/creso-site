@@ -12,7 +12,7 @@ import {
   MUGS_COVERING_OPTIONS,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 const complexityLevels = [
   { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
@@ -137,7 +137,7 @@ export default function OrderMugsForm() {
         return;
       }
 
-      reachGoal('mugs_order_submit_success');
+      reachGoal(YANDEX_GOALS.mugsOrderSubmitSuccess);
       setSuccessMessage('Спасибо! Мы свяжемся с вами в ближайшее время.');
       setValues(defaultValues);
       setFile(null);

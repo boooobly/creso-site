@@ -16,7 +16,7 @@ import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
 const RASTER_EXTENSIONS = ['png', 'jpg', 'jpeg'];
@@ -330,7 +330,7 @@ ${calcSummary}`,
         throw new Error(data.error || 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
       }
 
-      reachGoal('contact_form_submit_success', { source: 'heat_transfer' });
+      reachGoal(YANDEX_GOALS.contactFormSubmitSuccess, { source: 'heat_transfer' });
       setSubmitSuccess('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');

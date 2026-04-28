@@ -5,7 +5,7 @@ import { Upload } from 'lucide-react';
 import Link from 'next/link';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import ImageDropzone from '@/components/ImageDropzone';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 
@@ -194,7 +194,7 @@ export default function OrderWideFormatForm() {
         throw new Error(result.error || 'Не удалось отправить заявку');
       }
 
-      reachGoal('wide_format_order_submit_success');
+      reachGoal(YANDEX_GOALS.wideFormatOrderSubmitSuccess);
 
       if (result.fileSent === false && result.reason === 'too_large') {
         setSuccessMessage('Заявка отправлена. Файл слишком большой для Telegram-бота, менеджер свяжется с вами для получения исходника.');

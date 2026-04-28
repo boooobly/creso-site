@@ -9,7 +9,7 @@ import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles } from '@/lib/public-form-styles';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { SiteImageRecord } from '@/lib/site-images';
-import { reachGoal } from '@/lib/analytics/yandexMetrica';
+import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 const heroBadges = ['Ширина до 600 мм', 'Резка по меткам', 'Срочные заказы', 'Чистая выборка'];
 
@@ -206,7 +206,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
         throw new Error(data?.error || 'Не удалось отправить заявку. Попробуйте ещё раз.');
       }
 
-      reachGoal('plotter_order_submit_success');
+      reachGoal(YANDEX_GOALS.plotterOrderSubmitSuccess);
       setSubmitSuccess('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
       setComment('');
       setFiles([]);
