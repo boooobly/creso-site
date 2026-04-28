@@ -48,8 +48,8 @@ function normalizeItem(item: any, index: number): PortfolioItem {
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Портфолио выполненных работ | CredoMir',
-  description: 'Примеры реализованных проектов CredoMir: наружная реклама, печать, фрезеровка и оформление.',
+  title: 'Портфолио наружной рекламы и печати | CredoMir',
+  description: 'Портфолио CredoMir: вывески, световые короба, объёмные буквы, печать и фрезеровка для проектов в Невинномысске и Ставропольском крае.',
   path: '/portfolio',
 });
 

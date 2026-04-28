@@ -6,8 +6,8 @@ import JsonLd from '@/components/seo/JsonLd';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Печать визиток в Невинномысске | CredoMir',
-  description: 'Печать визиток для бизнеса и частных клиентов в Невинномысске. Помощь с макетом и подготовкой тиража.',
+  title: 'Печать визиток в Невинномысске - офсет и цифра | CredoMir',
+  description: 'Печать визиток для компаний и частных клиентов в Невинномысске: помощь с макетом, выбор бумаги и аккуратный тираж.',
   path: '/business-cards',
 });
 
@@ -15,7 +15,7 @@ export default function BusinessCardsPage() {
   return (
     <div className="pb-12 md:pb-16">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Печать визиток', path: '/business-cards' }])} />
-      <JsonLd data={buildServiceJsonLd('Печать визиток в Невинномысске', 'Печать визиток для компаний и частных клиентов с подготовкой макета и тиража.', '/business-cards')} />
+      <JsonLd data={buildServiceJsonLd('Печать визиток в Невинномысске', 'Печать визиток для компаний и частных клиентов с подбором бумаги и подготовкой макета.', '/business-cards')} />
 
       <Section spacing="compact">
         <PageHero className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]">

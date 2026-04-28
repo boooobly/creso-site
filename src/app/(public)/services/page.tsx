@@ -23,8 +23,8 @@ const serviceImageById: Record<string, string> = {
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Услуги CredoMir — реклама и производство',
-  description: 'Каталог услуг CredoMir: багет, печать, фрезеровка, плоттерная резка, наружная реклама и другое.',
+  title: 'Услуги CredoMir в Невинномысске - реклама и производство',
+  description: 'Каталог услуг CredoMir: наружная реклама, вывески, широкоформатная печать, фрезеровка, багет и полиграфия в Невинномысске и Ставропольском крае.',
   path: '/services',
 });
 
@@ -62,7 +62,7 @@ export default async function ServicesPage() {
       <Section spacing="compact" background="muted" fullBleed className="border-y border-neutral-200/70">
         <div className="section-header">
           <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>
-          <h2 className="t-h2">Выберите нужную услугу</h2>
+          <h1 className="t-h2">Выберите нужную услугу</h1>
           <p className="t-body text-muted-foreground max-w-2xl">Каждая карточка ведёт на профильную страницу услуги с подробностями, примерами и формой заявки.</p>
         </div>
         <div className="grid-cards md:grid-cols-2 lg:grid-cols-3">

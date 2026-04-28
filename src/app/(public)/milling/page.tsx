@@ -5,8 +5,8 @@ import { getMillingPricingPublicData } from '@/lib/milling/millingPricing';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Фрезеровка листовых материалов в Невинномысске | CredoMir',
-  description: 'Фрезеровка ПВХ, акрила, композита и других листовых материалов на ЧПУ. Точные размеры, чистая кромка и расчёт сроков.',
+  title: 'Фрезеровка ПВХ, акрила и композита в Невинномысске | CredoMir',
+  description: 'ЧПУ-фрезеровка ПВХ, акрила, композита и других листовых материалов в Невинномысске: точный рез и чистая кромка.',
   path: '/milling',
 });
 
@@ -24,8 +24,8 @@ export default async function MillingPage() {
       />
       <JsonLd
         data={buildServiceJsonLd(
-          'Фрезеровка листовых материалов',
-          'Фрезеровка ПВХ, акрила, композита и других листовых материалов на ЧПУ с точной геометрией.',
+          'Фрезеровка ПВХ, акрила и композита в Невинномысске',
+          'ЧПУ-фрезеровка ПВХ, акрила, композита и других листовых материалов с точной геометрией.',
           '/milling'
         )}
       />

@@ -7,8 +7,8 @@ import { getSiteImages } from '@/lib/site-images';
 import { TSHIRTS_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Печать на футболках и текстиле | CredoMir',
-  description: 'Термоперенос и печать на футболках для брендов, команд и мероприятий. Подбираем технологию и тираж под задачу.',
+  title: 'Печать на футболках в Невинномысске | CredoMir',
+  description: 'Термоперенос и печать на футболках в Невинномысске: брендирование для команд, промо и корпоративных заказов.',
   path: '/heat-transfer',
 });
 
@@ -29,7 +29,7 @@ export default async function HeatTransferPage() {
       />
       <JsonLd
         data={buildServiceJsonLd(
-          'Печать на футболках',
+          'Печать на футболках в Невинномысске',
           'Термоперенос на футболки и текстиль для брендов, команд и мероприятий.',
           '/heat-transfer'
         )}

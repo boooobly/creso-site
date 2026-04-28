@@ -66,8 +66,8 @@ const getRevealDelayClass = (index: number) => revealDelayClasses[index] ?? reve
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Изготовление информационных стендов | CredoMir',
-  description: 'Проектирование и изготовление информационных стендов для помещений и улицы с доставкой и монтажом.',
+  title: 'Изготовление стендов в Невинномысске | CredoMir',
+  description: 'Изготовление информационных стендов для помещений и улицы: ПВХ, композит, карманы и монтаж в Невинномысске и Ставропольском крае.',
   path: '/services/stands',
 });
 
@@ -93,7 +93,7 @@ export default async function StandsServicePage() {
   return (
     <div>
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Изготовление информационных стендов', path: '/services/stands' }])} />
-      <JsonLd data={buildServiceJsonLd('Изготовление информационных стендов', 'Изготавливаем информационные стенды для помещений и улицы с подбором материалов под задачу.', '/services/stands')} />
+      <JsonLd data={buildServiceJsonLd('Изготовление стендов в Невинномысске', 'Изготавливаем информационные стенды для помещений и улицы с подбором материалов и креплений.', '/services/stands')} />
       <Section className="pb-8 pt-8 md:pb-10 md:pt-10" background="default" id="stands-hero">
         <PageHero className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-950 dark:to-neutral-900/80 lg:hidden">
           <HeroEyebrow>Изготовление стендов</HeroEyebrow>

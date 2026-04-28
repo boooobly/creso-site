@@ -6,8 +6,8 @@ import JsonLd from '@/components/seo/JsonLd';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Световые короба в Невинномысске | CredoMir',
-  description: 'Производство световых коробов для фасадов и входных групп в Невинномысске с подбором материалов и монтажом.',
+  title: 'Световые короба в Невинномысске - изготовление | CredoMir',
+  description: 'Производство световых коробов для фасадов и входных групп в Невинномысске: расчёт, макет, изготовление и монтаж.',
   path: '/lightboxes',
 });
 
@@ -21,7 +21,7 @@ export default function LightboxesPage() {
   return (
     <div className="pb-12 md:pb-16">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Световые короба', path: '/lightboxes' }])} />
-      <JsonLd data={buildServiceJsonLd('Световые короба в Невинномысске', 'Изготавливаем световые короба для наружной рекламы: производство, подготовка макета и монтаж.', '/lightboxes')} />
+      <JsonLd data={buildServiceJsonLd('Световые короба в Невинномысске', 'Изготавливаем световые короба для наружной рекламы: расчёт, производство и монтаж.', '/lightboxes')} />
 
       <Section spacing="compact">
         <PageHero className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]">

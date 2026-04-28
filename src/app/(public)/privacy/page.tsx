@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { buildPublicPageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Политика обработки персональных данных | CredoMir',
-  description: 'Официальная политика обработки персональных данных и условия работы с заявками на сайте CredoMir.',
+  title: 'Политика конфиденциальности | CredoMir',
+  description: 'Политика обработки персональных данных для заявок на услуги CredoMir: наружная реклама, печать и производство.',
   path: '/privacy',
 });
 

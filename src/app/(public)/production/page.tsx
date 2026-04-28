@@ -125,8 +125,8 @@ const trustPoints = [
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Производство рекламных конструкций | CredoMir',
-  description: 'Собственное производство CredoMir: фрезеровка, печать, плоттерная резка и багетная мастерская.',
+  title: 'Производство рекламы в Невинномысске | CredoMir',
+  description: 'Собственное производство CredoMir: фрезеровка, широкоформатная печать, плоттерная резка и сборка рекламных конструкций.',
   path: '/production',
 });
 
@@ -154,7 +154,7 @@ export default async function ProductionPage() {
   return (
     <div>
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Производство рекламных конструкций', path: '/production' }])} />
-      <JsonLd data={buildServiceJsonLd('Производство рекламных конструкций', 'Собственное производство рекламных конструкций, печати и обработки материалов.', '/production')} />
+      <JsonLd data={buildServiceJsonLd('Производство рекламы в Невинномысске', 'Собственное производство рекламных конструкций, печати и обработки листовых материалов.', '/production')} />
       <Section>
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"

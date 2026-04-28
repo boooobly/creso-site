@@ -41,8 +41,8 @@ const faq = [
 ] as const;
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Изготовление вывесок в Невинномысске | CredoMir',
-  description: 'Изготавливаем вывески для бизнеса в Невинномысске: проект, производство и монтаж под задачу объекта.',
+  title: 'Вывески в Невинномысске - изготовление и монтаж | CredoMir',
+  description: 'Изготавливаем рекламные вывески для магазинов, офисов и ТЦ в Невинномысске: проект, производство и монтаж под объект.',
   path: '/advertising-signs',
 });
 
@@ -50,7 +50,7 @@ export default function AdvertisingSignsPage() {
   return (
     <div className="pb-12 md:pb-16">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Изготовление вывесок', path: '/advertising-signs' }])} />
-      <JsonLd data={buildServiceJsonLd('Изготовление вывесок в Невинномысске', 'Производство вывесок для магазинов, офисов и коммерческих объектов с монтажом.', '/advertising-signs')} />
+      <JsonLd data={buildServiceJsonLd('Вывески в Невинномысске', 'Изготовление рекламных вывесок для магазинов, офисов и ТЦ с монтажом.', '/advertising-signs')} />
 
       <Section spacing="compact">
         <PageHero className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]">

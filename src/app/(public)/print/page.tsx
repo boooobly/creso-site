@@ -17,8 +17,8 @@ const featureChips = [
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Печать визиток и полиграфии | CredoMir',
-  description: 'Офсетная печать визиток и полиграфии с фиксированными параметрами и предсказуемыми сроками.',
+  title: 'Оперативная полиграфия в Невинномысске | CredoMir',
+  description: 'Печать полиграфии для бизнеса: визитки, флаеры и тиражные материалы с понятными сроками в Невинномысске.',
   path: '/print',
 });
 
@@ -31,7 +31,7 @@ export default async function PrintPage() {
   return (
     <div className="pb-12 md:pb-16">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Печать полиграфии', path: '/print' }])} />
-      <JsonLd data={buildServiceJsonLd('Печать полиграфии', 'Офсетная печать визиток и другой полиграфии с прогнозируемыми сроками.', '/print')} />
+      <JsonLd data={buildServiceJsonLd('Печать полиграфии в Невинномысске', 'Офсетная печать визиток, флаеров и другой полиграфии с понятными сроками.', '/print')} />
       <Section spacing="compact" className="pb-4 md:pb-5">
         <PageHero
           className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]"
