@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import JsonLd from '@/components/seo/JsonLd';
-import TshirtsLanding, { tshirtsFaqItems } from '@/components/heat-transfer/TshirtsLanding';
+import TshirtsLanding from '@/components/heat-transfer/TshirtsLanding';
+import { tshirtsFaqItems } from '@/lib/heat-transfer/tshirtsFaqItems';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 import { getSiteImages } from '@/lib/site-images';
