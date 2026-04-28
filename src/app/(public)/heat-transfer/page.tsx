@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import JsonLd from '@/components/seo/JsonLd';
 import TshirtsLanding from '@/components/heat-transfer/TshirtsLanding';
+import { tshirtsFaqItems } from '@/lib/heat-transfer/tshirtsFaqItems';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
-import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
+import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 import { getSiteImages } from '@/lib/site-images';
 import { TSHIRTS_SITE_IMAGE_SLOTS } from '@/lib/site-image-slots';
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = buildPublicPageMetadata({
 });
 
 export default async function HeatTransferPage() {
+  const faqPageJsonLd = buildFaqPageJsonLd(tshirtsFaqItems);
   const [contentMap, galleryImages] = await Promise.all([
     getPageContentMap('heat_transfer'),
     getSiteImages(TSHIRTS_SITE_IMAGE_SLOTS.map((slot) => slot.key)),
@@ -34,6 +36,7 @@ export default async function HeatTransferPage() {
           '/heat-transfer'
         )}
       />
+      {faqPageJsonLd ? <JsonLd data={faqPageJsonLd} /> : null}
       <TshirtsLanding
         heroTitle={getPageContentValue(contentMap, 'hero', 'title', 'Печать на футболках')}
         heroDescription={getPageContentValue(

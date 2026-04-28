@@ -15,7 +15,7 @@ import OrderMugsForm from '@/components/OrderMugsForm';
 import JsonLd from '@/components/seo/JsonLd';
 import ProtectedImage from '@/components/ui/ProtectedImage';
 import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
-import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
+import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 import { getSiteImages } from '@/lib/site-images';
 
 const quickBenefits = [
@@ -115,6 +115,7 @@ export const metadata: Metadata = buildPublicPageMetadata({
 });
 
 export default async function MugsServicePage() {
+  const faqPageJsonLd = buildFaqPageJsonLd(faqItems);
   const mugImages = await getSiteImages(['mugs.hero.main', 'mugs.result.main']);
   const heroImage = mugImages['mugs.hero.main'];
   const resultImage = mugImages['mugs.result.main'];
@@ -146,6 +147,7 @@ export default async function MugsServicePage() {
     <div>
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }, { name: 'Печать на кружках', path: '/services/mugs' }])} />
       <JsonLd data={buildServiceJsonLd('Печать на кружках в Невинномысске', 'Печать на кружках с логотипом и фото для подарков, промо и корпоративных заказов.', '/services/mugs')} />
+      {faqPageJsonLd ? <JsonLd data={faqPageJsonLd} /> : null}
       <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <PageHero className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:hidden lg:p-10">
