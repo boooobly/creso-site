@@ -5,6 +5,13 @@ import { getBaseUrl } from '@/lib/url/getBaseUrl';
 const DEFAULT_OG_IMAGE = '/og-image.png';
 const DEFAULT_LOCALE = 'ru_RU';
 const DEFAULT_TWITTER_CARD = 'summary_large_image' as const;
+const DEFAULT_ICONS: Metadata['icons'] = {
+  icon: [
+    { url: '/favicon.ico', sizes: 'any' },
+    { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+    { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+  ],
+};
 
 function toAbsoluteUrl(path: string): string {
   const base = getBaseUrl();
@@ -51,6 +58,7 @@ export function buildPublicPageMetadata({ title, description, path, image = DEFA
       index: true,
       follow: true,
     },
+    icons: DEFAULT_ICONS,
     verification: getVerificationMetadata(),
     openGraph: {
       title,
@@ -190,6 +198,7 @@ export async function getDefaultMetadata(): Promise<Metadata> {
       index: true,
       follow: true,
     },
+    icons: DEFAULT_ICONS,
     verification: getVerificationMetadata(),
     openGraph: {
       title: settings.seoTitle,

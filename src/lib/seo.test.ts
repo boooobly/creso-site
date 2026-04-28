@@ -39,6 +39,13 @@ describe('buildPublicPageMetadata', () => {
     expect(metadata.openGraph?.locale).toBe('ru_RU');
     expect(metadata.twitter?.card).toBe('summary_large_image');
     expect(metadata.robots).toEqual({ index: true, follow: true });
+    expect(metadata.icons).toEqual({
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+        { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+      ],
+    });
 
     const firstImage = Array.isArray(metadata.openGraph?.images) ? metadata.openGraph.images[0] : undefined;
     const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url;
@@ -81,5 +88,33 @@ describe('buildPublicPageMetadata', () => {
     });
 
     expect(metadata.verification).toBeUndefined();
+  });
+});
+
+describe('getDefaultMetadata', () => {
+  it('includes default site icons', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'production';
+    process.env.PUBLIC_BASE_URL = 'https://credomir.com';
+
+    vi.doMock('@/lib/site-settings', () => ({
+      getPublicSiteSettings: vi.fn().mockResolvedValue({
+        seoTitle: 'CredoMir',
+        seoDescription: 'Description',
+        seoSiteName: 'CredoMir',
+        seoOgImage: '/og-image.png',
+      }),
+    }));
+
+    const { getDefaultMetadata } = await import('@/lib/seo');
+    const metadata = await getDefaultMetadata();
+
+    expect(metadata.icons).toEqual({
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+        { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+      ],
+    });
   });
 });
