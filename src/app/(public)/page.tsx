@@ -1,4 +1,5 @@
 import HomePageContent from '@/components/home/HomePageContent';
+import JsonLd from '@/components/seo/JsonLd';
 import servicesLocal from '@/data/services.json';
 import faqLocal from '@/data/faq.json';
 import { getServices, getFaq } from '@/lib/contentful';
@@ -8,7 +9,7 @@ import { getFaqItemsFromContentMap, getPageContentList, getPageContentMap, getPa
 import { getSiteImage, getSiteImages } from '@/lib/site-images';
 import { SERVICE_CARD_IMAGE_SLOT_BY_ID } from '@/lib/site-service-image-slots';
 import type { Metadata } from 'next';
-import { buildPublicPageMetadata } from '@/lib/seo';
+import { buildFaqPageJsonLd, buildPublicPageMetadata } from '@/lib/seo';
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
@@ -193,9 +194,11 @@ export default async function Home() {
       imageSrc: imageSlotKey ? (serviceCardImages[imageSlotKey]?.url ?? undefined) : undefined,
     };
   });
+  const faqPageJsonLd = buildFaqPageJsonLd(faqItems.slice(0, 5));
 
   return (
     <div className="home-page-root">
+      {faqPageJsonLd ? <JsonLd data={faqPageJsonLd} /> : null}
       <HomePageContent
         services={servicesWithHref}
         faq={faqItems}

@@ -118,3 +118,70 @@ describe('getDefaultMetadata', () => {
     });
   });
 });
+
+describe('buildFaqPageJsonLd', () => {
+  it('builds FAQPage json-ld with Question and Answer objects', async () => {
+    const { buildFaqPageJsonLd } = await import('@/lib/seo');
+    const data = buildFaqPageJsonLd([{ question: '  Q1  ', answer: '  A1  ' }]);
+
+    expect(data).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Q1',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A1',
+          },
+        },
+      ],
+    });
+  });
+
+  it('supports both { question, answer } and { q, a } shapes', async () => {
+    const { buildFaqPageJsonLd } = await import('@/lib/seo');
+    const data = buildFaqPageJsonLd([
+      { question: 'Question one', answer: 'Answer one' },
+      { q: 'Question two', a: 'Answer two' },
+    ]);
+
+    expect(data?.mainEntity).toEqual([
+      {
+        '@type': 'Question',
+        name: 'Question one',
+        acceptedAnswer: { '@type': 'Answer', text: 'Answer one' },
+      },
+      {
+        '@type': 'Question',
+        name: 'Question two',
+        acceptedAnswer: { '@type': 'Answer', text: 'Answer two' },
+      },
+    ]);
+  });
+
+  it('filters invalid or empty items', async () => {
+    const { buildFaqPageJsonLd } = await import('@/lib/seo');
+    const data = buildFaqPageJsonLd([
+      { question: 'Valid', answer: 'Answer' },
+      { question: ' ', answer: 'Answer' },
+      { q: 'Question', a: '   ' },
+      {},
+    ]);
+
+    expect(data?.mainEntity).toHaveLength(1);
+    expect(data?.mainEntity[0]).toMatchObject({
+      '@type': 'Question',
+      name: 'Valid',
+      acceptedAnswer: { '@type': 'Answer', text: 'Answer' },
+    });
+  });
+
+  it('returns null when no valid items exist', async () => {
+    const { buildFaqPageJsonLd } = await import('@/lib/seo');
+    const data = buildFaqPageJsonLd([{ question: ' ', answer: ' ' }, { q: '', a: '' }]);
+
+    expect(data).toBeNull();
+  });
+});

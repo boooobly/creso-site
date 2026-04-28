@@ -168,6 +168,38 @@ export function buildLocalBusinessJsonLd() {
   };
 }
 
+export function buildFaqPageJsonLd(items: Array<{ question?: string; answer?: string; q?: string; a?: string }>) {
+  const mainEntity = items
+    .map((item) => {
+      const question = (item.question ?? item.q ?? '').trim();
+      const answer = (item.answer ?? item.a ?? '').trim();
+
+      if (!question || !answer) {
+        return null;
+      }
+
+      return {
+        '@type': 'Question',
+        name: question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: answer,
+        },
+      };
+    })
+    .filter((item): item is { '@type': 'Question'; name: string; acceptedAnswer: { '@type': 'Answer'; text: string } } => item !== null);
+
+  if (mainEntity.length === 0) {
+    return null;
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity,
+  };
+}
+
 export function buildWebSiteJsonLd() {
   const baseUrl = getBaseUrl();
 

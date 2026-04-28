@@ -110,7 +110,7 @@ const advantages = [
   { text: 'Поддержка менеджера до передачи готового заказа', icon: ClipboardCheck },
 ] as const;
 
-const faqItems: FaqItem[] = [
+export const tshirtsFaqItems: FaqItem[] = [
   { question: 'Можно печатать на своей футболке?', answer: 'Да, работаем как с вашими изделиями, так и с нашими заготовками.' },
   { question: 'Сколько стоит футболка?', answer: 'Футболки от 500 ₽, итог зависит от размера и наличия. Точную цену сообщит менеджер.' },
   { question: 'Что делать, если нет файла?', answer: 'Оставьте заявку и кратко опишите задачу — подскажем, как лучше подготовить макет.' },
@@ -156,7 +156,7 @@ function FaqAccordion() {
 
   return (
     <div className="space-y-3">
-      {faqItems.map((item, index) => {
+      {tshirtsFaqItems.map((item, index) => {
         const isOpen = openIndex === index;
 
         return (
