@@ -12,6 +12,7 @@ type SectionProps = PropsWithChildren<{
   background?: 'default' | 'muted';
   fullBleed?: boolean;
   spacing?: 'default' | 'tight' | 'compact' | 'hero';
+  reveal?: boolean;
 }>;
 
 const backgroundStyles: Record<NonNullable<SectionProps['background']>, string> = {
@@ -34,20 +35,23 @@ export default function Section({
   background = 'default',
   fullBleed = false,
   spacing = 'default',
+  reveal = true,
 }: SectionProps) {
   const shouldReduceMotion = useReducedMotion();
   const bleedClassName = fullBleed ? 'relative overflow-x-clip ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]' : '';
 
+  const MotionSection = reveal ? motion.section : 'section';
+
   return (
-    <motion.section
+    <MotionSection
       id={id}
       className={`${spacingStyles[spacing]} ${bleedClassName} ${backgroundStyles[background]} ${className}`.trim()}
-      initial={shouldReduceMotion ? false : 'hidden'}
-      whileInView={shouldReduceMotion ? undefined : 'show'}
-      viewport={viewportOnce}
-      variants={fadeUp(20)}
+      initial={reveal ? (shouldReduceMotion ? false : 'hidden') : undefined}
+      whileInView={reveal && !shouldReduceMotion ? 'show' : undefined}
+      viewport={reveal ? viewportOnce : undefined}
+      variants={reveal ? fadeUp(20) : undefined}
     >
       <Container className={containerClassName}>{children}</Container>
-    </motion.section>
+    </MotionSection>
   );
 }

@@ -239,7 +239,7 @@ export default async function WideFormatPrintingPage() {
         </div>
       </Section>
 
-      <Section spacing="tight">
+      <Section spacing="tight" reveal={false}>
         <div className="space-y-8 md:space-y-10">
           <div id="wide-format-calculator" className="scroll-mt-24">
             <div className="mb-4 space-y-3 md:mb-5">
