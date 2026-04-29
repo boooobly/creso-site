@@ -70,7 +70,7 @@ function toWhatsAppLink(value: string) {
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Контакты CredoMir в Невинномысске',
+  title: 'Контакты CredoMir (Кредомир) в Невинномысске',
   description: 'Адрес, телефон, мессенджеры и график работы CredoMir в Невинномысске. Консультация по наружной рекламе, печати и производству.',
   path: '/contacts',
 });
@@ -181,6 +181,7 @@ export default async function ContactsPage() {
             <p className="mt-2 break-words text-neutral-700 dark:text-neutral-300">Адрес: {settings.address}</p>
             <p className="text-neutral-700 dark:text-neutral-300">Тел: {settings.phone}</p>
             <p className="text-neutral-700 dark:text-neutral-300">E-mail: {settings.email}</p>
+            <p className="text-neutral-700 dark:text-neutral-300">CredoMir (Кредомир) — рекламно-производственная компания в Невинномысске.</p>
             <a className="btn-secondary mt-4 inline-flex w-full no-underline sm:w-auto" href={BRAND.yandexRoute} target="_blank" rel="noreferrer">Маршрут в Яндекс.Картах</a>
           </div>
           <MapSection />
