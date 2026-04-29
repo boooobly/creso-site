@@ -185,3 +185,13 @@ describe('buildFaqPageJsonLd', () => {
     expect(data).toBeNull();
   });
 });
+
+
+describe('organization and local business JSON-LD', () => {
+  it('includes alternate names for Cyrillic brand variants', async () => {
+    const { buildOrganizationJsonLd, buildLocalBusinessJsonLd } = await import('@/lib/seo');
+
+    expect(buildOrganizationJsonLd().alternateName).toEqual(['Кредомир', 'КредоМир', 'CredoMir']);
+    expect(buildLocalBusinessJsonLd().alternateName).toEqual(['Кредомир', 'КредоМир', 'CredoMir']);
+  });
+});

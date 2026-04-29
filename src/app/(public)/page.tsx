@@ -13,7 +13,7 @@ import { buildFaqPageJsonLd, buildPublicPageMetadata } from '@/lib/seo';
 
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'CredoMir - наружная реклама и печать в Невинномысске',
+  title: 'CredoMir (Кредомир) - наружная реклама и печать в Невинномысске',
   description: 'Рекламно-производственная компания в Невинномысске: вывески, световые короба, широкоформатная печать, фрезеровка и монтаж по Ставропольскому краю.',
   path: '/',
 });

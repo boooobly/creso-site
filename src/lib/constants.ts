@@ -1,5 +1,6 @@
 export const BRAND = {
   name: 'CredoMir',
+  aliases: ['Кредомир', 'КредоМир'],
   city: 'Невинномысск',
   address: 'ул. Калинина, 106, Невинномысск',
   phone: '+7 (988) 731-74-04',

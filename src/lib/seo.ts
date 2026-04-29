@@ -126,6 +126,7 @@ export function buildOrganizationJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: BRAND.name,
+    alternateName: [...BRAND.aliases, BRAND.name],
     url: baseUrl,
     logo: toAbsoluteUrl('/og-image.png'),
     email: BRAND.email,
@@ -145,6 +146,7 @@ export function buildLocalBusinessJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: BRAND.name,
+    alternateName: [...BRAND.aliases, BRAND.name],
     image: toAbsoluteUrl('/og-image.png'),
     telephone: BRAND.phone,
     email: BRAND.email,
@@ -207,6 +209,7 @@ export function buildWebSiteJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: BRAND.name,
+    alternateName: [...BRAND.aliases, BRAND.name],
     url: baseUrl,
     inLanguage: 'ru-RU',
   };
