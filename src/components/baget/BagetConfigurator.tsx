@@ -1316,7 +1316,7 @@ export default function BagetConfigurator({
             aria-modal="true"
             aria-label="Увеличенное превью багета"
           >
-            <div className="relative w-[min(1000px,90vw)] max-h-[80vh] overflow-auto rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="relative w-[96vw] max-w-[1200px] max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900 sm:p-5">
               <button
                 type="button"
                 onClick={() => setIsPreviewOpen(false)}
@@ -1361,7 +1361,8 @@ export default function BagetConfigurator({
                   }}
                 >
                   <BagetPreview
-                    className="max-h-[calc(80vh-2rem)]"
+                    className="mx-auto w-full"
+                    displayMode="modal"
                     {...previewProps}
                   />
                 </div>
