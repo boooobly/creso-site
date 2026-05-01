@@ -202,7 +202,7 @@ describe('bagetQuote', () => {
     });
 
     expect(result.items.some((item) => item.key === 'print')).toBe(true);
-    expect(result.meta?.printCost).toBe(1500);
+    expect(result.meta?.printCost).toBe(720);
   });
 
 
@@ -210,7 +210,7 @@ describe('bagetQuote', () => {
   it('uses baguette admin print pricing config instead of wide-format pricing module', () => {
     const config = getBaguetteExtrasDefaultConfig();
     config.print.canvasPricePerM2 = 2222;
-    config.print.minimumBillableAreaM2 = 0.25;
+    config.print.minimumPrintPriceRUB = 600;
 
     const result = bagetQuote({
       width: 500,
@@ -229,7 +229,7 @@ describe('bagetQuote', () => {
       transferSource: 'manual',
     }, config);
 
-    expect(result.meta?.printCost).toBe(555.5);
+    expect(result.meta?.printCost).toBe(600);
   });
   it('allows stretched canvas without baget in no-frame mode and keeps stretcher cost', () => {
     const result = bagetQuote({
@@ -281,6 +281,105 @@ describe('bagetQuote', () => {
     expect(result.meta?.stretchingRequired).toBe(true);
     expect(result.meta?.stretchingCost).toBeCloseTo(274, 5);
     expect(stretchingItem?.total).toBeCloseTo(274, 5);
+  });
+
+
+  it('applies minimum print price for small print area', () => {
+    const config = getBaguetteExtrasDefaultConfig();
+    config.print.paperPricePerM2 = 500;
+    config.print.minimumPrintPriceRUB = 400;
+
+    const result = bagetQuote({
+      width: 200,
+      height: 200,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+      requiresPrint: true,
+      printMaterial: 'paper',
+    }, config);
+
+    const printItem = result.items.find((item) => item.key === 'print');
+    expect(printItem?.unitPrice).toBe(400);
+    expect(result.meta?.minimumPrintPriceApplied).toBe(true);
+  });
+
+  it('uses regular print cost for large print area', () => {
+    const config = getBaguetteExtrasDefaultConfig();
+    config.print.paperPricePerM2 = 500;
+    config.print.minimumPrintPriceRUB = 400;
+
+    const result = bagetQuote({
+      width: 1000,
+      height: 1000,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+      requiresPrint: true,
+      printMaterial: 'paper',
+    }, config);
+
+    const printItem = result.items.find((item) => item.key === 'print');
+    expect(printItem?.unitPrice).toBe(500);
+    expect(result.meta?.minimumPrintPriceApplied).toBe(false);
+  });
+
+  it('does not add print item when print is not required', () => {
+    const result = bagetQuote({
+      width: 400,
+      height: 300,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+      requiresPrint: false,
+      printMaterial: 'paper',
+    });
+
+    expect(result.items.some((item) => item.key === 'print')).toBe(false);
+    expect(result.meta?.printCost).toBe(0);
+  });
+
+  it('multiplies minimum print price by quantity', () => {
+    const config = getBaguetteExtrasDefaultConfig();
+    config.print.paperPricePerM2 = 500;
+    config.print.minimumPrintPriceRUB = 400;
+
+    const result = bagetQuote({
+      width: 200,
+      height: 200,
+      quantity: 2,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+      requiresPrint: true,
+      printMaterial: 'paper',
+    }, config);
+
+    const printItem = result.items.find((item) => item.key === 'print');
+    expect(printItem?.total).toBe(800);
   });
 
   it('returns 0 stretching price for invalid math inputs', () => {

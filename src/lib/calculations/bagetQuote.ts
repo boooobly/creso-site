@@ -163,6 +163,10 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
         requiresBaget,
         stretchingRequired,
         stretchingCost: 0,
+        printAreaM2: 0,
+        regularPrintCost: 0,
+        minimumPrintPriceApplied: false,
+        minimumPrintPriceRUB: extrasConfig.print.minimumPrintPriceRUB,
       },
     };
   }
@@ -206,8 +210,12 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
   const stretcherCost = input.workType === 'stretchedCanvas'
     ? stretcherMeters * extrasConfig.stretcher.pricesPerMeter[effectiveStretcherType]
     : 0;
-  const printCost = requiresPrint && printMaterial
-    ? Math.max(printAreaM2, extrasConfig.print.minimumBillableAreaM2) * getBaguettePrintPricePerM2(printMaterial, extrasConfig)
+  const regularPrintCost = requiresPrint && printMaterial
+    ? printAreaM2 * getBaguettePrintPricePerM2(printMaterial, extrasConfig)
+    : 0;
+  const minimumPrintPriceApplied = regularPrintCost > 0 && regularPrintCost < extrasConfig.print.minimumPrintPriceRUB;
+  const printCost = requiresPrint && printMaterial && regularPrintCost > 0
+    ? Math.max(regularPrintCost, extrasConfig.print.minimumPrintPriceRUB)
     : 0;
   const stretchingCost = stretchingRequired
     ? calculateStretchingPrice({
@@ -319,6 +327,10 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       standCost,
       stretcherCost,
       stretchingCost,
+      printAreaM2,
+      regularPrintCost,
+      minimumPrintPriceApplied,
+      minimumPrintPriceRUB: extrasConfig.print.minimumPrintPriceRUB,
       autoBadges,
       autoAdditions,
       standAllowed,

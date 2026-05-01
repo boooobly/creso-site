@@ -24,6 +24,7 @@ export const BAGUETTE_EXTRAS_DEFAULT_ENTRIES = defaultsJson as RawDefaultEntry[]
 
 const nonNegativePriceSchema = z.number().min(0).max(1_000_000);
 const positiveAreaSchema = z.number().positive().max(50);
+const nonNegativeMinimumPriceSchema = z.number().min(0).max(1_000_000);
 const millimeterLimitSchema = z.number().min(0).max(10_000);
 const discreteQtySchema = z.number().int().min(1).max(10);
 
@@ -59,6 +60,7 @@ export type BaguetteExtrasPricingConfig = {
   print: {
     paperPricePerM2: number;
     canvasPricePerM2: number;
+    minimumPrintPriceRUB: number;
     minimumBillableAreaM2: number;
   };
   stretcher: {
@@ -112,6 +114,7 @@ const BAGUETTE_KEY_SCHEMAS: Record<string, z.ZodTypeAny> = {
   'stand.stand_max_height_mm': millimeterLimitSchema,
   'print.paper_price_per_m2': nonNegativePriceSchema,
   'print.canvas_price_per_m2': nonNegativePriceSchema,
+  'print.minimum_print_price_rub': nonNegativeMinimumPriceSchema,
   'print.minimum_billable_area_m2': positiveAreaSchema,
   'stretcher.stretcher_price_per_meter_narrow': nonNegativePriceSchema,
   'stretcher.stretcher_price_per_meter_wide': nonNegativePriceSchema,
@@ -218,6 +221,21 @@ function buildConfig(source: ConfigKeyMap) {
     print: {
       paperPricePerM2: readWithFallback(source, 'print.paper_price_per_m2', nonNegativePriceSchema, diagnostics),
       canvasPricePerM2: readWithFallback(source, 'print.canvas_price_per_m2', nonNegativePriceSchema, diagnostics),
+      minimumPrintPriceRUB: (() => {
+        const minimumPrintPrice = source['print.minimum_print_price_rub'];
+        if (typeof minimumPrintPrice === 'number') {
+          const parsed = nonNegativeMinimumPriceSchema.safeParse(minimumPrintPrice);
+          if (parsed.success) {
+            return parsed.data;
+          }
+          diagnostics.fallbackUsedKeys.push({ key: 'print.minimum_print_price_rub', reason: 'invalid' });
+        } else if (minimumPrintPrice === undefined) {
+          diagnostics.fallbackUsedKeys.push({ key: 'print.minimum_print_price_rub', reason: 'missing' });
+        }
+
+        return 400;
+      })(),
+      // Legacy field kept for backward compatibility with existing admin rows.
       minimumBillableAreaM2: readWithFallback(source, 'print.minimum_billable_area_m2', positiveAreaSchema, diagnostics),
     },
     stretcher: {
