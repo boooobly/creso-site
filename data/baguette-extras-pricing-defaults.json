@@ -178,12 +178,23 @@
   {
     "category": "baguette-extra-pricing",
     "subcategory": "print",
+    "key": "minimum_print_price_rub",
+    "label": "Минимальная стоимость печати",
+    "description": "Минимальная сумма за печать в багетном калькуляторе.",
+    "type": "number",
+    "unit": "₽",
+    "sortOrder": 123,
+    "value": 400
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "print",
     "key": "minimum_billable_area_m2",
     "label": "Печать для багета: минимальная тарифицируемая площадь",
     "description": "Минимальная площадь, которая тарифицируется при печати в багетном калькуляторе.",
     "type": "number",
     "unit": "м²",
-    "sortOrder": 123,
+    "sortOrder": 124,
     "value": 1
   },
   {
