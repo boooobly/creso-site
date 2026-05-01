@@ -18,6 +18,7 @@ export type BagetPreviewProps = {
   passepartoutMm?: number;
   passepartoutBottomMm?: number;
   passepartoutColor?: PassepartoutColor;
+  displayMode?: 'default' | 'modal';
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -51,6 +52,7 @@ export default function BagetPreview({
   passepartoutMm = 0,
   passepartoutBottomMm = 0,
   passepartoutColor = 'white',
+  displayMode = 'default',
 }: BagetPreviewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerPx, setContainerPx] = useState({ width: 0, height: 0 });
@@ -237,15 +239,21 @@ export default function BagetPreview({
   const bottomMiterClipPath = `polygon(0 0, 100% 0, 100% calc(100% - ${miter}px), calc(100% - ${miter}px) 100%, ${miter}px 100%, 0 calc(100% - ${miter}px))`;
   const leftMiterClipPath = `polygon(0 0, 100% ${miter}px, 100% calc(100% - ${miter}px), 0 100%, 0 0)`;
   const rightMiterClipPath = `polygon(0 ${miter}px, 100% 0, 100% 100%, 0 calc(100% - ${miter}px), 0 ${miter}px)`;
+  const isModalDisplay = displayMode === 'modal';
 
   return (
     <div className={['card p-5 shadow-md', className].join(' ')}>
       <h2 className="mb-3 text-base font-semibold">Превью</h2>
 
-      <div className="mx-auto w-full max-w-[520px]">
+      <div className={['mx-auto w-full', isModalDisplay ? '' : 'max-w-[520px]'].join(' ')}>
         <div
           ref={containerRef}
-          className="relative grid aspect-square min-h-[280px] w-full place-items-center overflow-hidden p-2"
+          className={[
+            'relative grid w-full place-items-center overflow-hidden p-2',
+            isModalDisplay
+              ? 'h-[min(72vh,760px)] min-h-[320px] sm:min-h-[380px] md:min-h-[420px]'
+              : 'aspect-square min-h-[280px]',
+          ].join(' ')}
         >
           <div
             className={[
