@@ -110,6 +110,7 @@ export async function POST(request: NextRequest) {
     const printType = toStringValue(formData.get('printType'));
     const notes = toStringValue(formData.get('notes'));
     const flyersRequested = toBooleanValue(formData.get('flyersRequested'));
+    const consent = toBooleanValue(formData.get('consent'));
 
     const fileName = toStringValue(formData.get('fileName'));
     const fileType = toStringValue(formData.get('fileType'));
@@ -145,6 +146,10 @@ export async function POST(request: NextRequest) {
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ ok: false, error: 'Некорректный email.' }, { status: 400 });
+    }
+
+    if (!consent) {
+      return NextResponse.json({ ok: false, error: 'Необходимо согласие на обработку персональных данных.' }, { status: 400 });
     }
 
     if (!Number.isFinite(quantity) || quantity < 1000 || quantity > 9000 || quantity % 1000 !== 0) {
@@ -198,6 +203,7 @@ export async function POST(request: NextRequest) {
       `Тип печати: ${printType}`,
       `Notes: ${notes || '—'}`,
       `Флаеры: ${flyersRequested ? 'нужен расчёт по согласованию с менеджером.' : 'не запрошены'}`,
+      `Согласие на обработку персональных данных: ${consent ? 'Да' : 'Нет'}`,
       '',
       `Имя: ${name}`,
       `Телефон: ${phone}`,
