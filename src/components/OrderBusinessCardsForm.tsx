@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { Upload } from 'lucide-react';
+import Link from 'next/link';
 import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
@@ -29,6 +30,7 @@ type FormValues = {
   comment: string;
   website: string;
   flyersRequested: boolean;
+  consent: boolean;
 };
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
@@ -40,6 +42,7 @@ const defaultValues: FormValues = {
   comment: '',
   website: '',
   flyersRequested: false,
+  consent: false,
 };
 
 const FIXED_NOTES = [
@@ -95,6 +98,10 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
       nextErrors.email = 'Проверьте email';
     }
 
+    if (!values.consent) {
+      nextErrors.consent = 'Необходимо согласие на обработку персональных данных';
+    }
+
     return nextErrors;
   };
 
@@ -136,6 +143,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
       formData.set('printType', payloadMeta.fixedSpecs.printType);
       formData.set('notes', JSON.stringify(payloadMeta.notes));
       formData.set('flyersRequested', String(payloadMeta.flyersRequested));
+      formData.set('consent', values.consent ? 'true' : 'false');
 
       if (file) {
         formData.set('fileName', file.name);
@@ -272,6 +280,20 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
           onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))}
           aria-hidden="true"
         />
+
+
+        <label className={publicFormStyles.consent}>
+          <input
+            type="checkbox"
+            checked={values.consent}
+            onChange={(e) => setValues((prev) => ({ ...prev, consent: e.target.checked }))}
+            className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500"
+          />
+          <span>
+            Я согласен с <Link href="/privacy" className="underline underline-offset-2">политикой обработки персональных данных</Link>.
+          </span>
+        </label>
+        {errors.consent && <p className="-mt-3 text-xs text-red-600">{errors.consent}</p>}
 
         <div className="pt-1 flex flex-col gap-3 md:flex-row md:items-center">
           <button
