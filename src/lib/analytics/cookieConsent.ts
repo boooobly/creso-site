@@ -12,12 +12,10 @@ export type CookieConsentState = {
 export function readCookieConsent(): CookieConsentState | null {
   if (typeof window === 'undefined') return null;
 
-  if (!window.localStorage) return null;
-
-  const raw = window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
-  if (!raw) return null;
-
   try {
+    const raw = window.localStorage?.getItem(COOKIE_CONSENT_STORAGE_KEY);
+    if (!raw) return null;
+
     const parsed = JSON.parse(raw) as Partial<CookieConsentState>;
     if (parsed.necessary !== true) return null;
     if (typeof parsed.analytics !== 'boolean') return null;
@@ -38,8 +36,6 @@ export function readCookieConsent(): CookieConsentState | null {
 export function writeCookieConsent(analytics: boolean): CookieConsentState | null {
   if (typeof window === 'undefined') return null;
 
-  if (!window.localStorage) return null;
-
   const consent: CookieConsentState = {
     necessary: true,
     analytics,
@@ -47,10 +43,13 @@ export function writeCookieConsent(analytics: boolean): CookieConsentState | nul
     version: COOKIE_CONSENT_VERSION,
   };
 
-  window.localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(consent));
-  window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_CHANGED_EVENT, { detail: consent }));
-
-  return consent;
+  try {
+    window.localStorage?.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(consent));
+    window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_CHANGED_EVENT, { detail: consent }));
+    return consent;
+  } catch {
+    return null;
+  }
 }
 
 export function hasAnalyticsConsent() {

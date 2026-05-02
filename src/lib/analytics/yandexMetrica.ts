@@ -1,3 +1,5 @@
+import { hasAnalyticsConsent } from '@/lib/analytics/cookieConsent';
+
 const getCounterId = () => {
   const value = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID?.trim();
   if (!value) return null;
@@ -28,8 +30,6 @@ export const YANDEX_GOALS = {
 } as const;
 
 export type YandexGoalName = (typeof YANDEX_GOALS)[keyof typeof YANDEX_GOALS] | (string & {});
-
-import { hasAnalyticsConsent } from '@/lib/analytics/cookieConsent';
 
 type YandexMetricaWindow = Window & {
   ym?: (counterId: number, action: YandexMetricaAction, target: string, params?: Record<string, unknown>) => void;

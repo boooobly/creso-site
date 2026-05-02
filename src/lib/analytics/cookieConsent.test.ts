@@ -49,4 +49,24 @@ describe('cookie consent storage', () => {
     expect(first).not.toEqual(second);
     expect(readCookieConsent()?.analytics).toBe(true);
   });
+
+  it('does not throw when localStorage read fails', () => {
+    (globalThis as { window?: Window }).window = {
+      localStorage: { getItem: () => { throw new Error('blocked'); } },
+      dispatchEvent: () => true,
+    } as unknown as Window;
+
+    expect(() => readCookieConsent()).not.toThrow();
+    expect(readCookieConsent()).toBeNull();
+  });
+
+  it('does not throw when localStorage write fails', () => {
+    (globalThis as { window?: Window }).window = {
+      localStorage: { setItem: () => { throw new Error('blocked'); } },
+      dispatchEvent: () => true,
+    } as unknown as Window;
+
+    expect(() => writeCookieConsent(true)).not.toThrow();
+    expect(writeCookieConsent(true)).toBeNull();
+  });
 });
