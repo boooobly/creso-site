@@ -29,6 +29,8 @@ export const YANDEX_GOALS = {
 
 export type YandexGoalName = (typeof YANDEX_GOALS)[keyof typeof YANDEX_GOALS] | (string & {});
 
+import { hasAnalyticsConsent } from '@/lib/analytics/cookieConsent';
+
 type YandexMetricaWindow = Window & {
   ym?: (counterId: number, action: YandexMetricaAction, target: string, params?: Record<string, unknown>) => void;
 };
@@ -38,6 +40,8 @@ function sendYandexEvent(action: YandexMetricaAction, target: string, params?: R
 
   const counterId = getCounterId();
   if (!counterId) return;
+
+  if (!hasAnalyticsConsent()) return;
 
   const ym = (window as YandexMetricaWindow).ym;
   if (typeof ym !== 'function') return;
