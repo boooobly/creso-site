@@ -62,6 +62,14 @@ function toMetersFromMillimeters(valueMm: number): number {
   return Number.isFinite(valueMm) && valueMm > 0 ? valueMm / 1000 : 0;
 }
 
+function resolveFastenersPricing(config: BaguetteExtrasPricingConfig): { clampPrice: number; clampStepM: number } {
+  const rawClampPrice = config.fasteners?.clampPrice;
+  const rawClampStepM = config.fasteners?.clampStepM;
+  const clampPrice = Number.isFinite(rawClampPrice) && Number(rawClampPrice) >= 0 ? Number(rawClampPrice) : 14;
+  const clampStepM = Number.isFinite(rawClampStepM) && Number(rawClampStepM) > 0 ? Number(rawClampStepM) : 0.2;
+  return { clampPrice, clampStepM };
+}
+
 export function calculateStretchingPrice(params: {
   widthMm: number;
   heightMm: number;
@@ -225,13 +233,14 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
         perimeterDividedByAreaRate: extrasConfig.stretching.perimeterDividedByAreaRate,
       })
     : 0;
+  const { clampPrice, clampStepM } = resolveFastenersPricing(extrasConfig);
   const clampsPerimeterM = requiresBaget
     ? (2 * (effectiveWidth + effectiveHeight) + 8 * bagetWidthMm) / 1000
     : 0;
-  const clampsCount = requiresBaget && extrasConfig.fasteners.clampStepM > 0
-    ? clampsPerimeterM / extrasConfig.fasteners.clampStepM
+  const clampsCount = requiresBaget && clampStepM > 0
+    ? clampsPerimeterM / clampStepM
     : 0;
-  const clampsCost = clampsCount * extrasConfig.fasteners.clampPrice;
+  const clampsCost = clampsCount * clampPrice;
 
   const rawItems: QuoteLineItem[] = [
     {
@@ -339,8 +348,8 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       hangingCost,
       clampsCost,
       clampsCount,
-      clampsPrice: extrasConfig.fasteners.clampPrice,
-      clampsStepM: extrasConfig.fasteners.clampStepM,
+      clampsPrice: clampPrice,
+      clampsStepM: clampStepM,
       clampsPerimeterM,
       hangingLabel: hangerType === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик + ${extrasConfig.hanging.wireLoopDefaultQty} петли`,
       standCost,

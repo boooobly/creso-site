@@ -41,7 +41,7 @@ async function loadBagetPricingConfigUncached() {
 export async function getCachedBaguetteExtrasPricingConfig(): Promise<BaguetteExtrasPricingConfig> {
   const load = unstable_cache(
     async () => loadBagetPricingConfigUncached(),
-    ['baget.page_pricing.config'],
+    ['baget.page_pricing.config.v2'],
     { revalidate: BAGET_PRICING_CACHE_SECONDS }
   );
 

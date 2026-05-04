@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { bagetQuote, calculateStretchingPrice } from './bagetQuote';
-import { getBaguetteExtrasDefaultConfig } from '@/lib/baget/baguetteExtrasPricing';
+import { getBaguetteExtrasDefaultConfig, type BaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 
 const selectedBaget = {
   id: 'b-1',
@@ -51,6 +51,43 @@ describe('bagetQuote', () => {
     expect(result.meta?.stretchingCost).toBe(0);
     expect(result.meta?.stretchingRequired).toBe(false);
     expect(result.meta?.hangingType).toBe('crocodile');
+  });
+  it('falls back to default clamps pricing when fasteners block is missing in cached config', () => {
+    const configWithoutFasteners = {
+      ...getBaguetteExtrasDefaultConfig(),
+      fasteners: undefined,
+    } as unknown as BaguetteExtrasPricingConfig;
+
+    expect(() => bagetQuote({
+      width: 500,
+      height: 700,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+    }, configWithoutFasteners)).not.toThrow();
+
+    const result = bagetQuote({
+      width: 500,
+      height: 700,
+      quantity: 1,
+      selectedBaget,
+      workType: 'canvas',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'crocodile',
+      stand: false,
+      stretcherType: 'narrow',
+    }, configWithoutFasteners);
+    expect(result.meta?.clampsPrice).toBe(14);
+    expect(result.meta?.clampsStepM).toBe(0.2);
+    expect(result.meta?.clampsCost).toBeCloseTo(14 * (((2 * (500 + 700) + 8 * 30) / 1000) / 0.2), 6);
   });
 
   it('adds passepartout and increases effective size and total', () => {
