@@ -23,6 +23,7 @@ export type RawDefaultEntry = {
 export const BAGUETTE_EXTRAS_DEFAULT_ENTRIES = defaultsJson as RawDefaultEntry[];
 
 const nonNegativePriceSchema = z.number().min(0).max(1_000_000);
+const positiveDistanceSchema = z.number().positive().max(100);
 const positiveAreaSchema = z.number().positive().max(50);
 const nonNegativeMinimumPriceSchema = z.number().min(0).max(1_000_000);
 const millimeterLimitSchema = z.number().min(0).max(10_000);
@@ -75,6 +76,10 @@ export type BaguetteExtrasPricingConfig = {
     areaRate: number;
     perimeterDividedByAreaRate: number;
   };
+  fasteners: {
+    clampPrice: number;
+    clampStepM: number;
+  };
   materials: {
     glass: MaterialRate;
     antiReflectiveGlass: MaterialRate;
@@ -120,6 +125,8 @@ const BAGUETTE_KEY_SCHEMAS: Record<string, z.ZodTypeAny> = {
   'stretcher.stretcher_price_per_meter_wide': nonNegativePriceSchema,
   'stretching.stretching_area_rate': nonNegativePriceSchema,
   'stretching.stretching_perimeter_divided_by_area_rate': nonNegativePriceSchema,
+  'fasteners.clamp_price': nonNegativePriceSchema,
+  'fasteners.clamp_step_m': positiveDistanceSchema,
   'stretcher.stretcher_narrow_max_width_mm': millimeterLimitSchema,
   'stretcher.stretcher_narrow_max_height_mm': millimeterLimitSchema,
   'materials.glass': materialRateSchema,
@@ -249,6 +256,10 @@ function buildConfig(source: ConfigKeyMap) {
     stretching: {
       areaRate: readWithFallback(source, 'stretching.stretching_area_rate', nonNegativePriceSchema, diagnostics),
       perimeterDividedByAreaRate: readWithFallback(source, 'stretching.stretching_perimeter_divided_by_area_rate', nonNegativePriceSchema, diagnostics),
+    },
+    fasteners: {
+      clampPrice: readWithFallback(source, 'fasteners.clamp_price', nonNegativePriceSchema, diagnostics),
+      clampStepM: readWithFallback(source, 'fasteners.clamp_step_m', positiveDistanceSchema, diagnostics),
     },
     materials: {
       glass: readWithFallback(source, 'materials.glass', materialRateSchema, diagnostics),

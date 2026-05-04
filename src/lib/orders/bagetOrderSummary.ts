@@ -114,7 +114,8 @@ type SelectedBagetLike = {
 
 const WORK_TYPE_LABELS: Record<string, string> = {
   canvas: 'Картина на основе',
-  stretchedCanvas: 'Холст на подрамнике',
+  stretchedCanvas: 'Холст',
+  canvasOnStretcher: 'Холст на подрамнике',
   rhinestone: 'Стразы',
   embroidery: 'Вышивка',
   beads: 'Бисер',
@@ -217,6 +218,13 @@ function normalizeMaterialsBreakdown(params: {
       key: 'glazing',
       label: glazingLabel,
       included: params.baget.glazing !== 'none',
+    },
+    {
+      key: 'clamps',
+      label: 'Прижимы',
+      included: numberFromMeta(meta, 'clampsCost') > 0,
+      costRub: numberFromMeta(meta, 'clampsCost'),
+      note: meta.clampsCount ? `Количество: ${Math.round(Number(meta.clampsCount))}` : undefined,
     },
     {
       key: 'hanger',

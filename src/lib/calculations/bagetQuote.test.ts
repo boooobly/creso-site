@@ -30,8 +30,27 @@ describe('bagetQuote', () => {
     });
 
     expect(result.effectiveSize).toEqual({ width: 500, height: 700 });
-    expect(result.total).toBe(3027);
-    expect(result.items.map((item) => item.key)).toEqual(['baget', 'materials', 'hanging']);
+    expect(result.total).toBe(3212);
+    expect(result.items.map((item) => item.key)).toEqual(['baget', 'materials', 'clamps', 'hanging']);
+  });
+  it('calculates clamps using perimeter with baguette width from excel formula', () => {
+    const result = bagetQuote({ width: 500, height: 700, quantity: 1, selectedBaget, workType: 'canvas', glazing: 'none', hasPassepartout: false, backPanel: false, hangerType: 'crocodile', stand: false, stretcherType: 'narrow' });
+    expect(result.meta?.clampsPerimeterM).toBeCloseTo((2 * (500 + 700) + 8 * 30) / 1000, 6);
+    expect(result.meta?.clampsCost).toBeCloseTo(14 * (((2 * (500 + 700) + 8 * 30) / 1000) / 0.2), 6);
+  });
+  it('does not add clamps without decorative baguette', () => {
+    const result = bagetQuote({ width: 600, height: 500, quantity: 1, selectedBaget: null, workType: 'stretchedCanvas', frameMode: 'noFrame', glazing: 'none', hasPassepartout: false, backPanel: false, hangerType: 'wire', stand: false, stretcherType: 'wide' });
+    expect(result.items.some((item) => item.key === 'clamps')).toBe(false);
+    expect(result.meta?.clampsCost).toBe(0);
+  });
+  it('canvasOnStretcher does not add stretcher/stretching and respects crocodile hanger', () => {
+    const result = bagetQuote({ width: 500, height: 700, quantity: 1, selectedBaget, workType: 'canvasOnStretcher', glazing: 'none', hasPassepartout: false, backPanel: true, hangerType: 'crocodile', stand: false, stretcherType: 'narrow' });
+    expect(result.items.some((item) => item.key === 'stretcher')).toBe(false);
+    expect(result.items.some((item) => item.key === 'stretching')).toBe(false);
+    expect(result.meta?.stretcherCost).toBe(0);
+    expect(result.meta?.stretchingCost).toBe(0);
+    expect(result.meta?.stretchingRequired).toBe(false);
+    expect(result.meta?.hangingType).toBe('crocodile');
   });
 
   it('adds passepartout and increases effective size and total', () => {
