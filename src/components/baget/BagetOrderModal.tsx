@@ -63,7 +63,7 @@ export type BagetOrderRequestBagetInput = {
   height: number;
   quantity: number;
   selectedBagetId?: string | null;
-  workType: 'canvas' | 'stretchedCanvas' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
+  workType: 'canvas' | 'stretchedCanvas' | 'canvasOnStretcher' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
   glazing: 'none' | 'glass' | 'antiReflectiveGlass' | 'plexiglass' | 'pet1mm';
   hasPassepartout: boolean;
   passepartoutSize?: number;

@@ -43,7 +43,7 @@ const orderSchema = z.object({
     height: z.number().positive(),
     quantity: z.number().int().positive().default(1),
     selectedBagetId: z.string().min(1).optional().nullable(),
-    workType: z.enum(['canvas', 'stretchedCanvas', 'rhinestone', 'embroidery', 'beads', 'photo', 'other']),
+    workType: z.enum(['canvas', 'stretchedCanvas', 'canvasOnStretcher', 'rhinestone', 'embroidery', 'beads', 'photo', 'other']),
     glazing: z.enum(['none', 'glass', 'antiReflectiveGlass', 'plexiglass', 'pet1mm']),
     hasPassepartout: z.boolean(),
     passepartoutSize: z.number().min(0).optional(),
