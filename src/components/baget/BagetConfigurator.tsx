@@ -43,7 +43,8 @@ const GLAZING_LABELS: Record<MaterialsState['glazing'], string> = {
 
 const WORK_TYPE_LABELS: Record<MaterialsState['workType'], string> = {
   canvas: 'Картина на основе',
-  stretchedCanvas: 'Холст на подрамнике',
+  stretchedCanvas: 'Холст',
+  canvasOnStretcher: 'Холст на подрамнике',
   rhinestone: 'Стразы',
   embroidery: 'Вышивка',
   beads: 'Бисер',
@@ -363,6 +364,11 @@ export default function BagetConfigurator({
         value: Number(calcMeta.hangingCost ?? 0),
       },
       {
+        key: 'clamps',
+        label: 'Прижимы:',
+        value: Number(calcMeta.clampsCost ?? 0),
+      },
+      {
         key: 'stand',
         label: 'Ножка-подставка:',
         value: Number(calcMeta.standCost ?? 0),
@@ -386,7 +392,7 @@ export default function BagetConfigurator({
     ];
 
     return rows.filter((row) => row.value > 0);
-  }, [autoAdditions?.addOrabond, autoAdditions?.pvcType, calcMeta.hangingCost, calcMeta.hangingLabel, calcMeta.materialsCost, calcMeta.orabondCost, calcMeta.printCost, calcMeta.printMaterial, calcMeta.pvcCost, calcMeta.standCost, calcMeta.stretcherCost, calcMeta.stretchingCost, calcMeta.stretchingRequired, materials.stretcherType, materials.workType]);
+  }, [autoAdditions?.addOrabond, autoAdditions?.pvcType, calcMeta.clampsCost, calcMeta.hangingCost, calcMeta.hangingLabel, calcMeta.materialsCost, calcMeta.orabondCost, calcMeta.printCost, calcMeta.printMaterial, calcMeta.pvcCost, calcMeta.standCost, calcMeta.stretcherCost, calcMeta.stretchingCost, calcMeta.stretchingRequired, materials.stretcherType, materials.workType]);
 
   useEffect(() => {
     if (!standAllowed && materials.stand) {
@@ -812,8 +818,9 @@ export default function BagetConfigurator({
             {!validSize && <p className="text-xs text-red-600">Введите корректные значения не менее 50 мм.</p>}
             <div className="space-y-2 rounded-xl border border-neutral-200 p-3 text-sm dark:border-neutral-700">
               <p className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Тип работы</p>
-              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
-              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст на подрамнике</label>
+            <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvasOnStretcher'} onChange={() => setMaterials({ ...materials, workType: 'canvasOnStretcher' })} />Холст на подрамнике</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'embroidery'} onChange={() => setMaterials({ ...materials, workType: 'embroidery' })} />Вышивка</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'beads'} onChange={() => setMaterials({ ...materials, workType: 'beads' })} />Бисер</label>

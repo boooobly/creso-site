@@ -225,6 +225,13 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
         perimeterDividedByAreaRate: extrasConfig.stretching.perimeterDividedByAreaRate,
       })
     : 0;
+  const clampsPerimeterM = requiresBaget
+    ? (2 * (effectiveWidth + effectiveHeight) + 8 * bagetWidthMm) / 1000
+    : 0;
+  const clampsCount = requiresBaget && extrasConfig.fasteners.clampStepM > 0
+    ? clampsPerimeterM / extrasConfig.fasteners.clampStepM
+    : 0;
+  const clampsCost = clampsCount * extrasConfig.fasteners.clampPrice;
 
   const rawItems: QuoteLineItem[] = [
     {
@@ -261,6 +268,13 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       qty: quantity,
       unitPrice: Math.round(orabondCost),
       total: orabondCost * quantity,
+    },
+    {
+      key: 'clamps',
+      title: 'Прижимы',
+      qty: quantity,
+      unitPrice: roundCurrency(clampsCost),
+      total: clampsCost * quantity,
     },
     {
       key: 'hanging',
@@ -323,6 +337,11 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       pvcCost,
       orabondCost,
       hangingCost,
+      clampsCost,
+      clampsCount,
+      clampsPrice: extrasConfig.fasteners.clampPrice,
+      clampsStepM: extrasConfig.fasteners.clampStepM,
+      clampsPerimeterM,
       hangingLabel: hangerType === 'crocodile' ? `Крокодильчик × ${hangingQuantity}` : `Тросик + ${extrasConfig.hanging.wireLoopDefaultQty} петли`,
       standCost,
       stretcherCost,

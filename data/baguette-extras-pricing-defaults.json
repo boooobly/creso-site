@@ -424,5 +424,27 @@
       "stretchingRequired": false,
       "removeCardboard": false
     }
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "fasteners",
+    "key": "clamp_price",
+    "label": "Прижимы: цена за 1 шт",
+    "description": "Стоимость одного прижима.",
+    "type": "number",
+    "unit": "₽/шт",
+    "sortOrder": 55,
+    "value": 14
+  },
+  {
+    "category": "baguette-extra-pricing",
+    "subcategory": "fasteners",
+    "key": "clamp_step_m",
+    "label": "Прижимы: шаг по периметру",
+    "description": "Количество прижимов рассчитывается как периметр / шаг.",
+    "type": "number",
+    "unit": "м",
+    "sortOrder": 56,
+    "value": 0.2
   }
 ]
