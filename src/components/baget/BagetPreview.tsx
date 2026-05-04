@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { buildDriveDirectImageCandidates, extractDriveFileId } from '@/lib/baget/driveDirectImageUrl';
 import { BagetItem } from './BagetCard';
+import { calculatePreviewGeometry } from './previewGeometry';
 import { PassepartoutColor } from './BagetFilters';
 
 export type BagetPreviewProps = {
@@ -20,8 +21,6 @@ export type BagetPreviewProps = {
   passepartoutColor?: PassepartoutColor;
   displayMode?: 'default' | 'modal';
 };
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const PASSEPARTOUT_COLORS: Record<PassepartoutColor, string> = {
   white: '#f8fafc',
@@ -84,53 +83,17 @@ export default function BagetPreview({
   }, []);
 
   const previewGeometry = useMemo(() => {
-    const cw = containerPx.width;
-    const ch = containerPx.height;
     const bagetWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_mm ?? 0);
-    const effectiveWmm = safeWidthMm + safePasseMm * 2;
-    const effectiveHmm = safeHeightMm + safePasseMm + safePasseBottomMm;
 
-    if (!cw || !ch) {
-      return {
-        scale: 0,
-        framePx: 0,
-        outerWpx: 0,
-        outerHpx: 0,
-        effectiveWpx: 0,
-        effectiveHpx: 0,
-        workWpx: 0,
-        workHpx: 0,
-        passePx: 0,
-        passeBottomPx: 0,
-      };
-    }
-
-    const outerTotalWmm = effectiveWmm + 2 * bagetWidthMm;
-    const outerTotalHmm = effectiveHmm + 2 * bagetWidthMm;
-    const scale = Math.min(cw / outerTotalWmm, ch / outerTotalHmm);
-
-    const framePx = bagetWidthMm > 0 ? clamp(bagetWidthMm * scale, 6, 48) : 0;
-    const passePx = clamp(safePasseMm * scale, 0, 80);
-    const passeBottomPx = clamp(safePasseBottomMm * scale, 0, 80);
-    const workWpx = safeWidthMm * scale;
-    const workHpx = safeHeightMm * scale;
-    const effectiveWpx = effectiveWmm * scale;
-    const effectiveHpx = effectiveHmm * scale;
-    const outerWpx = effectiveWpx + 2 * framePx;
-    const outerHpx = effectiveHpx + 2 * framePx;
-
-    return {
-      scale,
-      framePx,
-      outerWpx,
-      outerHpx,
-      effectiveWpx,
-      effectiveHpx,
-      workWpx,
-      workHpx,
-      passePx,
-      passeBottomPx,
-    };
+    return calculatePreviewGeometry({
+      containerWidthPx: containerPx.width,
+      containerHeightPx: containerPx.height,
+      workWidthMm: safeWidthMm,
+      workHeightMm: safeHeightMm,
+      bagetWidthMm,
+      passepartoutMm: safePasseMm,
+      passepartoutBottomMm: safePasseBottomMm,
+    });
   }, [containerPx.height, containerPx.width, safeHeightMm, safePasseBottomMm, safePasseMm, safeWidthMm, selectedBaget, stretchedCanvas]);
 
   const textureUrl = selectedBaget?.frameTextureImage || '';
