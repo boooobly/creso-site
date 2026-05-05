@@ -628,7 +628,7 @@ export default function BagetConfigurator({
       glazing: GLAZING_LABELS[materials.glazing],
       materials: summaryMaterials,
       workType: materials.workType === 'stretchedCanvas' && materials.frameMode === 'noFrame'
-        ? `${WORK_TYPE_LABELS[materials.workType]} (без рамки)`
+        ? `${WORK_TYPE_LABELS[materials.workType]} (без багета)`
         : WORK_TYPE_LABELS[materials.workType],
       frameMode: materials.workType === 'stretchedCanvas' ? materials.frameMode : 'framed',
       hanging: {
@@ -884,12 +884,12 @@ export default function BagetConfigurator({
                 showWorkType={false}
                 passepartoutDisabledReason={
                   isNoFrameStretchedCanvas
-                    ? 'Паспарту недоступно для холста на подрамнике без рамки.'
+                    ? 'Паспарту недоступно для холста на подрамнике без багета.'
                     : !isPassepartoutSizeAllowed
                       ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
                       : undefined
                 }
-                glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
+                glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без багета.' : undefined}
               />
             </div>
           )}
@@ -948,7 +948,7 @@ export default function BagetConfigurator({
             <p className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
               {isStretcherOnly
                 ? 'Для этого типа работы рассчитывается только изготовление подрамника.'
-                : 'Для режима «Холст на подрамнике без рамки» декоративный багет не используется.'}
+                : 'Для режима «Холст без багета» декоративный багет не используется.'}
             </p>
           )}
         </div>
@@ -982,7 +982,7 @@ export default function BagetConfigurator({
                     </>
                   ) : (
                     <li className="border-b border-neutral-200/70 pb-2 text-sm text-neutral-600 dark:border-neutral-700/70 dark:text-neutral-300">
-                      Режим оформления: <b>Без рамки</b>
+                      Режим оформления: <b>Без багета</b>
                     </li>
                   )}
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
@@ -1103,12 +1103,12 @@ export default function BagetConfigurator({
             glazingAllowed={isGlazingAllowed}
             passepartoutDisabledReason={
               isNoFrameStretchedCanvas
-                ? 'Паспарту недоступно для холста на подрамнике без рамки.'
+                ? 'Паспарту недоступно для холста на подрамнике без багета.'
                 : !isPassepartoutSizeAllowed
                   ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
                   : undefined
             }
-            glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
+            glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без багета.' : undefined}
           />
         </aside>
 
@@ -1160,7 +1160,7 @@ export default function BagetConfigurator({
                   </>
                 ) : (
                   <li className="border-b border-neutral-200/70 pb-2 text-sm text-neutral-600 dark:border-neutral-700/70 dark:text-neutral-300">
-                    Режим оформления: <b>Без рамки</b>
+                    Режим оформления: <b>Без багета</b>
                   </li>
                 )}
                 <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
@@ -1268,12 +1268,12 @@ export default function BagetConfigurator({
                     glazingAllowed={isGlazingAllowed}
                     passepartoutDisabledReason={
                       isNoFrameStretchedCanvas
-                        ? 'Паспарту недоступно для холста на подрамнике без рамки.'
+                        ? 'Паспарту недоступно для холста на подрамнике без багета.'
                         : !isPassepartoutSizeAllowed
                           ? 'Паспарту доступно для размеров до 1000 × 700 мм.'
                           : undefined
                     }
-                    glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без рамки.' : undefined}
+                    glazingDisabledReason={isNoFrameStretchedCanvas ? 'Остекление недоступно для холста на подрамнике без багета.' : undefined}
                   />
                 </div>
               ) : null}

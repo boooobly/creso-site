@@ -150,7 +150,7 @@ const TRANSFER_SOURCE_LABELS: Record<string, string> = {
 
 const FRAME_MODE_LABELS: Record<string, string> = {
   framed: 'В раме',
-  noFrame: 'Без рамки',
+  noFrame: 'Без багета',
 };
 
 const STRETCHER_LABELS: Record<string, string> = {
