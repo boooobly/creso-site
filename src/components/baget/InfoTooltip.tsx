@@ -14,7 +14,7 @@ export default function InfoTooltip({ text, ariaLabel }: InfoTooltipProps) {
 
   return (
     <span
-      className="relative inline-flex items-center"
+      className="relative z-[100] inline-flex items-center"
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
@@ -33,7 +33,7 @@ export default function InfoTooltip({ text, ariaLabel }: InfoTooltipProps) {
         <span
           id={tooltipId}
           role="tooltip"
-          className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-64 -translate-x-1/2 rounded-xl bg-white p-2 text-xs font-normal text-neutral-700 shadow-lg ring-1 ring-black/5 dark:bg-neutral-900 dark:text-neutral-200 dark:ring-white/10"
+          className="pointer-events-none absolute left-1/2 top-full z-[9999] mt-2 w-64 -translate-x-1/2 rounded-xl bg-white p-2 text-xs font-normal text-neutral-700 shadow-lg ring-1 ring-black/5 dark:bg-neutral-900 dark:text-neutral-200 dark:ring-white/10"
         >
           {text}
         </span>
