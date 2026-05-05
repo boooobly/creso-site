@@ -43,7 +43,7 @@ export default function InfoTooltip({ text, ariaLabel }: InfoTooltipProps) {
 
   return (
     <span
-      className="relative inline-flex items-center"
+      className="relative z-[100] inline-flex items-center"
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
