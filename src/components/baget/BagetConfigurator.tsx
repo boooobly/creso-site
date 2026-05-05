@@ -47,10 +47,15 @@ const WORK_TYPE_LABELS: Record<MaterialsState['workType'], string> = {
   canvasOnStretcher: 'Холст на подрамнике',
   rhinestone: 'Стразы',
   embroideryBeads: 'Вышивка, бисер',
+  embroidery: 'Вышивка, бисер',
+  beads: 'Вышивка, бисер',
   stretcherOnly: 'Только подрамник',
   photo: 'Фото',
   other: 'Другое',
 };
+const PRINT_DISABLED_WORK_TYPES = new Set<MaterialsState['workType']>(['canvas', 'canvasOnStretcher', 'rhinestone', 'embroideryBeads', 'embroidery', 'beads', 'stretcherOnly']);
+const isPrintDisabledForWorkType = (workType: MaterialsState['workType']) => PRINT_DISABLED_WORK_TYPES.has(workType);
+const isStretcherOnlyWorkType = (workType: MaterialsState['workType']) => workType === 'stretcherOnly';
 
 const PASSEPARTOUT_COLOR_LABELS: Record<MaterialsState['passepartoutColor'], string> = {
   white: 'Белый',
@@ -267,10 +272,11 @@ export default function BagetConfigurator({
   const passepartoutMm = Math.max(0, materials.passepartoutMm);
   const passepartoutBottomMm = Math.max(0, materials.passepartoutBottomMm);
   const isNoFrameStretchedCanvas = materials.workType === 'stretchedCanvas' && materials.frameMode === 'noFrame';
+  const isStretcherOnly = isStretcherOnlyWorkType(materials.workType);
   const isPassepartoutSizeAllowed = Number.isFinite(widthMm) && Number.isFinite(heightMm) ? widthMm <= 1000 && heightMm <= 700 : true;
-  const isPassepartoutAllowed = !isNoFrameStretchedCanvas && isPassepartoutSizeAllowed;
-  const isGlazingAllowed = !isNoFrameStretchedCanvas;
-  const selectedBagetForQuote = isNoFrameStretchedCanvas ? null : selectedBaget;
+  const isPassepartoutAllowed = !isNoFrameStretchedCanvas && !isStretcherOnly && isPassepartoutSizeAllowed;
+  const isGlazingAllowed = !isNoFrameStretchedCanvas && !isStretcherOnly;
+  const selectedBagetForQuote = isNoFrameStretchedCanvas || isStretcherOnly ? null : selectedBaget;
   const quote = useMemo(
     () =>
       bagetQuote({
@@ -414,6 +420,11 @@ export default function BagetConfigurator({
   }, [isGlazingAllowed, materials.glazing]);
 
   useEffect(() => {
+    if (isPrintDisabledForWorkType(materials.workType) && (printRequirement.requiresPrint || printRequirement.printMaterial !== null)) {
+      setPrintRequirement((prev) => ({ ...prev, requiresPrint: false, printMaterial: null }));
+      return;
+    }
+
     if (!printRequirement.requiresPrint && printRequirement.printMaterial !== null) {
       setPrintRequirement((prev) => ({ ...prev, printMaterial: null }));
       return;
@@ -422,7 +433,7 @@ export default function BagetConfigurator({
     if (printRequirement.requiresPrint && printRequirement.printMaterial === null) {
       setPrintRequirement((prev) => ({ ...prev, printMaterial: 'canvas' }));
     }
-  }, [printRequirement.printMaterial, printRequirement.requiresPrint]);
+  }, [materials.workType, printRequirement.printMaterial, printRequirement.requiresPrint]);
 
   useEffect(() => {
     if (materials.workType === 'stretchedCanvas' && !stretcherNarrowAllowed && materials.stretcherType === 'narrow') {
@@ -626,8 +637,8 @@ export default function BagetConfigurator({
       },
       stand: materials.stand && standAllowed,
       printRequirement: {
-        requiresPrint: printRequirement.requiresPrint,
-        printMaterial: printRequirement.printMaterial,
+        requiresPrint: Boolean(calcMeta.requiresPrint),
+        printMaterial: (calcMeta.printMaterial as BagetPrintMaterial | null) ?? null,
         transferSource: printRequirement.transferSource,
         printCost: Math.round(Number(calcMeta.printCost ?? 0)),
       },
@@ -650,8 +661,8 @@ export default function BagetConfigurator({
     selectedBagetForQuote,
     standAllowed,
     summaryMaterials,
-    printRequirement.printMaterial,
-    printRequirement.requiresPrint,
+    calcMeta.printMaterial,
+    calcMeta.requiresPrint,
     printRequirement.transferSource,
     quote.items,
     calcMeta.hangingQuantity,
@@ -664,7 +675,7 @@ export default function BagetConfigurator({
 
 
   const orderInput = useMemo<{ baget: BagetOrderRequestBagetInput; fulfillmentType: 'pickup' } | null>(() => {
-    const requiresBaget = !isNoFrameStretchedCanvas;
+    const requiresBaget = !isNoFrameStretchedCanvas && !isStretcherOnly;
     if (requiresBaget && !selectedBagetForQuote) return null;
 
     return {
@@ -683,8 +694,8 @@ export default function BagetConfigurator({
         stand: materials.stand,
         stretcherType: materials.stretcherType,
         frameMode: materials.workType === 'stretchedCanvas' ? materials.frameMode : 'framed',
-        requiresPrint: printRequirement.requiresPrint,
-        printMaterial: printRequirement.printMaterial,
+        requiresPrint: Boolean(calcMeta.requiresPrint),
+        printMaterial: (calcMeta.printMaterial as BagetPrintMaterial | null) ?? null,
         transferSource: printRequirement.transferSource,
         printCost: Math.round(Number(calcMeta.printCost ?? 0)),
       },
@@ -693,7 +704,10 @@ export default function BagetConfigurator({
   }, [
     heightMm,
     materials.backPanel,
+    calcMeta.printMaterial,
+    calcMeta.requiresPrint,
     isNoFrameStretchedCanvas,
+    isStretcherOnly,
     materials.glazing,
     materials.hanging,
     materials.passepartout,
@@ -703,8 +717,6 @@ export default function BagetConfigurator({
     materials.workType,
     passepartoutBottomMm,
     passepartoutMm,
-    printRequirement.printMaterial,
-    printRequirement.requiresPrint,
     printRequirement.transferSource,
     selectedBagetForQuote,
     widthMm,
@@ -780,7 +792,7 @@ export default function BagetConfigurator({
     </div>
   );
 
-  const canOrder = Boolean(selectedBagetForQuote || isNoFrameStretchedCanvas) && validSize;
+  const canOrder = Boolean(selectedBagetForQuote || isNoFrameStretchedCanvas || isStretcherOnly) && validSize;
 
   return (
     <>
@@ -818,13 +830,13 @@ export default function BagetConfigurator({
             {!validSize && <p className="text-xs text-red-600">Введите корректные значения не менее 50 мм.</p>}
             <div className="space-y-2 rounded-xl border border-neutral-200 p-3 text-sm dark:border-neutral-700">
               <p className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Тип работы</p>
-            <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
+            <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе <InfoTooltip ariaLabel="О типе работы Картина на основе" text="У вас есть готовая картина, которую нужно оформить в багет." /></label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvasOnStretcher'} onChange={() => setMaterials({ ...materials, workType: 'canvasOnStretcher' })} />Холст на подрамнике</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'embroideryBeads'} onChange={() => setMaterials({ ...materials, workType: 'embroideryBeads' })} />Вышивка, бисер</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'photo'} onChange={() => setMaterials({ ...materials, workType: 'photo' })} />Фото</label>
-              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretcherOnly'} onChange={() => setMaterials({ ...materials, workType: 'stretcherOnly' })} />Только подрамник</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretcherOnly'} onChange={() => setMaterials({ ...materials, workType: 'stretcherOnly' })} />Только подрамник <InfoTooltip ariaLabel="О типе работы Только подрамник" text="Требуется только изготовление подрамника." /></label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'other'} onChange={() => setMaterials({ ...materials, workType: 'other' })} />Другое</label>
             </div>
           </div>

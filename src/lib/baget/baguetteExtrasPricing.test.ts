@@ -37,7 +37,7 @@ describe('baguette pricing fallback regression', () => {
       height: 400,
       quantity: 1,
       selectedBaget,
-      workType: 'canvas',
+      workType: 'photo',
       glazing: 'none',
       hasPassepartout: false,
       backPanel: true,

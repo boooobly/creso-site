@@ -108,7 +108,8 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
   const width = Number(input.width);
   const height = Number(input.height);
   const quantity = Math.max(1, Math.round(input.quantity) || 1);
-  const printDisabledByWorkType = input.workType === 'canvas' || input.workType === 'canvasOnStretcher' || input.workType === 'rhinestone' || input.workType === 'embroideryBeads' || input.workType === 'stretcherOnly';
+  const isStretcherOnly = input.workType === 'stretcherOnly';
+  const printDisabledByWorkType = input.workType === 'canvas' || input.workType === 'canvasOnStretcher' || input.workType === 'rhinestone' || input.workType === 'embroideryBeads' || input.workType === 'embroidery' || input.workType === 'beads' || isStretcherOnly;
   const effectiveRequiresPrint = printDisabledByWorkType ? false : Boolean(input.requiresPrint);
   const effectivePrintMaterial = effectiveRequiresPrint ? (input.printMaterial ?? 'canvas') : null;
   const validSize = Number.isFinite(width) && Number.isFinite(height) && width >= 50 && height >= 50;
@@ -126,16 +127,14 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
   const effectiveFrameMode: FrameMode = input.workType === 'stretchedCanvas'
     ? (input.frameMode ?? 'framed')
     : 'framed';
-  const requiresBaget = input.workType !== 'stretcherOnly' && !(input.workType === 'stretchedCanvas' && effectiveFrameMode === 'noFrame');
+  const requiresBaget = !isStretcherOnly && !(input.workType === 'stretchedCanvas' && effectiveFrameMode === 'noFrame');
   const hangerType: HangingType = input.workType === 'stretchedCanvas' ? 'wire' : input.hangerType ?? 'crocodile';
   const effectiveBackPanel = input.workType === 'stretchedCanvas' || input.workType === 'stretcherOnly'
     ? false
     : effectiveAutoAdditions.removeCardboard
       ? false
       : input.backPanel || effectiveAutoAdditions.forceCardboard;
-  const effectiveStretcherType: StretcherType = input.workType !== 'stretchedCanvas'
-    ? (input.stretcherType ?? 'narrow')
-    : (input.stretcherType === 'narrow' && !stretcherNarrowAllowed ? 'wide' : (input.stretcherType ?? 'narrow'));
+  const effectiveStretcherType: StretcherType = input.stretcherType === 'narrow' && !stretcherNarrowAllowed ? 'wide' : (input.stretcherType ?? 'narrow');
   const effectiveStand = input.stand && standAllowed;
   const stretchingRequired = input.workType === 'stretcherOnly' ? false : Boolean(effectiveAutoAdditions.stretchingRequired);
 
@@ -195,11 +194,11 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     : 0;
 
   let materialsCost = 0;
-  if (input.glazing !== 'none') {
+  if (!isStretcherOnly && input.glazing !== 'none') {
     const glazingPricing = extrasConfig.materials[input.glazing];
     materialsCost += areaM2 * glazingPricing.areaPricePerM2 + perimeterM * glazingPricing.cuttingPricePerM;
   }
-  if (input.hasPassepartout) {
+  if (!isStretcherOnly && input.hasPassepartout) {
     materialsCost += areaM2 * extrasConfig.materials.passepartout.areaPricePerM2 + perimeterM * extrasConfig.materials.passepartout.cuttingPricePerM;
   }
   if (effectiveBackPanel) {
@@ -210,9 +209,9 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     ? 0
     : areaM2 * extrasConfig.materials[effectiveAutoAdditions.pvcType].areaPricePerM2 + perimeterM * extrasConfig.materials[effectiveAutoAdditions.pvcType].cuttingPricePerM;
   const orabondCost = effectiveAutoAdditions.addOrabond ? areaM2 * extrasConfig.materials.orabond.areaPricePerM2 : 0;
-  const hangingQuantity = hangerType === 'crocodile'
+  const hangingQuantity = isStretcherOnly ? 0 : (hangerType === 'crocodile'
     ? (effectiveWidth > extrasConfig.hanging.crocodileDoubleThresholdWidthMm ? 2 : 1)
-    : 1;
+    : 1);
   const wireLoopsCost = extrasConfig.hanging.wireLoopDefaultQty * extrasConfig.hanging.wireLoopPrice;
   const hangingCost = input.workType === 'stretcherOnly' ? 0 : hangerType === 'wire'
     ? (width / 1000) * extrasConfig.hanging.wirePricePerMeterWidth + wireLoopsCost
