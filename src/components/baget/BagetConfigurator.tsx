@@ -46,8 +46,8 @@ const WORK_TYPE_LABELS: Record<MaterialsState['workType'], string> = {
   stretchedCanvas: 'Холст',
   canvasOnStretcher: 'Холст на подрамнике',
   rhinestone: 'Стразы',
-  embroidery: 'Вышивка',
-  beads: 'Бисер',
+  embroideryBeads: 'Вышивка, бисер',
+  stretcherOnly: 'Только подрамник',
   photo: 'Фото',
   other: 'Другое',
 };
@@ -822,9 +822,9 @@ export default function BagetConfigurator({
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvasOnStretcher'} onChange={() => setMaterials({ ...materials, workType: 'canvasOnStretcher' })} />Холст на подрамнике</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
-              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'embroidery'} onChange={() => setMaterials({ ...materials, workType: 'embroidery' })} />Вышивка</label>
-              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'beads'} onChange={() => setMaterials({ ...materials, workType: 'beads' })} />Бисер</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'embroideryBeads'} onChange={() => setMaterials({ ...materials, workType: 'embroideryBeads' })} />Вышивка, бисер</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'photo'} onChange={() => setMaterials({ ...materials, workType: 'photo' })} />Фото</label>
+              <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretcherOnly'} onChange={() => setMaterials({ ...materials, workType: 'stretcherOnly' })} />Только подрамник</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'other'} onChange={() => setMaterials({ ...materials, workType: 'other' })} />Другое</label>
             </div>
           </div>

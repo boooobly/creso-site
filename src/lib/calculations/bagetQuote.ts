@@ -108,8 +108,9 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
   const width = Number(input.width);
   const height = Number(input.height);
   const quantity = Math.max(1, Math.round(input.quantity) || 1);
-  const requiresPrint = Boolean(input.requiresPrint);
-  const printMaterial = input.printMaterial ?? null;
+  const printDisabledByWorkType = input.workType === 'canvas' || input.workType === 'canvasOnStretcher' || input.workType === 'rhinestone' || input.workType === 'embroideryBeads' || input.workType === 'stretcherOnly';
+  const effectiveRequiresPrint = printDisabledByWorkType ? false : Boolean(input.requiresPrint);
+  const effectivePrintMaterial = effectiveRequiresPrint ? (input.printMaterial ?? 'canvas') : null;
   const validSize = Number.isFinite(width) && Number.isFinite(height) && width >= 50 && height >= 50;
   const passepartoutSize = Math.max(0, input.passepartoutSize ?? 0);
   const passepartoutBottomSize = Math.max(0, input.passepartoutBottomSize ?? 0);
@@ -120,21 +121,23 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
   const stretcherNarrowAllowed = width <= extrasConfig.stretcher.narrowMaxWidthMm && height <= extrasConfig.stretcher.narrowMaxHeightMm;
 
   const autoAdditions: AutoAdditionRule = resolveAutoAdditionsFromConfig(input.workType, extrasConfig);
+  const isPhotoPrintedOnCanvas = input.workType === 'photo' && effectiveRequiresPrint && effectivePrintMaterial === 'canvas';
+  const effectiveAutoAdditions: AutoAdditionRule = isPhotoPrintedOnCanvas ? { ...autoAdditions, addOrabond: false, stretchingRequired: true, removeCardboard: true, pvcType: 'none', forceCardboard: false } : autoAdditions;
   const effectiveFrameMode: FrameMode = input.workType === 'stretchedCanvas'
     ? (input.frameMode ?? 'framed')
     : 'framed';
-  const requiresBaget = !(input.workType === 'stretchedCanvas' && effectiveFrameMode === 'noFrame');
+  const requiresBaget = input.workType !== 'stretcherOnly' && !(input.workType === 'stretchedCanvas' && effectiveFrameMode === 'noFrame');
   const hangerType: HangingType = input.workType === 'stretchedCanvas' ? 'wire' : input.hangerType ?? 'crocodile';
-  const effectiveBackPanel = input.workType === 'stretchedCanvas'
+  const effectiveBackPanel = input.workType === 'stretchedCanvas' || input.workType === 'stretcherOnly'
     ? false
-    : autoAdditions.removeCardboard
+    : effectiveAutoAdditions.removeCardboard
       ? false
-      : input.backPanel || autoAdditions.forceCardboard;
+      : input.backPanel || effectiveAutoAdditions.forceCardboard;
   const effectiveStretcherType: StretcherType = input.workType !== 'stretchedCanvas'
     ? (input.stretcherType ?? 'narrow')
     : (input.stretcherType === 'narrow' && !stretcherNarrowAllowed ? 'wide' : (input.stretcherType ?? 'narrow'));
   const effectiveStand = input.stand && standAllowed;
-  const stretchingRequired = Boolean(autoAdditions.stretchingRequired);
+  const stretchingRequired = input.workType === 'stretcherOnly' ? false : Boolean(effectiveAutoAdditions.stretchingRequired);
 
   if (!validSize) {
     warnings.push('Введите корректные значения не менее 50 мм.');
@@ -159,7 +162,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
         framedHeightMm: Number.isFinite(effectiveHeight) ? effectiveHeight : 0,
         bagetMeters: 0,
         hangingLabel: hangerType === 'crocodile' ? 'Крокодильчик × 1' : `Тросик (${extrasConfig.hanging.wireLoopDefaultQty} петли)`,
-        autoAdditions,
+        autoAdditions: effectiveAutoAdditions,
         standAllowed,
         stretcherNarrowAllowed,
         effectiveBackPanel,
@@ -169,6 +172,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
         stretcherType: effectiveStretcherType,
         frameMode: effectiveFrameMode,
         requiresBaget,
+        requiresPrint: effectiveRequiresPrint,
         stretchingRequired,
         stretchingCost: 0,
         printAreaM2: 0,
@@ -202,27 +206,27 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     materialsCost += areaM2 * extrasConfig.materials.cardboard.areaPricePerM2 + perimeterM * extrasConfig.materials.cardboard.cuttingPricePerM;
   }
 
-  const pvcCost = autoAdditions.pvcType === 'none'
+  const pvcCost = effectiveAutoAdditions.pvcType === 'none'
     ? 0
-    : areaM2 * extrasConfig.materials[autoAdditions.pvcType].areaPricePerM2 + perimeterM * extrasConfig.materials[autoAdditions.pvcType].cuttingPricePerM;
-  const orabondCost = autoAdditions.addOrabond ? areaM2 * extrasConfig.materials.orabond.areaPricePerM2 : 0;
+    : areaM2 * extrasConfig.materials[effectiveAutoAdditions.pvcType].areaPricePerM2 + perimeterM * extrasConfig.materials[effectiveAutoAdditions.pvcType].cuttingPricePerM;
+  const orabondCost = effectiveAutoAdditions.addOrabond ? areaM2 * extrasConfig.materials.orabond.areaPricePerM2 : 0;
   const hangingQuantity = hangerType === 'crocodile'
     ? (effectiveWidth > extrasConfig.hanging.crocodileDoubleThresholdWidthMm ? 2 : 1)
     : 1;
   const wireLoopsCost = extrasConfig.hanging.wireLoopDefaultQty * extrasConfig.hanging.wireLoopPrice;
-  const hangingCost = hangerType === 'wire'
+  const hangingCost = input.workType === 'stretcherOnly' ? 0 : hangerType === 'wire'
     ? (width / 1000) * extrasConfig.hanging.wirePricePerMeterWidth + wireLoopsCost
     : extrasConfig.hanging.crocodilePrice * hangingQuantity;
-  const standCost = effectiveStand ? extrasConfig.stand.price : 0;
+  const standCost = input.workType === 'stretcherOnly' ? 0 : (effectiveStand ? extrasConfig.stand.price : 0);
   const stretcherMeters = (width * 2 + height * 2) / 1000;
-  const stretcherCost = input.workType === 'stretchedCanvas'
+  const stretcherCost = (input.workType === 'stretchedCanvas' || input.workType === 'stretcherOnly' || isPhotoPrintedOnCanvas)
     ? stretcherMeters * extrasConfig.stretcher.pricesPerMeter[effectiveStretcherType]
     : 0;
-  const regularPrintCost = requiresPrint && printMaterial
-    ? printAreaM2 * getBaguettePrintPricePerM2(printMaterial, extrasConfig)
+  const regularPrintCost = effectiveRequiresPrint && effectivePrintMaterial
+    ? printAreaM2 * getBaguettePrintPricePerM2(effectivePrintMaterial, extrasConfig)
     : 0;
   const minimumPrintPriceApplied = regularPrintCost > 0 && regularPrintCost < extrasConfig.print.minimumPrintPriceRUB;
-  const printCost = requiresPrint && printMaterial && regularPrintCost > 0
+  const printCost = effectiveRequiresPrint && effectivePrintMaterial && regularPrintCost > 0
     ? Math.max(regularPrintCost, extrasConfig.print.minimumPrintPriceRUB)
     : 0;
   const stretchingCost = stretchingRequired
@@ -240,7 +244,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
   const clampsCount = requiresBaget && clampStepM > 0
     ? clampsPerimeterM / clampStepM
     : 0;
-  const clampsCost = clampsCount * clampPrice;
+  const clampsCost = input.workType === 'stretcherOnly' ? 0 : clampsCount * clampPrice;
 
   const rawItems: QuoteLineItem[] = [
     {
@@ -252,7 +256,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     },
     {
       key: 'print',
-      title: printMaterial === 'paper' ? 'Печать на бумаге' : 'Печать на холсте',
+      title: effectivePrintMaterial === 'paper' ? 'Печать на бумаге' : 'Печать на холсте',
       qty: quantity,
       unitPrice: Math.round(printCost),
       total: printCost * quantity,
@@ -319,10 +323,10 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
   const total = items.reduce((sum, item) => sum + item.total, 0);
 
   const autoBadges: string[] = [];
-  if (autoAdditions.pvcType === 'pvc3') autoBadges.push('ПВХ 3мм');
-  if (autoAdditions.pvcType === 'pvc4') autoBadges.push('ПВХ 4мм');
-  if (autoAdditions.addOrabond) autoBadges.push('Orabond');
-  if (autoAdditions.forceCardboard) autoBadges.push('Картон (задник)');
+  if (effectiveAutoAdditions.pvcType === 'pvc3') autoBadges.push('ПВХ 3мм');
+  if (effectiveAutoAdditions.pvcType === 'pvc4') autoBadges.push('ПВХ 4мм');
+  if (effectiveAutoAdditions.addOrabond) autoBadges.push('Orabond');
+  if (effectiveAutoAdditions.forceCardboard) autoBadges.push('Картон (задник)');
 
   return {
     total: Math.round(total),
@@ -339,8 +343,8 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       bagetMeters,
       bagetCost,
       printCost,
-      printMaterial,
-      requiresPrint,
+      printMaterial: effectivePrintMaterial,
+      requiresPrint: effectiveRequiresPrint,
       transferSource: input.transferSource ?? null,
       materialsCost,
       pvcCost,
@@ -360,7 +364,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
       minimumPrintPriceApplied,
       minimumPrintPriceRUB: extrasConfig.print.minimumPrintPriceRUB,
       autoBadges,
-      autoAdditions,
+      autoAdditions: effectiveAutoAdditions,
       standAllowed,
       stretcherNarrowAllowed,
       effectiveBackPanel,

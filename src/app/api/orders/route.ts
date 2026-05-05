@@ -43,7 +43,7 @@ const orderSchema = z.object({
     height: z.number().positive(),
     quantity: z.number().int().positive().default(1),
     selectedBagetId: z.string().min(1).optional().nullable(),
-    workType: z.enum(['canvas', 'stretchedCanvas', 'canvasOnStretcher', 'rhinestone', 'embroidery', 'beads', 'photo', 'other']),
+    workType: z.enum(['canvas', 'stretchedCanvas', 'canvasOnStretcher', 'rhinestone', 'embroideryBeads', 'stretcherOnly', 'photo', 'other', 'embroidery', 'beads']),
     glazing: z.enum(['none', 'glass', 'antiReflectiveGlass', 'plexiglass', 'pet1mm']),
     hasPassepartout: z.boolean(),
     passepartoutSize: z.number().min(0).optional(),
@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
 
     const sheetItems = await getBagetCatalogFromSheet();
     const allBagets = z.array(bagetItemSchema).parse(mapSheetItemsToBagetItems(sheetItems));
-    const requiresBaget = !(parsed.data.baget.workType === 'stretchedCanvas' && parsed.data.baget.frameMode === 'noFrame');
+    const requiresBaget = parsed.data.baget.workType !== 'stretcherOnly' && !(parsed.data.baget.workType === 'stretchedCanvas' && parsed.data.baget.frameMode === 'noFrame');
     const selectedBaget = parsed.data.baget.selectedBagetId
       ? allBagets.find((item) => item.id === parsed.data.baget.selectedBagetId) ?? null
       : null;

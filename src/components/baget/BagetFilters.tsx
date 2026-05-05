@@ -3,6 +3,7 @@
 import { ChevronDown } from 'lucide-react';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import AccessoryHelpTooltip from './AccessoryHelpTooltip';
+import InfoTooltip from './InfoTooltip';
 import type { BagetPrintMaterial, BagetPrintRequirement } from '@/lib/baget/printRequirement';
 
 export type FilterState = {
@@ -16,7 +17,7 @@ export type FilterState = {
 
 export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'plexiglass' | 'pet1mm';
 export type HangingType = 'crocodile' | 'wire';
-export type WorkType = 'canvas' | 'stretchedCanvas' | 'canvasOnStretcher' | 'rhinestone' | 'embroidery' | 'beads' | 'photo' | 'other';
+export type WorkType = 'canvas' | 'stretchedCanvas' | 'canvasOnStretcher' | 'rhinestone' | 'embroideryBeads' | 'photo' | 'stretcherOnly' | 'other' | 'embroidery' | 'beads';
 export type StretcherType = 'narrow' | 'wide';
 export type FrameMode = 'framed' | 'noFrame';
 export type PassepartoutColor =
@@ -127,6 +128,11 @@ export default function BagetFilters({
   showWorkType = true,
   showMaterials = true,
 }: BagetFiltersProps) {
+  const printDisabledForWorkType = materials.workType === 'canvas'
+    || materials.workType === 'canvasOnStretcher'
+    || materials.workType === 'rhinestone'
+    || materials.workType === 'embroideryBeads'
+    || materials.workType === 'stretcherOnly';
   return (
     <div className="space-y-4">
       {showCatalogFilters ? (
@@ -216,13 +222,13 @@ export default function BagetFilters({
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="mb-3 text-base font-semibold">Тип работы</h2>
           <div className="space-y-2 text-sm">
-            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе</label>
-            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст</label>
-            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'canvasOnStretcher'} onChange={() => setMaterials({ ...materials, workType: 'canvasOnStretcher' })} />Холст на подрамнике</label>
-            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы</label>
-            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'embroidery'} onChange={() => setMaterials({ ...materials, workType: 'embroidery' })} />Вышивка</label>
-            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'beads'} onChange={() => setMaterials({ ...materials, workType: 'beads' })} />Бисер</label>
-            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'photo'} onChange={() => setMaterials({ ...materials, workType: 'photo' })} />Фото</label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе <InfoTooltip ariaLabel="О типе работы Картина на основе" text="У вас есть готовая картина, которую нужно оформить в багет." /></label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст <InfoTooltip ariaLabel="О типе работы Холст" text="У вас есть идея, которую вы хотите перенести на холст. Можно оформить с рамкой и без неё." /></label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'canvasOnStretcher'} onChange={() => setMaterials({ ...materials, workType: 'canvasOnStretcher' })} />Холст на подрамнике <InfoTooltip ariaLabel="О типе работы Холст на подрамнике" text="У вас уже есть готовый холст, натянутый на подрамник, который вы хотите оформить в багет." /></label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'rhinestone'} onChange={() => setMaterials({ ...materials, workType: 'rhinestone' })} />Стразы <InfoTooltip ariaLabel="О типе работы Стразы" text="У вас есть работа, выложенная стразами, которую вы хотите оформить в багет." /></label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'embroideryBeads'} onChange={() => setMaterials({ ...materials, workType: 'embroideryBeads' })} />Вышивка, бисер <InfoTooltip ariaLabel="О типе работы Вышивка, бисер" text="У вас есть вышивка или работа из бисера, которую вы хотите оформить в багет." /></label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'photo'} onChange={() => setMaterials({ ...materials, workType: 'photo' })} />Фото <InfoTooltip ariaLabel="О типе работы Фото" text="У вас есть готовая фотография, которую вы хотите оформить в багет. Можно распечатать у нас фотографию, для этого выберите 'Требуется печать'." /></label>
+            <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'stretcherOnly'} onChange={() => setMaterials({ ...materials, workType: 'stretcherOnly' })} />Только подрамник <InfoTooltip ariaLabel="О типе работы Только подрамник" text="Требуется только изготовление подрамника." /></label>
             <label className="flex items-center gap-2"><input type="radio" name="workType" checked={materials.workType === 'other'} onChange={() => setMaterials({ ...materials, workType: 'other' })} />Другое</label>
           </div>
         </div>
@@ -302,6 +308,7 @@ export default function BagetFilters({
             <input
               type="checkbox"
               checked={printRequirement.requiresPrint}
+              disabled={printDisabledForWorkType}
               onChange={(e) =>
                 setPrintRequirement({
                   ...printRequirement,
