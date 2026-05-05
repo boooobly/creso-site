@@ -311,6 +311,99 @@ describe('bagetQuote', () => {
     expect(result.total).toBeGreaterThan(0);
   });
 
+  it('stretchedCanvas in noFrame mode does not require baget and excludes baget/clamps', () => {
+    const result = bagetQuote({
+      width: 1000,
+      height: 700,
+      quantity: 1,
+      selectedBaget: null,
+      workType: 'stretchedCanvas',
+      frameMode: 'noFrame',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'wire',
+      stand: false,
+      stretcherType: 'wide',
+    });
+
+    expect(result.warnings).not.toContain('Выберите багет для расчёта.');
+    expect(result.meta?.requiresBaget).toBe(false);
+    expect(result.items.some((item) => item.key === 'stretcher')).toBe(true);
+    expect(result.items.some((item) => item.key === 'stretching')).toBe(true);
+    expect(result.items.some((item) => item.key === 'baget')).toBe(false);
+    expect(result.items.some((item) => item.key === 'clamps')).toBe(false);
+    expect(result.total).toBeGreaterThan(0);
+  });
+
+  it('stretchedCanvas in framed mode still requires selected baget', () => {
+    const result = bagetQuote({
+      width: 1000,
+      height: 700,
+      quantity: 1,
+      selectedBaget: null,
+      workType: 'stretchedCanvas',
+      frameMode: 'framed',
+      glazing: 'none',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'wire',
+      stand: false,
+      stretcherType: 'wide',
+    });
+
+    expect(result.meta?.requiresBaget).toBe(true);
+    expect(result.warnings).toContain('Выберите багет для расчёта.');
+    expect(result.total).toBe(0);
+  });
+
+  it('stretcherOnly does not require baguette and returns only stretcher item', () => {
+    const result = bagetQuote({
+      width: 900,
+      height: 600,
+      quantity: 1,
+      selectedBaget: null,
+      workType: 'stretcherOnly',
+      glazing: 'glass',
+      hasPassepartout: false,
+      backPanel: false,
+      hangerType: 'wire',
+      stand: false,
+      stretcherType: 'wide',
+      requiresPrint: true,
+      printMaterial: 'canvas',
+    });
+
+    expect(result.warnings).not.toContain('Выберите багет для расчёта.');
+    expect(result.total).toBeGreaterThan(0);
+    expect(result.items.map((item) => item.key)).toEqual(['stretcher']);
+    expect(result.meta?.requiresBaget).toBe(false);
+  });
+
+  it('stretcherOnly ignores decorative payload options and still returns only stretcher', () => {
+    const result = bagetQuote({
+      width: 700,
+      height: 500,
+      quantity: 1,
+      selectedBaget,
+      workType: 'stretcherOnly',
+      glazing: 'antiReflectiveGlass',
+      hasPassepartout: true,
+      passepartoutSize: 80,
+      passepartoutBottomSize: 120,
+      backPanel: true,
+      hangerType: 'crocodile',
+      stand: true,
+      stretcherType: 'narrow',
+      requiresPrint: true,
+      printMaterial: 'paper',
+    });
+
+    expect(result.items.map((item) => item.key)).toEqual(['stretcher']);
+    expect(result.items.some((item) => ['baget', 'materials', 'print', 'hanging', 'clamps', 'stretching', 'orabond', 'pvc'].includes(item.key))).toBe(false);
+    expect(result.meta?.requiresBaget).toBe(false);
+  });
+
 
   it('adds stretching as a separate line item using admin-managed coefficients', () => {
     const config = getBaguetteExtrasDefaultConfig();
