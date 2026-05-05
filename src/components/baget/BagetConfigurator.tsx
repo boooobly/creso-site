@@ -15,7 +15,7 @@ import type { BaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPric
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
 import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
-import { getInitialBagetPrintRequirement, type BagetPrintRequirement, type BagetTransferSource } from '@/lib/baget/printRequirement';
+import { getInitialBagetPrintRequirement, type BagetPrintMaterial, type BagetPrintRequirement, type BagetTransferSource } from '@/lib/baget/printRequirement';
 import BagetCard, { BagetItem } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetMobileSelectorCard from './BagetMobileSelectorCard';
