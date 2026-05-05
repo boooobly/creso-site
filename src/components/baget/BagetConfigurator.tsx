@@ -81,6 +81,7 @@ const initialFilters: FilterState = {
   widthMax: 100,
   priceMin: 0,
   priceMax: 5000,
+  articleQuery: '',
 };
 
 const initialMaterials: MaterialsState = {
@@ -460,6 +461,8 @@ export default function BagetConfigurator({
   const colors = useMemo(() => Array.from(new Set(catalogItems.map((item) => item.color))), [catalogItems]);
   const styles = useMemo(() => Array.from(new Set(catalogItems.map((item) => item.style))), [catalogItems]);
 
+  const normalizedArticleQuery = filters.articleQuery.trim().toLowerCase().replace(/\s+/g, '');
+
   const filteredItems = useMemo(
     () =>
       catalogItems.filter((item) => {
@@ -467,6 +470,8 @@ export default function BagetConfigurator({
         const styleMatch = filters.style === 'all' || item.style === filters.style;
         const widthMatch = item.width_mm >= filters.widthMin && item.width_mm <= filters.widthMax;
         const priceMatch = item.price_per_meter >= filters.priceMin && item.price_per_meter <= filters.priceMax;
+        const normalizedArticle = String(item.article ?? '').trim().toLowerCase().replace(/\s+/g, '');
+        const articleMatch = !normalizedArticleQuery || normalizedArticle.includes(normalizedArticleQuery);
         const visibleOnSite = item.show_on_site;
 
         const canFulfillFromStock = !validSize || canFulfillFrameFromPieces(
@@ -479,9 +484,9 @@ export default function BagetConfigurator({
           ),
         );
 
-        return colorMatch && styleMatch && widthMatch && priceMatch && visibleOnSite && canFulfillFromStock;
+        return colorMatch && styleMatch && widthMatch && priceMatch && articleMatch && visibleOnSite && canFulfillFromStock;
       }),
-    [catalogItems, effectiveHeightMm, effectiveWidthMm, filters, validSize],
+    [catalogItems, effectiveHeightMm, effectiveWidthMm, filters, normalizedArticleQuery, validSize],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
@@ -499,6 +504,17 @@ export default function BagetConfigurator({
     if (page > totalPages) setPage(totalPages);
   }, [page, totalPages]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [
+    filters.articleQuery,
+    filters.color,
+    filters.style,
+    filters.widthMin,
+    filters.widthMax,
+    filters.priceMin,
+    filters.priceMax,
+  ]);
 
   useEffect(() => {
     if (isNoFrameStretchedCanvas) {
@@ -1124,7 +1140,7 @@ export default function BagetConfigurator({
             ))}
           </div>
           {pagedItems.length === 0 && (
-            <div className="card rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">По заданным фильтрам ничего не найдено.</div>
+            <div className="card rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">Багет по этим фильтрам не найден. Попробуйте изменить артикул или сбросить фильтры.</div>
           )}
           {renderPagination()}
         </main>
@@ -1290,7 +1306,7 @@ export default function BagetConfigurator({
                 ))}
               </div>
               {pagedItems.length === 0 && (
-                <div className="card mt-2 rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">По заданным фильтрам ничего не найдено.</div>
+                <div className="card mt-2 rounded-2xl p-4 text-sm text-neutral-600 dark:text-neutral-300">Багет по этим фильтрам не найден. Попробуйте изменить артикул или сбросить фильтры.</div>
               )}
               <div className="pt-3">{renderPagination()}</div>
             </div>

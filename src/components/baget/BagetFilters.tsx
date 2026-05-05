@@ -13,6 +13,7 @@ export type FilterState = {
   widthMax: number;
   priceMin: number;
   priceMax: number;
+  articleQuery: string;
 };
 
 export type GlazingType = 'none' | 'glass' | 'antiReflectiveGlass' | 'plexiglass' | 'pet1mm';
@@ -191,6 +192,30 @@ export default function BagetFilters({
                 />
               </label>
             </div>
+
+
+
+            <label className="block space-y-1 text-sm">
+              <span>Поиск по артикулу</span>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={filters.articleQuery}
+                  onChange={(e) => setFilters({ ...filters, articleQuery: e.target.value })}
+                  placeholder="Например, T9034-4"
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                />
+                {filters.articleQuery ? (
+                  <button
+                    type="button"
+                    onClick={() => setFilters({ ...filters, articleQuery: '' })}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-neutral-500 transition-colors hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  >
+                    Очистить
+                  </button>
+                ) : null}
+              </div>
+            </label>
 
             <div className="grid grid-cols-2 gap-2">
               <label className="space-y-1 text-sm">
