@@ -117,8 +117,10 @@ const WORK_TYPE_LABELS: Record<string, string> = {
   stretchedCanvas: 'Холст',
   canvasOnStretcher: 'Холст на подрамнике',
   rhinestone: 'Стразы',
-  embroidery: 'Вышивка',
-  beads: 'Бисер',
+  embroideryBeads: 'Вышивка, бисер',
+  embroidery: 'Вышивка, бисер',
+  beads: 'Вышивка, бисер',
+  stretcherOnly: 'Только подрамник',
   photo: 'Фото',
   other: 'Другое',
 };

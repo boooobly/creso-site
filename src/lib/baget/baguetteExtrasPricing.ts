@@ -351,6 +351,7 @@ export function getBaguettePrintPricePerM2(material: BagetPrintMaterial, config:
 
 export function resolveAutoAdditionsFromConfig(workType: WorkType, config: BaguetteExtrasPricingConfig): AutoAdditionRule {
   if (workType === 'rhinestone') return config.autoAdditions.rhinestone;
+  if (workType === 'embroideryBeads') return config.autoAdditions.embroidery;
   if (workType === 'embroidery') return config.autoAdditions.embroidery;
   if (workType === 'beads') return config.autoAdditions.beads;
   if (workType === 'photo') return config.autoAdditions.photo;
