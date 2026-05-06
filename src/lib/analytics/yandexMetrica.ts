@@ -1,3 +1,5 @@
+import { hasAnalyticsConsent } from '@/lib/analytics/cookieConsent';
+
 const getCounterId = () => {
   const value = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID?.trim();
   if (!value) return null;
@@ -38,6 +40,8 @@ function sendYandexEvent(action: YandexMetricaAction, target: string, params?: R
 
   const counterId = getCounterId();
   if (!counterId) return;
+
+  if (!hasAnalyticsConsent()) return;
 
   const ym = (window as YandexMetricaWindow).ym;
   if (typeof ym !== 'function') return;

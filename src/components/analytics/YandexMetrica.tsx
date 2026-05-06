@@ -2,8 +2,9 @@
 
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { trackHit } from '@/lib/analytics/yandexMetrica';
+import { COOKIE_CONSENT_CHANGED_EVENT, hasAnalyticsConsent } from '@/lib/analytics/cookieConsent';
 
 const METRICA_SCRIPT_ID = 'yandex-metrica';
 
@@ -34,13 +35,22 @@ export default function YandexMetrica() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const counterId = getCounterId();
+  const [isAnalyticsAllowed, setIsAnalyticsAllowed] = useState(false);
   const lastTrackedUrlRef = useRef<string | null>(null);
   const isFirstRenderRef = useRef(true);
 
   const currentUrl = useMemo(() => getCurrentUrl(pathname, searchParams), [pathname, searchParams]);
 
   useEffect(() => {
-    if (!counterId) return;
+    setIsAnalyticsAllowed(hasAnalyticsConsent());
+
+    const handleConsentChanged = () => setIsAnalyticsAllowed(hasAnalyticsConsent());
+    window.addEventListener(COOKIE_CONSENT_CHANGED_EVENT, handleConsentChanged);
+    return () => window.removeEventListener(COOKIE_CONSENT_CHANGED_EVENT, handleConsentChanged);
+  }, []);
+
+  useEffect(() => {
+    if (!counterId || !isAnalyticsAllowed) return;
 
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
@@ -55,9 +65,9 @@ export default function YandexMetrica() {
 
     trackHit(absoluteUrl);
     lastTrackedUrlRef.current = currentUrl;
-  }, [counterId, currentUrl]);
+  }, [counterId, currentUrl, isAnalyticsAllowed]);
 
-  if (!counterId) {
+  if (!counterId || !isAnalyticsAllowed) {
     return null;
   }
 
@@ -87,7 +97,6 @@ export default function YandexMetrica() {
       </Script>
       <noscript>
         <div>
-          {/* eslint-disable-next-line @next/next/no-img-element -- Yandex Metrica requires a plain <img> beacon in noscript fallback. */}
           <img src={`https://mc.yandex.ru/watch/${counterId}`} style={{ position: 'absolute', left: '-9999px' }} alt="" />
         </div>
       </noscript>
