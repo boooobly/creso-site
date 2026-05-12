@@ -35,7 +35,13 @@ describe('GET /api/baget/image-proxy', () => {
     expect(response.headers.get('content-type')).toBe('image/jpeg');
     expect(response.headers.get('cache-control')).toBe('public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800');
     expect(new Uint8Array(await response.arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]));
-    expect(fetchMock).toHaveBeenCalledWith(new URL('https://drive.google.com/uc?id=image-id'), { redirect: 'follow' });
+    expect(fetchMock).toHaveBeenCalledWith(new URL('https://drive.google.com/uc?id=image-id'), {
+      redirect: 'follow',
+      headers: {
+        Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (compatible; CredomirImageProxy/1.0)',
+      },
+    });
   });
 
   it('rejects non-image upstream responses so the client can fall back', async () => {

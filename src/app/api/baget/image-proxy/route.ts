@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
 const IMAGE_CACHE_CONTROL = 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800';
+const IMAGE_PROXY_FETCH_HEADERS = {
+  Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+  'User-Agent': 'Mozilla/5.0 (compatible; CredomirImageProxy/1.0)',
+};
 
 function isAllowedHostname(hostname: string): boolean {
   const normalizedHostname = hostname.toLowerCase();
@@ -52,7 +56,10 @@ export async function GET(request: NextRequest) {
 
   let upstreamResponse: Response;
   try {
-    upstreamResponse = await fetch(imageUrl, { redirect: 'follow' });
+    upstreamResponse = await fetch(imageUrl, {
+      redirect: 'follow',
+      headers: IMAGE_PROXY_FETCH_HEADERS,
+    });
   } catch {
     return NextResponse.json({ ok: false, error: 'Image fetch failed.' }, { status: 502 });
   }
