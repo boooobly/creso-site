@@ -57,6 +57,9 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   }, [isImagePreviewOpen]);
 
   const currentImage = imageCandidates[Math.min(imageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
+  const handleImageError = () => {
+    setImageIndex((prev) => Math.min(prev + 1, imageCandidates.length - 1));
+  };
 
   return (
     <>
@@ -80,7 +83,7 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
             className="object-cover"
             loading="lazy"
-            onError={() => setImageIndex((prev) => Math.min(prev + 1, imageCandidates.length - 1))}
+            onError={handleImageError}
           />
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition-all duration-200 group-hover:bg-black/25 group-hover:opacity-100 group-focus-visible:bg-black/25 group-focus-visible:opacity-100">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1 text-xs font-medium backdrop-blur-sm">
@@ -128,13 +131,14 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
               <X size={18} aria-hidden="true" />
             </button>
             <div className="relative mx-auto aspect-square w-full max-h-[80vh] overflow-hidden rounded-xl bg-neutral-100">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element -- Avoid Next image optimization for enlarged remote previews. */}
+              <img
                 src={currentImage}
                 alt={`Увеличенный угол багета ${item.name}`}
-                fill
-                sizes="(max-width: 1024px) 92vw, 960px"
-                className="object-contain"
-                priority
+                className="h-full w-full object-contain"
+                loading="eager"
+                decoding="async"
+                onError={handleImageError}
               />
             </div>
           </div>
