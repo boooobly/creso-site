@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { X, ZoomIn } from 'lucide-react';
 
@@ -23,6 +24,11 @@ type BagetCardProps = {
 };
 
 const BAGET_PLACEHOLDER_IMAGE = '/images/outdoor-portfolio/placeholder-1.svg';
+
+function getPreviewImageSrc(src: string): string {
+  if (!src || src.startsWith('/')) return src;
+  return `/api/baget/image-proxy?url=${encodeURIComponent(src)}`;
+}
 
 function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   const imageCandidates = useMemo(
@@ -61,11 +67,17 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   const previewImage = imageCandidates[Math.min(previewImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
 
   const handleThumbnailImageError = () => {
-    setThumbnailImageIndex((prev) => Math.min(prev + 1, imageCandidates.length - 1));
+    setThumbnailImageIndex((prev) => {
+      const next = Math.min(prev + 1, imageCandidates.length - 1);
+      return next === prev ? prev : next;
+    });
   };
 
   const handlePreviewImageError = () => {
-    setPreviewImageIndex((prev) => Math.min(prev + 1, imageCandidates.length - 1));
+    setPreviewImageIndex((prev) => {
+      const next = Math.min(prev + 1, imageCandidates.length - 1);
+      return next === prev ? prev : next;
+    });
   };
 
   return (
@@ -86,13 +98,13 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
           className="group relative mb-2 block aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg bg-neutral-100 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2"
           aria-label={`Увеличить изображение багета ${item.name}`}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- Avoid Next image optimization for remote baguette thumbnails. */}
-          <img
+          <Image
             src={thumbnailImage}
             alt={`Угол багета ${item.name}`}
-            className="h-full w-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
+            className="object-cover"
             loading="lazy"
-            decoding="async"
             onError={handleThumbnailImageError}
           />
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition-all duration-200 group-hover:bg-black/25 group-hover:opacity-100 group-focus-visible:bg-black/25 group-focus-visible:opacity-100">
@@ -143,7 +155,7 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
             <div className="relative mx-auto aspect-square w-full max-h-[80vh] overflow-hidden rounded-xl bg-neutral-100">
               {/* eslint-disable-next-line @next/next/no-img-element -- Avoid Next image optimization for enlarged remote previews. */}
               <img
-                src={previewImage}
+                src={getPreviewImageSrc(previewImage)}
                 alt={`Увеличенный угол багета ${item.name}`}
                 className="h-full w-full object-contain"
                 loading="eager"
