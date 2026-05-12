@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { X, ZoomIn } from 'lucide-react';
 
@@ -30,11 +29,13 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
     () => [item.cardImage, item.fallbackImage, BAGET_PLACEHOLDER_IMAGE].filter(Boolean) as string[],
     [item.cardImage, item.fallbackImage],
   );
-  const [imageIndex, setImageIndex] = useState(0);
+  const [thumbnailImageIndex, setThumbnailImageIndex] = useState(0);
+  const [previewImageIndex, setPreviewImageIndex] = useState(0);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
 
   useEffect(() => {
-    setImageIndex(0);
+    setThumbnailImageIndex(0);
+    setPreviewImageIndex(0);
   }, [item.id, imageCandidates]);
 
   useEffect(() => {
@@ -56,9 +57,15 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
     };
   }, [isImagePreviewOpen]);
 
-  const currentImage = imageCandidates[Math.min(imageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
-  const handleImageError = () => {
-    setImageIndex((prev) => Math.min(prev + 1, imageCandidates.length - 1));
+  const thumbnailImage = imageCandidates[Math.min(thumbnailImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
+  const previewImage = imageCandidates[Math.min(previewImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
+
+  const handleThumbnailImageError = () => {
+    setThumbnailImageIndex((prev) => Math.min(prev + 1, imageCandidates.length - 1));
+  };
+
+  const handlePreviewImageError = () => {
+    setPreviewImageIndex((prev) => Math.min(prev + 1, imageCandidates.length - 1));
   };
 
   return (
@@ -72,18 +79,21 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
       >
         <button
           type="button"
-          onClick={() => setIsImagePreviewOpen(true)}
+          onClick={() => {
+            setPreviewImageIndex(0);
+            setIsImagePreviewOpen(true);
+          }}
           className="group relative mb-2 block aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg bg-neutral-100 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2"
           aria-label={`Увеличить изображение багета ${item.name}`}
         >
-          <Image
-            src={currentImage}
+          {/* eslint-disable-next-line @next/next/no-img-element -- Avoid Next image optimization for remote baguette thumbnails. */}
+          <img
+            src={thumbnailImage}
             alt={`Угол багета ${item.name}`}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-            className="object-cover"
+            className="h-full w-full object-cover"
             loading="lazy"
-            onError={handleImageError}
+            decoding="async"
+            onError={handleThumbnailImageError}
           />
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition-all duration-200 group-hover:bg-black/25 group-hover:opacity-100 group-focus-visible:bg-black/25 group-focus-visible:opacity-100">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1 text-xs font-medium backdrop-blur-sm">
@@ -133,12 +143,12 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
             <div className="relative mx-auto aspect-square w-full max-h-[80vh] overflow-hidden rounded-xl bg-neutral-100">
               {/* eslint-disable-next-line @next/next/no-img-element -- Avoid Next image optimization for enlarged remote previews. */}
               <img
-                src={currentImage}
+                src={previewImage}
                 alt={`Увеличенный угол багета ${item.name}`}
                 className="h-full w-full object-contain"
                 loading="eager"
                 decoding="async"
-                onError={handleImageError}
+                onError={handlePreviewImageError}
               />
             </div>
           </div>
