@@ -81,6 +81,84 @@ describe('loadBagetCatalog caching and fallback', () => {
     expect(result.items[2]?.show_on_site).toBe(true);
   });
 
+
+  it('parses normal Название багета header into item name', async () => {
+    process.env.BAGET_SHEET_ID = 'test-sheet-name-normal';
+    process.env.BAGET_SHEET_TAB = 'test-tab-name-normal';
+
+    const csv = buildCsv([
+      'A10,Supplier,ART-010,Профиль 010,40,500,12*20,10,yes,https://example.com/a10.jpg,,modern,white,',
+    ]);
+
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(csv, { status: 200 })));
+
+    const { loadBagetCatalogUncached } = await import('./sheetsCatalog');
+    const result = await loadBagetCatalogUncached();
+
+    expect(result.source).toBe('sheet');
+    expect(result.items[0]?.name).toBe('Профиль 010');
+    expect(result.diagnostics?.nameHeader).toBe('Название багета');
+    expect(result.diagnostics?.nameValuesMissing).toBe(0);
+  });
+
+  it('parses name header with extra spaces and NBSP into item name', async () => {
+    process.env.BAGET_SHEET_ID = 'test-sheet-name-nbsp';
+    process.env.BAGET_SHEET_TAB = 'test-tab-name-nbsp';
+
+    const csv = [
+      'ID,Поставщик,Артикул, Название\u00A0багета ,Ширина в миллиметрах,Цена за метр,"Остатки багета, м (редактируемая строка)","Запас на распил, мм",Показывать на сайте,URL изображения плети,URL изображения уголка,Стиль,Цвет,Примечание',
+      'A11,Supplier,ART-011,Профиль 011,40,500,12*20,10,yes,https://example.com/a11.jpg,,modern,white,',
+    ].join('\n');
+
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(csv, { status: 200 })));
+
+    const { loadBagetCatalogUncached } = await import('./sheetsCatalog');
+    const result = await loadBagetCatalogUncached();
+
+    expect(result.source).toBe('sheet');
+    expect(result.items[0]?.name).toBe('Профиль 011');
+    expect(result.diagnostics?.nameHeader).toBe('Название\u00A0багета');
+    expect(result.diagnostics?.nameValuesMissing).toBe(0);
+  });
+
+  it('falls back to article when name is empty', async () => {
+    process.env.BAGET_SHEET_ID = 'test-sheet-name-fallback';
+    process.env.BAGET_SHEET_TAB = 'test-tab-name-fallback';
+
+    const csv = buildCsv([
+      'A12,Supplier,ART-012,,40,500,12*20,10,yes,https://example.com/a12.jpg,,modern,white,',
+    ]);
+
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(csv, { status: 200 })));
+
+    const { loadBagetCatalogUncached } = await import('./sheetsCatalog');
+    const result = await loadBagetCatalogUncached();
+
+    expect(result.source).toBe('sheet');
+    expect(result.items[0]?.article).toBe('ART-012');
+    expect(result.items[0]?.name).toBe('ART-012');
+    expect(result.diagnostics?.nameValuesMissing).toBe(1);
+  });
+
+  it('accepts Наименование багета as an alternative name header', async () => {
+    process.env.BAGET_SHEET_ID = 'test-sheet-name-alternative';
+    process.env.BAGET_SHEET_TAB = 'test-tab-name-alternative';
+
+    const csv = [
+      'ID,Поставщик,Артикул,Наименование багета,Ширина в миллиметрах,Цена за метр,"Остатки багета, м (редактируемая строка)","Запас на распил, мм",Показывать на сайте,URL изображения плети,URL изображения уголка,Стиль,Цвет,Примечание',
+      'A13,Supplier,ART-013,Профиль 013,40,500,12*20,10,yes,https://example.com/a13.jpg,,modern,white,',
+    ].join('\n');
+
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(csv, { status: 200 })));
+
+    const { loadBagetCatalogUncached } = await import('./sheetsCatalog');
+    const result = await loadBagetCatalogUncached();
+
+    expect(result.source).toBe('sheet');
+    expect(result.items[0]?.name).toBe('Профиль 013');
+    expect(result.diagnostics?.nameHeader).toBe('Наименование багета');
+  });
+
   it('returns diagnostics when there are zero valid rows', async () => {
     process.env.BAGET_SHEET_ID = 'test-sheet-zero';
     process.env.BAGET_SHEET_TAB = 'test-tab-zero';

@@ -30,7 +30,15 @@ const HEADER_ALIASES = {
   id: [HEADERS.id, 'Id', 'id'],
   supplier: [HEADERS.supplier],
   article: [HEADERS.article, 'Артикул багета'],
-  name: [HEADERS.name, 'Название', 'Наименование'],
+  name: [
+    HEADERS.name,
+    'Название',
+    'Наименование',
+    'Наименование багета',
+    'Имя',
+    'Название профиля',
+    'Профиль',
+  ],
   widthMm: [HEADERS.widthMm, 'Ширина в мм', 'Ширина, мм', 'Ширина', 'Ширина профиля'],
   pricePerMeter: [HEADERS.pricePerMeter, 'Цена', 'Цена за м', 'Цена за пог.м', 'Цена за пог. м', 'Цена, ₽/м'],
   residues: [
@@ -80,6 +88,8 @@ export type BagetCatalogDiagnostics = {
   };
   showOnSiteHeader?: string | null;
   showOnSiteValues?: Array<{ value: string; count: number }>;
+  nameHeader?: string | null;
+  nameValuesMissing?: number;
 };
 
 type CsvRow = Record<string, string>;
@@ -180,11 +190,28 @@ function toBoolean(input: string): boolean {
   return false;
 }
 
+function normalizeHeaderName(value: string): string {
+  return value
+    .trim()
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .toLowerCase()
+    .replace(/ё/g, 'е');
+}
+
 function getFirstByAliases(row: CsvRow, aliases: readonly string[]): string {
   for (const alias of aliases) {
     const value = row[alias];
     if (typeof value === 'string' && value.trim()) return value;
   }
+
+  const normalizedAliases = new Set(aliases.map(normalizeHeaderName));
+  for (const [header, value] of Object.entries(row)) {
+    if (normalizedAliases.has(normalizeHeaderName(header)) && typeof value === 'string' && value.trim()) {
+      return value;
+    }
+  }
+
   return '';
 }
 
@@ -192,6 +219,12 @@ function getFirstPresentHeader(headers: string[], aliases: readonly string[]): s
   for (const alias of aliases) {
     if (headers.includes(alias)) return alias;
   }
+
+  const normalizedAliases = new Set(aliases.map(normalizeHeaderName));
+  for (const header of headers) {
+    if (normalizedAliases.has(normalizeHeaderName(header))) return header;
+  }
+
   return null;
 }
 
@@ -229,11 +262,15 @@ function mapRowToItem(
   }
 
   try {
+    const article = getFirstByAliases(row, HEADER_ALIASES.article).trim();
+    const rawName = getFirstByAliases(row, HEADER_ALIASES.name).trim();
+    const name = rawName || article;
+
     return {
       id: getFirstByAliases(row, HEADER_ALIASES.id).trim(),
       supplier: getFirstByAliases(row, HEADER_ALIASES.supplier).trim(),
-      article: getFirstByAliases(row, HEADER_ALIASES.article).trim(),
-      name: getFirstByAliases(row, HEADER_ALIASES.name).trim(),
+      article,
+      name,
       width_mm: widthMm,
       price_per_meter: pricePerMeter,
       residues_text: residuesText,
@@ -336,6 +373,12 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
       other: 0,
     };
     const showOnSiteHeader = getFirstPresentHeader(headers, HEADER_ALIASES.showOnSite);
+    const nameHeader = getFirstPresentHeader(headers, HEADER_ALIASES.name);
+    const nameValuesMissing = records.filter((row) => {
+      const article = getFirstByAliases(row, HEADER_ALIASES.article).trim();
+      const rawName = getFirstByAliases(row, HEADER_ALIASES.name).trim();
+      return Boolean(article) && !rawName;
+    }).length;
     const showOnSiteHistogram = new Map<string, number>();
     for (const row of records) {
       const rawValue = (showOnSiteHeader ? row[showOnSiteHeader] : undefined) ?? '';
@@ -358,6 +401,8 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
       skipped,
       showOnSiteHeader,
       showOnSiteValues,
+      nameHeader,
+      nameValuesMissing,
     };
 
     if (items.length === 0) {
@@ -376,7 +421,10 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
           price: getFirstPresentHeader(headers, HEADER_ALIASES.pricePerMeter),
           residues: getFirstPresentHeader(headers, HEADER_ALIASES.residues),
           showOnSite: getFirstPresentHeader(headers, HEADER_ALIASES.showOnSite),
+          name: getFirstPresentHeader(headers, HEADER_ALIASES.name),
         },
+        nameHeader,
+        nameValuesMissing,
         showOnSiteValues,
       });
       return { source: 'fallback', sheetId, tab, items: getFallbackCatalog(), error, diagnostics };
