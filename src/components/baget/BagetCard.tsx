@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { X, ZoomIn } from 'lucide-react';
 
@@ -25,22 +24,10 @@ type BagetCardProps = {
 
 const BAGET_PLACEHOLDER_IMAGE = '/images/outdoor-portfolio/placeholder-1.svg';
 
-export type PreviewSourceMode = 'thumbnail' | 'nextImage' | 'proxy';
-
-export function getNextImageOptimizerSrc(src: string, width = 1200, quality = 90): string {
-  if (!src || src.startsWith('/')) return src;
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`;
-}
-
-export function getProxyImageSrc(src: string): string {
-  if (!src || src.startsWith('/')) return src;
-  return `/api/baget/image-proxy?url=${encodeURIComponent(src)}`;
-}
-
-export function getModalImageSrc(previewImage: string, previewSourceMode: PreviewSourceMode, modalPrimarySrc: string | null): string {
-  if (previewSourceMode === 'thumbnail' && modalPrimarySrc) return modalPrimarySrc;
-  if (previewSourceMode === 'proxy') return getProxyImageSrc(previewImage);
-  return getNextImageOptimizerSrc(previewImage);
+export function getBagetProxyImageSrc(src: string, width: number): string {
+  if (!src) return BAGET_PLACEHOLDER_IMAGE;
+  if (src.startsWith('/')) return src;
+  return `/api/baget/image-proxy?url=${encodeURIComponent(src)}&width=${width}`;
 }
 
 function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
@@ -49,21 +36,13 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
     () => [item.cardImage, item.fallbackImage, BAGET_PLACEHOLDER_IMAGE].filter(Boolean) as string[],
     [item.cardImage, item.fallbackImage],
   );
-  const realImageCandidates = useMemo(
-    () => [item.cardImage, item.fallbackImage].filter(Boolean) as string[],
-    [item.cardImage, item.fallbackImage],
-  );
   const [thumbnailImageIndex, setThumbnailImageIndex] = useState(0);
   const [previewImageIndex, setPreviewImageIndex] = useState(0);
-  const [previewSourceMode, setPreviewSourceMode] = useState<PreviewSourceMode>('thumbnail');
-  const [modalPrimarySrc, setModalPrimarySrc] = useState<string | null>(null);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
 
   useEffect(() => {
     setThumbnailImageIndex(0);
     setPreviewImageIndex(0);
-    setPreviewSourceMode('thumbnail');
-    setModalPrimarySrc(null);
   }, [item.id, imageCandidates]);
 
   useEffect(() => {
@@ -86,9 +65,7 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   }, [isImagePreviewOpen]);
 
   const thumbnailImage = imageCandidates[Math.min(thumbnailImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
-  const previewImage = previewImageIndex >= realImageCandidates.length
-    ? BAGET_PLACEHOLDER_IMAGE
-    : realImageCandidates[Math.min(previewImageIndex, realImageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
+  const previewImage = imageCandidates[Math.min(previewImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
 
   const handleThumbnailImageError = () => {
     setThumbnailImageIndex((prev) => {
@@ -98,37 +75,14 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   };
 
   const handlePreviewImageError = () => {
-    if (previewImageIndex >= realImageCandidates.length) return;
-
-    if (previewSourceMode === 'thumbnail') {
-      setPreviewSourceMode('nextImage');
-      return;
-    }
-
-    if (previewSourceMode === 'nextImage') {
-      setPreviewSourceMode('proxy');
-      return;
-    }
-
-    const nextIndex = previewImageIndex + 1;
-    if (nextIndex < realImageCandidates.length) {
-      setPreviewImageIndex(nextIndex);
-      setPreviewSourceMode('nextImage');
-      setModalPrimarySrc(null);
-      return;
-    }
-
-    setPreviewImageIndex(realImageCandidates.length);
-    setPreviewSourceMode('nextImage');
-    setModalPrimarySrc(null);
+    setPreviewImageIndex((prev) => {
+      const next = Math.min(prev + 1, imageCandidates.length - 1);
+      return next === prev ? prev : next;
+    });
   };
 
   const openImagePreview = () => {
-    const loadedThumbnailSrc = thumbnailImgRef.current?.currentSrc || thumbnailImgRef.current?.src || null;
-
-    setModalPrimarySrc(loadedThumbnailSrc);
-    setPreviewImageIndex(0);
-    setPreviewSourceMode('thumbnail');
+    setPreviewImageIndex(Math.min(thumbnailImageIndex, imageCandidates.length - 1));
     setIsImagePreviewOpen(true);
   };
 
@@ -147,13 +101,13 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
           className="group relative mb-2 block aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg bg-neutral-100 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2"
           aria-label={`Увеличить изображение багета ${item.name}`}
         >
-          <Image
-            src={thumbnailImage}
+          {/* eslint-disable-next-line @next/next/no-img-element -- Baguette catalog images must bypass Next Image Optimization. */}
+          <img
+            src={getBagetProxyImageSrc(thumbnailImage, 700)}
             alt={`Угол багета ${item.name}`}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-            className="object-cover"
+            className="h-full w-full object-cover"
             loading="lazy"
+            decoding="async"
             ref={thumbnailImgRef}
             onError={handleThumbnailImageError}
           />
@@ -205,7 +159,7 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
             <div className="relative mx-auto aspect-square w-full max-h-[80vh] overflow-hidden rounded-xl bg-neutral-100">
               {/* eslint-disable-next-line @next/next/no-img-element -- Avoid Next image optimization for enlarged remote previews. */}
               <img
-                src={getModalImageSrc(previewImage, previewSourceMode, modalPrimarySrc)}
+                src={getBagetProxyImageSrc(previewImage, 1600)}
                 alt={`Увеличенный угол багета ${item.name}`}
                 className="h-full w-full object-contain"
                 loading="eager"
