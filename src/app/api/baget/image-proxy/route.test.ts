@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
+import {
+  buildUpstreamImageCandidates,
+  clampProxyWidth,
+  extractGoogleDriveFileId,
+  isAllowedHostname,
+  parseAllowedImageUrl,
+} from './helpers';
 
 const fetchMock = vi.fn();
 const warnMock = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -26,6 +33,35 @@ function requestFor(rawUrl: string, width?: string) {
 
   return new NextRequest(url);
 }
+
+describe('image proxy helpers', () => {
+  it('extracts Google Drive file IDs from supported URL formats', () => {
+    expect(extractGoogleDriveFileId(new URL('https://drive.google.com/file/d/abc123/view?usp=sharing'))).toBe('abc123');
+    expect(extractGoogleDriveFileId(new URL('https://drive.google.com/open?id=abc123'))).toBe('abc123');
+    expect(extractGoogleDriveFileId(new URL('https://drive.google.com/uc?id=abc123'))).toBe('abc123');
+    expect(extractGoogleDriveFileId(new URL('https://drive.google.com/uc?export=view&id=abc123'))).toBe('abc123');
+    expect(extractGoogleDriveFileId(new URL('https://docs.google.com/document/d/abc123/edit'))).toBe('abc123');
+  });
+
+  it('clamps proxy widths and builds Google Drive candidates in fallback order', () => {
+    expect(clampProxyWidth(null)).toBe(900);
+    expect(clampProxyWidth('50')).toBe(120);
+    expect(clampProxyWidth('5000')).toBe(2000);
+
+    expect(buildUpstreamImageCandidates(new URL('https://drive.google.com/uc?export=view&id=abc123'), 700).map(String)).toEqual([
+      'https://drive.google.com/thumbnail?id=abc123&sz=w700',
+      'https://drive.usercontent.google.com/download?id=abc123&export=view',
+      'https://drive.google.com/uc?export=view&id=abc123',
+    ]);
+  });
+
+  it('parses only allowlisted HTTPS image hosts', () => {
+    expect(isAllowedHostname('lh3.googleusercontent.com')).toBe(true);
+    expect(parseAllowedImageUrl('https://images.ctfassets.net/space/image.jpg')?.hostname).toBe('images.ctfassets.net');
+    expect(parseAllowedImageUrl('https://example.com/image.jpg')).toBeNull();
+    expect(parseAllowedImageUrl('http://drive.google.com/uc?id=abc123')).toBeNull();
+  });
+});
 
 describe('GET /api/baget/image-proxy', () => {
   beforeEach(() => {
