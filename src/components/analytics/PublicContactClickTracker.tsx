@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { trackContactClick } from '@/lib/analytics/yandexMetrica';
+import { COOKIE_CONSENT_CHANGED_EVENT, hasAnalyticsConsent } from '@/lib/analytics/cookieConsent';
 
 function resolveContactType(anchor: HTMLAnchorElement): 'phone' | 'whatsapp' | 'telegram' | 'email' | null {
   const href = anchor.getAttribute('href')?.trim().toLowerCase() ?? '';
@@ -16,8 +17,20 @@ function resolveContactType(anchor: HTMLAnchorElement): 'phone' | 'whatsapp' | '
 }
 
 export default function PublicContactClickTracker() {
+  const [isAnalyticsAllowed, setIsAnalyticsAllowed] = useState(false);
+
+  useEffect(() => {
+    setIsAnalyticsAllowed(hasAnalyticsConsent());
+
+    const handleConsentChanged = () => setIsAnalyticsAllowed(hasAnalyticsConsent());
+    window.addEventListener(COOKIE_CONSENT_CHANGED_EVENT, handleConsentChanged);
+    return () => window.removeEventListener(COOKIE_CONSENT_CHANGED_EVENT, handleConsentChanged);
+  }, []);
+
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
+      if (!isAnalyticsAllowed) return;
+
       const target = event.target;
       if (!(target instanceof Element)) return;
 
@@ -34,7 +47,7 @@ export default function PublicContactClickTracker() {
     return () => {
       document.removeEventListener('click', onClick);
     };
-  }, []);
+  }, [isAnalyticsAllowed]);
 
   return null;
 }
