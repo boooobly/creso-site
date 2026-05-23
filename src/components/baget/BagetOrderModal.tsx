@@ -19,6 +19,8 @@ type BagetSelection = {
   article?: string;
   title?: string;
   widthMm?: number;
+  widthWithQuarterMm?: number;
+  quarterMm?: number;
   pricePerM?: number;
 } | null;
 
@@ -386,7 +388,7 @@ export default function BagetOrderModal({
                         : orderSummary.frameMode === 'noFrame'
                           ? 'Без рамки'
                           : 'Не выбран'}
-                      {orderSummary.selectedBaget?.widthMm ? `, ${orderSummary.selectedBaget.widthMm} мм` : ''}
+                      {orderSummary.selectedBaget?.widthWithQuarterMm ? `, ${orderSummary.selectedBaget.widthWithQuarterMm} мм (без четверти ${orderSummary.selectedBaget.widthMm ?? '—'} мм)` : orderSummary.selectedBaget?.widthMm ? `, ${orderSummary.selectedBaget.widthMm} мм` : ''}
                       {orderSummary.selectedBaget?.pricePerM ? `, ${orderSummary.selectedBaget.pricePerM.toLocaleString('ru-RU')} ₽/м` : ''}
                     </dd>
                   </div>

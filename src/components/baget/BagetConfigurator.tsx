@@ -638,6 +638,8 @@ export default function BagetConfigurator({
             article: selectedBagetForQuote.article,
             title: selectedBagetForQuote.name,
             widthMm: selectedBagetForQuote.width_mm,
+            widthWithQuarterMm: selectedBagetForQuote.width_with_quarter_mm,
+            quarterMm: Math.max(0, selectedBagetForQuote.width_with_quarter_mm - selectedBagetForQuote.width_mm),
             pricePerM: selectedBagetForQuote.price_per_meter,
           }
         : null,
@@ -955,7 +957,7 @@ export default function BagetConfigurator({
                   <div className="min-w-0 flex-1 text-sm">
                     <p className="truncate font-medium">{selectedBagetForQuote.name}</p>
                     <p className="text-xs text-neutral-500 dark:text-neutral-300">Артикул: {selectedBagetForQuote.article}</p>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-300">{selectedBagetForQuote.width_with_quarter_mm} мм (видимая {selectedBagetForQuote.width_mm} мм) · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-300">{selectedBagetForQuote.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote.width_mm} мм) · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
                   </div>
                 </div>
               ) : (
@@ -1005,7 +1007,7 @@ export default function BagetConfigurator({
                         <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
                       </li>
                       <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                        <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (видимая {selectedBagetForQuote?.width_mm} мм)
+                        <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote?.width_mm} мм)
                       </li>
                     </>
                   ) : (
@@ -1183,7 +1185,7 @@ export default function BagetConfigurator({
                       <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
                     </li>
                     <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                      <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (видимая {selectedBagetForQuote?.width_mm} мм)
+                      <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote?.width_mm} мм)
                     </li>
                   </>
                 ) : (
