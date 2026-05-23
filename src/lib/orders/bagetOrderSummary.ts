@@ -33,6 +33,8 @@ export type BagetOrderSummaryData = {
     color?: string | null;
     style?: string | null;
     widthMm?: number | null;
+    widthWithQuarterMm?: number | null;
+    quarterMm?: number | null;
   } | null;
   workType: {
     value?: string | null;
