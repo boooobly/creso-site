@@ -83,14 +83,16 @@ export default function BagetPreview({
   }, []);
 
   const previewGeometry = useMemo(() => {
-    const bagetWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_mm ?? 0);
+    const bagetVisibleWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_mm ?? 0);
+    const bagetFullWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_with_quarter_mm ?? bagetVisibleWidthMm);
 
     return calculatePreviewGeometry({
       containerWidthPx: containerPx.width,
       containerHeightPx: containerPx.height,
       workWidthMm: safeWidthMm,
       workHeightMm: safeHeightMm,
-      bagetWidthMm,
+      bagetVisibleWidthMm,
+      bagetFullWidthMm,
       passepartoutMm: safePasseMm,
       passepartoutBottomMm: safePasseBottomMm,
     });
@@ -290,8 +292,8 @@ export default function BagetPreview({
             <div
               className="absolute overflow-hidden transition-all duration-200"
               style={{
-                top: `${previewGeometry.framePx}px`,
-                left: `${previewGeometry.framePx}px`,
+                top: `${previewGeometry.contentOffsetPx}px`,
+                left: `${previewGeometry.contentOffsetPx}px`,
                 width: `${previewGeometry.effectiveWpx}px`,
                 height: `${previewGeometry.effectiveHpx}px`,
                 backgroundColor: PASSEPARTOUT_COLORS[passepartoutColor],

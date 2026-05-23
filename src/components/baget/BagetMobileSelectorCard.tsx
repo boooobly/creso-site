@@ -45,7 +45,8 @@ export default function BagetMobileSelectorCard({ item, selected, onSelect }: Ba
 
       <p className="line-clamp-2 min-h-8 text-xs font-medium leading-snug text-neutral-900 dark:text-neutral-100">{item.name}</p>
       <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{item.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
-      <p className="text-[11px] text-neutral-500 dark:text-neutral-300">Ширина: {item.width_mm} мм</p>
+      <p className="text-[11px] text-neutral-500 dark:text-neutral-300">Ширина: {item.width_with_quarter_mm} мм</p>
+      <p className="text-[11px] text-neutral-500 dark:text-neutral-300">Без четверти: {item.width_mm} мм</p>
     </button>
   );
 }

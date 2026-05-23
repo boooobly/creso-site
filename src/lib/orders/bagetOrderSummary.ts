@@ -33,6 +33,8 @@ export type BagetOrderSummaryData = {
     color?: string | null;
     style?: string | null;
     widthMm?: number | null;
+    widthWithQuarterMm?: number | null;
+    quarterMm?: number | null;
   } | null;
   workType: {
     value?: string | null;
@@ -110,6 +112,7 @@ type SelectedBagetLike = {
   color?: string | null;
   style?: string | null;
   width_mm?: number | null;
+  width_with_quarter_mm?: number | null;
 };
 
 const WORK_TYPE_LABELS: Record<string, string> = {
@@ -304,6 +307,8 @@ export function buildBagetOrderSummary(params: {
           color: formatOptional(params.selectedBaget?.color ?? null),
           style: formatOptional(params.selectedBaget?.style ?? null),
           widthMm: params.selectedBaget?.width_mm ?? null,
+          widthWithQuarterMm: params.selectedBaget?.width_with_quarter_mm ?? params.selectedBaget?.width_mm ?? null,
+          quarterMm: Math.max(0, (params.selectedBaget?.width_with_quarter_mm ?? params.selectedBaget?.width_mm ?? 0) - (params.selectedBaget?.width_mm ?? 0)),
         }
       : null,
     workType: {

@@ -56,6 +56,8 @@ function buildNotificationText(payload: NotifyNewOrderPayload): string {
   const bagetName = payload.orderSummary.baguette?.name;
   const bagetArticle = payload.orderSummary.baguette?.article;
   const bagetWidth = payload.orderSummary.baguette?.widthMm;
+  const bagetWidthWithQuarter = payload.orderSummary.baguette?.widthWithQuarterMm;
+  const bagetQuarter = payload.orderSummary.baguette?.quarterMm;
   const bagetColor = payload.orderSummary.baguette?.color;
   const bagetLine = payload.orderSummary.frameMode.value === 'noFrame'
     ? 'Без рамки'
@@ -77,7 +79,9 @@ function buildNotificationText(payload: NotifyNewOrderPayload): string {
     `• Эффективный размер: ${Math.round(payload.effectiveSize.width)} × ${Math.round(payload.effectiveSize.height)} мм`,
     `• Багет: ${bagetLine}`,
     `• Цвет / стиль: ${formatValue([bagetColor, payload.orderSummary.baguette?.style].filter(Boolean).join(' / ') || null)}`,
-    `• Ширина профиля: ${bagetWidth ? `${Math.round(bagetWidth)} мм` : '—'}`,
+    `• Ширина с четвертью: ${bagetWidthWithQuarter ? `${Math.round(bagetWidthWithQuarter)} мм` : '—'}`,
+    `• Ширина без четверти: ${bagetWidth ? `${Math.round(bagetWidth)} мм` : '—'}`,
+    `• Четверть: ${bagetQuarter !== null && bagetQuarter !== undefined ? `${Math.round(bagetQuarter)} мм` : '—'}`,
     `• Тип работы: ${payload.orderSummary.workType.label}`,
     `• Остекление: ${payload.orderSummary.glazing.label}`,
     `• Паспарту: ${payload.orderSummary.passepartout.label}`,

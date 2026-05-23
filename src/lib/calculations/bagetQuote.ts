@@ -7,6 +7,7 @@ import type {
   WorkType,
 } from '@/components/baget/BagetFilters';
 import type { BagetPrintMaterial } from '@/lib/baget/printRequirement';
+import { resolveBagetFrameGeometry } from '@/lib/calculations/bagetGeometry';
 import {
   getBaguetteExtrasDefaultConfig,
   resolveAutoAdditionsFromConfig,
@@ -159,6 +160,11 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
         areaM2: 0,
         framedWidthMm: Number.isFinite(effectiveWidth) ? effectiveWidth : 0,
         framedHeightMm: Number.isFinite(effectiveHeight) ? effectiveHeight : 0,
+        bagetVisibleWidthMm: 0,
+        bagetFullWidthMm: 0,
+        bagetQuarterMm: 0,
+        visibleOpeningWidthMm: Number.isFinite(effectiveWidth) ? effectiveWidth : 0,
+        visibleOpeningHeightMm: Number.isFinite(effectiveHeight) ? effectiveHeight : 0,
         bagetMeters: 0,
         hangingLabel: hangerType === 'crocodile' ? 'Крокодильчик × 1' : `Тросик (${extrasConfig.hanging.wireLoopDefaultQty} петли)`,
         autoAdditions: effectiveAutoAdditions,
@@ -182,12 +188,23 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     };
   }
 
-  const bagetWidthMm = requiresBaget ? (input.selectedBaget?.width_mm ?? 0) : 0;
+  const bagetVisibleWidthMm = requiresBaget ? (input.selectedBaget?.width_mm ?? 0) : 0;
+  const bagetFullWidthMm = requiresBaget ? (input.selectedBaget?.width_with_quarter_mm ?? bagetVisibleWidthMm) : 0;
+  const frameGeometry = resolveBagetFrameGeometry({
+    workWidthMm: width,
+    workHeightMm: height,
+    passepartoutLeftMm: input.hasPassepartout ? passepartoutSize : 0,
+    passepartoutRightMm: input.hasPassepartout ? passepartoutSize : 0,
+    passepartoutTopMm: input.hasPassepartout ? passepartoutSize : 0,
+    passepartoutBottomMm: input.hasPassepartout ? passepartoutBottomSize : 0,
+    visibleWidthMm: bagetVisibleWidthMm,
+    fullWidthMm: bagetFullWidthMm,
+  });
   const areaM2 = (effectiveWidth * effectiveHeight) / 1_000_000;
   const perimeterM = (2 * (effectiveWidth + effectiveHeight)) / 1000;
   const printAreaM2 = (width * height) / 1_000_000;
   const bagetMeters = requiresBaget
-    ? ((2 * (effectiveWidth + effectiveHeight) + 8 * bagetWidthMm) / 1000) * 1.05
+    ? ((2 * (frameGeometry.outerFrameWidthMm + frameGeometry.outerFrameHeightMm)) / 1000) * 1.05
     : 0;
   const bagetCost = requiresBaget && input.selectedBaget
     ? bagetMeters * input.selectedBaget.price_per_meter
@@ -238,7 +255,7 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     : 0;
   const { clampPrice, clampStepM } = resolveFastenersPricing(extrasConfig);
   const clampsPerimeterM = requiresBaget
-    ? (2 * (effectiveWidth + effectiveHeight) + 8 * bagetWidthMm) / 1000
+    ? (2 * (frameGeometry.outerFrameWidthMm + frameGeometry.outerFrameHeightMm)) / 1000
     : 0;
   const clampsCount = requiresBaget && clampStepM > 0
     ? clampsPerimeterM / clampStepM
@@ -337,8 +354,8 @@ export function bagetQuote(input: BagetQuoteInput, extrasConfig: BaguetteExtrasP
     warnings,
     meta: {
       areaM2,
-      framedWidthMm: effectiveWidth + 2 * bagetWidthMm,
-      framedHeightMm: effectiveHeight + 2 * bagetWidthMm,
+      framedWidthMm: frameGeometry.outerFrameWidthMm,
+      framedHeightMm: frameGeometry.outerFrameHeightMm,
       bagetMeters,
       bagetCost,
       printCost,

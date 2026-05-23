@@ -103,13 +103,13 @@ export function canFulfillFrameFromPieces(piecesMeters: number[], requiredSidesM
 }
 
 export function computeRequiredSidesMeters(
-  effectiveWidthMm: number,
-  effectiveHeightMm: number,
-  bagetProfileWidthMm: number,
+  visibleOpeningWidthMm: number,
+  visibleOpeningHeightMm: number,
+  bagetFullWidthMm: number,
   reserveMmPerSide: number,
 ): number[] {
-  const sideWidthMeters = (effectiveWidthMm + 2 * bagetProfileWidthMm + reserveMmPerSide) / 1000;
-  const sideHeightMeters = (effectiveHeightMm + 2 * bagetProfileWidthMm + reserveMmPerSide) / 1000;
+  const sideWidthMeters = (visibleOpeningWidthMm + 2 * bagetFullWidthMm + reserveMmPerSide) / 1000;
+  const sideHeightMeters = (visibleOpeningHeightMm + 2 * bagetFullWidthMm + reserveMmPerSide) / 1000;
 
   return [sideWidthMeters, sideWidthMeters, sideHeightMeters, sideHeightMeters];
 }

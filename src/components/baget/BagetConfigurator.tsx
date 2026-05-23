@@ -11,6 +11,7 @@ import {
 } from 'react';
 import Image from 'next/image';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
+import { resolveBagetFrameGeometry } from '@/lib/calculations/bagetGeometry';
 import type { BaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
@@ -154,6 +155,7 @@ export default function BagetConfigurator({
           color: item.color,
           style: item.style,
           width_mm: item.width_mm,
+          width_with_quarter_mm: item.width_with_quarter_mm,
           price_per_meter: item.price_per_meter,
           cardImage: cornerImage || plankImage || BAGET_PLACEHOLDER_IMAGE,
           frameTextureImage: plankTexture || cornerTextureFallback || '',
@@ -474,19 +476,30 @@ export default function BagetConfigurator({
         const articleMatch = !normalizedArticleQuery || normalizedArticle.includes(normalizedArticleQuery);
         const visibleOnSite = item.show_on_site;
 
+        const stockGeometry = resolveBagetFrameGeometry({
+          workWidthMm: widthMm,
+          workHeightMm: heightMm,
+          passepartoutLeftMm: materials.passepartout ? passepartoutMm : 0,
+          passepartoutRightMm: materials.passepartout ? passepartoutMm : 0,
+          passepartoutTopMm: materials.passepartout ? passepartoutMm : 0,
+          passepartoutBottomMm: materials.passepartout ? passepartoutBottomMm : 0,
+          visibleWidthMm: item.width_mm,
+          fullWidthMm: item.width_with_quarter_mm,
+        });
+
         const canFulfillFromStock = !validSize || canFulfillFrameFromPieces(
           parseResiduesToPieces(item.residues_text),
           computeRequiredSidesMeters(
-            effectiveWidthMm,
-            effectiveHeightMm,
-            Number.isFinite(item.width_mm) ? item.width_mm : 0,
+            stockGeometry.visibleOpeningWidthMm,
+            stockGeometry.visibleOpeningHeightMm,
+            stockGeometry.fullWidthMm,
             Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10,
           ),
         );
 
         return colorMatch && styleMatch && widthMatch && priceMatch && articleMatch && visibleOnSite && canFulfillFromStock;
       }),
-    [catalogItems, effectiveHeightMm, effectiveWidthMm, filters, normalizedArticleQuery, validSize],
+    [catalogItems, filters, normalizedArticleQuery, validSize, widthMm, heightMm, materials.passepartout, passepartoutMm, passepartoutBottomMm],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
@@ -625,6 +638,8 @@ export default function BagetConfigurator({
             article: selectedBagetForQuote.article,
             title: selectedBagetForQuote.name,
             widthMm: selectedBagetForQuote.width_mm,
+            widthWithQuarterMm: selectedBagetForQuote.width_with_quarter_mm,
+            quarterMm: Math.max(0, selectedBagetForQuote.width_with_quarter_mm - selectedBagetForQuote.width_mm),
             pricePerM: selectedBagetForQuote.price_per_meter,
           }
         : null,
@@ -723,8 +738,7 @@ export default function BagetConfigurator({
     materials.backPanel,
     calcMeta.printMaterial,
     calcMeta.requiresPrint,
-    isNoFrameStretchedCanvas,
-    isStretcherOnly,
+    requiresDecorativeBaget,
     materials.glazing,
     materials.hanging,
     materials.passepartout,
@@ -824,7 +838,7 @@ export default function BagetConfigurator({
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <label className="block space-y-1 text-sm">
-                <span>Ширина (мм)</span>
+                <span>Видимая ширина от, мм</span>
                 <input
                   type="number"
                   min={50}
@@ -943,7 +957,7 @@ export default function BagetConfigurator({
                   <div className="min-w-0 flex-1 text-sm">
                     <p className="truncate font-medium">{selectedBagetForQuote.name}</p>
                     <p className="text-xs text-neutral-500 dark:text-neutral-300">Артикул: {selectedBagetForQuote.article}</p>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-300">{selectedBagetForQuote.width_mm} мм · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-300">{selectedBagetForQuote.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote.width_mm} мм) · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
                   </div>
                 </div>
               ) : (
@@ -993,7 +1007,7 @@ export default function BagetConfigurator({
                         <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
                       </li>
                       <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                        <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_mm} мм
+                        <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote?.width_mm} мм)
                       </li>
                     </>
                   ) : (
@@ -1082,7 +1096,7 @@ export default function BagetConfigurator({
             <h2 className="mb-3 text-base font-semibold">Размер изделия (мм)</h2>
             <div className="space-y-3">
               <label className="block space-y-1 text-sm">
-                <span>Ширина (мм)</span>
+                <span>Видимая ширина до, мм</span>
                 <input
                   type="number"
                   min={50}
@@ -1171,7 +1185,7 @@ export default function BagetConfigurator({
                       <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
                     </li>
                     <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                      <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_mm} мм
+                      <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote?.width_mm} мм)
                     </li>
                   </>
                 ) : (
@@ -1317,7 +1331,7 @@ export default function BagetConfigurator({
                 {mobileDraftBaget ? (
                   <>
                     <p className="truncate text-xs text-neutral-500 dark:text-neutral-300">
-                      {mobileDraftBaget.article} · {mobileDraftBaget.width_mm} мм
+                      {mobileDraftBaget.article} · {mobileDraftBaget.width_with_quarter_mm} мм
                     </p>
                     <p className="truncate text-sm font-medium">{mobileDraftBaget.name}</p>
                   </>
