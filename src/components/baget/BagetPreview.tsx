@@ -83,14 +83,16 @@ export default function BagetPreview({
   }, []);
 
   const previewGeometry = useMemo(() => {
-    const bagetWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_mm ?? 0);
+    const bagetVisibleWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_mm ?? 0);
+    const bagetFullWidthMm = stretchedCanvas ? 0 : (selectedBaget?.width_with_quarter_mm ?? bagetVisibleWidthMm);
 
     return calculatePreviewGeometry({
       containerWidthPx: containerPx.width,
       containerHeightPx: containerPx.height,
       workWidthMm: safeWidthMm,
       workHeightMm: safeHeightMm,
-      bagetWidthMm,
+      bagetVisibleWidthMm,
+      bagetFullWidthMm,
       passepartoutMm: safePasseMm,
       passepartoutBottomMm: safePasseBottomMm,
     });

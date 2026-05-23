@@ -10,6 +10,7 @@ export type BagetItem = {
   color: string;
   style: string;
   width_mm: number;
+  width_with_quarter_mm: number;
   price_per_meter: number;
   cardImage?: string;
   frameTextureImage?: string;
@@ -119,7 +120,8 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
           </span>
         </button>
         <h3 className="min-h-[2.25rem] text-xs font-semibold leading-tight sm:text-sm">{item.name}</h3>
-        <p className="mt-1 text-[11px] text-neutral-600 dark:text-neutral-300 sm:text-xs">{item.width_mm} мм</p>
+        <p className="mt-1 text-[11px] text-neutral-600 dark:text-neutral-300 sm:text-xs">{item.width_with_quarter_mm} мм</p>
+        <p className="text-[11px] text-neutral-500 dark:text-neutral-400 sm:text-xs">видимая часть {item.width_mm} мм</p>
         <p className="text-[11px] text-neutral-700 dark:text-neutral-200 sm:text-xs">{item.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
         <button
           type="button"

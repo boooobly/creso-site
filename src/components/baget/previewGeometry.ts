@@ -3,7 +3,8 @@ export type PreviewGeometryInput = {
   containerHeightPx: number;
   workWidthMm: number;
   workHeightMm: number;
-  bagetWidthMm: number;
+  bagetVisibleWidthMm: number;
+  bagetFullWidthMm: number;
   passepartoutMm: number;
   passepartoutBottomMm: number;
 };
@@ -22,7 +23,7 @@ export type PreviewGeometry = {
 };
 
 export function calculatePreviewGeometry(input: PreviewGeometryInput): PreviewGeometry {
-  const { containerWidthPx, containerHeightPx, workWidthMm, workHeightMm, bagetWidthMm, passepartoutMm, passepartoutBottomMm } = input;
+  const { containerWidthPx, containerHeightPx, workWidthMm, workHeightMm, bagetVisibleWidthMm, bagetFullWidthMm, passepartoutMm, passepartoutBottomMm } = input;
 
   if (!containerWidthPx || !containerHeightPx) {
     return {
@@ -41,11 +42,14 @@ export function calculatePreviewGeometry(input: PreviewGeometryInput): PreviewGe
 
   const effectiveWmm = workWidthMm + passepartoutMm * 2;
   const effectiveHmm = workHeightMm + passepartoutMm + passepartoutBottomMm;
-  const outerTotalWmm = effectiveWmm + 2 * bagetWidthMm;
-  const outerTotalHmm = effectiveHmm + 2 * bagetWidthMm;
+  const quarterMm = Math.max(0, bagetFullWidthMm - bagetVisibleWidthMm);
+  const visibleOpeningWmm = Math.max(0, effectiveWmm - 2 * quarterMm);
+  const visibleOpeningHmm = Math.max(0, effectiveHmm - 2 * quarterMm);
+  const outerTotalWmm = visibleOpeningWmm + 2 * bagetFullWidthMm;
+  const outerTotalHmm = visibleOpeningHmm + 2 * bagetFullWidthMm;
   const scale = Math.min(containerWidthPx / outerTotalWmm, containerHeightPx / outerTotalHmm);
 
-  const framePx = bagetWidthMm > 0 ? bagetWidthMm * scale : 0;
+  const framePx = bagetFullWidthMm > 0 ? bagetFullWidthMm * scale : 0;
   const passePx = passepartoutMm * scale;
   const passeBottomPx = passepartoutBottomMm * scale;
   const workWpx = workWidthMm * scale;

@@ -27,6 +27,7 @@ const bagetItemSchema = z.object({
   color: z.string(),
   style: z.string(),
   width_mm: z.number(),
+  width_with_quarter_mm: z.number().optional(),
   price_per_meter: z.number(),
   image: z.string(),
 });

@@ -8,7 +8,8 @@ describe('calculatePreviewGeometry', () => {
       containerHeightPx: 1000,
       workWidthMm: 100,
       workHeightMm: 100,
-      bagetWidthMm: 81,
+      bagetVisibleWidthMm: 81,
+      bagetFullWidthMm: 81,
       passepartoutMm: 0,
       passepartoutBottomMm: 0,
     });
@@ -23,7 +24,8 @@ describe('calculatePreviewGeometry', () => {
       containerHeightPx: 1400,
       workWidthMm: 500,
       workHeightMm: 700,
-      bagetWidthMm: 30,
+      bagetVisibleWidthMm: 30,
+      bagetFullWidthMm: 30,
       passepartoutMm: 0,
       passepartoutBottomMm: 0,
     });
@@ -38,7 +40,8 @@ describe('calculatePreviewGeometry', () => {
       containerHeightPx: 1000,
       workWidthMm: 100,
       workHeightMm: 100,
-      bagetWidthMm: 10,
+      bagetVisibleWidthMm: 10,
+      bagetFullWidthMm: 10,
       passepartoutMm: 0,
       passepartoutBottomMm: 0,
     });

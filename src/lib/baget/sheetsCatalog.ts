@@ -15,6 +15,7 @@ const HEADERS = {
   article: 'Артикул',
   name: 'Название багета',
   widthMm: 'Ширина в миллиметрах',
+  widthWithQuarterMm: 'Ширина с четвертью в мм',
   pricePerMeter: 'Цена за метр',
   residues: 'Остатки багета, м (редактируемая строка)',
   reserveMm: 'Запас на распил, мм',
@@ -40,6 +41,7 @@ const HEADER_ALIASES = {
     'Профиль',
   ],
   widthMm: [HEADERS.widthMm, 'Ширина в мм', 'Ширина, мм', 'Ширина', 'Ширина профиля'],
+  widthWithQuarterMm: [HEADERS.widthWithQuarterMm, 'Ширина с четвертью', 'Полная ширина, мм', 'Ширина профиля с четвертью', 'Ширина багета с четвертью'],
   pricePerMeter: [HEADERS.pricePerMeter, 'Цена', 'Цена за м', 'Цена за пог.м', 'Цена за пог. м', 'Цена, ₽/м'],
   residues: [
     HEADERS.residues,
@@ -65,6 +67,7 @@ export type BagetSheetItem = {
   article: string;
   name: string;
   width_mm: number;
+  width_with_quarter_mm: number;
   price_per_meter: number;
   residues_text: string;
   reserve_mm: number;
@@ -90,6 +93,8 @@ export type BagetCatalogDiagnostics = {
   showOnSiteValues?: Array<{ value: string; count: number }>;
   nameHeader?: string | null;
   nameValuesMissing?: number;
+  widthWithQuarterHeader?: string | null;
+  widthWithQuarterFallbackCount?: number;
 };
 
 type CsvRow = Record<string, string>;
@@ -101,6 +106,7 @@ type BagetCatalogItem = {
   color: string;
   style: string;
   width_mm: number;
+  width_with_quarter_mm: number;
   price_per_meter: number;
   image: string;
 };
@@ -255,6 +261,10 @@ function mapRowToItem(
     skipped.invalidWidth += 1;
     return null;
   }
+  const widthWithQuarterRaw = toNumber(getFirstByAliases(row, HEADER_ALIASES.widthWithQuarterMm));
+  const widthWithQuarterMm = Number.isFinite(widthWithQuarterRaw) && widthWithQuarterRaw > 0 && widthWithQuarterRaw >= widthMm
+    ? widthWithQuarterRaw
+    : widthMm;
   const pricePerMeter = toNumber(getFirstByAliases(row, HEADER_ALIASES.pricePerMeter));
   if (!Number.isFinite(pricePerMeter)) {
     skipped.invalidPrice += 1;
@@ -272,6 +282,7 @@ function mapRowToItem(
       article,
       name,
       width_mm: widthMm,
+      width_with_quarter_mm: widthWithQuarterMm,
       price_per_meter: pricePerMeter,
       residues_text: residuesText,
       reserve_mm: toNumber(getFirstByAliases(row, HEADER_ALIASES.reserveMm), DEFAULT_RESERVE_MM),
@@ -296,6 +307,7 @@ function getFallbackCatalog(): BagetSheetItem[] {
     article: item.article,
     name: item.name,
     width_mm: item.width_mm,
+    width_with_quarter_mm: item.width_mm,
     price_per_meter: item.price_per_meter,
     residues_text: '100*20',
     reserve_mm: DEFAULT_RESERVE_MM,
@@ -316,6 +328,7 @@ export function mapSheetItemsToBagetItems(items: BagetSheetItem[]): BagetCatalog
     color: item.color,
     style: item.style,
     width_mm: item.width_mm,
+    width_with_quarter_mm: item.width_mm,
     price_per_meter: item.price_per_meter,
     image:
       normalizeBagetImageUrl(item.image_url) ||
@@ -379,6 +392,12 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
       const rawName = getFirstByAliases(row, HEADER_ALIASES.name).trim();
       return Boolean(article) && !rawName;
     }).length;
+    const widthWithQuarterHeader = getFirstPresentHeader(headers, HEADER_ALIASES.widthWithQuarterMm);
+    const widthWithQuarterFallbackCount = records.filter((row) => {
+      const widthMm = toNumber(getFirstByAliases(row, HEADER_ALIASES.widthMm));
+      const widthWithQuarter = toNumber(getFirstByAliases(row, HEADER_ALIASES.widthWithQuarterMm));
+      return !Number.isFinite(widthWithQuarter) || widthWithQuarter <= 0 || !Number.isFinite(widthMm) || widthWithQuarter < widthMm;
+    }).length;
     const showOnSiteHistogram = new Map<string, number>();
     for (const row of records) {
       const rawValue = (showOnSiteHeader ? row[showOnSiteHeader] : undefined) ?? '';
@@ -403,6 +422,8 @@ export async function loadBagetCatalogUncached(sourceConfig = getBagetCatalogSou
       showOnSiteValues,
       nameHeader,
       nameValuesMissing,
+      widthWithQuarterHeader,
+      widthWithQuarterFallbackCount,
     };
 
     if (items.length === 0) {
