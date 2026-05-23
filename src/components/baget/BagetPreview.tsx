@@ -292,8 +292,8 @@ export default function BagetPreview({
             <div
               className="absolute overflow-hidden transition-all duration-200"
               style={{
-                top: `${previewGeometry.framePx}px`,
-                left: `${previewGeometry.framePx}px`,
+                top: `${previewGeometry.contentOffsetPx}px`,
+                left: `${previewGeometry.contentOffsetPx}px`,
                 width: `${previewGeometry.effectiveWpx}px`,
                 height: `${previewGeometry.effectiveHpx}px`,
                 backgroundColor: PASSEPARTOUT_COLORS[passepartoutColor],

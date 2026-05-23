@@ -7,6 +7,7 @@ import {
   type BagetCatalogDiagnostics,
   type BagetSheetItem,
 } from '@/lib/baget/sheetsCatalog';
+import { normalizeBagetWidths } from '@/lib/baget/widths';
 
 const BAGET_SNAPSHOT_SOURCE_KEY = 'public_baget_catalog';
 const BAGET_SNAPSHOT_CACHE_SECONDS = 120;
@@ -44,7 +45,17 @@ let lastAutoSyncedAt: string | null = null;
 
 function mapSnapshotItems(itemsJson: unknown): BagetSheetItem[] {
   if (!Array.isArray(itemsJson)) return [];
-  return itemsJson as BagetSheetItem[];
+
+  return itemsJson
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item) => {
+      const widths = normalizeBagetWidths(item.width_mm, item.width_with_quarter_mm);
+      return {
+        ...(item as BagetSheetItem),
+        width_mm: widths.visibleWidthMm,
+        width_with_quarter_mm: widths.fullWidthMm,
+      };
+    });
 }
 
 async function loadSnapshotUncached(): Promise<BagetCatalogSnapshotRecord | null> {

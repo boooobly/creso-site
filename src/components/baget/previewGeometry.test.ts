@@ -50,3 +50,24 @@ describe('calculatePreviewGeometry', () => {
     expect(geometry.outerHpx / geometry.workHpx).toBeCloseTo(120 / 100, 6);
   });
 });
+
+
+  it('uses visible/full/quarter model for 500x500 with visible 35 and full 40', () => {
+    const geometry = calculatePreviewGeometry({
+      containerWidthPx: 1140,
+      containerHeightPx: 1140,
+      workWidthMm: 500,
+      workHeightMm: 500,
+      bagetVisibleWidthMm: 35,
+      bagetFullWidthMm: 40,
+      passepartoutMm: 0,
+      passepartoutBottomMm: 0,
+    });
+
+    expect(geometry.outerWpx / geometry.workWpx).toBeCloseTo(570 / 500, 6);
+    expect(geometry.framePx / geometry.workWpx).toBeCloseTo(40 / 500, 6);
+    expect(geometry.contentOffsetPx / geometry.workWpx).toBeCloseTo(35 / 500, 6);
+    expect(geometry.quarterPx / geometry.workWpx).toBeCloseTo(5 / 500, 6);
+    expect(geometry.visibleOpeningWpx / geometry.workWpx).toBeCloseTo(490 / 500, 6);
+    expect(geometry.visibleOpeningHpx / geometry.workHpx).toBeCloseTo(490 / 500, 6);
+  });

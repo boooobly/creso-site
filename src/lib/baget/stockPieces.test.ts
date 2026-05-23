@@ -36,3 +36,9 @@ describe('canFulfillFrameFromPieces', () => {
     expect(canFulfillFrameFromPieces([1.3, 0.9], requiredSides)).toBe(false);
   });
 });
+
+
+  it('computes 500/35/40 stock side lengths as 570mm + reserve', () => {
+    expect(computeRequiredSidesMeters(490, 490, 40, 0)).toEqual([0.57, 0.57, 0.57, 0.57]);
+    expect(computeRequiredSidesMeters(490, 490, 40, 10)).toEqual([0.58, 0.58, 0.58, 0.58]);
+  });

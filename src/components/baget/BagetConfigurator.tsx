@@ -11,6 +11,7 @@ import {
 } from 'react';
 import Image from 'next/image';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
+import { resolveBagetFrameGeometry } from '@/lib/calculations/bagetGeometry';
 import type { BaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
 import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToPieces } from '@/lib/baget/stockPieces';
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
@@ -475,19 +476,30 @@ export default function BagetConfigurator({
         const articleMatch = !normalizedArticleQuery || normalizedArticle.includes(normalizedArticleQuery);
         const visibleOnSite = item.show_on_site;
 
+        const stockGeometry = resolveBagetFrameGeometry({
+          workWidthMm: widthMm,
+          workHeightMm: heightMm,
+          passepartoutLeftMm: materials.passepartout ? passepartoutMm : 0,
+          passepartoutRightMm: materials.passepartout ? passepartoutMm : 0,
+          passepartoutTopMm: materials.passepartout ? passepartoutMm : 0,
+          passepartoutBottomMm: materials.passepartout ? passepartoutBottomMm : 0,
+          visibleWidthMm: item.width_mm,
+          fullWidthMm: item.width_with_quarter_mm,
+        });
+
         const canFulfillFromStock = !validSize || canFulfillFrameFromPieces(
           parseResiduesToPieces(item.residues_text),
           computeRequiredSidesMeters(
-            effectiveWidthMm,
-            effectiveHeightMm,
-            Number.isFinite(item.width_with_quarter_mm) ? item.width_with_quarter_mm : item.width_mm,
+            stockGeometry.visibleOpeningWidthMm,
+            stockGeometry.visibleOpeningHeightMm,
+            stockGeometry.fullWidthMm,
             Number.isFinite(item.reserve_mm) ? item.reserve_mm : 10,
           ),
         );
 
         return colorMatch && styleMatch && widthMatch && priceMatch && articleMatch && visibleOnSite && canFulfillFromStock;
       }),
-    [catalogItems, effectiveHeightMm, effectiveWidthMm, filters, normalizedArticleQuery, validSize],
+    [catalogItems, filters, normalizedArticleQuery, validSize, widthMm, heightMm, materials.passepartout, passepartoutMm, passepartoutBottomMm],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
@@ -724,8 +736,7 @@ export default function BagetConfigurator({
     materials.backPanel,
     calcMeta.printMaterial,
     calcMeta.requiresPrint,
-    isNoFrameStretchedCanvas,
-    isStretcherOnly,
+    requiresDecorativeBaget,
     materials.glazing,
     materials.hanging,
     materials.passepartout,

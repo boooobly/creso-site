@@ -17,6 +17,7 @@ import { buildBagetOrderSummary, type PersistedOrderUpload } from '@/lib/orders/
 import { MAX_ORDER_IMAGE_SIZE_BYTES, storeBagetCustomerImage } from '@/lib/orders/storeCustomerImage';
 import { validateUploadedImageFile } from '@/lib/file-validation';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
+import { normalizeBagetWidths } from '@/lib/baget/widths';
 
 export const runtime = 'nodejs';
 
@@ -27,7 +28,7 @@ const bagetItemSchema = z.object({
   color: z.string(),
   style: z.string(),
   width_mm: z.number(),
-  width_with_quarter_mm: z.number().optional(),
+  width_with_quarter_mm: z.number(),
   price_per_meter: z.number(),
   image: z.string(),
 });
@@ -208,7 +209,15 @@ export async function POST(request: NextRequest) {
     }
 
     const sheetItems = await getBagetCatalogFromSheet();
-    const allBagets = z.array(bagetItemSchema).parse(mapSheetItemsToBagetItems(sheetItems));
+    const rawCatalog = mapSheetItemsToBagetItems(sheetItems).map((item) => {
+      const widths = normalizeBagetWidths(item.width_mm, item.width_with_quarter_mm);
+      return {
+        ...item,
+        width_mm: widths.visibleWidthMm,
+        width_with_quarter_mm: widths.fullWidthMm,
+      };
+    });
+    const allBagets = z.array(bagetItemSchema).parse(rawCatalog);
     const requiresBaget = parsed.data.baget.workType !== 'stretcherOnly' && !(parsed.data.baget.workType === 'stretchedCanvas' && parsed.data.baget.frameMode === 'noFrame');
     const selectedBaget = parsed.data.baget.selectedBagetId
       ? allBagets.find((item) => item.id === parsed.data.baget.selectedBagetId) ?? null
