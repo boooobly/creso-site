@@ -9,7 +9,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import Image from 'next/image';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import { resolveBagetFrameGeometry } from '@/lib/calculations/bagetGeometry';
 import type { BaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
@@ -17,7 +16,7 @@ import { canFulfillFrameFromPieces, computeRequiredSidesMeters, parseResiduesToP
 import { normalizeBagetImageUrl } from '@/lib/baget/normalizeBagetImageUrl';
 import type { BagetSheetItem } from '@/lib/baget/sheetsCatalog';
 import { getInitialBagetPrintRequirement, type BagetPrintMaterial, type BagetPrintRequirement, type BagetTransferSource } from '@/lib/baget/printRequirement';
-import BagetCard, { BagetItem } from './BagetCard';
+import BagetCard, { BagetItem, getBagetProxyImageSrc } from './BagetCard';
 import BagetFilters, { FilterState, MaterialsState } from './BagetFilters';
 import BagetMobileSelectorCard from './BagetMobileSelectorCard';
 import BagetOrderModal, { BagetOrderRequestBagetInput, BagetOrderSummary } from './BagetOrderModal';
@@ -947,12 +946,13 @@ export default function BagetConfigurator({
             <div className="mt-3 space-y-3">
               {selectedBagetForQuote ? (
                 <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-3 dark:border-neutral-700">
-                  <Image
-                    src={selectedBagetForQuote.cardImage || selectedBagetForQuote.fallbackImage || BAGET_PLACEHOLDER_IMAGE}
+                  {/* eslint-disable-next-line @next/next/no-img-element -- Selected baguette thumbnail should bypass Next optimization for mobile reliability. */}
+                  <img
+                    src={getBagetProxyImageSrc(selectedBagetForQuote.cardImage || selectedBagetForQuote.fallbackImage || BAGET_PLACEHOLDER_IMAGE, 240)}
                     alt={`Миниатюра багета ${selectedBagetForQuote.name}`}
-                    width={64}
-                    height={64}
                     className="h-16 w-16 shrink-0 rounded-lg object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="min-w-0 flex-1 text-sm">
                     <p className="truncate font-medium">{selectedBagetForQuote.name}</p>

@@ -1,6 +1,6 @@
+import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import ProtectedImage from '@/components/ui/ProtectedImage';
 
 export default function ServiceCard({
   title,
@@ -24,7 +24,17 @@ export default function ServiceCard({
     >
       <div className="mb-3 overflow-hidden rounded-xl border border-neutral-200/80 transition-colors duration-300 group-hover:border-neutral-300 dark:border-neutral-800 dark:group-hover:border-neutral-700 md:mb-4">
         <div className="relative aspect-[16/7] w-full overflow-hidden rounded-xl sm:aspect-[16/6] md:aspect-[16/5]">
-          {imageSrc ? <ProtectedImage src={imageSrc} alt={title} fill className="object-cover" sizes="(min-width: 1280px) 20vw, (min-width: 768px) 35vw, 90vw" /> : null}
+          {imageSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element -- Service card images should bypass Next optimization for better mobile reliability.
+            <img
+              src={imageSrc}
+              alt={title}
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+              draggable={false}
+            />
+          ) : null}
           <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-45 transition-opacity duration-300 group-hover:opacity-20" />
         </div>
       </div>
