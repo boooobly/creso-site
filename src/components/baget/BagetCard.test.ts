@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getBagetProxyImageSrc } from './BagetCard';
+import { BAGET_CARD_IMAGE_WIDTH, BAGET_PREVIEW_IMAGE_WIDTH, getBagetProxyImageSrc } from './BagetCard';
 
 describe('baget image source helper', () => {
   it('returns the baguette image proxy URL with a width for remote images', () => {
@@ -12,5 +12,10 @@ describe('baget image source helper', () => {
 
   it('returns local image paths directly', () => {
     expect(getBagetProxyImageSrc('/images/baget/local.png', 700)).toBe('/images/baget/local.png');
+  });
+
+  it('uses expected image width constants for card and preview requests', () => {
+    expect(BAGET_CARD_IMAGE_WIDTH).toBe(480);
+    expect(BAGET_PREVIEW_IMAGE_WIDTH).toBe(1600);
   });
 });
