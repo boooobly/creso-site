@@ -1144,12 +1144,13 @@ export default function BagetConfigurator({
 
         <main className="space-y-3 lg:pr-1">
           <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {pagedItems.map((item) => (
+            {pagedItems.map((item, index) => (
               <BagetCard
                 key={item.id}
                 item={item}
                 selected={selectedBaget?.id === item.id}
                 onSelect={handleSelectBaget}
+                eager={index < 6}
               />
             ))}
           </div>

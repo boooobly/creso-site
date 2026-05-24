@@ -21,9 +21,12 @@ type BagetCardProps = {
   item: BagetItem;
   selected: boolean;
   onSelect: (item: BagetItem) => void;
+  eager?: boolean;
 };
 
 const BAGET_PLACEHOLDER_IMAGE = '/images/outdoor-portfolio/placeholder-1.svg';
+export const BAGET_CARD_IMAGE_WIDTH = 480;
+export const BAGET_PREVIEW_IMAGE_WIDTH = 1600;
 
 export function getBagetProxyImageSrc(src: string, width: number): string {
   if (!src) return BAGET_PLACEHOLDER_IMAGE;
@@ -31,7 +34,7 @@ export function getBagetProxyImageSrc(src: string, width: number): string {
   return `/api/baget/image-proxy?url=${encodeURIComponent(src)}&width=${width}`;
 }
 
-function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
+function BagetCardBase({ item, selected, onSelect, eager = false }: BagetCardProps) {
   const thumbnailImgRef = useRef<HTMLImageElement | null>(null);
   const imageCandidates = useMemo(
     () => [item.cardImage, item.fallbackImage, BAGET_PLACEHOLDER_IMAGE].filter(Boolean) as string[],
@@ -40,6 +43,7 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
   const [thumbnailImageIndex, setThumbnailImageIndex] = useState(0);
   const [previewImageIndex, setPreviewImageIndex] = useState(0);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [isThumbnailLoaded, setIsThumbnailLoaded] = useState(false);
 
   useEffect(() => {
     setThumbnailImageIndex(0);
@@ -67,6 +71,10 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
 
   const thumbnailImage = imageCandidates[Math.min(thumbnailImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
   const previewImage = imageCandidates[Math.min(previewImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
+
+  useEffect(() => {
+    setIsThumbnailLoaded(false);
+  }, [item.id, thumbnailImage]);
 
   const handleThumbnailImageError = () => {
     setThumbnailImageIndex((prev) => {
@@ -102,14 +110,22 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
           className="group relative mb-2 block aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg bg-neutral-100 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2"
           aria-label={`Увеличить изображение багета ${item.name}`}
         >
+          {!isThumbnailLoaded ? (
+            <span
+              className="pointer-events-none absolute inset-0 animate-pulse bg-gradient-to-br from-neutral-100 via-neutral-200 to-neutral-100 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800"
+              aria-hidden="true"
+            />
+          ) : null}
           {/* eslint-disable-next-line @next/next/no-img-element -- Baguette catalog images must bypass Next Image Optimization. */}
           <img
-            src={getBagetProxyImageSrc(thumbnailImage, 700)}
+            src={getBagetProxyImageSrc(thumbnailImage, BAGET_CARD_IMAGE_WIDTH)}
             alt={`Угол багета ${item.name}`}
-            className="h-full w-full object-cover"
-            loading="lazy"
+            className={`h-full w-full object-cover transition-opacity duration-300 ${isThumbnailLoaded ? 'opacity-100' : 'opacity-0'}`}
+            loading={eager ? 'eager' : 'lazy'}
+            fetchPriority={eager ? 'high' : 'auto'}
             decoding="async"
             ref={thumbnailImgRef}
+            onLoad={() => setIsThumbnailLoaded(true)}
             onError={handleThumbnailImageError}
           />
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition-all duration-200 group-hover:bg-black/25 group-hover:opacity-100 group-focus-visible:bg-black/25 group-focus-visible:opacity-100">
@@ -161,7 +177,7 @@ function BagetCardBase({ item, selected, onSelect }: BagetCardProps) {
             <div className="relative mx-auto aspect-square w-full max-h-[80vh] overflow-hidden rounded-xl bg-neutral-100">
               {/* eslint-disable-next-line @next/next/no-img-element -- Avoid Next image optimization for enlarged remote previews. */}
               <img
-                src={getBagetProxyImageSrc(previewImage, 1600)}
+                src={getBagetProxyImageSrc(previewImage, BAGET_PREVIEW_IMAGE_WIDTH)}
                 alt={`Увеличенный угол багета ${item.name}`}
                 className="h-full w-full object-contain"
                 loading="eager"
