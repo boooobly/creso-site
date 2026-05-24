@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
-import type { BagetItem } from './BagetCard';
+import { useEffect, useMemo, useState } from 'react';
+import { BAGET_CARD_IMAGE_WIDTH, getBagetProxyImageSrc, type BagetItem } from './BagetCard';
 
 const BAGET_PLACEHOLDER_IMAGE = '/images/outdoor-portfolio/placeholder-1.svg';
 
@@ -11,7 +11,35 @@ type BagetMobileSelectorCardProps = {
   onSelect: (item: BagetItem) => void;
 };
 
+export function getMobileBagetImageCandidates(item: Pick<BagetItem, 'cardImage' | 'fallbackImage'>): string[] {
+  return [item.cardImage, item.fallbackImage, BAGET_PLACEHOLDER_IMAGE].filter(Boolean) as string[];
+}
+
+export function getNextMobileBagetImageIndex(currentIndex: number, candidatesLength: number): number {
+  const lastIndex = Math.max(0, candidatesLength - 1);
+  const nextIndex = Math.min(currentIndex + 1, lastIndex);
+  return nextIndex === currentIndex ? currentIndex : nextIndex;
+}
+
 export default function BagetMobileSelectorCard({ item, selected, onSelect }: BagetMobileSelectorCardProps) {
+  const imageCandidates = useMemo(() => getMobileBagetImageCandidates(item), [item.cardImage, item.fallbackImage]);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  useEffect(() => {
+    setImageIndex(0);
+  }, [item.id, imageCandidates]);
+
+  useEffect(() => {
+    setIsImageLoaded(false);
+  }, [item.id, imageIndex]);
+
+  const currentImage = imageCandidates[Math.min(imageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
+
+  const handleImageError = () => {
+    setImageIndex((prev) => getNextMobileBagetImageIndex(prev, imageCandidates.length));
+  };
+
   return (
     <button
       type="button"
@@ -26,12 +54,21 @@ export default function BagetMobileSelectorCard({ item, selected, onSelect }: Ba
       ].join(' ')}
     >
       <div className="relative mb-2 aspect-square w-full overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800">
-        <Image
-          src={item.cardImage || item.fallbackImage || BAGET_PLACEHOLDER_IMAGE}
+        {!isImageLoaded ? (
+          <span
+            className="pointer-events-none absolute inset-0 animate-pulse bg-gradient-to-br from-neutral-100 via-neutral-200 to-neutral-100 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800"
+            aria-hidden="true"
+          />
+        ) : null}
+        {/* eslint-disable-next-line @next/next/no-img-element -- Mobile baguette selector images should bypass Next optimization. */}
+        <img
+          src={getBagetProxyImageSrc(currentImage, BAGET_CARD_IMAGE_WIDTH)}
           alt={`Угол багета ${item.name}`}
-          fill
-          sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover"
+          className={`h-full w-full object-cover transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setIsImageLoaded(true)}
+          onError={handleImageError}
         />
         <span className="absolute left-1.5 top-1.5 rounded-md bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
           {item.article}
