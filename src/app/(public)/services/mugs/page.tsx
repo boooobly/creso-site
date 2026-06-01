@@ -149,155 +149,147 @@ export default async function MugsServicePage() {
       <JsonLd data={buildServiceJsonLd('Печать на кружках в Невинномысске', 'Печать на кружках с логотипом и фото для подарков, промо и корпоративных заказов.', '/services/mugs')} />
       {faqPageJsonLd ? <JsonLd data={faqPageJsonLd} /> : null}
       <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <PageHero className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:hidden lg:p-10">
-            <HeroEyebrow>Печать на кружках</HeroEyebrow>
-            <HeroTitle className="hero-title-mobile-safe max-w-[20ch] lg:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
-            <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
-              Производим кружки для корпоративных подарков, мероприятий и розницы: от малых партий до крупных тиражей. На выходе — аккуратный брендированный продукт, готовый к выдаче и продажам.
-            </HeroLead>
+        <PageHero className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:hidden lg:p-10">
+          <HeroEyebrow>Печать на кружках</HeroEyebrow>
+          <HeroTitle className="hero-title-mobile-safe max-w-[20ch] lg:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
+          <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
+            Производим кружки для корпоративных подарков, мероприятий и розницы: от малых партий до крупных тиражей. На выходе — аккуратный брендированный продукт, готовый к выдаче и продажам.
+          </HeroLead>
 
-            <HeroChipList className="mt-6 gap-2.5">
-              {['Белая керамика AAA', 'Глянец или мат', 'Тираж от 1 шт', 'Логотипы и фото'].map((item) => (
-                <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
-                  <span>{item}</span>
-                </HeroChip>
-              ))}
-            </HeroChipList>
+          <HeroChipList className="mt-6 gap-2.5">
+            {['Белая керамика AAA', 'Глянец или мат', 'Тираж от 1 шт', 'Логотипы и фото'].map((item) => (
+              <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                <span>{item}</span>
+              </HeroChip>
+            ))}
+          </HeroChipList>
 
-            <HeroActions className="mt-8">
-              <a href="#mugs-order" data-floating-cta-hide className="btn-primary no-underline">
-                Оставить заявку
-              </a>
-              <a href="#mugs-prices" className="btn-secondary no-underline">
-                Цены и условия
-              </a>
-            </HeroActions>
-          </PageHero>
+          <HeroActions className="mt-8">
+            <a href="#mugs-order" data-floating-cta-hide className="btn-primary no-underline">
+              Оставить заявку
+            </a>
+            <a href="#mugs-prices" className="btn-secondary no-underline">
+              Цены и условия
+            </a>
+          </HeroActions>
+        </PageHero>
 
-          <div className="mt-4 lg:hidden">
-            <div className="overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-[0_18px_44px_-28px_rgba(15,23,42,0.42)] dark:border-neutral-800/80 dark:bg-neutral-900/80 dark:shadow-[0_20px_44px_-28px_rgba(0,0,0,0.72)]">
-              <div className="relative min-h-[260px]">{heroMedia}</div>
-            </div>
+        <div className="mt-4 lg:hidden">
+          <div className="overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-[0_18px_44px_-28px_rgba(15,23,42,0.42)] dark:border-neutral-800/80 dark:bg-neutral-900/80 dark:shadow-[0_20px_44px_-28px_rgba(0,0,0,0.72)]">
+            <div className="relative min-h-[260px]">{heroMedia}</div>
           </div>
-
-          <PageHero className="hidden p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:block lg:p-10" mediaClassName="h-full" media={heroMedia}>
-            <HeroEyebrow>Печать на кружках</HeroEyebrow>
-            <HeroTitle className="max-w-[20ch] text-4xl tracking-tight sm:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
-            <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
-              Производим кружки для корпоративных подарков, мероприятий и розницы: от малых партий до крупных тиражей. На выходе — аккуратный брендированный продукт, готовый к выдаче и продажам.
-            </HeroLead>
-
-            <HeroChipList className="mt-6 gap-2.5">
-              {['Белая керамика AAA', 'Глянец или мат', 'Тираж от 1 шт', 'Логотипы и фото'].map((item) => (
-                <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
-                  <span>{item}</span>
-                </HeroChip>
-              ))}
-            </HeroChipList>
-
-            <HeroActions className="mt-8">
-              <a href="#mugs-order" data-floating-cta-hide className="btn-primary no-underline">
-                Оставить заявку
-              </a>
-              <a href="#mugs-prices" className="btn-secondary no-underline">
-                Цены и условия
-              </a>
-            </HeroActions>
-          </PageHero>
         </div>
+
+        <PageHero className="hidden p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:block lg:p-10" mediaClassName="h-full" media={heroMedia}>
+          <HeroEyebrow>Печать на кружках</HeroEyebrow>
+          <HeroTitle className="max-w-[20ch] text-4xl tracking-tight sm:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
+          <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
+            Производим кружки для корпоративных подарков, мероприятий и розницы: от малых партий до крупных тиражей. На выходе — аккуратный брендированный продукт, готовый к выдаче и продажам.
+          </HeroLead>
+
+          <HeroChipList className="mt-6 gap-2.5">
+            {['Белая керамика AAA', 'Глянец или мат', 'Тираж от 1 шт', 'Логотипы и фото'].map((item) => (
+              <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                <span>{item}</span>
+              </HeroChip>
+            ))}
+          </HeroChipList>
+
+          <HeroActions className="mt-8">
+            <a href="#mugs-order" data-floating-cta-hide className="btn-primary no-underline">
+              Оставить заявку
+            </a>
+            <a href="#mugs-prices" className="btn-secondary no-underline">
+              Цены и условия
+            </a>
+          </HeroActions>
+        </PageHero>
       </Section>
 
       <Section className="pb-2 pt-0 sm:pb-3">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {quickBenefits.map((item) => {
-              const Icon = item.icon;
-              return (
-                <article key={item.title} className="h-full rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-300 dark:border-neutral-700/80 dark:bg-neutral-900/85 dark:shadow-[0_12px_28px_-24px_rgba(0,0,0,0.8)] dark:hover:border-neutral-700">
-                  <span className="public-icon-badge-sm">
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                  <h2 className="mt-3 text-base font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h2>
-                  <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
-                </article>
-              );
-            })}
-          </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {quickBenefits.map((item) => {
+            const Icon = item.icon;
+            return (
+              <article key={item.title} className="h-full rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-300 dark:border-neutral-700/80 dark:bg-neutral-900/85 dark:shadow-[0_12px_28px_-24px_rgba(0,0,0,0.8)] dark:hover:border-neutral-700">
+                <span className="public-icon-badge-sm">
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <h2 className="mt-3 text-base font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h2>
+                <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
+              </article>
+            );
+          })}
         </div>
       </Section>
 
       <Section id="mugs-prices" className="pb-8 pt-4 sm:pb-10 sm:pt-5 lg:pb-12">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <p className="t-eyebrow">Цены и условия</p>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Понятная стоимость без скрытых доплат</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">Стоимость формируется без скрытых пунктов: вы заранее понимаете цену, сроки и что именно входит в заказ.</p>
+        <p className="t-eyebrow">Цены и условия</p>
+        <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Понятная стоимость без скрытых доплат</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">Стоимость формируется без скрытых пунктов: вы заранее понимаете цену, сроки и что именно входит в заказ.</p>
 
-          <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            {pricingCards.map((item) => {
-              const Icon = item.icon;
-              return (
-                <article key={item.title} className="premium-card h-full p-5 sm:p-6">
-                  <div className="public-icon-badge-sm">
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
-                  <p className="mt-3 text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">{item.price}</p>
-                  <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">{item.caption}</p>
-                  <ul className="mt-4 space-y-2.5 text-sm text-neutral-700 dark:text-neutral-200">
-                    {item.bullets.map((bullet) => (
-                      <li key={bullet} className="flex items-start gap-2.5">
-                        <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              );
-            })}
-          </div>
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {pricingCards.map((item) => {
+            const Icon = item.icon;
+            return (
+              <article key={item.title} className="premium-card h-full p-5 sm:p-6">
+                <div className="public-icon-badge-sm">
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
+                <p className="mt-3 text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">{item.price}</p>
+                <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">{item.caption}</p>
+                <ul className="mt-4 space-y-2.5 text-sm text-neutral-700 dark:text-neutral-200">
+                  {item.bullets.map((bullet) => (
+                    <li key={bullet} className="flex items-start gap-2.5">
+                      <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            );
+          })}
+        </div>
 
-          <div className="mt-5 rounded-2xl border border-red-100 bg-red-50/60 p-4 text-sm text-neutral-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-neutral-200 sm:p-5">
-            <span className="font-semibold text-neutral-900 dark:text-neutral-100">Скидки за объём:</span> каждые 12 шт — минус 2,5%, максимальная суммарная скидка — 20%.
-          </div>
+        <div className="mt-5 rounded-2xl border border-red-100 bg-red-50/60 p-4 text-sm text-neutral-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-neutral-200 sm:p-5">
+          <span className="font-semibold text-neutral-900 dark:text-neutral-100">Скидки за объём:</span> каждые 12 шт — минус 2,5%, максимальная суммарная скидка — 20%.
         </div>
       </Section>
 
       <Section className="py-8 sm:py-10 lg:py-12">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700/80 dark:bg-neutral-900/90 dark:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.78)] sm:p-8">
-              <p className="t-eyebrow">Что вы получаете</p>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">Кружка как готовый коммерческий продукт</h2>
-              <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
-                Мы делаем не просто “нанесение на сувенир”, а готовое изделие для продаж, подарков и бренд-коммуникации. Важно, чтобы тираж выглядел единообразно и профессионально.
-              </p>
-              <div className="mt-6 grid gap-3">
-                {resultCards.map((item) => (
-                  <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 dark:border-neutral-700/75 dark:bg-neutral-950/55 dark:text-neutral-200">
-                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
-                  </article>
-                ))}
-              </div>
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700/80 dark:bg-neutral-900/90 dark:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.78)] sm:p-8">
+            <p className="t-eyebrow">Что вы получаете</p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">Кружка как готовый коммерческий продукт</h2>
+            <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
+              Мы делаем не просто “нанесение на сувенир”, а готовое изделие для продаж, подарков и бренд-коммуникации. Важно, чтобы тираж выглядел единообразно и профессионально.
+            </p>
+            <div className="mt-6 grid gap-3">
+              {resultCards.map((item) => (
+                <article key={item.title} className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 dark:border-neutral-700/75 dark:bg-neutral-950/55 dark:text-neutral-200">
+                  <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{item.description}</p>
+                </article>
+              ))}
             </div>
+          </div>
 
-            <div className="overflow-hidden rounded-3xl border border-neutral-200 shadow-sm dark:border-neutral-800 dark:shadow-[0_18px_34px_-26px_rgba(0,0,0,0.8)]">
-              <div className="relative h-full min-h-[420px] w-full sm:min-h-[520px] lg:min-h-[560px]">
-                <ProtectedImage
-                  src={resultImageSrc}
-                  alt={resultImageAlt}
-                  fill
-                  sizes="(min-width: 1024px) 34vw, 100vw"
-                  className="object-cover object-center"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/5" />
-                <div className={glassOverlayClassName}>
-                  <p className="text-sm font-semibold text-white">Премиальная подача результата</p>
-                  <p className="mt-1 text-xs text-white/80">Чистая белая керамика, чёткая печать и стабильный вид во всём тираже.</p>
-                </div>
+          <div className="overflow-hidden rounded-3xl border border-neutral-200 shadow-sm dark:border-neutral-800 dark:shadow-[0_18px_34px_-26px_rgba(0,0,0,0.8)]">
+            <div className="relative h-full min-h-[420px] w-full sm:min-h-[520px] lg:min-h-[560px]">
+              <ProtectedImage
+                src={resultImageSrc}
+                alt={resultImageAlt}
+                fill
+                sizes="(min-width: 1024px) 34vw, 100vw"
+                className="object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/5" />
+              <div className={glassOverlayClassName}>
+                <p className="text-sm font-semibold text-white">Премиальная подача результата</p>
+                <p className="mt-1 text-xs text-white/80">Чистая белая керамика, чёткая печать и стабильный вид во всём тираже.</p>
               </div>
             </div>
           </div>
@@ -305,49 +297,45 @@ export default async function MugsServicePage() {
       </Section>
 
       <Section id="mugs-order" className="pb-10 pt-8 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-12">
-        <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-          <div data-floating-cta-hide className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-gradient-to-br dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-7">
-            <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 dark:border-neutral-800/90 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
-              <div className="max-w-2xl">
-                <p className="t-eyebrow">Оформление заказа</p>
-                <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Отправьте заявку за 1 минуту</h2>
-                <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Укажите основные параметры заказа, чтобы быстро получить расчёт и план запуска по вашему тиражу.</p>
-              </div>
-              <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-200 lg:min-w-[340px]">
-                {[
-                  'Укажите тираж и покрытие',
-                  'Приложите макет или кратко опишите задачу',
-                  'Получите расчёт и следующий шаг',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-neutral-700/90 dark:bg-neutral-800/85">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600 dark:text-red-400" aria-hidden="true" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+        <div data-floating-cta-hide className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-gradient-to-br dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-7">
+          <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 dark:border-neutral-800/90 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="t-eyebrow">Оформление заказа</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Отправьте заявку за 1 минуту</h2>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Укажите основные параметры заказа, чтобы быстро получить расчёт и план запуска по вашему тиражу.</p>
             </div>
-            <OrderMugsForm />
+            <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-200 lg:min-w-[340px]">
+              {[
+                'Укажите тираж и покрытие',
+                'Приложите макет или кратко опишите задачу',
+                'Получите расчёт и следующий шаг',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-neutral-700/90 dark:bg-neutral-800/85">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-red-600 dark:text-red-400" aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
+          <OrderMugsForm />
         </div>
       </Section>
 
       <Section id="mugs-faq" className="pb-12 pt-0 lg:pb-14">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/90 dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-8">
-            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Частые вопросы</h2>
-            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 sm:text-base">Коротко о сроках, макетах и процессе печати.</p>
+        <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/90 dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-8">
+          <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Частые вопросы</h2>
+          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 sm:text-base">Коротко о сроках, макетах и процессе печати.</p>
 
-            <div className="mt-5 space-y-3">
-              {faqItems.map((item) => (
-                <details key={item.question} className="accordion-panel group p-4">
-                  <summary className="accordion-trigger -mx-4 -mt-4 mb-2 px-4 py-3 text-sm font-semibold text-neutral-900 marker:hidden dark:text-neutral-100">
-                    <span>{item.question}</span>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180 dark:text-neutral-400" aria-hidden="true" />
-                  </summary>
-                  <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{item.answer}</p>
-                </details>
-              ))}
-            </div>
+          <div className="mt-5 space-y-3">
+            {faqItems.map((item) => (
+              <details key={item.question} className="accordion-panel group p-4">
+                <summary className="accordion-trigger -mx-4 -mt-4 mb-2 px-4 py-3 text-sm font-semibold text-neutral-900 marker:hidden dark:text-neutral-100">
+                  <span>{item.question}</span>
+                  <ChevronDown className="h-4 w-4 shrink-0 text-neutral-500 transition group-open:rotate-180 dark:text-neutral-400" aria-hidden="true" />
+                </summary>
+                <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">{item.answer}</p>
+              </details>
+            ))}
           </div>
         </div>
       </Section>
