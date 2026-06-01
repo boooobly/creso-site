@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Upload } from 'lucide-react';
 import Link from 'next/link';
 import ImageDropzone from '@/components/ImageDropzone';
@@ -13,6 +14,9 @@ import {
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
+import type { MugDesignerValue } from '@/components/mug-designer/types';
+
+const MugLayoutDesignerModal = dynamic(() => import('@/components/mug-designer/MugLayoutDesignerModal'), { ssr: false });
 
 const complexityLevels = [
   { title: 'I', description: 'Простой текст, логотип или базовый макет без сложной обработки.' },
@@ -69,6 +73,14 @@ export default function OrderMugsForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [formError, setFormError] = useState('');
   const [needsDesign, setNeedsDesign] = useState(false);
+  const [designerOpen, setDesignerOpen] = useState(false);
+  const [mugDesign, setMugDesign] = useState<MugDesignerValue | null>(null);
+  const designerButtonRef = useRef<HTMLButtonElement>(null);
+
+  const closeDesigner = () => {
+    setDesignerOpen(false);
+    requestAnimationFrame(() => designerButtonRef.current?.focus());
+  };
 
   const inputClass = (name: keyof FormValues) => publicInputClass(Boolean(errors[name]));
 
@@ -124,6 +136,12 @@ export default function OrderMugsForm() {
         const rawImageDataUrl = await fileToDataUrl(file);
         formData.set('rawImageDataUrl', rawImageDataUrl);
       }
+      if (mugDesign) {
+        formData.set('mugDesignPreviewDataUrl', mugDesign.previewDataUrl);
+        formData.set('mugPrintLayoutDataUrl', mugDesign.printLayoutDataUrl);
+        formData.set('mugDesignJson', mugDesign.designJson);
+        mugDesign.sourceFiles.forEach((sourceFile) => formData.append('designerSourceFiles[]', sourceFile, sourceFile.name));
+      }
 
       const response = await fetch('/api/requests/mugs', {
         method: 'POST',
@@ -142,6 +160,7 @@ export default function OrderMugsForm() {
       setValues(defaultValues);
       setFile(null);
       setNeedsDesign(false);
+      setMugDesign(null);
       setErrors({});
     } catch {
       setFormError('Не удалось отправить заявку. Попробуйте позже.');
@@ -267,6 +286,16 @@ export default function OrderMugsForm() {
           />
           {errors.file && <p className="mt-1 text-xs text-red-600">{errors.file}</p>}
           <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
+          <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4">
+            <button ref={designerButtonRef} type="button" onClick={() => setDesignerOpen(true)} className="rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
+              Открыть конструктор макета
+            </button>
+            <p className="mt-2 text-xs text-neutral-600">Соберите макет прямо на кружке: изображения, текст, масштаб и поворот.</p>
+          </div>
+          {mugDesign && <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white p-4 sm:flex-row sm:items-center">
+            <img src={mugDesign.previewDataUrl} alt="Превью макета кружки" className="h-24 w-40 rounded-lg border border-neutral-200 object-cover" />
+            <div><p className="text-sm font-semibold text-neutral-900">Макет из конструктора</p><div className="mt-2 flex flex-wrap gap-2"><button type="button" onClick={() => setDesignerOpen(true)} className="text-xs font-semibold text-red-700 hover:underline">Редактировать</button><button type="button" onClick={() => setMugDesign(null)} className="text-xs font-semibold text-neutral-600 hover:underline">Удалить макет</button></div></div>
+          </div>}
         </div>
 
         <input className="hidden" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((prev) => ({ ...prev, website: e.target.value }))} aria-hidden="true" />
@@ -303,6 +332,7 @@ export default function OrderMugsForm() {
         {formError && <p className="text-sm text-red-600">{formError}</p>}
         {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
       </form>
+      <MugLayoutDesignerModal open={designerOpen} initialValue={mugDesign} onClose={closeDesigner} onApply={(value) => { setMugDesign(value); closeDesigner(); }} />
     </div>
   );
 }
