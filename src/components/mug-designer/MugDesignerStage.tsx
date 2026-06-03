@@ -6,6 +6,7 @@ import { MUG_PRINT_AREA, MUG_STAGE, MugDesignerLayer } from './types';
 
 export type MugDesignerStageHandle = {
   exportDesign: () => Promise<{ previewDataUrl: string; printLayoutDataUrl: string }>;
+  getLayerClientRect: (id: string) => { x: number; y: number; width: number; height: number } | undefined;
 };
 
 type Props = {
@@ -18,7 +19,30 @@ type Props = {
 };
 
 const BASE_IMAGE_SRC = '/images/mug/mug-base.png';
+const SNAP_THRESHOLD = 10;
+const PRINT_AREA_RIGHT = MUG_PRINT_AREA.x + MUG_PRINT_AREA.width;
+const PRINT_AREA_BOTTOM = MUG_PRINT_AREA.y + MUG_PRINT_AREA.height;
+const PRINT_AREA_CENTER_X = MUG_PRINT_AREA.x + MUG_PRINT_AREA.width / 2;
+const PRINT_AREA_CENTER_Y = MUG_PRINT_AREA.y + MUG_PRINT_AREA.height / 2;
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
+
+type SnapOrientation = 'vertical' | 'horizontal';
+
+type GuideStop = {
+  orientation: SnapOrientation;
+  lineGuide: number;
+};
+
+type SnappingEdge = {
+  orientation: SnapOrientation;
+  guide: number;
+  offset: number;
+};
+
+type SnapMatch = GuideStop & {
+  offset: number;
+  diff: number;
+};
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   const cached = imageCache.get(src);
@@ -60,6 +84,100 @@ function createTextNode(layer: Extract<MugDesignerLayer, { type: 'text' }>) {
   });
 }
 
+function collectGuideStops(objectsGroup: Konva.Group, activeNode: Konva.Node): GuideStop[] {
+  const stops: GuideStop[] = [
+    { orientation: 'vertical', lineGuide: MUG_PRINT_AREA.x },
+    { orientation: 'vertical', lineGuide: PRINT_AREA_CENTER_X },
+    { orientation: 'vertical', lineGuide: PRINT_AREA_RIGHT },
+    { orientation: 'horizontal', lineGuide: MUG_PRINT_AREA.y },
+    { orientation: 'horizontal', lineGuide: PRINT_AREA_CENTER_Y },
+    { orientation: 'horizontal', lineGuide: PRINT_AREA_BOTTOM },
+  ];
+
+  objectsGroup.getChildren().forEach((node) => {
+    if (node === activeNode) return;
+    const box = node.getClientRect({ relativeTo: objectsGroup });
+    stops.push(
+      { orientation: 'vertical', lineGuide: box.x },
+      { orientation: 'vertical', lineGuide: box.x + box.width / 2 },
+      { orientation: 'vertical', lineGuide: box.x + box.width },
+      { orientation: 'horizontal', lineGuide: box.y },
+      { orientation: 'horizontal', lineGuide: box.y + box.height / 2 },
+      { orientation: 'horizontal', lineGuide: box.y + box.height },
+    );
+  });
+
+  return stops;
+}
+
+function getObjectSnappingEdges(node: Konva.Node, relativeTo: Konva.Container): SnappingEdge[] {
+  const box = node.getClientRect({ relativeTo });
+  return [
+    { orientation: 'vertical', guide: box.x, offset: node.x() - box.x },
+    { orientation: 'vertical', guide: box.x + box.width / 2, offset: node.x() - (box.x + box.width / 2) },
+    { orientation: 'vertical', guide: box.x + box.width, offset: node.x() - (box.x + box.width) },
+    { orientation: 'horizontal', guide: box.y, offset: node.y() - box.y },
+    { orientation: 'horizontal', guide: box.y + box.height / 2, offset: node.y() - (box.y + box.height / 2) },
+    { orientation: 'horizontal', guide: box.y + box.height, offset: node.y() - (box.y + box.height) },
+  ];
+}
+
+function getClosestSnap(stops: GuideStop[], edges: SnappingEdge[]) {
+  const closest = new Map<SnapOrientation, SnapMatch>();
+
+  edges.forEach((edge) => {
+    stops.forEach((stop) => {
+      if (edge.orientation !== stop.orientation) return;
+      const diff = Math.abs(edge.guide - stop.lineGuide);
+      if (diff > SNAP_THRESHOLD) return;
+
+      const current = closest.get(edge.orientation);
+      if (!current || diff < current.diff) {
+        closest.set(edge.orientation, { ...stop, offset: edge.offset, diff });
+      }
+    });
+  });
+
+  return Array.from(closest.values());
+}
+
+function clearSnapGuides(layer?: Konva.Layer) {
+  if (!layer) return;
+  layer.destroyChildren();
+  layer.draw();
+}
+
+function drawSnapGuides(layer: Konva.Layer | undefined, snaps: SnapMatch[]) {
+  if (!layer) return;
+  layer.destroyChildren();
+
+  snaps.forEach((snap) => {
+    if (snap.orientation === 'vertical') {
+      layer.add(
+        new Konva.Line({
+          points: [snap.lineGuide, 0, snap.lineGuide, MUG_STAGE.height],
+          stroke: '#2563eb',
+          strokeWidth: 2,
+          dash: [8, 8],
+          listening: false,
+        }),
+      );
+    } else {
+      layer.add(
+        new Konva.Line({
+          points: [0, snap.lineGuide, MUG_STAGE.width, snap.lineGuide],
+          stroke: '#2563eb',
+          strokeWidth: 2,
+          dash: [8, 8],
+          listening: false,
+        }),
+      );
+    }
+  });
+
+  layer.draw();
+}
+
 async function createExportNode(layer: MugDesignerLayer): Promise<Konva.Shape> {
   if (layer.type === 'text') return createTextNode(layer);
   return new Konva.Image({
@@ -84,6 +202,7 @@ const MugDesignerStage = forwardRef<MugDesignerStageHandle, Props>(function MugD
   const objectsLayerRef = useRef<Konva.Layer>();
   const objectsGroupRef = useRef<Konva.Group>();
   const guidesLayerRef = useRef<Konva.Layer>();
+  const snapGuidesLayerRef = useRef<Konva.Layer>();
   const transformerRef = useRef<Konva.Transformer>();
   const onSelectRef = useRef(onSelect);
   const onPatchRef = useRef(onPatch);
@@ -107,21 +226,52 @@ const MugDesignerStage = forwardRef<MugDesignerStageHandle, Props>(function MugD
       clipHeight: MUG_PRINT_AREA.height,
     });
     const guidesLayer = new Konva.Layer({ listening: false });
+    const snapGuidesLayer = new Konva.Layer({ listening: false });
     const transformer = new Konva.Transformer({
       rotateEnabled: true,
       enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+      anchorFill: '#ffffff',
+      anchorStroke: '#525252',
+      anchorStrokeWidth: 1.5,
+      anchorSize: 11,
+      anchorCornerRadius: 3,
+      rotateAnchorOffset: 42,
+      rotateAnchorCursor: 'grab',
       boundBoxFunc: (oldBox, nextBox) => (nextBox.width < 24 || nextBox.height < 24 ? oldBox : nextBox),
+      anchorStyleFunc: (anchor) => {
+        if (anchor.hasName('rotater')) {
+          anchor.fill('#ffffff');
+          anchor.stroke('#dc2626');
+          anchor.strokeWidth(3);
+          anchor.width(18);
+          anchor.height(18);
+          anchor.cornerRadius(9);
+          anchor.offsetX(9);
+          anchor.offsetY(9);
+          return;
+        }
+
+        anchor.fill('#ffffff');
+        anchor.stroke('#525252');
+        anchor.strokeWidth(1.5);
+        anchor.width(11);
+        anchor.height(11);
+        anchor.cornerRadius(3);
+        anchor.offsetX(5.5);
+        anchor.offsetY(5.5);
+      },
     });
     const transformerLayer = new Konva.Layer();
 
     objectsLayer.add(objectsGroup);
     transformerLayer.add(transformer);
-    stage.add(baseLayer, objectsLayer, guidesLayer, transformerLayer);
+    stage.add(baseLayer, objectsLayer, guidesLayer, snapGuidesLayer, transformerLayer);
 
     stageRef.current = stage;
     objectsLayerRef.current = objectsLayer;
     objectsGroupRef.current = objectsGroup;
     guidesLayerRef.current = guidesLayer;
+    snapGuidesLayerRef.current = snapGuidesLayer;
     transformerRef.current = transformer;
 
     stage.on('click tap', (event) => {
@@ -158,6 +308,7 @@ const MugDesignerStage = forwardRef<MugDesignerStageHandle, Props>(function MugD
       objectsLayerRef.current = undefined;
       objectsGroupRef.current = undefined;
       guidesLayerRef.current = undefined;
+      snapGuidesLayerRef.current = undefined;
       transformerRef.current = undefined;
     };
   }, []);
@@ -165,6 +316,7 @@ const MugDesignerStage = forwardRef<MugDesignerStageHandle, Props>(function MugD
   useEffect(() => {
     const objectsLayer = objectsLayerRef.current;
     const objectsGroup = objectsGroupRef.current;
+    const snapGuidesLayer = snapGuidesLayerRef.current;
     if (!objectsLayer || !objectsGroup) return;
 
     objectsGroup.destroyChildren();
@@ -176,7 +328,26 @@ const MugDesignerStage = forwardRef<MugDesignerStageHandle, Props>(function MugD
 
       node.draggable(true);
       node.on('click tap', () => onSelectRef.current(layer.id));
-      node.on('dragend', () => onPatchRef.current(layer.id, { x: node.x(), y: node.y() }));
+      node.on('dragstart', () => clearSnapGuides(snapGuidesLayer));
+      node.on('dragmove', () => {
+        const snaps = getClosestSnap(collectGuideStops(objectsGroup, node), getObjectSnappingEdges(node, objectsGroup));
+        const position = node.position();
+
+        snaps.forEach((snap) => {
+          if (snap.orientation === 'vertical') {
+            position.x = snap.lineGuide + snap.offset;
+          } else {
+            position.y = snap.lineGuide + snap.offset;
+          }
+        });
+
+        if (snaps.length) node.position(position);
+        drawSnapGuides(snapGuidesLayer, snaps);
+      });
+      node.on('dragend', () => {
+        clearSnapGuides(snapGuidesLayer);
+        onPatchRef.current(layer.id, { x: node.x(), y: node.y() });
+      });
       node.on('transformend', () =>
         onPatchRef.current(layer.id, {
           x: node.x(),
@@ -230,6 +401,13 @@ const MugDesignerStage = forwardRef<MugDesignerStageHandle, Props>(function MugD
   useImperativeHandle(
     ref,
     () => ({
+      getLayerClientRect: (id: string) => {
+        const objectsGroup = objectsGroupRef.current;
+        const node = objectsGroup?.findOne(`#${id}`);
+        if (!objectsGroup || !node) return undefined;
+        const rect = node.getClientRect({ relativeTo: objectsGroup });
+        return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+      },
       exportDesign: async () => {
         const host = document.createElement('div');
         host.style.cssText = 'position:fixed;left:-99999px;top:0;width:1px;height:1px;overflow:hidden;';
