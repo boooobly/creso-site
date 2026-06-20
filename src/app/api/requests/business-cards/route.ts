@@ -7,6 +7,7 @@ import { getServerEnv } from '@/lib/env';
 import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentWithCaption';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
@@ -187,8 +188,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const referer = request.headers.get('referer') || request.headers.get('origin') || '';
+    const createdOrder = await createServiceRequestOrder({
+      source: 'business-cards',
+      customer: { name, phone, email, comment },
+      total: Math.round(totalPrice),
+      payloadJson: { service: 'business-cards', customer: { name, phone, email: email || null, comment: comment || null }, fields: { product, quantity, printSide, lamination, needDesign, unitPrice, totalPrice, turnaround, size, stock, printType, notes, flyersRequested, consent }, file: file ? { name: file.name, size: file.size, type: file.type || null } : { fileName, fileType, fileSize }, referer },
+      quoteJson: { kind: 'service-request', service: 'business-cards', total: Math.round(totalPrice), pricingStatus: 'calculated', unitPrice, totalPrice: Math.round(totalPrice) },
+    });
+
     const message = [
       'Визитки — новая заявка',
+      `Номер заявки: #${createdOrder.orderNumber}`,
       '',
       `Продукт: ${product || 'Business cards'}`,
       `Тираж: ${quantity}`,

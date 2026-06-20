@@ -11,6 +11,7 @@ import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
 import { MUGS_ALLOWED_EXTENSIONS, MUGS_ALLOWED_MIME_TYPES, MUGS_COVERING_OPTIONS } from '@/lib/pricing-config/mugs';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 
 export const runtime = 'nodejs';
 const allowedExtensionsSet = new Set<string>(MUGS_ALLOWED_EXTENSIONS);
@@ -38,8 +39,8 @@ function hasSupportedImageSignature(file: { buffer: Buffer; mime: string }) {
 }
 function isKnownCovering(value: string) { return MUGS_COVERING_OPTIONS.some((option) => option.value === value); }
 function getCoveringLabel(value: string) { return MUGS_COVERING_OPTIONS.find((option) => option.value === value)?.label ?? value; }
-function buildMugsText(params: { name: string; phone: string; quantity: number; coveringLabel: string; consent: boolean; comment?: string; needsDesign: boolean; rawAttached: boolean; constructorAttached: boolean }) {
-  return ['Услуга: Печать на кружках', `Имя: ${params.name || '—'}`, `Телефон: ${params.phone || '—'}`, `Количество: ${params.quantity || 1}`, `Покрытие: ${params.coveringLabel || '—'}`, `Комментарий: ${params.comment || '—'}`, `Согласие на обработку данных: ${params.consent ? 'да' : 'нет'}`, `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`, `Исходник клиента: ${params.rawAttached ? 'прикреплен' : 'не прикреплен'}`, `Макет из конструктора: ${params.constructorAttached ? 'да' : 'нет'}`].join('\n');
+function buildMugsText(params: { name: string; phone: string; quantity: number; coveringLabel: string; consent: boolean; comment?: string; needsDesign: boolean; rawAttached: boolean; constructorAttached: boolean; orderNumber?: string }) {
+  return ['Услуга: Печать на кружках', params.orderNumber ? `Номер заявки: #${params.orderNumber}` : null, `Имя: ${params.name || '—'}`, `Телефон: ${params.phone || '—'}`, `Количество: ${params.quantity || 1}`, `Покрытие: ${params.coveringLabel || '—'}`, `Комментарий: ${params.comment || '—'}`, `Согласие на обработку данных: ${params.consent ? 'да' : 'нет'}`, `Дизайн макета: ${params.needsDesign ? 'нужен' : 'не нужен'}`, `Исходник клиента: ${params.rawAttached ? 'прикреплен' : 'не прикреплен'}`, `Макет из конструктора: ${params.constructorAttached ? 'да' : 'нет'}`].filter((line): line is string => line !== null).join('\n');
 }
 function extensionFromMime(mime?: string | null) { return mime === 'image/jpeg' ? '.jpg' : mime === 'image/png' ? '.png' : '.bin'; }
 async function sendMugsTelegramNotification(params: { text: string; file: File | null; rawImageDataUrl: string | null; preview: ReturnType<typeof parseDataUrl>; printLayout: ReturnType<typeof parseDataUrl> }) {
@@ -90,7 +91,21 @@ export async function POST(request: NextRequest) {
     if (!normalizedPhone) return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
     if (!isKnownCovering(parsed.data.covering)) return NextResponse.json({ ok: false, error: 'Выберите корректное покрытие.' }, { status: 400 });
     if (!parsed.data.consent) return NextResponse.json({ ok: false, error: 'Необходимо согласие на обработку персональных данных.' }, { status: 400 });
-    const text = buildMugsText({ name: parsed.data.name, phone: normalizedPhone, quantity: parsed.data.quantity, coveringLabel: getCoveringLabel(parsed.data.covering), consent: parsed.data.consent, comment: parsed.data.comment, needsDesign, rawAttached: Boolean(rawImageDataUrl || file), constructorAttached: Boolean(preview) });
+    const referer = request.headers.get('referer') || request.headers.get('origin') || '';
+    const createdOrder = await createServiceRequestOrder({
+      source: 'mugs',
+      customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment },
+      total: 0,
+      payloadJson: {
+        service: 'mugs',
+        customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment || null },
+        fields: { ...parsed.data, phone: normalizedPhone, website: undefined, rawImageDataUrl: undefined, mugDesignPreviewDataUrl: undefined, mugPrintLayoutDataUrl: undefined },
+        options: { needsDesign, coveringLabel: getCoveringLabel(parsed.data.covering) },
+        files: { original: file ? { name: file.name, size: file.size, type: file.type || null } : null, rawImageDataUrl: Boolean(rawImageDataUrl), preview: Boolean(preview), printLayout: Boolean(printLayout), designerSourceFiles: designerSourceFiles.map((item) => ({ name: item.name, size: item.size, type: item.type || null })) },
+        referer,
+      },
+    });
+    const text = buildMugsText({ name: parsed.data.name, phone: normalizedPhone, quantity: parsed.data.quantity, coveringLabel: getCoveringLabel(parsed.data.covering), consent: parsed.data.consent, comment: parsed.data.comment, needsDesign, rawAttached: Boolean(rawImageDataUrl || file), constructorAttached: Boolean(preview), orderNumber: createdOrder.orderNumber });
     const attachments: EmailAttachment[] = [];
     if (file) attachments.push({ filename: sanitizeUploadFileName(file.name), content: Buffer.from(await file.arrayBuffer()), contentType: file.type || 'application/octet-stream' });
     if (preview) attachments.push({ filename: 'mug-design-preview.png', content: preview.buffer, contentType: preview.mime });

@@ -9,6 +9,22 @@ import { PLOTTER_CUTTING_PRICING_FALLBACK_CONFIG } from '@/lib/plotter-cutting/p
 
 const sendMailMock = vi.fn(async () => ({}));
 
+const { orderCreateMock, resetOrderSeq } = vi.hoisted(() => {
+  let orderSeq = 1;
+  return {
+    orderCreateMock: vi.fn(async ({ data }) => ({ id: `order-${orderSeq++}`, ...data })),
+    resetOrderSeq: () => { orderSeq = 1; },
+  };
+});
+
+vi.mock('@/lib/db/prisma', () => ({
+  prisma: {
+    order: {
+      create: orderCreateMock,
+    },
+  },
+}));
+
 vi.mock('@/lib/env', () => ({
   requireDatabaseEnv: () => undefined,
   getServerEnv: () => ({
@@ -110,6 +126,8 @@ vi.mock('@/lib/plotter-cutting/plotterCuttingPricing', async () => {
 
 beforeEach(() => {
   sendMailMock.mockClear();
+  orderCreateMock.mockClear();
+  resetOrderSeq();
 });
 
 describe('calculator & pricing regression coverage', () => {

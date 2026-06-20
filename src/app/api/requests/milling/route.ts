@@ -17,6 +17,7 @@ import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
 import { FIVE_MB_IN_BYTES } from '@/lib/file-validation';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 
 export const runtime = 'nodejs';
 
@@ -72,11 +73,13 @@ function buildMillingText(params: {
   file: File | null;
   referer: string;
   ip: string;
+  orderNumber?: string;
 }): string {
   return [
     '🆕 Новая заявка — Фрезеровка листовых материалов',
     '',
     `Услуга: Фрезеровка`,
+    params.orderNumber ? `Номер заявки: #${params.orderNumber}` : null,
     `Имя: ${params.name}`,
     `Телефон: ${params.phone}`,
     `Материал: ${params.material}`,
@@ -88,7 +91,7 @@ function buildMillingText(params: {
     `MIME: ${params.file?.type || '—'}`,
     `Страница: ${params.referer || '—'}`,
     `IP: ${params.ip}`,
-  ].join('\n');
+  ].filter((line): line is string => line !== null).join('\n');
 }
 
 async function sendMillingTelegramNotification(params: {
@@ -243,6 +246,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Выбрана некорректная толщина для материала.' }, { status: 400 });
     }
 
+    const referer = request.headers.get('referer') || request.headers.get('origin') || '';
+    const ip = getClientIp(request);
+    const createdOrder = await createServiceRequestOrder({
+      source: 'milling',
+      customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment },
+      total: 0,
+      payloadJson: {
+        service: 'milling',
+        customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment || null },
+        fields: { ...parsed.data, phone: normalizedPhone, website: undefined },
+        file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+        referer,
+        ip,
+      },
+    });
+
     const text = buildMillingText({
       name: parsed.data.name,
       phone: normalizedPhone,
@@ -251,8 +270,9 @@ export async function POST(request: NextRequest) {
       helpWithPrep: parsed.data.helpWithPrep,
       comment: parsed.data.comment,
       file,
-      referer: request.headers.get('referer') || request.headers.get('origin') || '',
-      ip: getClientIp(request),
+      referer,
+      ip,
+      orderNumber: createdOrder.orderNumber,
     });
 
     const [telegramSent, emailSent] = await Promise.all([

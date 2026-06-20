@@ -6,9 +6,11 @@ import { getServerEnv } from '@/lib/env';
 import { calculateHeatTransferPricing } from '@/lib/calculations/heatTransferPricing';
 import { getHeatTransferPricingConfig } from '@/lib/heat-transfer/heatTransferPricing';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 export const runtime = 'nodejs';
 
 type HeatTransferPayload = {
+  orderNumber?: string;
   productType: 'mug' | 'tshirt' | 'film';
   configuration: {
     mugType: 'white330' | 'chameleon';
@@ -56,6 +58,7 @@ async function sendTelegramMessage(payload: HeatTransferPayload) {
 
   const text = [
     '🆕 Новая заявка — Термоперенос',
+    payload.orderNumber ? `Номер заявки: #${payload.orderNumber}` : '',
     '',
     `Имя: ${payload.contact.name}`,
     `Телефон: ${payload.contact.phone}`,
@@ -104,6 +107,7 @@ async function sendEmail(payload: HeatTransferPayload) {
     subject: 'Новая заявка — Термоперенос',
     text: [
       'Новая заявка — Термоперенос',
+      payload.orderNumber ? `Номер заявки: #${payload.orderNumber}` : '',
       '',
       `Имя: ${payload.contact.name}`,
       `Телефон: ${payload.contact.phone}`,
@@ -161,6 +165,15 @@ export async function POST(req: NextRequest) {
     payload.pricing.subtotal = Math.round(recalculated.subtotal);
     payload.pricing.discount = Math.round(recalculated.discount);
     payload.pricing.total = Math.round(recalculated.total);
+
+    const createdOrder = await createServiceRequestOrder({
+      source: 'heat-transfer',
+      customer: { name: payload.contact.name, phone: payload.contact.phone, email: payload.contact.email, comment: payload.contact.comment },
+      total: Math.round(payload.pricing.total),
+      payloadJson: { service: 'heat-transfer', ...payload, files: payload.files },
+      quoteJson: { kind: 'service-request', service: 'heat-transfer', total: Math.round(payload.pricing.total), pricingStatus: 'calculated', pricing: payload.pricing },
+    });
+    payload.orderNumber = createdOrder.orderNumber;
 
     const [emailSent, telegramSent] = await Promise.all([
       sendEmail(payload).catch(() => false),

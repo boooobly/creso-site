@@ -6,6 +6,7 @@ import { getServerEnv } from '@/lib/env';
 import { calculatePlotterCuttingPricing } from '@/lib/calculations/plotterCuttingPricing';
 import { getPlotterCuttingPricingConfig } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 export const runtime = 'nodejs';
 
 type PlotterPayload = {
@@ -26,6 +27,7 @@ type PlotterPayload = {
     total: number;
   };
   files: string[];
+  orderNumber?: string;
   contact: {
     name: string;
     phone: string;
@@ -55,6 +57,7 @@ async function sendTelegramMessage(payload: PlotterPayload) {
 
   const text = [
     '🆕 Новая заявка — Плоттерная резка',
+    payload.orderNumber ? `Номер заявки: #${payload.orderNumber}` : '',
     '',
     `Имя: ${payload.contact.name}`,
     `Телефон: ${payload.contact.phone}`,
@@ -107,6 +110,7 @@ async function sendEmail(payload: PlotterPayload) {
     subject: 'Новая заявка — Плоттерная резка',
     text: [
       'Новая заявка — Плоттерная резка',
+      payload.orderNumber ? `Номер заявки: #${payload.orderNumber}` : '',
       '',
       `Имя: ${payload.contact.name}`,
       `Телефон: ${payload.contact.phone}`,
@@ -168,6 +172,15 @@ export async function POST(req: NextRequest) {
     payload.calculator.extrasCost = recalculated.extrasCost;
     payload.calculator.minimumApplied = recalculated.minimumApplied;
     payload.calculator.total = recalculated.totalCost;
+
+    const createdOrder = await createServiceRequestOrder({
+      source: 'plotter',
+      customer: { name: payload.contact.name, phone: payload.contact.phone, email: payload.contact.email, comment: payload.contact.comment },
+      total: Math.round(payload.calculator.total),
+      payloadJson: { service: 'plotter', ...payload, files: payload.files },
+      quoteJson: { kind: 'service-request', service: 'plotter', total: Math.round(payload.calculator.total), pricingStatus: 'calculated', calculator: payload.calculator },
+    });
+    payload.orderNumber = createdOrder.orderNumber;
 
     const [emailSent, telegramSent] = await Promise.all([
       sendEmail(payload).catch(() => false),

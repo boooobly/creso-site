@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
+vi.mock('@/lib/orders/createServiceRequestOrder', () => ({
+  createServiceRequestOrder: vi.fn(async () => ({ orderId: 'order-1', orderNumber: 'TESTORDER' })),
+}));
+
 vi.mock('@/lib/env', () => ({
   getServerEnv: () => ({
     TELEGRAM_BOT_TOKEN: '',

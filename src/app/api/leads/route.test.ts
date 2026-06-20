@@ -5,6 +5,11 @@ const sendEmailLeadMock = vi.fn(async () => undefined);
 const sendTelegramLeadMock = vi.fn(async () => undefined);
 const sendTelegramDocumentBufferMock = vi.fn(async () => undefined);
 
+const orderCreateMock = vi.fn(async ({ data }) => ({ id: 'order-1', ...data }));
+vi.mock('@/lib/db/prisma', () => ({
+  prisma: { order: { create: orderCreateMock } },
+}));
+
 vi.mock('@/lib/anti-spam', () => ({
   enforcePublicRequestGuard: vi.fn(() => null),
   getClientIp: vi.fn(() => '203.0.113.77'),
@@ -42,6 +47,7 @@ describe('POST /api/leads', () => {
     sendEmailLeadMock.mockClear();
     sendTelegramLeadMock.mockClear();
     sendTelegramDocumentBufferMock.mockClear();
+    orderCreateMock.mockClear();
   });
 
   it('rejects oversized file before notifications', async () => {
