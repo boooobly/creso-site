@@ -4,9 +4,11 @@ import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 
 import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 export const runtime = 'nodejs';
 
 type OutdoorPayload = {
+  orderNumber?: string;
   address: string;
   dimensions: string;
   budget?: string;
@@ -17,6 +19,7 @@ type OutdoorPayload = {
 function buildMessage(payload: OutdoorPayload) {
   return [
     'Новая заявка — Наружная реклама',
+    payload.orderNumber ? `Номер заявки: #${payload.orderNumber}` : '',
     '',
     `Адрес: ${payload.address}`,
     `Размеры: ${payload.dimensions}`,
@@ -93,6 +96,14 @@ export async function POST(req: NextRequest) {
     }
 
     payload.phone = phone;
+
+    const createdOrder = await createServiceRequestOrder({
+      source: 'outdoor',
+      customer: { phone },
+      total: 0,
+      payloadJson: { service: 'outdoor', ...payload, phone, referer: req.headers.get('referer') || req.headers.get('origin') || '' },
+    });
+    payload.orderNumber = createdOrder.orderNumber;
 
     const message = buildMessage(payload);
 

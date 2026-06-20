@@ -11,6 +11,7 @@ import { getServerEnv } from '@/lib/env';
 
 import { logger } from '@/lib/logger';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 export const runtime = 'nodejs';
 
 const optionalTrimmedString = z.preprocess(
@@ -204,12 +205,18 @@ export async function POST(request: NextRequest) {
     );
 
     const referer = request.headers.get('referer') || request.headers.get('origin') || '';
-    const text = buildLeadNotificationText({
+    const createdOrder = await createServiceRequestOrder({
+      source: 'lead',
+      customer: { name: parsed.data.name, phone: normalizedPhone, email: parsed.data.email, comment: parsed.data.comment },
+      total: 0,
+      payloadJson: JSON.parse(JSON.stringify({ service: 'lead', source: parsed.data.source, customer: { name: parsed.data.name, phone: normalizedPhone || null, email: parsed.data.email || null, comment: parsed.data.comment || null }, fields: { ...parsed.data, phone: normalizedPhone ?? null, company: null }, files: notificationFiles.map(({ bytes, ...file }) => file), referer, ip })),
+    });
+    const text = [`Номер заявки: #${createdOrder.orderNumber}`, buildLeadNotificationText({
       ...parsed.data,
       phone: normalizedPhone,
       pageUrl: parsed.data.pageUrl || referer,
       files: notificationFiles,
-    });
+    })].join('\n');
 
     await Promise.all([
       sendTelegramLead(text)

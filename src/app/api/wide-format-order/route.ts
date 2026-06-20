@@ -11,6 +11,7 @@ import { logger } from '@/lib/logger';
 import { FIVE_MB_IN_BYTES, validateUploadedFile } from '@/lib/file-validation';
 import { getServerEnv } from '@/lib/env';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
@@ -235,8 +236,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const referer = pageUrl || request.headers.get('referer') || request.headers.get('origin') || '';
+    const createdOrder = await createServiceRequestOrder({
+      source: 'wide-format',
+      customer: { name, phone, email, comment },
+      total: Math.round(calculated.totalCost),
+      payloadJson: { service: 'wide-format', customer: { name, phone, email: email || null, comment: comment || null }, fields: { material: materialIdRaw, widthMm: parsedWidthMm, heightMm: parsedHeightMm, quantity: parsedQuantity, edgeGluing, imageWelding, grommets, grommetsCount: calculated.grommetsCount, cutByPositioningMarks, plotterCutByRegistrationMarks, pageUrl }, file: file ? { name: file.name, size: file.size, type: file.type || null } : null, calculated, referer },
+      quoteJson: { kind: 'service-request', service: 'wide-format', total: Math.round(calculated.totalCost), pricingStatus: 'calculated', calculated },
+    });
+
     const message = [
       '🆕 Новая заявка — Широкоформатная печать',
+      `Номер заявки: #${createdOrder.orderNumber}`,
       '',
       `Материал: ${materialLabel}`,
       `Размер: ${Math.round(parsedWidthMm)} × ${Math.round(parsedHeightMm)} мм (${calculated.width.toFixed(2)} × ${calculated.height.toFixed(2)} м)`,
@@ -258,7 +269,7 @@ export async function POST(request: NextRequest) {
       `Email: ${email || '—'}`,
       `Комментарий: ${comment || '—'}`,
       `Файл: ${file?.name ? `${file.name} (${Math.round(file.size / 1024)} КБ)` : '—'}`,
-      `Страница: ${pageUrl || request.headers.get('referer') || request.headers.get('origin') || '—'}`,
+      `Страница: ${referer || '—'}`,
     ].join('\n');
 
     const botToken = env.TELEGRAM_BOT_TOKEN;

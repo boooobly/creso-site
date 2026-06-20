@@ -15,6 +15,7 @@ import {
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
+import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 
 export const runtime = 'nodejs';
 
@@ -45,17 +46,19 @@ function buildTshirtsText(params: {
   comment?: string;
   file: File | null;
   referer: string;
+  orderNumber?: string;
 }): string {
   return [
     '🆕 Новая заявка — Печать на футболках',
     '',
     'Услуга: Печать на футболках',
+    params.orderNumber ? `Номер заявки: #${params.orderNumber}` : null,
     `Имя: ${params.name}`,
     `Телефон: ${params.phone}`,
     `Комментарий: ${params.comment || '—'}`,
     `Файл: ${params.file ? `${params.file.name} (${formatFileSize(params.file.size)})` : 'не прикреплён'}`,
     `Страница: ${params.referer || '—'}`,
-  ].join('\n');
+  ].filter((line): line is string => line !== null).join('\n');
 }
 
 async function sendTshirtsTelegramNotification(params: {
@@ -65,6 +68,7 @@ async function sendTshirtsTelegramNotification(params: {
   name: string;
   phone: string;
   comment?: string;
+  orderNumber?: string;
 }): Promise<boolean> {
   const env = getServerEnv();
   const token = env.TELEGRAM_BOT_TOKEN;
@@ -90,11 +94,12 @@ async function sendTshirtsTelegramNotification(params: {
     'Макет к заявке — Печать на футболках',
     '',
     'Услуга: Печать на футболках',
+    params.orderNumber ? `Номер заявки: #${params.orderNumber}` : null,
     `Имя: ${params.name}`,
     `Телефон: ${params.phone}`,
     `Комментарий: ${params.comment || '—'}`,
     `Страница: ${params.referer || '—'}`,
-  ].join('\n');
+  ].filter((line): line is string => line !== null).join('\n');
 
   try {
     const bytes = Buffer.from(await params.file.arrayBuffer());
@@ -186,12 +191,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
     }
 
+    const referer = request.headers.get('referer') || request.headers.get('origin') || '';
+    const createdOrder = await createServiceRequestOrder({
+      source: 'tshirts',
+      customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment },
+      total: 0,
+      payloadJson: {
+        service: 'tshirts',
+        customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment || null },
+        fields: { ...parsed.data, phone: normalizedPhone, website: undefined },
+        file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+        referer,
+      },
+    });
+
     const text = buildTshirtsText({
       name: parsed.data.name,
       phone: normalizedPhone,
       comment: parsed.data.comment,
       file,
-      referer: request.headers.get('referer') || request.headers.get('origin') || '',
+      referer,
+      orderNumber: createdOrder.orderNumber,
     });
 
     const [telegramSent, emailSent] = await Promise.all([
@@ -202,6 +222,7 @@ export async function POST(request: NextRequest) {
         name: parsed.data.name,
         phone: normalizedPhone,
         comment: parsed.data.comment,
+        orderNumber: createdOrder.orderNumber,
       }),
       sendEmailLead({
         subject: 'Новая заявка — Печать на футболках',
