@@ -34,6 +34,7 @@ Use this matrix when configuring variables in Vercel:
 - In production, missing `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` fail fast with clear `[env] ... must be configured in production.` errors.
 - If a required runtime variable is missing, API routes fail fast with a clear `[env] Invalid environment configuration: ...` error.
 - Without `CRON_SECRET`, the notification processor fails closed with HTTP 503. Orders are still stored, but queued manager/customer notifications cannot be retried in the background.
+- The checked-in Vercel Cron runs daily at `06:00 UTC` to stay compatible with the project's Hobby plan. New jobs still get one immediate best-effort delivery attempt during the originating request; the daily run recovers due retries.
 
 - For Neon on Vercel: keep `DATABASE_URL` pointed at the pooler host (`-pooler`) for runtime, and set `DATABASE_URL_UNPOOLED` to the direct host for Prisma migrations.
 
