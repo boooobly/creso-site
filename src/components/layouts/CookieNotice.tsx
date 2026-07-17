@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { ANALYTICS_CONSENT_EVENT, ANALYTICS_CONSENT_STORAGE_KEY } from '@/lib/analytics/yandexMetrica';
 
-const COOKIE_NOTICE_STORAGE_KEY = 'credomir_cookie_notice_accepted';
 const COOKIE_NOTICE_VISIBILITY_EVENT = 'creso-cookie-notice-visibility';
 
 const notifyFloatingCtaVisibility = (visible: boolean) => {
@@ -22,7 +22,7 @@ export default function CookieNotice() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const isAccepted = localStorage.getItem(COOKIE_NOTICE_STORAGE_KEY) === 'true';
+    const isAccepted = localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY) === 'true';
     setIsVisible(!isAccepted);
   }, []);
 
@@ -34,7 +34,8 @@ export default function CookieNotice() {
 
   const acceptNotice = () => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(COOKIE_NOTICE_STORAGE_KEY, 'true');
+      localStorage.setItem(ANALYTICS_CONSENT_STORAGE_KEY, 'true');
+      window.dispatchEvent(new Event(ANALYTICS_CONSENT_EVENT));
     }
 
     setIsVisible(false);

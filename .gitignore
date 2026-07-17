@@ -1,0 +1,23 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+coverage/
+
+# Local environment and platform state
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Logs and local databases
+*.log
+*.db
+*.db-journal
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.tsbuildinfo

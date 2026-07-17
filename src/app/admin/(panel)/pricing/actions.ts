@@ -19,6 +19,7 @@ import { updateHeatTransferPricingEntry } from '@/lib/heat-transfer/heatTransfer
 import { updatePrintPricingEntry } from '@/lib/print/printPricing';
 import { updateMillingPricingEntry } from '@/lib/milling/millingPricing';
 import { normalizeNumericInput } from '@/lib/admin/pricing-input';
+import { requireAdminActionAuth } from '@/lib/admin/require-admin-action-auth';
 
 function parseBoolean(value: FormDataEntryValue | null) {
   return value === 'on' || value === 'true' || value === '1';
@@ -84,6 +85,8 @@ function redirectWithError(error: unknown) {
 }
 
 export async function createPriceCategoryAction(formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     await createPriceCategory({
       name: String(formData.get('name') ?? '').trim(),
@@ -102,6 +105,8 @@ export async function createPriceCategoryAction(formData: FormData) {
 }
 
 export async function updatePriceCategoryAction(id: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     await updatePriceCategory(id, {
       name: String(formData.get('name') ?? '').trim(),
@@ -120,6 +125,8 @@ export async function updatePriceCategoryAction(id: string, formData: FormData) 
 }
 
 export async function deletePriceCategoryAction(id: string) {
+  await requireAdminActionAuth();
+
   try {
     await deletePriceCategory(id);
     revalidatePath('/admin/pricing');
@@ -130,6 +137,8 @@ export async function deletePriceCategoryAction(id: string) {
 }
 
 export async function createPriceItemAction(formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     await createPriceItem({
       categoryId: String(formData.get('categoryId') ?? '').trim(),
@@ -149,6 +158,8 @@ export async function createPriceItemAction(formData: FormData) {
 }
 
 export async function updatePriceItemAction(id: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     await updatePriceItem(id, {
       categoryId: String(formData.get('categoryId') ?? '').trim(),
@@ -168,6 +179,8 @@ export async function updatePriceItemAction(id: string, formData: FormData) {
 }
 
 export async function deletePriceItemAction(id: string) {
+  await requireAdminActionAuth();
+
   try {
     await deletePriceItem(id);
     revalidatePath('/admin/pricing');
@@ -179,6 +192,8 @@ export async function deletePriceItemAction(id: string) {
 
 
 export async function updateBaguetteExtrasPricingEntryAction(entryId: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     const rawValue = buildBaguetteRawValue(formData);
     const note = String(formData.get('note') ?? '').trim();
@@ -196,6 +211,8 @@ export async function updateBaguetteExtrasPricingEntryAction(entryId: string, fo
 
 
 export async function updateWideFormatPricingEntryAction(entryId: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     const entryType = String(formData.get('entryType') ?? 'number').trim();
     const rawValue = entryType === 'boolean'
@@ -213,6 +230,8 @@ export async function updateWideFormatPricingEntryAction(entryId: string, formDa
 
 
 export async function updatePlotterCuttingPricingEntryAction(entryId: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     const rawValue = String(formData.get('value') ?? '').trim();
     const note = String(formData.get('note') ?? '').trim();
@@ -227,6 +246,8 @@ export async function updatePlotterCuttingPricingEntryAction(entryId: string, fo
 
 
 export async function updateHeatTransferPricingEntryAction(entryId: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     const rawValue = String(formData.get('value') ?? '').trim();
     const note = String(formData.get('note') ?? '').trim();
@@ -241,6 +262,8 @@ export async function updateHeatTransferPricingEntryAction(entryId: string, form
 
 
 export async function updatePrintPricingEntryAction(entryId: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     const rawValue = String(formData.get('value') ?? '').trim();
     const note = String(formData.get('note') ?? '').trim();
@@ -254,6 +277,8 @@ export async function updatePrintPricingEntryAction(entryId: string, formData: F
 }
 
 export async function updateMillingPricingEntryAction(entryId: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     const rawValue = String(formData.get('value') ?? '').trim();
     const note = String(formData.get('note') ?? '').trim();

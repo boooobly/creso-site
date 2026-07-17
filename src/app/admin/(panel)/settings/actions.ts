@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { SITE_SETTINGS_SECTIONS } from '@/lib/admin/site-settings-config';
 import { upsertSiteSettings } from '@/lib/admin/site-settings-service';
+import { requireAdminActionAuth } from '@/lib/admin/require-admin-action-auth';
 
 const SETTINGS_SUCCESS = 'saved';
 
@@ -48,6 +49,8 @@ function validateField(label: string, inputName: string, value: string, required
 }
 
 export async function saveSiteSettingsAction(formData: FormData) {
+  await requireAdminActionAuth();
+
   try {
     const entries = SITE_SETTINGS_SECTIONS.flatMap((section) =>
       section.fields.map((field) => {

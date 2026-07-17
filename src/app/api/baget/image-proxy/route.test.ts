@@ -60,6 +60,8 @@ describe('image proxy helpers', () => {
     expect(parseAllowedImageUrl('https://images.ctfassets.net/space/image.jpg')?.hostname).toBe('images.ctfassets.net');
     expect(parseAllowedImageUrl('https://example.com/image.jpg')).toBeNull();
     expect(parseAllowedImageUrl('http://drive.google.com/uc?id=abc123')).toBeNull();
+    expect(parseAllowedImageUrl('https://user:pass@drive.google.com/uc?id=abc123')).toBeNull();
+    expect(parseAllowedImageUrl('https://drive.google.com:8443/uc?id=abc123')).toBeNull();
   });
 });
 
@@ -162,11 +164,50 @@ describe('GET /api/baget/image-proxy', () => {
     expect(response.headers.get('cache-control')).toBe('public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800');
     expect(new Uint8Array(await response.arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]));
     expect(fetchMock).toHaveBeenCalledWith(new URL('https://images.ctfassets.net/space/image.jpg'), {
-      redirect: 'follow',
+      redirect: 'manual',
       headers: {
-        Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        Accept: 'image/avif,image/webp,image/apng,image/png,image/jpeg,image/gif,*/*;q=0.1',
         'User-Agent': 'Mozilla/5.0 (compatible; CredomirImageProxy/1.0)',
       },
+      signal: expect.any(AbortSignal),
     });
+    expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+  });
+
+  it('rejects SVG responses even from allowed hosts', async () => {
+    const { GET } = await import('@/app/api/baget/image-proxy/route');
+    fetchMock.mockResolvedValueOnce(imageResponse([1, 2, 3], 'image/svg+xml'));
+
+    const response = await GET(requestFor('https://images.ctfassets.net/space/image.svg'));
+
+    expect(response.status).toBe(502);
+  });
+
+  it('rejects images whose declared size exceeds the proxy limit', async () => {
+    const { GET } = await import('@/app/api/baget/image-proxy/route');
+    fetchMock.mockResolvedValueOnce(new Response(new Uint8Array([1]), {
+      status: 200,
+      headers: {
+        'content-type': 'image/jpeg',
+        'content-length': String(11 * 1024 * 1024),
+      },
+    }));
+
+    const response = await GET(requestFor('https://images.ctfassets.net/space/large.jpg'));
+
+    expect(response.status).toBe(502);
+  });
+
+  it('does not follow redirects to hosts outside the allowlist', async () => {
+    const { GET } = await import('@/app/api/baget/image-proxy/route');
+    fetchMock.mockResolvedValueOnce(new Response(null, {
+      status: 302,
+      headers: { location: 'https://example.com/private.jpg' },
+    }));
+
+    const response = await GET(requestFor('https://images.ctfassets.net/space/image.jpg'));
+
+    expect(response.status).toBe(502);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { MANAGER_ORDER_STATUSES } from '@/lib/admin/orders';
+import { requireAdminActionAuth } from '@/lib/admin/require-admin-action-auth';
 
 const updateOrderSchema = z.object({
   status: z.enum(MANAGER_ORDER_STATUSES),
@@ -12,6 +13,8 @@ const updateOrderSchema = z.object({
 });
 
 export async function updateOrderAdminAction(orderId: string, formData: FormData) {
+  await requireAdminActionAuth();
+
   const parsed = updateOrderSchema.safeParse({
     status: String(formData.get('status') ?? ''),
     managerNote: String(formData.get('managerNote') ?? '').trim()

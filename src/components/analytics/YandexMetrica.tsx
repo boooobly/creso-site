@@ -1,26 +1,17 @@
 'use client';
 
 import Script from 'next/script';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useRef } from 'react';
-import { trackHit } from '@/lib/analytics/yandexMetrica';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import {
+  ANALYTICS_CONSENT_EVENT,
+  ANALYTICS_CONSENT_STORAGE_KEY,
+  getAnalyticsPageUrl,
+  isAnalyticsRouteAllowed,
+  trackHit,
+} from '@/lib/analytics/yandexMetrica';
 
 const METRICA_SCRIPT_ID = 'yandex-metrica';
-
-function getCurrentUrl(pathname: string, searchParams: { toString(): string } | null) {
-  const search = searchParams?.toString();
-  return search ? `${pathname}?${search}` : pathname;
-}
-
-function toAbsoluteUrl(url: string) {
-  if (typeof window === 'undefined') return null;
-
-  try {
-    return new URL(url, window.location.origin).href;
-  } catch {
-    return null;
-  }
-}
 
 function getCounterId() {
   const value = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID?.trim();
@@ -32,15 +23,26 @@ function getCounterId() {
 
 export default function YandexMetrica() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const counterId = getCounterId();
+  const [hasConsent, setHasConsent] = useState(false);
   const lastTrackedUrlRef = useRef<string | null>(null);
   const isFirstRenderRef = useRef(true);
 
-  const currentUrl = useMemo(() => getCurrentUrl(pathname, searchParams), [pathname, searchParams]);
+  useEffect(() => {
+    const syncConsent = () => {
+      setHasConsent(window.localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY) === 'true');
+    };
+
+    syncConsent();
+    window.addEventListener(ANALYTICS_CONSENT_EVENT, syncConsent);
+    return () => window.removeEventListener(ANALYTICS_CONSENT_EVENT, syncConsent);
+  }, []);
 
   useEffect(() => {
-    if (!counterId) return;
+    if (!counterId || !hasConsent || !isAnalyticsRouteAllowed(pathname)) return;
+
+    const currentUrl = getAnalyticsPageUrl(pathname, window.location.origin);
+    if (!currentUrl) return;
 
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
@@ -50,14 +52,11 @@ export default function YandexMetrica() {
 
     if (lastTrackedUrlRef.current === currentUrl) return;
 
-    const absoluteUrl = toAbsoluteUrl(currentUrl);
-    if (!absoluteUrl) return;
-
-    trackHit(absoluteUrl);
+    trackHit(currentUrl);
     lastTrackedUrlRef.current = currentUrl;
-  }, [counterId, currentUrl]);
+  }, [counterId, hasConsent, pathname]);
 
-  if (!counterId) {
+  if (!counterId || !hasConsent || !isAnalyticsRouteAllowed(pathname)) {
     return null;
   }
 
@@ -75,14 +74,14 @@ export default function YandexMetrica() {
           })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
 
           ym(${counterId}, 'init', {
-            clickmap: true,
-            trackLinks: true,
+            clickmap: false,
+            trackLinks: false,
             accurateTrackBounce: true,
-            webvisor: true,
+            webvisor: false,
             defer: true
           });
 
-          ym(${counterId}, 'hit', window.location.href);
+          ym(${counterId}, 'hit', window.location.origin + window.location.pathname);
         `}
       </Script>
       <noscript>

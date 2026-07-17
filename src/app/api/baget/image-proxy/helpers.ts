@@ -3,7 +3,7 @@ export const MIN_PROXY_WIDTH = 120;
 export const MAX_PROXY_WIDTH = 2000;
 export const IMAGE_CACHE_CONTROL = 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800';
 export const IMAGE_PROXY_FETCH_HEADERS = {
-  Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+  Accept: 'image/avif,image/webp,image/apng,image/png,image/jpeg,image/gif,*/*;q=0.1',
   'User-Agent': 'Mozilla/5.0 (compatible; CredomirImageProxy/1.0)',
 };
 
@@ -38,6 +38,10 @@ export function parseAllowedImageUrl(rawUrl: string | null): URL | null {
   try {
     const url = new URL(rawUrl);
     if (url.protocol !== 'https:') {
+      return null;
+    }
+
+    if (url.username || url.password || (url.port && url.port !== '443')) {
       return null;
     }
 

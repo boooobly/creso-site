@@ -6,6 +6,26 @@ const getCounterId = () => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+export const ANALYTICS_CONSENT_STORAGE_KEY = 'credomir_cookie_notice_accepted';
+export const ANALYTICS_CONSENT_EVENT = 'creso-analytics-consent-granted';
+
+export function isAnalyticsRouteAllowed(pathname: string): boolean {
+  return pathname !== '/order' && !pathname.startsWith('/order/');
+}
+
+export function getAnalyticsPageUrl(pathname: string, origin: string): string | null {
+  if (!isAnalyticsRouteAllowed(pathname)) return null;
+
+  try {
+    const url = new URL(pathname, origin);
+    url.search = '';
+    url.hash = '';
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
 type YandexMetricaAction = 'hit' | 'reachGoal';
 type YandexGoalContactType = 'phone' | 'whatsapp' | 'telegram' | 'email';
 

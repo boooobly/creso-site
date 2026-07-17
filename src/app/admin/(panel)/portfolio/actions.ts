@@ -11,6 +11,7 @@ import {
 } from '@/lib/admin/portfolio-service';
 import { createMediaAsset, deleteMediaAsset } from '@/lib/admin/media-assets-service';
 import { portfolioItemSchema } from '@/lib/admin/validation';
+import { requireAdminActionAuth } from '@/lib/admin/require-admin-action-auth';
 
 type ActionResult = {
   error?: string;
@@ -160,6 +161,8 @@ function mapActionError(error: unknown): ActionResult {
 }
 
 export async function createPortfolioItemAction(_: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdminActionAuth();
+
   let createdAssetId: string | null = null;
   let shouldRedirect = false;
 
@@ -198,6 +201,8 @@ export async function updatePortfolioItemAction(
   _: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
+  await requireAdminActionAuth();
+
   let createdAssetId: string | null = null;
   let shouldRedirect = false;
 
@@ -233,6 +238,8 @@ export async function updatePortfolioItemAction(
 }
 
 export async function removePortfolioItemAction(id: string) {
+  await requireAdminActionAuth();
+
   await deletePortfolioItem(id);
   revalidatePath('/admin/portfolio');
   revalidatePath('/portfolio');
@@ -241,6 +248,8 @@ export async function removePortfolioItemAction(id: string) {
 }
 
 export async function quickTogglePortfolioPublishAction(id: string, nextPublished: boolean) {
+  await requireAdminActionAuth();
+
   await updatePortfolioItem(id, { published: nextPublished });
   revalidatePath('/admin/portfolio');
   revalidatePath('/portfolio');
@@ -248,6 +257,8 @@ export async function quickTogglePortfolioPublishAction(id: string, nextPublishe
 }
 
 export async function quickTogglePortfolioFeaturedAction(id: string, nextFeatured: boolean) {
+  await requireAdminActionAuth();
+
   await updatePortfolioItem(id, { featured: nextFeatured });
   revalidatePath('/admin/portfolio');
   revalidatePath('/portfolio');

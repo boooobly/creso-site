@@ -18,6 +18,7 @@ import { MAX_ORDER_IMAGE_SIZE_BYTES, storeBagetCustomerImage } from '@/lib/order
 import { validateUploadedImageFile } from '@/lib/file-validation';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { normalizeBagetWidths } from '@/lib/baget/widths';
+import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 
 export const runtime = 'nodejs';
 
@@ -35,21 +36,21 @@ const bagetItemSchema = z.object({
 
 const orderSchema = z.object({
   customer: z.object({
-    name: z.string().trim().min(2),
-    phone: z.string().trim().min(1),
-    email: z.string().trim().email().optional(),
-    comment: z.string().trim().optional(),
+    name: z.string().trim().min(2).max(120),
+    phone: z.string().trim().min(1).max(32),
+    email: z.string().trim().email().max(254).optional(),
+    comment: z.string().trim().max(3000).optional(),
   }),
   baget: z.object({
-    width: z.number().positive(),
-    height: z.number().positive(),
-    quantity: z.number().int().positive().default(1),
-    selectedBagetId: z.string().min(1).optional().nullable(),
+    width: z.number().min(50).max(10_000),
+    height: z.number().min(50).max(10_000),
+    quantity: z.number().int().min(1).max(100).default(1),
+    selectedBagetId: z.string().min(1).max(200).optional().nullable(),
     workType: z.enum(['canvas', 'stretchedCanvas', 'canvasOnStretcher', 'rhinestone', 'embroideryBeads', 'stretcherOnly', 'photo', 'other', 'embroidery', 'beads']),
     glazing: z.enum(['none', 'glass', 'antiReflectiveGlass', 'plexiglass', 'pet1mm']),
     hasPassepartout: z.boolean(),
-    passepartoutSize: z.number().min(0).optional(),
-    passepartoutBottomSize: z.number().min(0).optional(),
+    passepartoutSize: z.number().min(0).max(2000).optional(),
+    passepartoutBottomSize: z.number().min(0).max(2000).optional(),
     backPanel: z.boolean(),
     hangerType: z.enum(['crocodile', 'wire']).nullable().optional(),
     stand: z.boolean(),
@@ -58,10 +59,9 @@ const orderSchema = z.object({
     requiresPrint: z.boolean().default(false),
     printMaterial: z.enum(['paper', 'canvas']).nullable().default(null),
     transferSource: z.enum(['manual', 'wide-format']).nullable().default('manual'),
-    printCost: z.number().min(0).optional(),
   }),
   fulfillmentType: z.enum(['pickup', 'selfPickup', 'delivery']).default('pickup'),
-  company: z.string().optional(),
+  company: z.string().max(200).optional(),
 });
 
 type ParsedOrderInput = z.infer<typeof orderSchema>;
@@ -73,6 +73,48 @@ type ParsedOrderRequest = {
 const ORDER_MAX_FILES = 1;
 const ORDER_MAX_TOTAL_SIZE_BYTES = MAX_ORDER_IMAGE_SIZE_BYTES;
 const ORDER_MAX_CONTENT_LENGTH_BYTES = MAX_ORDER_IMAGE_SIZE_BYTES + (1024 * 1024);
+const ORDER_MAX_JSON_SIZE_BYTES = 256 * 1024;
+
+class OrderPayloadTooLargeError extends Error {}
+
+function parseJsonPayload(rawPayload: string): unknown {
+  if (new TextEncoder().encode(rawPayload).byteLength > ORDER_MAX_JSON_SIZE_BYTES) {
+    throw new OrderPayloadTooLargeError('Order payload is too large.');
+  }
+
+  if (!rawPayload) return null;
+
+  try {
+    return JSON.parse(rawPayload);
+  } catch {
+    return null;
+  }
+}
+
+async function readLimitedJsonBody(request: NextRequest): Promise<string> {
+  if (!request.body) return '';
+
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let totalBytes = 0;
+  let rawPayload = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+
+    totalBytes += value.byteLength;
+    if (totalBytes > ORDER_MAX_JSON_SIZE_BYTES) {
+      await reader.cancel();
+      throw new OrderPayloadTooLargeError('Order payload is too large.');
+    }
+
+    rawPayload += decoder.decode(value, { stream: true });
+  }
+
+  return rawPayload + decoder.decode();
+}
 
 async function parseOrderRequest(request: NextRequest): Promise<ParsedOrderRequest> {
   const contentType = request.headers.get('content-type') || '';
@@ -81,7 +123,7 @@ async function parseOrderRequest(request: NextRequest): Promise<ParsedOrderReque
     const formData = await request.formData();
     const payloadRaw = formData.get('payload');
     const payloadText = typeof payloadRaw === 'string' ? payloadRaw : '';
-    const payload = payloadText ? JSON.parse(payloadText) : null;
+    const payload = parseJsonPayload(payloadText);
     const fileValue = formData.get('customerImage');
 
     return {
@@ -90,7 +132,7 @@ async function parseOrderRequest(request: NextRequest): Promise<ParsedOrderReque
     };
   }
 
-  const payload = await request.json().catch(() => null);
+  const payload = parseJsonPayload(await readLimitedJsonBody(request));
   return { payload, customerImageFile: null };
 }
 
@@ -170,17 +212,28 @@ async function createOrderWithRetry(data: {
 export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get('content-type') || '';
-    if (contentType.includes('multipart/form-data')) {
-      const contentLengthValidation = validateMultipartContentLength(request, {
-        maxContentLengthBytes: ORDER_MAX_CONTENT_LENGTH_BYTES,
-      });
-      if (!contentLengthValidation.ok) {
-        return multipartErrorResponse(contentLengthValidation);
-      }
+    const contentLengthValidation = validateMultipartContentLength(request, {
+      maxContentLengthBytes: contentType.includes('multipart/form-data')
+        ? ORDER_MAX_CONTENT_LENGTH_BYTES
+        : ORDER_MAX_JSON_SIZE_BYTES,
+    });
+    if (!contentLengthValidation.ok) {
+      return multipartErrorResponse(contentLengthValidation);
+    }
+
+    const { payload, customerImageFile } = await parseOrderRequest(request);
+    const blockedResponse = enforcePublicRequestGuard(request, {
+      route: '/api/orders',
+      payload,
+      honeypotFields: ['company'],
+      requirePayload: true,
+    });
+    if (blockedResponse) {
+      return blockedResponse;
     }
 
     const env = getServerEnv();
-    const { payload, customerImageFile } = await parseOrderRequest(request);
+
     const filesValidation = validateMultipartFiles(customerImageFile ? [customerImageFile] : [], {
       maxFiles: ORDER_MAX_FILES,
       maxFileBytes: MAX_ORDER_IMAGE_SIZE_BYTES,
@@ -197,10 +250,6 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json({ ok: false, error: 'Не заполнены обязательные поля.' }, { status: 400 });
-    }
-
-    if (parsed.data.company?.trim()) {
-      return NextResponse.json({ ok: true });
     }
 
     const normalizedPhone = normalizePhone(parsed.data.customer.phone);
@@ -311,6 +360,10 @@ export async function POST(request: NextRequest) {
       accessToken,
     });
   } catch (error) {
+    if (error instanceof OrderPayloadTooLargeError) {
+      return NextResponse.json({ ok: false, error: 'Размер загружаемых данных превышает допустимый лимит.' }, { status: 413 });
+    }
+
     const message = error instanceof Error ? error.message : 'Unknown server error.';
     if (message.startsWith('[env]')) {
       return NextResponse.json({ ok: false, error: message }, { status: 500 });
