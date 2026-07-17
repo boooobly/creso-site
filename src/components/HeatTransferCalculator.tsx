@@ -16,6 +16,7 @@ import { openLeadFormWithCalculation } from '@/lib/lead-prefill';
 import { trackEvent } from '@/lib/analytics';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 const VECTOR_EXTENSIONS = ['pdf', 'svg', 'ai', 'eps', 'cdr'];
@@ -42,6 +43,7 @@ type HeatTransferQuote = {
 };
 
 export default function HeatTransferCalculator() {
+  const submissionIdempotency = useSubmissionIdempotency('heat-transfer-lead');
   const [productType, setProductType] = useState<HeatTransferProductType>('mug');
 
   const [mugType, setMugType] = useState<MugType>('white330');
@@ -318,18 +320,21 @@ ${calcSummary}`,
           },
         },
       };
+      const idempotencyKey = submissionIdempotency.getKey(payload);
 
       const res = await fetch('/api/leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
         body: JSON.stringify(payload),
       });
+      submissionIdempotency.settle(idempotencyKey, res.status);
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({ error: 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.' }));
         throw new Error(data.error || 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.contactFormSubmitSuccess, { source: 'heat_transfer' });
       setSubmitSuccess('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
     } catch (error) {

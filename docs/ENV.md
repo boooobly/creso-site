@@ -18,6 +18,7 @@ Use this matrix when configuring variables in Vercel:
 | `PUBLIC_BASE_URL` | Optional (falls back to `http://localhost:3000` for local/non-production contexts) | Optional (fallback applies in preview/non-production contexts) | **Required at runtime** | Required in production deploy/runtime (`NODE_ENV=production` + `VERCEL_ENV=production`). |
 | `SEND_CUSTOMER_EMAILS` | Optional | Optional | Optional | Boolean flag, defaults to `false` when omitted. |
 | `PAYMENT_WEBHOOK_SECRET` | Deprecated (unused) | Deprecated (unused) | Deprecated (unused) | Online payment is disabled; keep unset. |
+| `CRON_SECRET` | Optional unless testing the cron locally | Required for notification retries | **Required for notification retries** | Server-only bearer secret sent automatically by Vercel Cron to `/api/internal/notifications/process`. Use a different random value per environment. |
 | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Optional | Optional | Optional | If Telegram sending is enabled, both values must be set together. |
 | `BLOB_READ_WRITE_TOKEN` | Optional for local image upload testing | Required if admin image uploads are enabled | Required if admin image uploads are enabled | Vercel Blob token used by `/api/admin/upload-image` for portfolio and site images. |
 | `NEXT_PUBLIC_YANDEX_METRIKA_ID` | Optional | Optional | Optional | Public Yandex Metrica counter ID. When empty or invalid, metrica script/events are skipped safely. |
@@ -32,6 +33,7 @@ Use this matrix when configuring variables in Vercel:
 - For local development, copy `.env.example` to `.env.local` and fill in the values you need.
 - In production, missing `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` fail fast with clear `[env] ... must be configured in production.` errors.
 - If a required runtime variable is missing, API routes fail fast with a clear `[env] Invalid environment configuration: ...` error.
+- Without `CRON_SECRET`, the notification processor fails closed with HTTP 503. Orders are still stored, but queued manager/customer notifications cannot be retried in the background.
 
 - For Neon on Vercel: keep `DATABASE_URL` pointed at the pooler host (`-pooler`) for runtime, and set `DATABASE_URL_UNPOOLED` to the direct host for Prisma migrations.
 

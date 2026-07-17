@@ -6,7 +6,7 @@ import { sendTelegramDocumentBuffer, sendTelegramLead } from '@/lib/notification
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { logger } from '@/lib/logger';
 
-type NotifyNewOrderPayload = {
+export type NotifyNewOrderPayload = {
   orderNumber: string;
   customer: {
     name: string;
@@ -52,7 +52,7 @@ function buildMaterialsText(summary: BagetOrderSummaryData): string {
     .join('\n');
 }
 
-function buildNotificationText(payload: NotifyNewOrderPayload): string {
+export function buildNewOrderNotificationText(payload: NotifyNewOrderPayload): string {
   const bagetName = payload.orderSummary.baguette?.name;
   const bagetArticle = payload.orderSummary.baguette?.article;
   const bagetWidth = payload.orderSummary.baguette?.widthMm;
@@ -107,7 +107,7 @@ function buildNotificationText(payload: NotifyNewOrderPayload): string {
 }
 
 export async function notifyNewOrder(payload: NotifyNewOrderPayload): Promise<void> {
-  const text = buildNotificationText(payload);
+  const text = buildNewOrderNotificationText(payload);
   const env = getServerEnv();
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;

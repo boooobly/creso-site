@@ -7,6 +7,7 @@ import { calculatePlotterCuttingPricing } from '@/lib/calculations/plotterCuttin
 import { getPlotterCuttingPricingConfig } from '@/lib/plotter-cutting/plotterCuttingPricing';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
+import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
 export const runtime = 'nodejs';
 
 type PlotterPayload = {
@@ -179,6 +180,17 @@ export async function POST(req: NextRequest) {
       total: Math.round(payload.calculator.total),
       payloadJson: { service: 'plotter', ...payload, files: payload.files },
       quoteJson: { kind: 'service-request', service: 'plotter', total: Math.round(payload.calculator.total), pricingStatus: 'calculated', calculator: payload.calculator },
+      ...readRequestIdempotency(req.headers, {
+        calculator: {
+          material: payload.calculator.material,
+          cutLength: payload.calculator.cutLength,
+          area: payload.calculator.area,
+          complexity: payload.calculator.complexity,
+          extras: payload.calculator.extras,
+        },
+        files: payload.files,
+        contact: payload.contact,
+      }),
     });
     payload.orderNumber = createdOrder.orderNumber;
 
@@ -193,6 +205,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error);
+    if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';
     if (message.startsWith('[env]')) {
       return NextResponse.json({ ok: false, error: message }, { status: 500 });

@@ -8,6 +8,7 @@ import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import ImageDropzone from '@/components/ImageDropzone';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 
 type FormValues = {
   name: string;
@@ -67,6 +68,7 @@ type WideFormatPrefillDetail = {
 type WideFormatPrefillEvent = CustomEvent<WideFormatPrefillDetail>;
 
 export default function OrderWideFormatForm() {
+  const submissionIdempotency = useSubmissionIdempotency('wide-format-order');
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSending, setIsSending] = useState(false);
@@ -182,11 +184,18 @@ export default function OrderWideFormatForm() {
       if (file) {
         formData.set('file', file, file.name);
       }
+      const idempotencyKey = submissionIdempotency.getKey({
+        values,
+        phone: getPhoneDigits(values.phone),
+        file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
+      });
 
       const response = await fetch('/api/wide-format-order', {
         method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
         body: formData,
       });
+      submissionIdempotency.settle(idempotencyKey, response.status);
 
       const result = await response.json();
 
@@ -194,6 +203,7 @@ export default function OrderWideFormatForm() {
         throw new Error(result.error || 'Не удалось отправить заявку');
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.wideFormatOrderSubmitSuccess);
 
       if (result.fileSent === false && result.reason === 'too_large') {

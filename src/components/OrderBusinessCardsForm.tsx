@@ -7,6 +7,7 @@ import ImageDropzone from '@/components/ImageDropzone';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 
 type PrintSide = 'single' | 'double';
 
@@ -52,6 +53,7 @@ const FIXED_NOTES = [
 ];
 
 export default function OrderBusinessCardsForm({ summary }: Props) {
+  const submissionIdempotency = useSubmissionIdempotency('business-cards-order');
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSending, setIsSending] = useState(false);
@@ -151,11 +153,19 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
         formData.set('fileSize', String(file.size));
         formData.set('file', file, file.name);
       }
+      const idempotencyKey = submissionIdempotency.getKey({
+        values,
+        phone: getPhoneDigits(values.phone),
+        payloadMeta,
+        file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
+      });
 
       const response = await fetch('/api/requests/business-cards', {
         method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
         body: formData,
       });
+      submissionIdempotency.settle(idempotencyKey, response.status);
 
       const result = await response.json();
 
@@ -163,6 +173,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
         throw new Error(result.error || 'Не удалось отправить заявку');
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.businessCardsOrderSubmitSuccess);
 
       if (result.fileSent === false && result.reason === 'too_large') {

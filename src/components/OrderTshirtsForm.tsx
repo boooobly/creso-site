@@ -12,6 +12,7 @@ import {
   MUGS_ALLOWED_MIME_TYPES,
   MUGS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 
 type FormValues = {
   name: string;
@@ -32,6 +33,7 @@ const defaultValues: FormValues = {
 };
 
 export default function OrderTshirtsForm() {
+  const submissionIdempotency = useSubmissionIdempotency('tshirts-order');
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
@@ -84,11 +86,18 @@ export default function OrderTshirtsForm() {
       formData.set('consent', values.consent ? 'true' : 'false');
       formData.set('website', values.website);
       if (file) formData.set('file', file, file.name);
+      const idempotencyKey = submissionIdempotency.getKey({
+        values,
+        phone: getPhoneDigits(values.phone),
+        file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
+      });
 
       const response = await fetch('/api/requests/tshirts', {
         method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
         body: formData,
       });
+      submissionIdempotency.settle(idempotencyKey, response.status);
 
       const payload = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
 
@@ -97,6 +106,7 @@ export default function OrderTshirtsForm() {
         return;
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.tshirtsOrderSubmitSuccess);
       setSuccessMessage('Спасибо! Мы свяжемся с вами в ближайшее время.');
       setValues(defaultValues);

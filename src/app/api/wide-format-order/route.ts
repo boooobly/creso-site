@@ -12,6 +12,7 @@ import { FIVE_MB_IN_BYTES, validateUploadedFile } from '@/lib/file-validation';
 import { getServerEnv } from '@/lib/env';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
+import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
@@ -243,6 +244,11 @@ export async function POST(request: NextRequest) {
       total: Math.round(calculated.totalCost),
       payloadJson: { service: 'wide-format', customer: { name, phone, email: email || null, comment: comment || null }, fields: { material: materialIdRaw, widthMm: parsedWidthMm, heightMm: parsedHeightMm, quantity: parsedQuantity, edgeGluing, imageWelding, grommets, grommetsCount: calculated.grommetsCount, cutByPositioningMarks, plotterCutByRegistrationMarks, pageUrl }, file: file ? { name: file.name, size: file.size, type: file.type || null } : null, calculated, referer },
       quoteJson: { kind: 'service-request', service: 'wide-format', total: Math.round(calculated.totalCost), pricingStatus: 'calculated', calculated },
+      ...readRequestIdempotency(request.headers, {
+        customer: { name, phone, email: email || null, comment: comment || null },
+        fields: { material: materialIdRaw, widthMm: parsedWidthMm, heightMm: parsedHeightMm, quantity: parsedQuantity, edgeGluing, imageWelding, grommets, cutByPositioningMarks, plotterCutByRegistrationMarks },
+        file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+      }),
     });
 
     const message = [
@@ -309,6 +315,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, fileSent: telegramCanSendFile ? true : undefined });
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error);
+    if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';
     if (message.startsWith('[env]')) {
       return NextResponse.json({ ok: false, error: message }, { status: 500 });

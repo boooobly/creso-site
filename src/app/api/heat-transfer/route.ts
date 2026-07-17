@@ -7,6 +7,7 @@ import { calculateHeatTransferPricing } from '@/lib/calculations/heatTransferPri
 import { getHeatTransferPricingConfig } from '@/lib/heat-transfer/heatTransferPricing';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
+import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
 export const runtime = 'nodejs';
 
 type HeatTransferPayload = {
@@ -172,6 +173,12 @@ export async function POST(req: NextRequest) {
       total: Math.round(payload.pricing.total),
       payloadJson: { service: 'heat-transfer', ...payload, files: payload.files },
       quoteJson: { kind: 'service-request', service: 'heat-transfer', total: Math.round(payload.pricing.total), pricingStatus: 'calculated', pricing: payload.pricing },
+      ...readRequestIdempotency(req.headers, {
+        productType: payload.productType,
+        configuration: payload.configuration,
+        files: payload.files,
+        contact: payload.contact,
+      }),
     });
     payload.orderNumber = createdOrder.orderNumber;
 
@@ -189,6 +196,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error);
+    if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';
     if (message.startsWith('[env]')) {
       return NextResponse.json({ ok: false, error: message }, { status: 500 });

@@ -18,6 +18,7 @@ import { normalizePhone } from '@/lib/utils/phone';
 import { FIVE_MB_IN_BYTES } from '@/lib/file-validation';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
+import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
 
 export const runtime = 'nodejs';
 
@@ -260,6 +261,12 @@ export async function POST(request: NextRequest) {
         referer,
         ip,
       },
+      ...readRequestIdempotency(request.headers, {
+        ...parsed.data,
+        phone: normalizedPhone,
+        website: undefined,
+        file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+      }),
     });
 
     const text = buildMillingText({
@@ -303,6 +310,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error);
+    if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';
     if (message.startsWith('[env]')) {
       return NextResponse.json({ ok: false, error: message }, { status: 500 });

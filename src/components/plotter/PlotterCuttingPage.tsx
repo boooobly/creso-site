@@ -10,6 +10,7 @@ import { publicFormStyles } from '@/lib/public-form-styles';
 import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { SiteImageRecord } from '@/lib/site-images';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 
 const heroBadges = ['Ширина до 600 мм', 'Резка по меткам', 'Срочные заказы', 'Чистая выборка'];
 
@@ -82,6 +83,7 @@ type PlotterCuttingPageProps = {
 };
 
 export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPageProps) {
+  const submissionIdempotency = useSubmissionIdempotency('plotter-lead');
   const [isRequirementsOpen, setIsRequirementsOpen] = useState(false);
   const [pricingRows, setPricingRows] = useState(defaultPricingRows);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -195,17 +197,29 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       files.forEach((file) => {
         formData.append('files', file, file.name);
       });
+      const idempotencyKey = submissionIdempotency.getKey({
+        source: 'plotter-cutting',
+        name: name.trim(),
+        phone: phoneDigits,
+        comment: comment.trim(),
+        serviceType,
+        privacyConsent,
+        files: files.map((file) => ({ name: file.name, size: file.size, type: file.type, lastModified: file.lastModified })),
+      });
 
       const response = await fetch('/api/leads', {
         method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
         body: formData,
       });
+      submissionIdempotency.settle(idempotencyKey, response.status);
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data?.error || 'Не удалось отправить заявку. Попробуйте ещё раз.');
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.plotterOrderSubmitSuccess);
       setSubmitSuccess('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
       setComment('');

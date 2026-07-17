@@ -13,6 +13,7 @@ import {
   MILLING_THICKNESS_BY_MATERIAL,
 } from '@/lib/pricing-config/milling';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 
 type FormValues = {
   name: string;
@@ -69,6 +70,7 @@ const defaultValues: FormValues = {
 };
 
 export default function OrderMillingForm() {
+  const submissionIdempotency = useSubmissionIdempotency('milling-order');
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
@@ -134,11 +136,18 @@ export default function OrderMillingForm() {
       formData.set('privacyConsent', String(values.privacyConsent));
       formData.set('website', values.website);
       if (file) formData.set('file', file, file.name);
+      const idempotencyKey = submissionIdempotency.getKey({
+        values,
+        phone: getPhoneDigits(values.phone),
+        file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
+      });
 
       const response = await fetch('/api/requests/milling', {
         method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
         body: formData,
       });
+      submissionIdempotency.settle(idempotencyKey, response.status);
 
       const payload = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
 
@@ -147,6 +156,7 @@ export default function OrderMillingForm() {
         return;
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.millingOrderSubmitSuccess);
       setSuccessMessage('Заявка отправлена. Менеджер свяжется с вами в ближайшее время.');
       setValues(defaultValues);

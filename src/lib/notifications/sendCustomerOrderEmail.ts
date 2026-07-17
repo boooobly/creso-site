@@ -9,13 +9,19 @@ function formatValue(value: string | null | undefined): string {
   return text || 'клиент';
 }
 
-export async function sendCustomerOrderEmail(params: {
+export type CustomerOrderEmailParams = {
   toEmail: string;
   customerName?: string | null;
   orderNumber: string;
   total: number;
   orderUrl: string;
-}): Promise<void> {
+};
+
+export function buildCustomerOrderEmail(params: CustomerOrderEmailParams): {
+  to: string;
+  subject: string;
+  text: string;
+} {
   const greetingName = formatValue(params.customerName);
 
   const lines = [
@@ -30,9 +36,13 @@ export async function sendCustomerOrderEmail(params: {
     'Если у вас есть вопросы, ответьте на это письмо или свяжитесь с нами по телефону на сайте.',
   ];
 
-  await sendSmtpEmail({
+  return {
     to: params.toEmail,
     subject: `Заявка №${params.orderNumber} принята`,
     text: lines.join('\n'),
-  });
+  };
+}
+
+export async function sendCustomerOrderEmail(params: CustomerOrderEmailParams): Promise<void> {
+  await sendSmtpEmail(buildCustomerOrderEmail(params));
 }
