@@ -9,6 +9,7 @@ import { multipartErrorResponse, validateMultipartContentLength, validateMultipa
 import { calculateTotal, getUnitPrice } from '@/lib/pricing-config/business-cards';
 
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
+import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
@@ -204,6 +205,11 @@ export async function POST(request: NextRequest) {
       total: totalPrice,
       payloadJson: { service: 'business-cards', customer: { name, phone, email: email || null, comment: comment || null }, fields: { product, quantity, printSide, lamination, needDesign, unitPrice, totalPrice, turnaround, size, stock, printType, notes, flyersRequested, consent }, file: file ? { name: file.name, size: file.size, type: file.type || null } : null, referer },
       quoteJson: { kind: 'service-request', service: 'business-cards', total: totalPrice, pricingStatus: 'calculated', pricingSource: 'server', unitPrice, totalPrice },
+      ...readRequestIdempotency(request.headers, {
+        customer: { name, phone, email: email || null, comment: comment || null },
+        fields: { product, quantity, printSide, lamination, needDesign, flyersRequested, consent },
+        file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+      }),
     });
 
     const message = [
@@ -271,6 +277,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, fileSent: telegramCanSendFile ? true : undefined });
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error);
+    if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';
     if (message.startsWith('[env]')) {
       return NextResponse.json({ ok: false, error: message }, { status: 500 });

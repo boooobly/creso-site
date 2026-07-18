@@ -12,27 +12,54 @@ datasource db {
 
 model Order {
   // Internal immutable identifier (UUID) to avoid coupling storage identity to public order numbers
-  id              String   @id @default(uuid())
-  number          String   @unique
-  source          String
-  status          String   @default("new")
-  customerName    String?
-  phone           String?
-  email           String?
-  comment         String?
-  managerNote     String?
-  total           Int
-  prepayRequired  Boolean  @default(false)
-  prepayAmount    Int?
-  paymentStatus   String   @default("unpaid")
-  paymentProvider String?
-  paymentRef      String?
-  paidAmount      Int?
-  paidAt          DateTime?
-  payloadJson     Json
-  quoteJson       Json
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String               @id @default(uuid())
+  number           String               @unique
+  source           String
+  status           String               @default("new")
+  customerName     String?
+  phone            String?
+  email            String?
+  comment          String?
+  managerNote      String?
+  total            Int
+  prepayRequired   Boolean              @default(false)
+  prepayAmount     Int?
+  paymentStatus    String               @default("unpaid")
+  paymentProvider  String?
+  paymentRef       String?
+  paidAmount       Int?
+  paidAt           DateTime?
+  payloadJson      Json
+  quoteJson        Json
+  idempotencyKey   String?
+  requestHash      String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  notificationJobs NotificationOutbox[]
+
+  @@unique([source, idempotencyKey])
+  @@index([source, createdAt])
+}
+
+model NotificationOutbox {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  kind          String
+  dedupeKey     String    @unique
+  payloadJson   Json
+  status        String    @default("pending")
+  attempts      Int       @default(0)
+  maxAttempts   Int       @default(8)
+  nextAttemptAt DateTime  @default(now())
+  lockedAt      DateTime?
+  processedAt   DateTime?
+  lastError     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, nextAttemptAt])
+  @@index([orderId, createdAt])
 }
 
 model PaymentWebhookEvent {

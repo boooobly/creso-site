@@ -4,8 +4,30 @@ import { NextRequest } from 'next/server';
 const sendEmailLeadMock = vi.fn(async () => undefined);
 const sendTelegramLeadMock = vi.fn(async () => undefined);
 const sendTelegramDocumentBufferMock = vi.fn(async () => undefined);
+const buildManagerNotificationJobsMock = vi.fn(() => [
+  { kind: 'telegram.text', dedupeSuffix: 'manager-telegram', payloadJson: { text: 'lead' } },
+  { kind: 'email.lead', dedupeSuffix: 'manager-email', payloadJson: { subject: 'lead', html: 'lead' } },
+]);
+const processNotificationJobsBestEffortMock = vi.fn(async () => undefined);
 
-const orderCreateMock = vi.fn(async ({ data }) => ({ id: 'order-1', ...data }));
+const orderCreateMock = vi.fn(async ({ data }) => ({
+  id: 'order-1',
+  ...data,
+  notificationJobs: (data.notificationJobs?.create ?? []).map((job: Record<string, unknown>, index: number) => ({
+    id: `job-${index + 1}`,
+    orderId: 'order-1',
+    status: 'pending',
+    attempts: 0,
+    maxAttempts: 8,
+    nextAttemptAt: new Date(),
+    lockedAt: null,
+    processedAt: null,
+    lastError: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...job,
+  })),
+}));
 vi.mock('@/lib/db/prisma', () => ({
   prisma: { order: { create: orderCreateMock } },
 }));
@@ -22,6 +44,11 @@ vi.mock('@/lib/notifications/email', () => ({
 vi.mock('@/lib/notifications/telegram', () => ({
   sendTelegramLead: sendTelegramLeadMock,
   sendTelegramDocumentBuffer: sendTelegramDocumentBufferMock,
+}));
+
+vi.mock('@/lib/notifications/outbox', () => ({
+  buildManagerNotificationJobs: buildManagerNotificationJobsMock,
+  processNotificationJobsBestEffort: processNotificationJobsBestEffortMock,
 }));
 
 vi.mock('@/lib/env', () => ({
@@ -48,6 +75,8 @@ describe('POST /api/leads', () => {
     sendTelegramLeadMock.mockClear();
     sendTelegramDocumentBufferMock.mockClear();
     orderCreateMock.mockClear();
+    buildManagerNotificationJobsMock.mockClear();
+    processNotificationJobsBestEffortMock.mockClear();
   });
 
   it('rejects oversized file before notifications', async () => {
@@ -91,7 +120,7 @@ describe('POST /api/leads', () => {
     expect(sendTelegramLeadMock).not.toHaveBeenCalled();
   });
 
-  it('accepts valid multipart files and sends notifications', async () => {
+  it('accepts valid multipart files, enqueues notifications and sends transient attachments', async () => {
     const { POST } = await import('@/app/api/leads/route');
 
     const formData = new FormData();
@@ -105,8 +134,10 @@ describe('POST /api/leads', () => {
 
     expect(response.status).toBe(200);
     expect(json.ok).toBe(true);
-    expect(sendEmailLeadMock).toHaveBeenCalledTimes(1);
-    expect(sendTelegramLeadMock).toHaveBeenCalledTimes(1);
+    expect(buildManagerNotificationJobsMock).toHaveBeenCalledTimes(1);
+    expect(processNotificationJobsBestEffortMock).toHaveBeenCalledWith(['job-1', 'job-2']);
+    expect(sendEmailLeadMock).not.toHaveBeenCalled();
+    expect(sendTelegramLeadMock).not.toHaveBeenCalled();
     expect(sendTelegramDocumentBufferMock).toHaveBeenCalledTimes(1);
   });
 });

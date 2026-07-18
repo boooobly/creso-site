@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
 import { getBaguetteExtrasPricingConfig } from '@/lib/baget/baguetteExtrasPricing';
-import { prisma } from '@/lib/db/prisma';
-import { notifyNewOrder } from '@/lib/notifications/notifyNewOrder';
-import { sendCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
+import { buildNewOrderNotificationText } from '@/lib/notifications/notifyNewOrder';
+import { buildCustomerOrderEmail } from '@/lib/notifications/sendCustomerOrderEmail';
 import { getBaseUrl } from '@/lib/url/getBaseUrl';
-import { generateOrderNumber } from '@/lib/orders/generateOrderNumber';
 import { createOrderAccessToken } from '@/lib/orders/pdfAccessToken';
 import { normalizePhone } from '@/lib/utils/phone';
 import { logger } from '@/lib/logger';
@@ -19,6 +18,9 @@ import { validateUploadedImageFile } from '@/lib/file-validation';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { normalizeBagetWidths } from '@/lib/baget/widths';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
+import { createOrder, findOrderByIdempotency } from '@/lib/orders/createOrder';
+import { createRequestFingerprint, idempotencyErrorResponse, readIdempotencyKey } from '@/lib/orders/idempotency';
+import { buildDirectEmailJob, buildManagerNotificationJobs, buildTelegramDocumentUrlJob, processNotificationJobsBestEffort } from '@/lib/notifications/outbox';
 
 export const runtime = 'nodejs';
 
@@ -158,57 +160,6 @@ async function getSafeCustomerImageFile(file: File | null): Promise<File | null>
   return file;
 }
 
-async function createOrderWithRetry(data: {
-  payloadJson: Prisma.InputJsonValue;
-  quote: ReturnType<typeof bagetQuote>;
-  prepayRequired: boolean;
-  prepayAmount: number | null;
-  customer: {
-    name: string;
-    phone: string;
-    email?: string;
-    comment?: string;
-  };
-}): Promise<string> {
-  for (let attempt = 0; attempt < 10; attempt += 1) {
-    const orderNumber = generateOrderNumber();
-
-    try {
-      await prisma.order.create({
-        data: {
-          number: orderNumber,
-          source: 'baget',
-          status: 'new',
-          customerName: data.customer.name,
-          phone: data.customer.phone,
-          email: data.customer.email,
-          comment: data.customer.comment,
-          total: data.quote.total,
-          prepayRequired: data.prepayRequired,
-          prepayAmount: data.prepayAmount,
-          payloadJson: data.payloadJson,
-          quoteJson: data.quote as unknown as Prisma.InputJsonValue,
-        },
-      });
-
-      return orderNumber;
-    } catch (error) {
-      if (
-        typeof error === 'object'
-        && error !== null
-        && 'code' in error
-        && (error as { code?: string }).code === 'P2002'
-        && attempt < 9
-      ) {
-        continue;
-      }
-      throw error;
-    }
-  }
-
-  throw new Error('Failed to create unique order number after 10 collision retries.');
-}
-
 export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get('content-type') || '';
@@ -255,6 +206,45 @@ export async function POST(request: NextRequest) {
     const normalizedPhone = normalizePhone(parsed.data.customer.phone);
     if (!normalizedPhone) {
       return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
+    }
+
+    const idempotencyKey = readIdempotencyKey(request.headers);
+    const customerImageDigest = idempotencyKey && customerImageFile
+      ? createHash('sha256').update(Buffer.from(await customerImageFile.arrayBuffer())).digest('hex')
+      : null;
+    const requestHash = idempotencyKey
+      ? createRequestFingerprint({
+        ...parsed.data,
+        customer: { ...parsed.data.customer, phone: normalizedPhone },
+        company: undefined,
+        customerImage: customerImageFile ? {
+          name: customerImageFile.name,
+          size: customerImageFile.size,
+          type: customerImageFile.type,
+          digest: customerImageDigest,
+        } : null,
+      })
+      : undefined;
+
+    const existingOrder = await findOrderByIdempotency({
+      source: 'baget',
+      idempotencyKey,
+      requestHash,
+    });
+    if (existingOrder) {
+      await processNotificationJobsBestEffort(existingOrder.notificationJobs.map((job) => job.id));
+      const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
+      const accessToken = createOrderAccessToken(existingOrder.orderNumber, tokenSecret);
+      const secureOrderUrl = `${getBaseUrl()}/order/${encodeURIComponent(existingOrder.orderNumber)}?token=${encodeURIComponent(accessToken)}`;
+
+      return NextResponse.json({
+        orderNumber: existingOrder.orderNumber,
+        quote: existingOrder.order.quoteJson,
+        prepayRequired: existingOrder.order.prepayRequired,
+        prepayAmount: existingOrder.order.prepayAmount,
+        secureOrderUrl,
+        accessToken,
+      }, { headers: { 'X-Idempotent-Replay': 'true' } });
     }
 
     const sheetItems = await getBagetCatalogFromSheet();
@@ -316,41 +306,65 @@ export async function POST(request: NextRequest) {
 
     const prepayRequired = false;
     const prepayAmount = null;
-
-    const orderNumber = await createOrderWithRetry({
-      payloadJson: normalizedPayload as unknown as Prisma.InputJsonValue,
-      quote,
-      prepayRequired,
-      prepayAmount,
-      customer: normalizedPayload.customer,
-    });
-
-    await notifyNewOrder({
-      orderNumber,
-      customer: normalizedPayload.customer,
-      effectiveSize: quote.effectiveSize,
-      quote,
-      orderSummary: normalizedPayload.orderSummary,
-      customerImageFile: safeCustomerImageFile,
-    });
-
     const shouldSendCustomerEmail = env.SEND_CUSTOMER_EMAILS;
     const customerEmail = parsed.data.customer.email?.trim();
     const tokenSecret = env.ORDER_TOKEN_SECRET || env.ADMIN_TOKEN;
+    const createdOrder = await createOrder({
+      source: 'baget',
+      customerName: normalizedPayload.customer.name,
+      phone: normalizedPayload.customer.phone,
+      email: normalizedPayload.customer.email,
+      comment: normalizedPayload.customer.comment,
+      total: quote.total,
+      prepayRequired,
+      prepayAmount,
+      payloadJson: normalizedPayload as unknown as Prisma.InputJsonValue,
+      quoteJson: quote as unknown as Prisma.InputJsonValue,
+      idempotencyKey,
+      requestHash,
+      buildNotificationJobs: (orderNumber) => {
+        const accessToken = createOrderAccessToken(orderNumber, tokenSecret);
+        const secureOrderUrl = `${getBaseUrl()}/order/${encodeURIComponent(orderNumber)}?token=${encodeURIComponent(accessToken)}`;
+        const notificationText = buildNewOrderNotificationText({
+          orderNumber,
+          customer: normalizedPayload.customer,
+          effectiveSize: quote.effectiveSize,
+          quote,
+          orderSummary: normalizedPayload.orderSummary,
+        });
+        const jobs = buildManagerNotificationJobs({
+          subject: `Новый заказ багета: ${orderNumber}`,
+          text: notificationText,
+        });
+
+        if (shouldSendCustomerEmail && customerEmail) {
+          jobs.push(buildDirectEmailJob(buildCustomerOrderEmail({
+            toEmail: customerEmail,
+            customerName: parsed.data.customer.name,
+            orderNumber,
+            total: quote.total,
+            orderUrl: secureOrderUrl,
+          })));
+        }
+
+        if (uploadedImage) {
+          jobs.push(buildTelegramDocumentUrlJob({
+            url: uploadedImage.url,
+            filename: uploadedImage.fileName,
+            mime: uploadedImage.mimeType,
+            caption: `Исходник клиента к заказу ${orderNumber}`,
+          }));
+        }
+
+        return jobs;
+      },
+    });
+
+    await processNotificationJobsBestEffort((createdOrder.notificationJobs ?? []).map((job) => job.id));
+    const orderNumber = createdOrder.orderNumber;
     const accessToken = createOrderAccessToken(orderNumber, tokenSecret);
     const secureOrderUrl = `${getBaseUrl()}/order/${encodeURIComponent(orderNumber)}?token=${encodeURIComponent(accessToken)}`;
 
-    if (shouldSendCustomerEmail && customerEmail) {
-      await sendCustomerOrderEmail({
-        toEmail: customerEmail,
-        customerName: parsed.data.customer.name,
-        orderNumber,
-        total: quote.total,
-        orderUrl: secureOrderUrl,
-      }).catch((error) => {
-        logger.error('orders.customer_email.send_failed', { error, orderNumber, customerEmail });
-      });
-    }
     return NextResponse.json({
       orderNumber,
       quote,
@@ -358,11 +372,14 @@ export async function POST(request: NextRequest) {
       prepayAmount,
       secureOrderUrl,
       accessToken,
-    });
+    }, { headers: createdOrder.reused ? { 'X-Idempotent-Replay': 'true' } : undefined });
   } catch (error) {
     if (error instanceof OrderPayloadTooLargeError) {
       return NextResponse.json({ ok: false, error: 'Размер загружаемых данных превышает допустимый лимит.' }, { status: 413 });
     }
+
+    const idempotencyResponse = idempotencyErrorResponse(error);
+    if (idempotencyResponse) return idempotencyResponse;
 
     const message = error instanceof Error ? error.message : 'Unknown server error.';
     if (message.startsWith('[env]')) {

@@ -4,6 +4,7 @@ import { FormEvent, useMemo, useState } from 'react';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles } from '@/lib/public-form-styles';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 
 type FormState = {
   address: string;
@@ -47,6 +48,7 @@ function getFieldError(field: keyof FormState, value: string | boolean) {
 }
 
 export default function OutdoorLeadForm() {
+  const submissionIdempotency = useSubmissionIdempotency('outdoor-lead');
   const [form, setForm] = useState<FormState>(initialState);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
@@ -85,22 +87,26 @@ export default function OutdoorLeadForm() {
       setStatus('loading');
       setError('');
 
+      const payload = {
+        source: 'outdoor',
+        name: form.address.trim(),
+        phone: getPhoneDigits(form.phone),
+        comment: `Размеры: ${form.dimensions.trim() || '—'}\nБюджет: ${form.budget.trim() || '—'}`,
+        extras: {
+          address: form.address.trim(),
+          dimensions: form.dimensions.trim(),
+          budget: form.budget.trim() || undefined,
+          agreed: form.agreed,
+        },
+      };
+      const idempotencyKey = submissionIdempotency.getKey(payload);
+
       const response = await fetch('/api/leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          source: 'outdoor',
-          name: form.address.trim(),
-          phone: getPhoneDigits(form.phone),
-          comment: `Размеры: ${form.dimensions.trim() || '—'}\nБюджет: ${form.budget.trim() || '—'}`,
-          extras: {
-            address: form.address.trim(),
-            dimensions: form.dimensions.trim(),
-            budget: form.budget.trim() || undefined,
-            agreed: form.agreed,
-          },
-        }),
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
+        body: JSON.stringify(payload),
       });
+      submissionIdempotency.settle(idempotencyKey, response.status);
 
       const data = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
 
@@ -110,6 +116,7 @@ export default function OutdoorLeadForm() {
         return;
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.outdoorLeadSubmitSuccess);
       setStatus('success');
       setForm(initialState);

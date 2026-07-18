@@ -16,6 +16,7 @@ import {
 } from '@/lib/pricing-config/mugs';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import type { MugDesignerValue } from '@/components/mug-designer/types';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 
 const MUG_DESIGNER_ERROR_MESSAGE = 'Не удалось открыть конструктор. Попробуйте обновить страницу или отправьте макет обычным файлом.';
 
@@ -108,6 +109,7 @@ const defaultValues: FormValues = {
 };
 
 export default function OrderMugsForm() {
+  const submissionIdempotency = useSubmissionIdempotency('mugs-order');
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
@@ -195,11 +197,23 @@ export default function OrderMugsForm() {
         formData.set('mugDesignJson', mugDesign.designJson);
         mugDesign.sourceFiles.forEach((sourceFile) => formData.append('designerSourceFiles[]', sourceFile, sourceFile.name));
       }
+      const idempotencyKey = submissionIdempotency.getKey({
+        values,
+        phone: getPhoneDigits(values.phone),
+        needsDesign,
+        file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
+        mugDesign: mugDesign ? {
+          designJson: mugDesign.designJson,
+          sourceFiles: mugDesign.sourceFiles.map((sourceFile) => ({ name: sourceFile.name, size: sourceFile.size, type: sourceFile.type, lastModified: sourceFile.lastModified })),
+        } : null,
+      });
 
       const response = await fetch('/api/requests/mugs', {
         method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
         body: formData,
       });
+      submissionIdempotency.settle(idempotencyKey, response.status);
 
       const payload = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
 
@@ -208,6 +222,7 @@ export default function OrderMugsForm() {
         return;
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.mugsOrderSubmitSuccess);
       setSuccessMessage('Спасибо! Мы свяжемся с вами в ближайшее время.');
       setValues(defaultValues);

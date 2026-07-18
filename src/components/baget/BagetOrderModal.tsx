@@ -8,6 +8,7 @@ import type { BagetPrintMaterial, BagetTransferSource } from '@/lib/baget/printR
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import BagetPreview, { type BagetPreviewProps } from './BagetPreview';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 
 type SizeMm = {
   wMm: number;
@@ -123,6 +124,7 @@ export default function BagetOrderModal({
   outerSize,
   previewProps,
 }: BagetOrderModalProps) {
+  const submissionIdempotency = useSubmissionIdempotency('baget-order');
   const [serverResult, setServerResult] = useState<OrderResponse | null>(null);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -243,21 +245,31 @@ export default function BagetOrderModal({
         baget: orderInput.baget,
         fulfillmentType: orderInput.fulfillmentType ?? 'pickup',
       };
+      const idempotencyKey = submissionIdempotency.getKey({
+        ...requestPayload,
+        customerImage: uploadedImageFile ? {
+          name: uploadedImageFile.name,
+          size: uploadedImageFile.size,
+          type: uploadedImageFile.type,
+          lastModified: uploadedImageFile.lastModified,
+        } : null,
+      });
 
       const requestInit: RequestInit = uploadedImageFile
         ? (() => {
             const formData = new FormData();
             formData.set('payload', JSON.stringify(requestPayload));
             formData.set('customerImage', uploadedImageFile, uploadedImageFile.name);
-            return { method: 'POST', body: formData };
+            return { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: formData };
           })()
         : {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
             body: JSON.stringify(requestPayload),
           };
 
       const response = await fetch('/api/orders', requestInit);
+      submissionIdempotency.settle(idempotencyKey, response.status);
 
       const result = (await response.json().catch(() => null)) as (OrderResponse & { error?: string }) | null;
 
@@ -266,6 +278,7 @@ export default function BagetOrderModal({
         return;
       }
 
+      submissionIdempotency.complete(idempotencyKey);
       reachGoal(YANDEX_GOALS.bagetOrderSubmitSuccess);
       setServerResult(result);
       setSubmitted(true);

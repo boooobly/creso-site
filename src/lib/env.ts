@@ -72,6 +72,7 @@ const serverEnvSchema = z.object({
   REVIEW_MODERATION_TOKEN: optionalTrimmedString,
   ORDER_TOKEN_SECRET: optionalTrimmedString,
   PAYMENT_WEBHOOK_SECRET: optionalTrimmedString,
+  CRON_SECRET: optionalTrimmedString,
   BAGET_SHEET_ID: optionalTrimmedString,
   BAGET_SHEET_TAB: optionalTrimmedString,
   BAGET_SHEET_CACHE_SECONDS: z.preprocess((value) => (value === '' ? undefined : value), z.coerce.number().int().positive().optional()),

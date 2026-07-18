@@ -165,10 +165,12 @@ vi.mock('@/lib/file-validation', () => ({
 
 vi.mock('@/lib/notifications/notifyNewOrder', () => ({
   notifyNewOrder: vi.fn(async () => undefined),
+  buildNewOrderNotificationText: vi.fn(() => 'New baget order'),
 }));
 
 vi.mock('@/lib/notifications/sendCustomerOrderEmail', () => ({
   sendCustomerOrderEmail: vi.fn(async () => undefined),
+  buildCustomerOrderEmail: vi.fn(() => ({ to: 'customer@example.com', subject: 'Order', text: 'Order accepted' })),
 }));
 
 vi.mock('@/lib/url/getBaseUrl', () => ({

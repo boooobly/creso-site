@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
-import { sendEmailLead } from '@/lib/notifications/email';
 import { buildLeadNotificationText, type LeadNotificationFile } from '@/lib/notifications/leadNotificationUtils';
-import { sendTelegramLead, sendTelegramDocumentBuffer } from '@/lib/notifications/telegram';
-import { buildEmailHtmlFromText } from '@/lib/utils/email';
+import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram';
 import { normalizePhone } from '@/lib/utils/phone';
 import { enforcePublicRequestGuard, getClientIp } from '@/lib/anti-spam';
 import { sourceTitle } from '@/lib/utils/sourceTitle';
@@ -12,6 +11,8 @@ import { getServerEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
+import { createRequestFingerprint, idempotencyErrorResponse, readIdempotencyKey } from '@/lib/orders/idempotency';
+import { buildManagerNotificationJobs, processNotificationJobsBestEffort } from '@/lib/notifications/outbox';
 export const runtime = 'nodejs';
 
 const optionalTrimmedString = z.preprocess(
@@ -205,37 +206,52 @@ export async function POST(request: NextRequest) {
     );
 
     const referer = request.headers.get('referer') || request.headers.get('origin') || '';
+    const idempotencyKey = readIdempotencyKey(request.headers);
+    const requestHash = idempotencyKey
+      ? createRequestFingerprint({
+        ...parsed.data,
+        phone: normalizedPhone ?? null,
+        company: null,
+        files: notificationFiles.map(({ bytes, ...file }) => ({
+          ...file,
+          digest: bytes ? createHash('sha256').update(bytes).digest('hex') : null,
+        })),
+      })
+      : undefined;
     const createdOrder = await createServiceRequestOrder({
       source: 'lead',
       customer: { name: parsed.data.name, phone: normalizedPhone, email: parsed.data.email, comment: parsed.data.comment },
       total: 0,
       payloadJson: JSON.parse(JSON.stringify({ service: 'lead', source: parsed.data.source, customer: { name: parsed.data.name, phone: normalizedPhone || null, email: parsed.data.email || null, comment: parsed.data.comment || null }, fields: { ...parsed.data, phone: normalizedPhone ?? null, company: null }, files: notificationFiles.map(({ bytes, ...file }) => file), referer, ip })),
+      idempotencyKey,
+      requestHash,
+      buildNotificationJobs: (orderNumber) => {
+        const text = [`Номер заявки: #${orderNumber}`, buildLeadNotificationText({
+          ...parsed.data,
+          phone: normalizedPhone,
+          pageUrl: parsed.data.pageUrl || referer,
+          files: notificationFiles,
+        })].join('\n');
+
+        return buildManagerNotificationJobs({
+          subject: `Новая заявка: ${sourceTitle(parsed.data.source)}`,
+          text,
+        });
+      },
     });
-    const text = [`Номер заявки: #${createdOrder.orderNumber}`, buildLeadNotificationText({
-      ...parsed.data,
-      phone: normalizedPhone,
-      pageUrl: parsed.data.pageUrl || referer,
-      files: notificationFiles,
-    })].join('\n');
 
-    await Promise.all([
-      sendTelegramLead(text)
-        .then(async () => {
-          await sendLeadTelegramFiles({ files: notificationFiles });
-        })
-        .catch((error) => {
-          logger.error('leads.notifications.telegram_send_failed', { error, source: parsed.data.source, ip });
-        }),
-      sendEmailLead({
-        subject: `Новая заявка: ${sourceTitle(parsed.data.source)}`,
-        html: buildEmailHtmlFromText(text),
-      }).catch((error) => {
-        logger.error('leads.notifications.email_send_failed', { error, source: parsed.data.source, ip });
-      }),
-    ]);
+    await processNotificationJobsBestEffort((createdOrder.notificationJobs ?? []).map((job) => job.id));
+    if (!createdOrder.reused) {
+      await sendLeadTelegramFiles({ files: notificationFiles });
+    }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json(
+      { ok: true },
+      { headers: createdOrder.reused ? { 'X-Idempotent-Replay': 'true' } : undefined },
+    );
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error);
+    if (idempotencyResponse) return idempotencyResponse;
     logger.error('api.request.failed', { error });
     return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 });
   }

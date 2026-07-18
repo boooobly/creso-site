@@ -5,6 +5,7 @@ import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 import { logger } from '@/lib/logger';
 import { getServerEnv } from '@/lib/env';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
+import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
 export const runtime = 'nodejs';
 
 type OutdoorPayload = {
@@ -102,6 +103,7 @@ export async function POST(req: NextRequest) {
       customer: { phone },
       total: 0,
       payloadJson: { service: 'outdoor', ...payload, phone, referer: req.headers.get('referer') || req.headers.get('origin') || '' },
+      ...readRequestIdempotency(req.headers, { ...payload, orderNumber: undefined, phone }),
     });
     payload.orderNumber = createdOrder.orderNumber;
 
@@ -121,6 +123,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error);
+    if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';
     if (message.startsWith('[env]')) {
       return NextResponse.json({ ok: false, error: message }, { status: 500 });
