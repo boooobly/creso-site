@@ -5,8 +5,11 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { getPageContentDefinition } from '@/lib/admin/page-content-config';
 import { upsertPageContentFields } from '@/lib/admin/page-content-service';
+import { requireAdminActionAuth } from '@/lib/admin/require-admin-action-auth';
 
 export async function savePageContentAction(formData: FormData) {
+  await requireAdminActionAuth();
+
   const pageKey = String(formData.get('pageKey') ?? '').trim();
   const definition = getPageContentDefinition(pageKey);
 

@@ -25,6 +25,15 @@ afterEach(() => {
 });
 
 describe('yandex metrica helpers', () => {
+  it('removes query strings from page hits and excludes order pages', async () => {
+    const { getAnalyticsPageUrl, isAnalyticsRouteAllowed } = await import('@/lib/analytics/yandexMetrica');
+
+    expect(getAnalyticsPageUrl('/services?token=secret#details', 'https://example.com')).toBe('https://example.com/services');
+    expect(getAnalyticsPageUrl('/order/ORDER123?token=secret', 'https://example.com')).toBeNull();
+    expect(isAnalyticsRouteAllowed('/order/ORDER123')).toBe(false);
+    expect(isAnalyticsRouteAllowed('/services')).toBe(true);
+  });
+
   it('no-ops safely when counter id is missing', async () => {
     delete process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID;
     const ym = vi.fn();

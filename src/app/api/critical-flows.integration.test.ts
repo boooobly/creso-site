@@ -237,7 +237,11 @@ describe('critical customer/admin integration smoke flows', () => {
     const { POST: createOrder } = await import('@/app/api/orders/route');
     const orderRequest = new NextRequest('http://localhost:3000/api/orders', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        'user-agent': 'Vitest',
+        'x-forwarded-for': '203.0.113.90',
+      },
       body: JSON.stringify({
         customer: { name: 'Иван', phone: '+79991234567', email: 'ivan@example.com', comment: 'Тестовый заказ' },
         baget: {

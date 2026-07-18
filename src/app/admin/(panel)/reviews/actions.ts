@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
+import { requireAdminActionAuth } from '@/lib/admin/require-admin-action-auth';
 
 const reviewStatusSchema = z.enum(['pending', 'approved', 'rejected']);
 
@@ -30,6 +31,8 @@ function redirectWithMessage(formData: FormData, patch: Record<string, string | 
 }
 
 export async function setReviewStatusAction(formData: FormData) {
+  await requireAdminActionAuth();
+
   const reviewId = String(formData.get('reviewId') ?? '').trim();
   const parsedStatus = reviewStatusSchema.safeParse(String(formData.get('nextStatus') ?? '').trim());
 
@@ -65,6 +68,8 @@ export async function setReviewStatusAction(formData: FormData) {
 }
 
 export async function deleteReviewAction(formData: FormData) {
+  await requireAdminActionAuth();
+
   const reviewId = String(formData.get('reviewId') ?? '').trim();
 
   if (!reviewId) {

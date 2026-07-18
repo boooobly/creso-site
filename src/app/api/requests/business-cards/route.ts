@@ -6,12 +6,23 @@ import { FIVE_MB_IN_BYTES, validateUploadedFile } from '@/lib/file-validation';
 import { getServerEnv } from '@/lib/env';
 import { sendTelegramDocument } from '@/lib/notifications/telegram/sendDocumentWithCaption';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
+import { calculateTotal, getUnitPrice } from '@/lib/pricing-config/business-cards';
 
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
 const MAX_CONTENT_LENGTH_BYTES = MAX_TELEGRAM_FILE_SIZE_BYTES + (512 * 1024);
+const BUSINESS_CARD_PRODUCT = 'Business cards';
+const BUSINESS_CARD_TURNAROUND = '7–10 business days';
+const BUSINESS_CARD_SIZE = '90x50';
+const BUSINESS_CARD_STOCK = '300 г/м²';
+const BUSINESS_CARD_PRINT_TYPE = 'offset';
+const BUSINESS_CARD_NOTES = JSON.stringify([
+  'Цена для односторонней и двусторонней печати одинаковая',
+  'Ламинация +15%, только с одной стороны',
+  'Стоимость дизайна согласовывается с менеджером',
+]);
 const ALLOWED_UPLOAD_MIME_TYPES = new Set([
   'image/jpeg',
   'image/png',
@@ -98,24 +109,13 @@ export async function POST(request: NextRequest) {
     const comment = toStringValue(formData.get('comment'));
     const website = toStringValue(formData.get('website'));
 
-    const product = toStringValue(formData.get('product'));
     const quantity = Number(toStringValue(formData.get('quantity')));
     const printSide = toStringValue(formData.get('printSide'));
     const lamination = toBooleanValue(formData.get('lamination'));
     const needDesign = toBooleanValue(formData.get('needDesign'));
-    const unitPrice = Number(toStringValue(formData.get('unitPrice')));
-    const totalPrice = Number(toStringValue(formData.get('totalPrice')));
-    const turnaround = toStringValue(formData.get('turnaround'));
-    const size = toStringValue(formData.get('size'));
-    const stock = toStringValue(formData.get('stock'));
-    const printType = toStringValue(formData.get('printType'));
-    const notes = toStringValue(formData.get('notes'));
     const flyersRequested = toBooleanValue(formData.get('flyersRequested'));
     const consent = toBooleanValue(formData.get('consent'));
 
-    const fileName = toStringValue(formData.get('fileName'));
-    const fileType = toStringValue(formData.get('fileType'));
-    const fileSize = Number(toStringValue(formData.get('fileSize')) || '0');
     const fileRaw = formData.get('file');
 
     const blockedResponse = enforcePublicRequestGuard(request, {
@@ -137,6 +137,10 @@ export async function POST(request: NextRequest) {
 
     if (!name || !phoneRaw) {
       return NextResponse.json({ ok: false, error: 'Заполните обязательные поля.' }, { status: 400 });
+    }
+
+    if (name.length > 120 || email.length > 254 || comment.length > 3000) {
+      return NextResponse.json({ ok: false, error: 'Одно из полей превышает допустимую длину.' }, { status: 400 });
     }
 
     if (!/^(7\d{10}|8\d{10})$/.test(phoneRaw)) {
@@ -161,9 +165,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Некорректный тип печати.' }, { status: 400 });
     }
 
-    if (!Number.isFinite(unitPrice) || !Number.isFinite(totalPrice)) {
-      return NextResponse.json({ ok: false, error: 'Некорректная стоимость.' }, { status: 400 });
-    }
+    const unitPrice = getUnitPrice(quantity);
+    const totalPrice = calculateTotal({ qty: quantity, lamination });
+    const product = BUSINESS_CARD_PRODUCT;
+    const turnaround = BUSINESS_CARD_TURNAROUND;
+    const size = BUSINESS_CARD_SIZE;
+    const stock = BUSINESS_CARD_STOCK;
+    const printType = BUSINESS_CARD_PRINT_TYPE;
+    const notes = BUSINESS_CARD_NOTES;
 
     const file = fileRaw instanceof File ? fileRaw : undefined;
     const filesValidation = validateMultipartFiles(file ? [file] : [], {
@@ -192,9 +201,9 @@ export async function POST(request: NextRequest) {
     const createdOrder = await createServiceRequestOrder({
       source: 'business-cards',
       customer: { name, phone, email, comment },
-      total: Math.round(totalPrice),
-      payloadJson: { service: 'business-cards', customer: { name, phone, email: email || null, comment: comment || null }, fields: { product, quantity, printSide, lamination, needDesign, unitPrice, totalPrice, turnaround, size, stock, printType, notes, flyersRequested, consent }, file: file ? { name: file.name, size: file.size, type: file.type || null } : { fileName, fileType, fileSize }, referer },
-      quoteJson: { kind: 'service-request', service: 'business-cards', total: Math.round(totalPrice), pricingStatus: 'calculated', unitPrice, totalPrice: Math.round(totalPrice) },
+      total: totalPrice,
+      payloadJson: { service: 'business-cards', customer: { name, phone, email: email || null, comment: comment || null }, fields: { product, quantity, printSide, lamination, needDesign, unitPrice, totalPrice, turnaround, size, stock, printType, notes, flyersRequested, consent }, file: file ? { name: file.name, size: file.size, type: file.type || null } : null, referer },
+      quoteJson: { kind: 'service-request', service: 'business-cards', total: totalPrice, pricingStatus: 'calculated', pricingSource: 'server', unitPrice, totalPrice },
     });
 
     const message = [
@@ -207,7 +216,7 @@ export async function POST(request: NextRequest) {
       `Ламинация: ${lamination ? 'Да' : 'Нет'}`,
       `Нужен дизайн: ${needDesign ? 'Да' : 'Нет'}`,
       `Цена за шт: ${unitPrice.toLocaleString('ru-RU')} ₽`,
-      `Итого: ${Math.round(totalPrice).toLocaleString('ru-RU')} ₽`,
+      `Итого: ${totalPrice.toLocaleString('ru-RU')} ₽`,
       `Срок: ${turnaround}`,
       `Размер: ${size}`,
       `Материал: ${stock}`,
@@ -221,9 +230,9 @@ export async function POST(request: NextRequest) {
       `Email: ${email || '—'}`,
       `Комментарий: ${comment || '—'}`,
       `Файл: ${file?.name ? `${file.name} (${Math.round(file.size / 1024)} KB)` : '—'}`,
-      `fileName: ${fileName || '—'}`,
-      `fileType: ${fileType || '—'}`,
-      `fileSize: ${fileSize > 0 ? `${Math.round(fileSize / 1024)} KB` : '—'}`,
+      `fileName: ${file?.name || '—'}`,
+      `fileType: ${file?.type || '—'}`,
+      `fileSize: ${file ? `${Math.round(file.size / 1024)} KB` : '—'}`,
     ].join('\n');
 
     const botToken = env.TELEGRAM_BOT_TOKEN;

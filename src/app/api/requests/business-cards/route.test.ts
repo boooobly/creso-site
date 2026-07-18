@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
+const { createServiceRequestOrderMock } = vi.hoisted(() => ({
+  createServiceRequestOrderMock: vi.fn(async () => ({ orderId: 'order-1', orderNumber: 'TESTORDER' })),
+}));
+
 vi.mock('@/lib/orders/createServiceRequestOrder', () => ({
-  createServiceRequestOrder: vi.fn(async () => ({ orderId: 'order-1', orderNumber: 'TESTORDER' })),
+  createServiceRequestOrder: createServiceRequestOrderMock,
 }));
 
 vi.mock('@/lib/env', () => ({
@@ -18,6 +22,10 @@ vi.mock('@/lib/env', () => ({
 }));
 
 describe('POST /api/requests/business-cards', () => {
+  beforeEach(() => {
+    createServiceRequestOrderMock.mockClear();
+  });
+
   it('blocks honeypot submission before business validation', async () => {
     const { POST } = await import('@/app/api/requests/business-cards/route');
 
@@ -51,8 +59,8 @@ describe('POST /api/requests/business-cards', () => {
     formData.set('printSide', 'single');
     formData.set('lamination', 'false');
     formData.set('needDesign', 'false');
-    formData.set('unitPrice', '10');
-    formData.set('totalPrice', '10000');
+    formData.set('unitPrice', '0.01');
+    formData.set('totalPrice', '1');
     formData.set('turnaround', '7–10 business days');
     formData.set('size', '90x50');
     formData.set('stock', '300 г/м²');
@@ -88,8 +96,8 @@ describe('POST /api/requests/business-cards', () => {
     formData.set('printSide', 'single');
     formData.set('lamination', 'false');
     formData.set('needDesign', 'false');
-    formData.set('unitPrice', '10');
-    formData.set('totalPrice', '10000');
+    formData.set('unitPrice', '0.01');
+    formData.set('totalPrice', '1');
     formData.set('turnaround', '7–10 business days');
     formData.set('size', '90x50');
     formData.set('stock', '300 г/м²');
@@ -111,5 +119,13 @@ describe('POST /api/requests/business-cards', () => {
 
     expect(response.status).toBe(500);
     expect(payload).toMatchObject({ ok: false, error: 'Не удалось отправить уведомление. Проверьте настройки SMTP/Telegram.' });
+    expect(createServiceRequestOrderMock).toHaveBeenCalledWith(expect.objectContaining({
+      total: 2000,
+      quoteJson: expect.objectContaining({
+        pricingSource: 'server',
+        unitPrice: 2,
+        totalPrice: 2000,
+      }),
+    }));
   });
 });
