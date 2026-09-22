@@ -14,7 +14,7 @@ describe('POST /api/payments/webhook', () => {
       body: JSON.stringify({ orderNumber: 'ORDER1', status: 'paid', eventId: 'evt_1' }),
     });
 
-    const response = await POST(request);
+    const response = await POST();
     const json = await response.json();
 
     expect(response.status).toBe(410);

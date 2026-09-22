@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError, readJsonLimited } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
@@ -80,7 +81,7 @@ async function parseLeadRequest(request: NextRequest): Promise<ParsedLeadRequest
   const contentType = request.headers.get('content-type') || '';
 
   if (contentType.includes('multipart/form-data')) {
-    const formData = await request.formData();
+    const formData = await readFormDataLimited(request, LEADS_MAX_CONTENT_LENGTH_BYTES);
     const extrasRaw = formData.get('extras');
     let extras: Record<string, unknown> | undefined;
 
@@ -117,7 +118,7 @@ async function parseLeadRequest(request: NextRequest): Promise<ParsedLeadRequest
   }
 
   return {
-    payload: await request.json().catch(() => null),
+    payload: await readJsonLimited(request),
     files: [],
   };
 }
@@ -250,6 +251,7 @@ export async function POST(request: NextRequest) {
       { headers: createdOrder.reused ? { 'X-Idempotent-Replay': 'true' } : undefined },
     );
   } catch (error) {
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     logger.error('api.request.failed', { error });

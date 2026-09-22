@@ -11,7 +11,7 @@ describe('POST /api/payments/mock/complete', () => {
       body: JSON.stringify({ orderNumber: 'ORDER1', paymentRef: 'pay_ref', status: 'paid', token: 'token' }),
     });
 
-    const response = await POST(request);
+    const response = await POST();
     const json = await response.json();
 
     expect(response.status).toBe(410);

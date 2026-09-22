@@ -256,4 +256,4 @@ export const MILLING_ALLOWED_MIME_TYPES = [
   'image/vnd.dxf',
 ] as const;
 
-export const MILLING_MAX_UPLOAD_SIZE_MB = 50;
+export const MILLING_MAX_UPLOAD_SIZE_MB = 5;

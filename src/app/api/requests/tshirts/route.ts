@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
@@ -10,7 +11,7 @@ import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram/sendDoc
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
-  MUGS_MAX_UPLOAD_SIZE_MB,
+  TSHIRTS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
@@ -22,7 +23,7 @@ export const runtime = 'nodejs';
 
 const allowedExtensionsSet = new Set<string>(MUGS_ALLOWED_EXTENSIONS);
 const allowedMimeTypesSet = new Set<string>(MUGS_ALLOWED_MIME_TYPES);
-const TSHIRTS_MAX_UPLOAD_BYTES = MUGS_MAX_UPLOAD_SIZE_MB * 1024 * 1024;
+const TSHIRTS_MAX_UPLOAD_BYTES = TSHIRTS_MAX_UPLOAD_SIZE_MB * 1024 * 1024;
 const TSHIRTS_MAX_CONTENT_LENGTH_BYTES = TSHIRTS_MAX_UPLOAD_BYTES + (512 * 1024);
 
 const tshirtsRequestSchema = z.object({
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const formData = await request.formData();
+    const formData = await readFormDataLimited(request, TSHIRTS_MAX_CONTENT_LENGTH_BYTES);
     const fileValue = formData.get('file');
 
     const blockedResponse = enforcePublicRequestGuard(request, {
@@ -248,6 +249,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';

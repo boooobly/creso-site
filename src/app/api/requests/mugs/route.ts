@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
     getServerEnv();
     const contentLengthValidation = validateMultipartContentLength(request, { maxContentLengthBytes: MUGS_MAX_CONTENT_LENGTH_BYTES });
     if (!contentLengthValidation.ok) return multipartErrorResponse(contentLengthValidation);
-    const formData = await request.formData();
+    const formData = await readFormDataLimited(request, MUGS_MAX_CONTENT_LENGTH_BYTES);
     const fileValue = formData.get('file'); const file = fileValue instanceof File ? fileValue : null;
     const rawImageDataUrl = toText(formData.get('rawImageDataUrl')) || null;
     const mugDesignPreviewDataUrl = toText(formData.get('mugDesignPreviewDataUrl')) || null;
@@ -123,5 +124,6 @@ export async function POST(request: NextRequest) {
     const [telegramSent, emailSent] = await Promise.all([sendMugsTelegramNotification({ text, file, rawImageDataUrl, preview, printLayout }), sendEmailLead({ subject: 'Новая заявка — Печать на кружках', html: buildEmailHtmlFromText(text), attachments }).then(() => true).catch((error) => { logger.error('mugs.email.failed', { error }); return false; })]);
     if (!telegramSent && !emailSent) return NextResponse.json({ ok: false, error: 'Не удалось отправить уведомления в Telegram и Email.' }, { status: 502 });
     return NextResponse.json({ ok: true });
-  } catch (error) { const idempotencyResponse = idempotencyErrorResponse(error); if (idempotencyResponse) return idempotencyResponse; const message = error instanceof Error ? error.message : 'Unknown server error.'; if (message.startsWith('[env]')) return NextResponse.json({ ok: false, error: message }, { status: 500 }); logger.error('mugs.request.failed', { error }); return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 }); }
+  } catch (error) {
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status }); const idempotencyResponse = idempotencyErrorResponse(error); if (idempotencyResponse) return idempotencyResponse; const message = error instanceof Error ? error.message : 'Unknown server error.'; if (message.startsWith('[env]')) return NextResponse.json({ ok: false, error: message }, { status: 500 }); logger.error('mugs.request.failed', { error }); return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 }); }
 }

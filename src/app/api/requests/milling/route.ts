@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { enforcePublicRequestGuard, getClientIp } from '@/lib/anti-spam';
@@ -173,7 +174,7 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const formData = await request.formData();
+    const formData = await readFormDataLimited(request, MILLING_MAX_CONTENT_LENGTH_BYTES);
     const fileValue = formData.get('file');
 
     const blockedResponse = enforcePublicRequestGuard(request, {
@@ -310,6 +311,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';

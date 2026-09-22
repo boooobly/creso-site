@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { vi, afterEach, describe, expect, it } from 'vitest';
 import {
   createSignedAdminSessionToken,
   getAdminSessionTtlSeconds,
@@ -12,14 +12,14 @@ const previousEnv = {
 };
 
 afterEach(() => {
-  process.env.NODE_ENV = previousEnv.NODE_ENV;
+  vi.stubEnv('NODE_ENV', previousEnv.NODE_ENV);
   process.env.ADMIN_SESSION_SECRET = previousEnv.ADMIN_SESSION_SECRET;
   process.env.ADMIN_SESSION_TTL_SECONDS = previousEnv.ADMIN_SESSION_TTL_SECONDS;
 });
 
 describe('admin session token', () => {
   it('creates and verifies a signed token', async () => {
-    process.env.NODE_ENV = 'test';
+    vi.stubEnv('NODE_ENV', 'test');
     process.env.ADMIN_SESSION_SECRET = 'unit-test-secret';
     process.env.ADMIN_SESSION_TTL_SECONDS = '86400';
 
@@ -28,7 +28,7 @@ describe('admin session token', () => {
   });
 
   it('rejects malformed or tampered tokens', async () => {
-    process.env.NODE_ENV = 'test';
+    vi.stubEnv('NODE_ENV', 'test');
     process.env.ADMIN_SESSION_SECRET = 'unit-test-secret';
     process.env.ADMIN_SESSION_TTL_SECONDS = '86400';
 
@@ -41,7 +41,7 @@ describe('admin session token', () => {
   });
 
   it('rejects expired tokens', async () => {
-    process.env.NODE_ENV = 'test';
+    vi.stubEnv('NODE_ENV', 'test');
     process.env.ADMIN_SESSION_SECRET = 'unit-test-secret';
     process.env.ADMIN_SESSION_TTL_SECONDS = '1';
 
@@ -53,7 +53,7 @@ describe('admin session token', () => {
   });
 
   it('validates TTL env format', () => {
-    process.env.NODE_ENV = 'test';
+    vi.stubEnv('NODE_ENV', 'test');
     process.env.ADMIN_SESSION_TTL_SECONDS = 'abc';
 
     expect(() => getAdminSessionTtlSeconds()).toThrow('[env] ADMIN_SESSION_TTL_SECONDS must be a positive integer.');

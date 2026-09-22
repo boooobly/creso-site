@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { put } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminApiAuth } from '@/lib/admin/api-auth';
@@ -36,7 +37,11 @@ export async function POST(request: NextRequest) {
     return multipartErrorResponse(contentLengthValidation);
   }
 
-  const formData = await request.formData();
+  let formData: FormData;
+  try { formData = await readFormDataLimited(request, MAX_UPLOAD_SIZE_BYTES + 256 * 1024); }
+  catch (error) {
+    return NextResponse.json({ ok: false, error: error instanceof RequestBodyError ? error.message : 'Некорректный файл.' }, { status: error instanceof RequestBodyError ? error.status : 400 });
+  }
   const file = formData.get('file');
 
   if (!(file instanceof File)) {

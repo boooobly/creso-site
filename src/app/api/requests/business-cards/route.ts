@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const formData = await request.formData();
+    const formData = await readFormDataLimited(request, MAX_CONTENT_LENGTH_BYTES);
     const name = toStringValue(formData.get('name'));
     const phoneRaw = toStringValue(formData.get('phone')).replace(/\D/g, '');
     const email = toStringValue(formData.get('email'));
@@ -277,6 +278,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, fileSent: telegramCanSendFile ? true : undefined });
   } catch (error) {
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';

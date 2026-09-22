@@ -40,7 +40,7 @@ describe('GET /api/orders/[number]', () => {
     const { GET } = await import('@/app/api/orders/[number]/route');
     const request = new NextRequest('http://localhost:3000/api/orders/ORDER12345');
 
-    const response = await GET(request, { params: { number: 'ORDER12345' } });
+    const response = await GET(request, { params: Promise.resolve({ number: 'ORDER12345' }) });
 
     expect(response.status).toBe(403);
   });
@@ -71,7 +71,7 @@ describe('GET /api/orders/[number]', () => {
 
     const { GET } = await import('@/app/api/orders/[number]/route');
     const request = new NextRequest('http://localhost:3000/api/orders/ORDER12345?token=valid-token');
-    const response = await GET(request, { params: { number: 'ORDER12345' } });
+    const response = await GET(request, { params: Promise.resolve({ number: 'ORDER12345' }) });
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -122,7 +122,7 @@ describe('GET /api/orders/[number]', () => {
     const request = new NextRequest('http://localhost:3000/api/orders/ORDER12345', {
       headers: { authorization: 'Bearer admin-token' },
     });
-    const response = await GET(request, { params: { number: 'ORDER12345' } });
+    const response = await GET(request, { params: Promise.resolve({ number: 'ORDER12345' }) });
     const json = await response.json();
 
     expect(response.status).toBe(200);

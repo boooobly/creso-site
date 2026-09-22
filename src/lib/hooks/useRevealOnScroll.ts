@@ -20,7 +20,7 @@ export function useRevealOnScroll<T extends HTMLElement>({
   rootMargin = '0px 0px -10% 0px',
 }: RevealOptions = {}): RevealResult<T> {
   const ref = useRef<T | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -50,13 +50,16 @@ export function useRevealOnScroll<T extends HTMLElement>({
       };
     }
 
+    if (!('IntersectionObserver' in window)) return;
+    if (element.getBoundingClientRect().top < window.innerHeight) return;
+    setIsVisible(false);
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         setIsVisible(true);
         observer.disconnect();
       },
-      { threshold, rootMargin },
+      { threshold: 0, rootMargin },
     );
 
     observer.observe(element);

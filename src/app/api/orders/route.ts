@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import type { Prisma } from '@prisma/client';
@@ -122,7 +123,7 @@ async function parseOrderRequest(request: NextRequest): Promise<ParsedOrderReque
   const contentType = request.headers.get('content-type') || '';
 
   if (contentType.includes('multipart/form-data')) {
-    const formData = await request.formData();
+    const formData = await readFormDataLimited(request, ORDER_MAX_CONTENT_LENGTH_BYTES);
     const payloadRaw = formData.get('payload');
     const payloadText = typeof payloadRaw === 'string' ? payloadRaw : '';
     const payload = parseJsonPayload(payloadText);
@@ -374,6 +375,7 @@ export async function POST(request: NextRequest) {
       accessToken,
     }, { headers: createdOrder.reused ? { 'X-Idempotent-Replay': 'true' } : undefined });
   } catch (error) {
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     if (error instanceof OrderPayloadTooLargeError) {
       return NextResponse.json({ ok: false, error: 'Размер загружаемых данных превышает допустимый лимит.' }, { status: 413 });
     }
