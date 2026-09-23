@@ -13,6 +13,7 @@ import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { SiteImageRecord } from '@/lib/site-images';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 const heroBadges = ['Ширина до 600 мм', 'Резка по меткам', 'Срочные заказы', 'Чистая выборка'];
 
@@ -188,6 +189,8 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
         privacyConsent,
         files: files.map((file) => ({ name: file.name, size: file.size, type: file.type, lastModified: file.lastModified })),
       });
+
+      await uploadCustomerFiles(formData, 'lead', idempotencyKey);
 
       const response = await fetch('/api/leads', {
         method: 'POST',

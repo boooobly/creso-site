@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
     getServerEnv();
     const payload = (await req.json()) as PlotterPayload;
 
-    const blockedResponse = enforcePublicRequestGuard(req, {
+    const blockedResponse = await enforcePublicRequestGuard(req, {
       route: '/api/plotter',
       payload,
       requirePayload: true,

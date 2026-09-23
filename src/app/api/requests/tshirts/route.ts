@@ -18,6 +18,7 @@ import { normalizePhone } from '@/lib/utils/phone';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
+import { customerUploadErrorResponse, readCustomerFormData } from '@/lib/customer-uploads/server';
 
 export const runtime = 'nodejs';
 
@@ -130,10 +131,10 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const formData = await readFormDataLimited(request, TSHIRTS_MAX_CONTENT_LENGTH_BYTES);
+    const { formData, refs: uploadRefs } = await readCustomerFormData(request, TSHIRTS_MAX_CONTENT_LENGTH_BYTES, 'tshirts');
     const fileValue = formData.get('file');
 
-    const blockedResponse = enforcePublicRequestGuard(request, {
+    const blockedResponse = await enforcePublicRequestGuard(request, {
       route: '/api/requests/tshirts',
       payload: {
         name: toText(formData.get('name')),
@@ -203,6 +204,7 @@ export async function POST(request: NextRequest) {
         customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment || null },
         fields: { ...parsed.data, phone: normalizedPhone, website: undefined },
         file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+        uploadRefs,
         referer,
       },
       ...readRequestIdempotency(request.headers, {
@@ -249,6 +251,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const uploadError = customerUploadErrorResponse(error);
+    if (uploadError) return uploadError;
     if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;

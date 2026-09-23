@@ -1,6 +1,5 @@
 import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash } from 'node:crypto';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { bagetQuote } from '@/lib/calculations/bagetQuote';
@@ -22,6 +21,7 @@ import { enforcePublicRequestGuard } from '@/lib/anti-spam';
 import { createOrder, findOrderByIdempotency } from '@/lib/orders/createOrder';
 import { createRequestFingerprint, idempotencyErrorResponse, readIdempotencyKey } from '@/lib/orders/idempotency';
 import { buildDirectEmailJob, buildManagerNotificationJobs, buildTelegramDocumentUrlJob, processNotificationJobsBestEffort } from '@/lib/notifications/outbox';
+import { readCustomerUploadFile, readCustomerUploadRefs } from '@/lib/customer-uploads/server';
 
 export const runtime = 'nodejs';
 
@@ -72,6 +72,7 @@ type ParsedOrderInput = z.infer<typeof orderSchema>;
 type ParsedOrderRequest = {
   payload: unknown;
   customerImageFile: File | null;
+  formData?: FormData;
 };
 const ORDER_MAX_FILES = 1;
 const ORDER_MAX_TOTAL_SIZE_BYTES = MAX_ORDER_IMAGE_SIZE_BYTES;
@@ -132,6 +133,7 @@ async function parseOrderRequest(request: NextRequest): Promise<ParsedOrderReque
     return {
       payload,
       customerImageFile: fileValue instanceof File && fileValue.size > 0 ? fileValue : null,
+      formData,
     };
   }
 
@@ -173,8 +175,8 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const { payload, customerImageFile } = await parseOrderRequest(request);
-    const blockedResponse = enforcePublicRequestGuard(request, {
+    const { payload, customerImageFile, formData } = await parseOrderRequest(request);
+    const blockedResponse = await enforcePublicRequestGuard(request, {
       route: '/api/orders',
       payload,
       honeypotFields: ['company'],
@@ -210,19 +212,23 @@ export async function POST(request: NextRequest) {
     }
 
     const idempotencyKey = readIdempotencyKey(request.headers);
-    const customerImageDigest = idempotencyKey && customerImageFile
-      ? createHash('sha256').update(Buffer.from(await customerImageFile.arrayBuffer())).digest('hex')
-      : null;
+    const uploadedRefs = formData ? await readCustomerUploadRefs(formData, 'baget', idempotencyKey) : [];
+    if (uploadedRefs.length > 1 || uploadedRefs.some((ref) => ref.field !== 'customerImage' || ref.size > MAX_ORDER_IMAGE_SIZE_BYTES || !CUSTOMER_IMAGE_MIME_TYPES.has(ref.type)) || (uploadedRefs.length && customerImageFile)) {
+      return NextResponse.json({ ok: false, error: 'Некорректный файл клиента.' }, { status: 400 });
+    }
+    const uploadedRef = uploadedRefs[0];
+    if (uploadedRef && !(await getSafeCustomerImageFile(await readCustomerUploadFile(uploadedRef)))) {
+      return NextResponse.json({ ok: false, error: 'Некорректный файл клиента.' }, { status: 400 });
+    }
     const requestHash = idempotencyKey
       ? createRequestFingerprint({
         ...parsed.data,
         customer: { ...parsed.data.customer, phone: normalizedPhone },
         company: undefined,
-        customerImage: customerImageFile ? {
+        customerImage: uploadedRef ? { name: uploadedRef.name, size: uploadedRef.size, type: uploadedRef.type } : customerImageFile ? {
           name: customerImageFile.name,
           size: customerImageFile.size,
           type: customerImageFile.type,
-          digest: customerImageDigest,
         } : null,
       })
       : undefined;
@@ -278,13 +284,13 @@ export async function POST(request: NextRequest) {
     }
 
     const safeCustomerImageFile = await getSafeCustomerImageFile(customerImageFile);
-    let uploadedImage: PersistedOrderUpload | null = null;
+    if (customerImageFile && !safeCustomerImageFile) return NextResponse.json({ ok: false, error: 'Некорректный файл клиента.' }, { status: 400 });
+    let uploadedImage: PersistedOrderUpload | null = uploadedRef ? {
+      url: uploadedRef.url, pathname: uploadedRef.pathname, fileName: uploadedRef.name, mimeType: uploadedRef.type, sizeBytes: uploadedRef.size,
+    } : null;
 
     if (safeCustomerImageFile) {
-      uploadedImage = await storeBagetCustomerImage(safeCustomerImageFile).catch((error) => {
-        logger.error('orders.customer_image.upload_failed', { error, name: safeCustomerImageFile.name, size: safeCustomerImageFile.size });
-        return null;
-      });
+      uploadedImage = await storeBagetCustomerImage(safeCustomerImageFile);
     }
 
     const normalizedPayload: ParsedOrderInput & {

@@ -17,6 +17,7 @@ import {
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import type { MugDesignerValue } from '@/components/mug-designer/types';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 const MUG_DESIGNER_ERROR_MESSAGE = 'Не удалось открыть конструктор. Попробуйте обновить страницу или отправьте макет обычным файлом.';
 
@@ -188,12 +189,12 @@ export default function OrderMugsForm() {
       formData.set('needsDesign', needsDesign ? 'true' : 'false');
       if (file) {
         formData.set('file', file, file.name);
-        const rawImageDataUrl = await fileToDataUrl(file);
-        formData.set('rawImageDataUrl', rawImageDataUrl);
       }
       if (mugDesign) {
-        formData.set('mugDesignPreviewDataUrl', mugDesign.previewDataUrl);
-        formData.set('mugPrintLayoutDataUrl', mugDesign.printLayoutDataUrl);
+        const previewBlob = await (await fetch(mugDesign.previewDataUrl)).blob();
+        const printBlob = await (await fetch(mugDesign.printLayoutDataUrl)).blob();
+        formData.set('mugDesignPreviewFile', new File([previewBlob], 'mug-design-preview.png', { type: previewBlob.type || 'image/png' }));
+        formData.set('mugPrintLayoutFile', new File([printBlob], 'mug-print-layout.png', { type: printBlob.type || 'image/png' }));
         formData.set('mugDesignJson', mugDesign.designJson);
         mugDesign.sourceFiles.forEach((sourceFile) => formData.append('designerSourceFiles[]', sourceFile, sourceFile.name));
       }
@@ -207,6 +208,8 @@ export default function OrderMugsForm() {
           sourceFiles: mugDesign.sourceFiles.map((sourceFile) => ({ name: sourceFile.name, size: sourceFile.size, type: sourceFile.type, lastModified: sourceFile.lastModified })),
         } : null,
       });
+
+      await uploadCustomerFiles(formData, 'mugs', idempotencyKey);
 
       const response = await fetch('/api/requests/mugs', {
         method: 'POST',

@@ -9,6 +9,7 @@ const buildManagerNotificationJobsMock = vi.fn(() => [
   { kind: 'email.lead', dedupeSuffix: 'manager-email', payloadJson: { subject: 'lead', html: 'lead' } },
 ]);
 const processNotificationJobsBestEffortMock = vi.fn(async () => undefined);
+const storeLegacyCustomerFileMock = vi.fn(async (file: File) => ({ field: 'file', url: 'https://store.private.blob.vercel-storage.com/uploads/customers/lead/key/file.pdf', pathname: 'uploads/customers/lead/key/file.pdf', name: file.name, size: file.size, type: file.type }));
 
 const orderCreateMock = vi.fn(async ({ data }) => ({
   id: 'order-1',
@@ -48,7 +49,13 @@ vi.mock('@/lib/notifications/telegram', () => ({
 
 vi.mock('@/lib/notifications/outbox', () => ({
   buildManagerNotificationJobs: buildManagerNotificationJobsMock,
+  buildTelegramDocumentUrlJob: vi.fn((params) => ({ kind: 'telegram.document-url', dedupeSuffix: params.dedupeSuffix, payloadJson: params })),
   processNotificationJobsBestEffort: processNotificationJobsBestEffortMock,
+}));
+
+vi.mock('@/lib/customer-uploads/server', () => ({
+  readCustomerUploadRefs: vi.fn(async () => []),
+  storeLegacyCustomerFile: storeLegacyCustomerFileMock,
 }));
 
 vi.mock('@/lib/env', () => ({
@@ -77,6 +84,7 @@ describe('POST /api/leads', () => {
     orderCreateMock.mockClear();
     buildManagerNotificationJobsMock.mockClear();
     processNotificationJobsBestEffortMock.mockClear();
+    storeLegacyCustomerFileMock.mockClear();
   });
 
   it('rejects oversized file before notifications', async () => {
@@ -120,7 +128,7 @@ describe('POST /api/leads', () => {
     expect(sendTelegramLeadMock).not.toHaveBeenCalled();
   });
 
-  it('accepts valid multipart files, enqueues notifications and sends transient attachments', async () => {
+  it('persists multipart files and queues retryable document delivery', async () => {
     const { POST } = await import('@/app/api/leads/route');
 
     const formData = new FormData();
@@ -135,9 +143,11 @@ describe('POST /api/leads', () => {
     expect(response.status).toBe(200);
     expect(json.ok).toBe(true);
     expect(buildManagerNotificationJobsMock).toHaveBeenCalledTimes(1);
-    expect(processNotificationJobsBestEffortMock).toHaveBeenCalledWith(['job-1', 'job-2']);
+    expect(storeLegacyCustomerFileMock).toHaveBeenCalledTimes(1);
+    expect(orderCreateMock.mock.calls[0]?.[0].data.payloadJson.files[0].url).toContain('.private.blob.vercel-storage.com');
+    expect(processNotificationJobsBestEffortMock).toHaveBeenCalledWith(['job-1', 'job-2', 'job-3']);
     expect(sendEmailLeadMock).not.toHaveBeenCalled();
     expect(sendTelegramLeadMock).not.toHaveBeenCalled();
-    expect(sendTelegramDocumentBufferMock).toHaveBeenCalledTimes(1);
+    expect(sendTelegramDocumentBufferMock).not.toHaveBeenCalled();
   });
 });

@@ -13,6 +13,7 @@ import {
   TSHIRTS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 type FormValues = {
   name: string;
@@ -91,6 +92,8 @@ export default function OrderTshirtsForm() {
         phone: getPhoneDigits(values.phone),
         file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
       });
+
+      await uploadCustomerFiles(formData, 'tshirts', idempotencyKey);
 
       const response = await fetch('/api/requests/tshirts', {
         method: 'POST',

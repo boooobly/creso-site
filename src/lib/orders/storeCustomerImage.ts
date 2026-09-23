@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { put } from '@vercel/blob';
 import type { PersistedOrderUpload } from '@/lib/orders/bagetOrderSummary';
 import { sanitizeUploadFileName } from '@/lib/file-validation';
+import { privateBlobToken } from '@/lib/customer-uploads/server';
 
 export const MAX_ORDER_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 
@@ -26,7 +27,7 @@ export function buildCustomerImagePath(input: { fileName: string; mimeType: stri
   const timestamp = input.now ?? Date.now();
   const safeId = (input.id ?? randomUUID()).replace(/[^a-zA-Z0-9-]/g, '');
 
-  return `uploads/orders/baget/${timestamp}-${safeId}${safeExtension}`;
+  return `uploads/customers/baget/legacy/${timestamp}-${safeId}${safeExtension}`;
 }
 
 export async function storeBagetCustomerImage(file: File): Promise<PersistedOrderUpload> {
@@ -36,9 +37,8 @@ export async function storeBagetCustomerImage(file: File): Promise<PersistedOrde
   });
 
   const blob = await put(pathname, file, {
-    // NOTE: Customer upload blobs remain public for now because order/admin flows
-    // render direct URLs. We keep paths unguessable and avoid exposing raw filenames.
-    access: 'public',
+    token: privateBlobToken(),
+    access: 'private',
     addRandomSuffix: true,
   });
 

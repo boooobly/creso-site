@@ -8,6 +8,7 @@ import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles, publicInputClass } from '@/lib/public-form-styles';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 type PrintSide = 'single' | 'double';
 
@@ -159,6 +160,8 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
         payloadMeta,
         file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
       });
+
+      await uploadCustomerFiles(formData, 'business-cards', idempotencyKey);
 
       const response = await fetch('/api/requests/business-cards', {
         method: 'POST',

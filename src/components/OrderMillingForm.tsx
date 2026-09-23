@@ -14,6 +14,7 @@ import {
 } from '@/lib/pricing-config/milling';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 type FormValues = {
   name: string;
@@ -141,6 +142,8 @@ export default function OrderMillingForm() {
         phone: getPhoneDigits(values.phone),
         file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
       });
+
+      await uploadCustomerFiles(formData, 'milling', idempotencyKey);
 
       const response = await fetch('/api/requests/milling', {
         method: 'POST',

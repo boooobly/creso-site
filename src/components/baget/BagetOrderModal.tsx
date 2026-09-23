@@ -11,6 +11,7 @@ import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import BagetPreview, { type BagetPreviewProps } from './BagetPreview';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 type SizeMm = {
   wMm: number;
@@ -225,10 +226,11 @@ export default function BagetOrderModal({
       });
 
       const requestInit: RequestInit = uploadedImageFile
-        ? (() => {
+        ? await (async () => {
             const formData = new FormData();
             formData.set('payload', JSON.stringify(requestPayload));
             formData.set('customerImage', uploadedImageFile, uploadedImageFile.name);
+            await uploadCustomerFiles(formData, 'baget', idempotencyKey);
             return { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: formData };
           })()
         : {

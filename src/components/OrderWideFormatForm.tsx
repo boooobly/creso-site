@@ -9,6 +9,7 @@ import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import ImageDropzone from '@/components/ImageDropzone';
 import type { WideFormatMaterialType } from '@/lib/calculations/types';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 type FormValues = {
   name: string;
@@ -189,6 +190,8 @@ export default function OrderWideFormatForm() {
         phone: getPhoneDigits(values.phone),
         file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
       });
+
+      await uploadCustomerFiles(formData, 'wide-format', idempotencyKey);
 
       const response = await fetch('/api/wide-format-order', {
         method: 'POST',
