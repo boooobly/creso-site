@@ -1,0 +1,2472 @@
+[
+  {
+    "route": "/",
+    "width": 375,
+    "status": 200,
+    "title": "CredoMir (Кредомир) - наружная реклама и печать в Невинномысске",
+    "h1": [
+      "Производство рекламы под ключ"
+    ],
+    "canonical": "http://localhost:3000/",
+    "description": "Рекламно-производственная компания в Невинномысске: вывески, световые короба, широкоформатная печать, фрезеровка и монтаж по Ставропольскому краю.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services",
+    "width": 375,
+    "status": 200,
+    "title": "Услуги CredoMir в Невинномысске - реклама и производство",
+    "h1": [
+      "Выберите нужную услугу"
+    ],
+    "canonical": "http://localhost:3000/services",
+    "description": "Каталог услуг CredoMir: наружная реклама, вывески, широкоформатная печать, фрезеровка, багет и полиграфия в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList"
+    ]
+  },
+  {
+    "route": "/baget",
+    "width": 375,
+    "status": 200,
+    "title": "Багетная мастерская в Невинномысске | CredoMir",
+    "h1": [
+      "Конфигуратор багета"
+    ],
+    "canonical": "http://localhost:3000/baget",
+    "description": "Багетная мастерская CredoMir: оформление картин, постеров и фото, подбор профиля и точный расчёт стоимости в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/wide-format-printing",
+    "width": 375,
+    "status": 200,
+    "title": "Широкоформатная печать в Невинномысске | CredoMir",
+    "h1": [
+      "Широкоформатная печать до 3.2 м"
+    ],
+    "canonical": "http://localhost:3000/wide-format-printing",
+    "description": "Интерьерная и уличная широкоформатная печать: баннеры, плёнка, холст и постобработка для бизнеса в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/milling",
+    "width": 375,
+    "status": 200,
+    "title": "Фрезеровка ПВХ, акрила и композита в Невинномысске | CredoMir",
+    "h1": [
+      "Фрезеровка листовых материалов"
+    ],
+    "canonical": "http://localhost:3000/milling",
+    "description": "ЧПУ-фрезеровка ПВХ, акрила, композита и других листовых материалов в Невинномысске: точный рез и чистая кромка.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/plotter-cutting",
+    "width": 375,
+    "status": 200,
+    "title": "Плоттерная резка в Невинномысске | CredoMir",
+    "h1": [
+      "Плоттерная резка самоклеящейся пленки и оракала"
+    ],
+    "canonical": "http://localhost:3000/plotter-cutting",
+    "description": "Плоттерная и контурная резка плёнки и стикеров в Невинномысске: подготовка макета, выборка и аккуратная выдача под монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/heat-transfer",
+    "width": 375,
+    "status": 200,
+    "title": "Печать на футболках в Невинномысске | CredoMir",
+    "h1": [
+      "Печать на футболках"
+    ],
+    "canonical": "http://localhost:3000/heat-transfer",
+    "description": "Термоперенос и печать на футболках в Невинномысске: брендирование для команд, промо и корпоративных заказов.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/mugs",
+    "width": 375,
+    "status": 200,
+    "title": "Печать на кружках в Невинномысске | CredoMir",
+    "h1": [
+      "Брендированные кружки с печатью по кругу"
+    ],
+    "canonical": "http://localhost:3000/services/mugs",
+    "description": "Печать на кружках от 1 штуки в Невинномысске: логотипы, фото и фирменная символика для подарков, мероприятий и бизнеса.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/stands",
+    "width": 375,
+    "status": 200,
+    "title": "Изготовление стендов в Невинномысске | CredoMir",
+    "h1": [
+      "Изготовление информационных стендов"
+    ],
+    "canonical": "http://localhost:3000/services/stands",
+    "description": "Изготовление информационных стендов для помещений и улицы: ПВХ, композит, карманы и монтаж в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/outdoor-advertising",
+    "width": 375,
+    "status": 200,
+    "title": "Наружная реклама в Невинномысске | CredoMir",
+    "h1": [
+      "Наружная реклама для фасадов, входных групп и коммерческих объектов"
+    ],
+    "canonical": "http://localhost:3000/outdoor-advertising",
+    "description": "Изготовление наружной рекламы под ключ: вывески, световые короба, объёмные буквы и монтаж в Невинномысске, Ставропольском крае и по ЮФО.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/advertising-signs",
+    "width": 375,
+    "status": 200,
+    "title": "Вывески в Невинномысске - изготовление и монтаж | CredoMir",
+    "h1": [
+      "Изготовление вывесок в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/advertising-signs",
+    "description": "Изготавливаем рекламные вывески для магазинов, офисов и ТЦ в Невинномысске: проект, производство и монтаж под объект.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/banner-printing",
+    "width": 375,
+    "status": 200,
+    "title": "Печать баннеров в Невинномысске | CredoMir",
+    "h1": [
+      "Печать баннеров в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/banner-printing",
+    "description": "Печать баннеров для фасадов, акций и навигации в Невинномысске: подбор материала, люверсы, проклейка и подготовка к монтажу.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/lightboxes",
+    "width": 375,
+    "status": 200,
+    "title": "Световые короба в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Световые короба в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/lightboxes",
+    "description": "Производство световых коробов для фасадов и входных групп в Невинномысске: расчёт, макет, изготовление и монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/volume-letters",
+    "width": 375,
+    "status": 200,
+    "title": "Объёмные буквы в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Объёмные буквы в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/volume-letters",
+    "description": "Изготавливаем объёмные буквы с подсветкой и без для фасадов и интерьеров в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/print",
+    "width": 375,
+    "status": 200,
+    "title": "Оперативная полиграфия в Невинномысске | CredoMir",
+    "h1": [
+      "Офсетные визитки для бизнеса"
+    ],
+    "canonical": "http://localhost:3000/print",
+    "description": "Печать полиграфии для бизнеса: визитки, флаеры и тиражные материалы с понятными сроками в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/business-cards",
+    "width": 375,
+    "status": 200,
+    "title": "Печать визиток в Невинномысске - офсет и цифра | CredoMir",
+    "h1": [
+      "Печать визиток в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/business-cards",
+    "description": "Печать визиток для компаний и частных клиентов в Невинномысске: помощь с макетом, выбор бумаги и аккуратный тираж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/production",
+    "width": 375,
+    "status": 200,
+    "title": "Производство рекламы в Невинномысске | CredoMir",
+    "h1": [
+      "Собственное производство рекламы"
+    ],
+    "canonical": "http://localhost:3000/production",
+    "description": "Собственное производство CredoMir: фрезеровка, широкоформатная печать, плоттерная резка и сборка рекламных конструкций.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/portfolio",
+    "width": 375,
+    "status": 200,
+    "title": "Портфолио наружной рекламы и печати | CredoMir",
+    "h1": [
+      "Портфолио"
+    ],
+    "canonical": "http://localhost:3000/portfolio",
+    "description": "Портфолио CredoMir: вывески, световые короба, объёмные буквы, печать и фрезеровка для проектов в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/reviews",
+    "width": 375,
+    "status": 200,
+    "title": "Отзывы о CredoMir - Невинномысск",
+    "h1": [
+      "Отзывы реальных клиентов"
+    ],
+    "canonical": "http://localhost:3000/reviews",
+    "description": "Отзывы клиентов о работе CredoMir: сроки, качество изготовления и сопровождение рекламных проектов в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/contacts",
+    "width": 375,
+    "status": 200,
+    "title": "Контакты CredoMir (Кредомир) в Невинномысске",
+    "h1": [
+      "Контакты"
+    ],
+    "canonical": "http://localhost:3000/contacts",
+    "description": "Адрес, телефон, мессенджеры и график работы CredoMir в Невинномысске. Консультация по наружной рекламе, печати и производству.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/privacy",
+    "width": 375,
+    "status": 200,
+    "title": "Политика конфиденциальности | CredoMir",
+    "h1": [
+      "Политика обработки персональных данных"
+    ],
+    "canonical": "http://localhost:3000/privacy",
+    "description": "Политика обработки персональных данных для заявок на услуги CredoMir: наружная реклама, печать и производство.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/",
+    "width": 430,
+    "status": 200,
+    "title": "CredoMir (Кредомир) - наружная реклама и печать в Невинномысске",
+    "h1": [
+      "Производство рекламы под ключ"
+    ],
+    "canonical": "http://localhost:3000/",
+    "description": "Рекламно-производственная компания в Невинномысске: вывески, световые короба, широкоформатная печать, фрезеровка и монтаж по Ставропольскому краю.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services",
+    "width": 430,
+    "status": 200,
+    "title": "Услуги CredoMir в Невинномысске - реклама и производство",
+    "h1": [
+      "Выберите нужную услугу"
+    ],
+    "canonical": "http://localhost:3000/services",
+    "description": "Каталог услуг CredoMir: наружная реклама, вывески, широкоформатная печать, фрезеровка, багет и полиграфия в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList"
+    ]
+  },
+  {
+    "route": "/baget",
+    "width": 430,
+    "status": 200,
+    "title": "Багетная мастерская в Невинномысске | CredoMir",
+    "h1": [
+      "Конфигуратор багета"
+    ],
+    "canonical": "http://localhost:3000/baget",
+    "description": "Багетная мастерская CredoMir: оформление картин, постеров и фото, подбор профиля и точный расчёт стоимости в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/wide-format-printing",
+    "width": 430,
+    "status": 200,
+    "title": "Широкоформатная печать в Невинномысске | CredoMir",
+    "h1": [
+      "Широкоформатная печать до 3.2 м"
+    ],
+    "canonical": "http://localhost:3000/wide-format-printing",
+    "description": "Интерьерная и уличная широкоформатная печать: баннеры, плёнка, холст и постобработка для бизнеса в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/milling",
+    "width": 430,
+    "status": 200,
+    "title": "Фрезеровка ПВХ, акрила и композита в Невинномысске | CredoMir",
+    "h1": [
+      "Фрезеровка листовых материалов"
+    ],
+    "canonical": "http://localhost:3000/milling",
+    "description": "ЧПУ-фрезеровка ПВХ, акрила, композита и других листовых материалов в Невинномысске: точный рез и чистая кромка.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/plotter-cutting",
+    "width": 430,
+    "status": 200,
+    "title": "Плоттерная резка в Невинномысске | CredoMir",
+    "h1": [
+      "Плоттерная резка самоклеящейся пленки и оракала"
+    ],
+    "canonical": "http://localhost:3000/plotter-cutting",
+    "description": "Плоттерная и контурная резка плёнки и стикеров в Невинномысске: подготовка макета, выборка и аккуратная выдача под монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/heat-transfer",
+    "width": 430,
+    "status": 200,
+    "title": "Печать на футболках в Невинномысске | CredoMir",
+    "h1": [
+      "Печать на футболках"
+    ],
+    "canonical": "http://localhost:3000/heat-transfer",
+    "description": "Термоперенос и печать на футболках в Невинномысске: брендирование для команд, промо и корпоративных заказов.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/mugs",
+    "width": 430,
+    "status": 200,
+    "title": "Печать на кружках в Невинномысске | CredoMir",
+    "h1": [
+      "Брендированные кружки с печатью по кругу"
+    ],
+    "canonical": "http://localhost:3000/services/mugs",
+    "description": "Печать на кружках от 1 штуки в Невинномысске: логотипы, фото и фирменная символика для подарков, мероприятий и бизнеса.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/stands",
+    "width": 430,
+    "status": 200,
+    "title": "Изготовление стендов в Невинномысске | CredoMir",
+    "h1": [
+      "Изготовление информационных стендов"
+    ],
+    "canonical": "http://localhost:3000/services/stands",
+    "description": "Изготовление информационных стендов для помещений и улицы: ПВХ, композит, карманы и монтаж в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/outdoor-advertising",
+    "width": 430,
+    "status": 200,
+    "title": "Наружная реклама в Невинномысске | CredoMir",
+    "h1": [
+      "Наружная реклама для фасадов, входных групп и коммерческих объектов"
+    ],
+    "canonical": "http://localhost:3000/outdoor-advertising",
+    "description": "Изготовление наружной рекламы под ключ: вывески, световые короба, объёмные буквы и монтаж в Невинномысске, Ставропольском крае и по ЮФО.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/advertising-signs",
+    "width": 430,
+    "status": 200,
+    "title": "Вывески в Невинномысске - изготовление и монтаж | CredoMir",
+    "h1": [
+      "Изготовление вывесок в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/advertising-signs",
+    "description": "Изготавливаем рекламные вывески для магазинов, офисов и ТЦ в Невинномысске: проект, производство и монтаж под объект.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/banner-printing",
+    "width": 430,
+    "status": 200,
+    "title": "Печать баннеров в Невинномысске | CredoMir",
+    "h1": [
+      "Печать баннеров в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/banner-printing",
+    "description": "Печать баннеров для фасадов, акций и навигации в Невинномысске: подбор материала, люверсы, проклейка и подготовка к монтажу.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/lightboxes",
+    "width": 430,
+    "status": 200,
+    "title": "Световые короба в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Световые короба в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/lightboxes",
+    "description": "Производство световых коробов для фасадов и входных групп в Невинномысске: расчёт, макет, изготовление и монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/volume-letters",
+    "width": 430,
+    "status": 200,
+    "title": "Объёмные буквы в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Объёмные буквы в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/volume-letters",
+    "description": "Изготавливаем объёмные буквы с подсветкой и без для фасадов и интерьеров в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/print",
+    "width": 430,
+    "status": 200,
+    "title": "Оперативная полиграфия в Невинномысске | CredoMir",
+    "h1": [
+      "Офсетные визитки для бизнеса"
+    ],
+    "canonical": "http://localhost:3000/print",
+    "description": "Печать полиграфии для бизнеса: визитки, флаеры и тиражные материалы с понятными сроками в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/business-cards",
+    "width": 430,
+    "status": 200,
+    "title": "Печать визиток в Невинномысске - офсет и цифра | CredoMir",
+    "h1": [
+      "Печать визиток в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/business-cards",
+    "description": "Печать визиток для компаний и частных клиентов в Невинномысске: помощь с макетом, выбор бумаги и аккуратный тираж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/production",
+    "width": 430,
+    "status": 200,
+    "title": "Производство рекламы в Невинномысске | CredoMir",
+    "h1": [
+      "Собственное производство рекламы"
+    ],
+    "canonical": "http://localhost:3000/production",
+    "description": "Собственное производство CredoMir: фрезеровка, широкоформатная печать, плоттерная резка и сборка рекламных конструкций.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/portfolio",
+    "width": 430,
+    "status": 200,
+    "title": "Портфолио наружной рекламы и печати | CredoMir",
+    "h1": [
+      "Портфолио"
+    ],
+    "canonical": "http://localhost:3000/portfolio",
+    "description": "Портфолио CredoMir: вывески, световые короба, объёмные буквы, печать и фрезеровка для проектов в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/reviews",
+    "width": 430,
+    "status": 200,
+    "title": "Отзывы о CredoMir - Невинномысск",
+    "h1": [
+      "Отзывы реальных клиентов"
+    ],
+    "canonical": "http://localhost:3000/reviews",
+    "description": "Отзывы клиентов о работе CredoMir: сроки, качество изготовления и сопровождение рекламных проектов в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/contacts",
+    "width": 430,
+    "status": 200,
+    "title": "Контакты CredoMir (Кредомир) в Невинномысске",
+    "h1": [
+      "Контакты"
+    ],
+    "canonical": "http://localhost:3000/contacts",
+    "description": "Адрес, телефон, мессенджеры и график работы CredoMir в Невинномысске. Консультация по наружной рекламе, печати и производству.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/privacy",
+    "width": 430,
+    "status": 200,
+    "title": "Политика конфиденциальности | CredoMir",
+    "h1": [
+      "Политика обработки персональных данных"
+    ],
+    "canonical": "http://localhost:3000/privacy",
+    "description": "Политика обработки персональных данных для заявок на услуги CredoMir: наружная реклама, печать и производство.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/",
+    "width": 768,
+    "status": 200,
+    "title": "CredoMir (Кредомир) - наружная реклама и печать в Невинномысске",
+    "h1": [
+      "Производство рекламы под ключ"
+    ],
+    "canonical": "http://localhost:3000/",
+    "description": "Рекламно-производственная компания в Невинномысске: вывески, световые короба, широкоформатная печать, фрезеровка и монтаж по Ставропольскому краю.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services",
+    "width": 768,
+    "status": 200,
+    "title": "Услуги CredoMir в Невинномысске - реклама и производство",
+    "h1": [
+      "Выберите нужную услугу"
+    ],
+    "canonical": "http://localhost:3000/services",
+    "description": "Каталог услуг CredoMir: наружная реклама, вывески, широкоформатная печать, фрезеровка, багет и полиграфия в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList"
+    ]
+  },
+  {
+    "route": "/baget",
+    "width": 768,
+    "status": 200,
+    "title": "Багетная мастерская в Невинномысске | CredoMir",
+    "h1": [
+      "Конфигуратор багета"
+    ],
+    "canonical": "http://localhost:3000/baget",
+    "description": "Багетная мастерская CredoMir: оформление картин, постеров и фото, подбор профиля и точный расчёт стоимости в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/wide-format-printing",
+    "width": 768,
+    "status": 200,
+    "title": "Широкоформатная печать в Невинномысске | CredoMir",
+    "h1": [
+      "Широкоформатная печать до 3.2 м"
+    ],
+    "canonical": "http://localhost:3000/wide-format-printing",
+    "description": "Интерьерная и уличная широкоформатная печать: баннеры, плёнка, холст и постобработка для бизнеса в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/milling",
+    "width": 768,
+    "status": 200,
+    "title": "Фрезеровка ПВХ, акрила и композита в Невинномысске | CredoMir",
+    "h1": [
+      "Фрезеровка листовых материалов"
+    ],
+    "canonical": "http://localhost:3000/milling",
+    "description": "ЧПУ-фрезеровка ПВХ, акрила, композита и других листовых материалов в Невинномысске: точный рез и чистая кромка.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/plotter-cutting",
+    "width": 768,
+    "status": 200,
+    "title": "Плоттерная резка в Невинномысске | CredoMir",
+    "h1": [
+      "Плоттерная резка самоклеящейся пленки и оракала"
+    ],
+    "canonical": "http://localhost:3000/plotter-cutting",
+    "description": "Плоттерная и контурная резка плёнки и стикеров в Невинномысске: подготовка макета, выборка и аккуратная выдача под монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/heat-transfer",
+    "width": 768,
+    "status": 200,
+    "title": "Печать на футболках в Невинномысске | CredoMir",
+    "h1": [
+      "Печать на футболках"
+    ],
+    "canonical": "http://localhost:3000/heat-transfer",
+    "description": "Термоперенос и печать на футболках в Невинномысске: брендирование для команд, промо и корпоративных заказов.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/mugs",
+    "width": 768,
+    "status": 200,
+    "title": "Печать на кружках в Невинномысске | CredoMir",
+    "h1": [
+      "Брендированные кружки с печатью по кругу"
+    ],
+    "canonical": "http://localhost:3000/services/mugs",
+    "description": "Печать на кружках от 1 штуки в Невинномысске: логотипы, фото и фирменная символика для подарков, мероприятий и бизнеса.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/stands",
+    "width": 768,
+    "status": 200,
+    "title": "Изготовление стендов в Невинномысске | CredoMir",
+    "h1": [
+      "Изготовление информационных стендов"
+    ],
+    "canonical": "http://localhost:3000/services/stands",
+    "description": "Изготовление информационных стендов для помещений и улицы: ПВХ, композит, карманы и монтаж в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/outdoor-advertising",
+    "width": 768,
+    "status": 200,
+    "title": "Наружная реклама в Невинномысске | CredoMir",
+    "h1": [
+      "Наружная реклама для фасадов, входных групп и коммерческих объектов"
+    ],
+    "canonical": "http://localhost:3000/outdoor-advertising",
+    "description": "Изготовление наружной рекламы под ключ: вывески, световые короба, объёмные буквы и монтаж в Невинномысске, Ставропольском крае и по ЮФО.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/advertising-signs",
+    "width": 768,
+    "status": 200,
+    "title": "Вывески в Невинномысске - изготовление и монтаж | CredoMir",
+    "h1": [
+      "Изготовление вывесок в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/advertising-signs",
+    "description": "Изготавливаем рекламные вывески для магазинов, офисов и ТЦ в Невинномысске: проект, производство и монтаж под объект.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/banner-printing",
+    "width": 768,
+    "status": 200,
+    "title": "Печать баннеров в Невинномысске | CredoMir",
+    "h1": [
+      "Печать баннеров в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/banner-printing",
+    "description": "Печать баннеров для фасадов, акций и навигации в Невинномысске: подбор материала, люверсы, проклейка и подготовка к монтажу.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/lightboxes",
+    "width": 768,
+    "status": 200,
+    "title": "Световые короба в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Световые короба в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/lightboxes",
+    "description": "Производство световых коробов для фасадов и входных групп в Невинномысске: расчёт, макет, изготовление и монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/volume-letters",
+    "width": 768,
+    "status": 200,
+    "title": "Объёмные буквы в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Объёмные буквы в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/volume-letters",
+    "description": "Изготавливаем объёмные буквы с подсветкой и без для фасадов и интерьеров в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/print",
+    "width": 768,
+    "status": 200,
+    "title": "Оперативная полиграфия в Невинномысске | CredoMir",
+    "h1": [
+      "Офсетные визитки для бизнеса"
+    ],
+    "canonical": "http://localhost:3000/print",
+    "description": "Печать полиграфии для бизнеса: визитки, флаеры и тиражные материалы с понятными сроками в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/business-cards",
+    "width": 768,
+    "status": 200,
+    "title": "Печать визиток в Невинномысске - офсет и цифра | CredoMir",
+    "h1": [
+      "Печать визиток в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/business-cards",
+    "description": "Печать визиток для компаний и частных клиентов в Невинномысске: помощь с макетом, выбор бумаги и аккуратный тираж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/production",
+    "width": 768,
+    "status": 200,
+    "title": "Производство рекламы в Невинномысске | CredoMir",
+    "h1": [
+      "Собственное производство рекламы"
+    ],
+    "canonical": "http://localhost:3000/production",
+    "description": "Собственное производство CredoMir: фрезеровка, широкоформатная печать, плоттерная резка и сборка рекламных конструкций.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/portfolio",
+    "width": 768,
+    "status": 200,
+    "title": "Портфолио наружной рекламы и печати | CredoMir",
+    "h1": [
+      "Портфолио"
+    ],
+    "canonical": "http://localhost:3000/portfolio",
+    "description": "Портфолио CredoMir: вывески, световые короба, объёмные буквы, печать и фрезеровка для проектов в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/reviews",
+    "width": 768,
+    "status": 200,
+    "title": "Отзывы о CredoMir - Невинномысск",
+    "h1": [
+      "Отзывы реальных клиентов"
+    ],
+    "canonical": "http://localhost:3000/reviews",
+    "description": "Отзывы клиентов о работе CredoMir: сроки, качество изготовления и сопровождение рекламных проектов в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/contacts",
+    "width": 768,
+    "status": 200,
+    "title": "Контакты CredoMir (Кредомир) в Невинномысске",
+    "h1": [
+      "Контакты"
+    ],
+    "canonical": "http://localhost:3000/contacts",
+    "description": "Адрес, телефон, мессенджеры и график работы CredoMir в Невинномысске. Консультация по наружной рекламе, печати и производству.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/privacy",
+    "width": 768,
+    "status": 200,
+    "title": "Политика конфиденциальности | CredoMir",
+    "h1": [
+      "Политика обработки персональных данных"
+    ],
+    "canonical": "http://localhost:3000/privacy",
+    "description": "Политика обработки персональных данных для заявок на услуги CredoMir: наружная реклама, печать и производство.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/",
+    "width": 1440,
+    "status": 200,
+    "title": "CredoMir (Кредомир) - наружная реклама и печать в Невинномысске",
+    "h1": [
+      "Производство рекламы под ключ"
+    ],
+    "canonical": "http://localhost:3000/",
+    "description": "Рекламно-производственная компания в Невинномысске: вывески, световые короба, широкоформатная печать, фрезеровка и монтаж по Ставропольскому краю.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services",
+    "width": 1440,
+    "status": 200,
+    "title": "Услуги CredoMir в Невинномысске - реклама и производство",
+    "h1": [
+      "Выберите нужную услугу"
+    ],
+    "canonical": "http://localhost:3000/services",
+    "description": "Каталог услуг CredoMir: наружная реклама, вывески, широкоформатная печать, фрезеровка, багет и полиграфия в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList"
+    ]
+  },
+  {
+    "route": "/baget",
+    "width": 1440,
+    "status": 200,
+    "title": "Багетная мастерская в Невинномысске | CredoMir",
+    "h1": [
+      "Конфигуратор багета"
+    ],
+    "canonical": "http://localhost:3000/baget",
+    "description": "Багетная мастерская CredoMir: оформление картин, постеров и фото, подбор профиля и точный расчёт стоимости в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/wide-format-printing",
+    "width": 1440,
+    "status": 200,
+    "title": "Широкоформатная печать в Невинномысске | CredoMir",
+    "h1": [
+      "Широкоформатная печать до 3.2 м"
+    ],
+    "canonical": "http://localhost:3000/wide-format-printing",
+    "description": "Интерьерная и уличная широкоформатная печать: баннеры, плёнка, холст и постобработка для бизнеса в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/milling",
+    "width": 1440,
+    "status": 200,
+    "title": "Фрезеровка ПВХ, акрила и композита в Невинномысске | CredoMir",
+    "h1": [
+      "Фрезеровка листовых материалов"
+    ],
+    "canonical": "http://localhost:3000/milling",
+    "description": "ЧПУ-фрезеровка ПВХ, акрила, композита и других листовых материалов в Невинномысске: точный рез и чистая кромка.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/plotter-cutting",
+    "width": 1440,
+    "status": 200,
+    "title": "Плоттерная резка в Невинномысске | CredoMir",
+    "h1": [
+      "Плоттерная резка самоклеящейся пленки и оракала"
+    ],
+    "canonical": "http://localhost:3000/plotter-cutting",
+    "description": "Плоттерная и контурная резка плёнки и стикеров в Невинномысске: подготовка макета, выборка и аккуратная выдача под монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/heat-transfer",
+    "width": 1440,
+    "status": 200,
+    "title": "Печать на футболках в Невинномысске | CredoMir",
+    "h1": [
+      "Печать на футболках"
+    ],
+    "canonical": "http://localhost:3000/heat-transfer",
+    "description": "Термоперенос и печать на футболках в Невинномысске: брендирование для команд, промо и корпоративных заказов.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/mugs",
+    "width": 1440,
+    "status": 200,
+    "title": "Печать на кружках в Невинномысске | CredoMir",
+    "h1": [
+      "Брендированные кружки с печатью по кругу"
+    ],
+    "canonical": "http://localhost:3000/services/mugs",
+    "description": "Печать на кружках от 1 штуки в Невинномысске: логотипы, фото и фирменная символика для подарков, мероприятий и бизнеса.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/stands",
+    "width": 1440,
+    "status": 200,
+    "title": "Изготовление стендов в Невинномысске | CredoMir",
+    "h1": [
+      "Изготовление информационных стендов"
+    ],
+    "canonical": "http://localhost:3000/services/stands",
+    "description": "Изготовление информационных стендов для помещений и улицы: ПВХ, композит, карманы и монтаж в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/outdoor-advertising",
+    "width": 1440,
+    "status": 200,
+    "title": "Наружная реклама в Невинномысске | CredoMir",
+    "h1": [
+      "Наружная реклама для фасадов, входных групп и коммерческих объектов"
+    ],
+    "canonical": "http://localhost:3000/outdoor-advertising",
+    "description": "Изготовление наружной рекламы под ключ: вывески, световые короба, объёмные буквы и монтаж в Невинномысске, Ставропольском крае и по ЮФО.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/advertising-signs",
+    "width": 1440,
+    "status": 200,
+    "title": "Вывески в Невинномысске - изготовление и монтаж | CredoMir",
+    "h1": [
+      "Изготовление вывесок в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/advertising-signs",
+    "description": "Изготавливаем рекламные вывески для магазинов, офисов и ТЦ в Невинномысске: проект, производство и монтаж под объект.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/banner-printing",
+    "width": 1440,
+    "status": 200,
+    "title": "Печать баннеров в Невинномысске | CredoMir",
+    "h1": [
+      "Печать баннеров в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/banner-printing",
+    "description": "Печать баннеров для фасадов, акций и навигации в Невинномысске: подбор материала, люверсы, проклейка и подготовка к монтажу.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/lightboxes",
+    "width": 1440,
+    "status": 200,
+    "title": "Световые короба в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Световые короба в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/lightboxes",
+    "description": "Производство световых коробов для фасадов и входных групп в Невинномысске: расчёт, макет, изготовление и монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/volume-letters",
+    "width": 1440,
+    "status": 200,
+    "title": "Объёмные буквы в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Объёмные буквы в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/volume-letters",
+    "description": "Изготавливаем объёмные буквы с подсветкой и без для фасадов и интерьеров в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/print",
+    "width": 1440,
+    "status": 200,
+    "title": "Оперативная полиграфия в Невинномысске | CredoMir",
+    "h1": [
+      "Офсетные визитки для бизнеса"
+    ],
+    "canonical": "http://localhost:3000/print",
+    "description": "Печать полиграфии для бизнеса: визитки, флаеры и тиражные материалы с понятными сроками в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/business-cards",
+    "width": 1440,
+    "status": 200,
+    "title": "Печать визиток в Невинномысске - офсет и цифра | CredoMir",
+    "h1": [
+      "Печать визиток в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/business-cards",
+    "description": "Печать визиток для компаний и частных клиентов в Невинномысске: помощь с макетом, выбор бумаги и аккуратный тираж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/production",
+    "width": 1440,
+    "status": 200,
+    "title": "Производство рекламы в Невинномысске | CredoMir",
+    "h1": [
+      "Собственное производство рекламы"
+    ],
+    "canonical": "http://localhost:3000/production",
+    "description": "Собственное производство CredoMir: фрезеровка, широкоформатная печать, плоттерная резка и сборка рекламных конструкций.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/portfolio",
+    "width": 1440,
+    "status": 200,
+    "title": "Портфолио наружной рекламы и печати | CredoMir",
+    "h1": [
+      "Портфолио"
+    ],
+    "canonical": "http://localhost:3000/portfolio",
+    "description": "Портфолио CredoMir: вывески, световые короба, объёмные буквы, печать и фрезеровка для проектов в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/reviews",
+    "width": 1440,
+    "status": 200,
+    "title": "Отзывы о CredoMir - Невинномысск",
+    "h1": [
+      "Отзывы реальных клиентов"
+    ],
+    "canonical": "http://localhost:3000/reviews",
+    "description": "Отзывы клиентов о работе CredoMir: сроки, качество изготовления и сопровождение рекламных проектов в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/contacts",
+    "width": 1440,
+    "status": 200,
+    "title": "Контакты CredoMir (Кредомир) в Невинномысске",
+    "h1": [
+      "Контакты"
+    ],
+    "canonical": "http://localhost:3000/contacts",
+    "description": "Адрес, телефон, мессенджеры и график работы CredoMir в Невинномысске. Консультация по наружной рекламе, печати и производству.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/privacy",
+    "width": 1440,
+    "status": 200,
+    "title": "Политика конфиденциальности | CredoMir",
+    "h1": [
+      "Политика обработки персональных данных"
+    ],
+    "canonical": "http://localhost:3000/privacy",
+    "description": "Политика обработки персональных данных для заявок на услуги CredoMir: наружная реклама, печать и производство.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/",
+    "width": 1920,
+    "status": 200,
+    "title": "CredoMir (Кредомир) - наружная реклама и печать в Невинномысске",
+    "h1": [
+      "Производство рекламы под ключ"
+    ],
+    "canonical": "http://localhost:3000/",
+    "description": "Рекламно-производственная компания в Невинномысске: вывески, световые короба, широкоформатная печать, фрезеровка и монтаж по Ставропольскому краю.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services",
+    "width": 1920,
+    "status": 200,
+    "title": "Услуги CredoMir в Невинномысске - реклама и производство",
+    "h1": [
+      "Выберите нужную услугу"
+    ],
+    "canonical": "http://localhost:3000/services",
+    "description": "Каталог услуг CredoMir: наружная реклама, вывески, широкоформатная печать, фрезеровка, багет и полиграфия в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList"
+    ]
+  },
+  {
+    "route": "/baget",
+    "width": 1920,
+    "status": 200,
+    "title": "Багетная мастерская в Невинномысске | CredoMir",
+    "h1": [
+      "Конфигуратор багета"
+    ],
+    "canonical": "http://localhost:3000/baget",
+    "description": "Багетная мастерская CredoMir: оформление картин, постеров и фото, подбор профиля и точный расчёт стоимости в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/wide-format-printing",
+    "width": 1920,
+    "status": 200,
+    "title": "Широкоформатная печать в Невинномысске | CredoMir",
+    "h1": [
+      "Широкоформатная печать до 3.2 м"
+    ],
+    "canonical": "http://localhost:3000/wide-format-printing",
+    "description": "Интерьерная и уличная широкоформатная печать: баннеры, плёнка, холст и постобработка для бизнеса в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/milling",
+    "width": 1920,
+    "status": 200,
+    "title": "Фрезеровка ПВХ, акрила и композита в Невинномысске | CredoMir",
+    "h1": [
+      "Фрезеровка листовых материалов"
+    ],
+    "canonical": "http://localhost:3000/milling",
+    "description": "ЧПУ-фрезеровка ПВХ, акрила, композита и других листовых материалов в Невинномысске: точный рез и чистая кромка.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/plotter-cutting",
+    "width": 1920,
+    "status": 200,
+    "title": "Плоттерная резка в Невинномысске | CredoMir",
+    "h1": [
+      "Плоттерная резка самоклеящейся пленки и оракала"
+    ],
+    "canonical": "http://localhost:3000/plotter-cutting",
+    "description": "Плоттерная и контурная резка плёнки и стикеров в Невинномысске: подготовка макета, выборка и аккуратная выдача под монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/heat-transfer",
+    "width": 1920,
+    "status": 200,
+    "title": "Печать на футболках в Невинномысске | CredoMir",
+    "h1": [
+      "Печать на футболках"
+    ],
+    "canonical": "http://localhost:3000/heat-transfer",
+    "description": "Термоперенос и печать на футболках в Невинномысске: брендирование для команд, промо и корпоративных заказов.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/mugs",
+    "width": 1920,
+    "status": 200,
+    "title": "Печать на кружках в Невинномысске | CredoMir",
+    "h1": [
+      "Брендированные кружки с печатью по кругу"
+    ],
+    "canonical": "http://localhost:3000/services/mugs",
+    "description": "Печать на кружках от 1 штуки в Невинномысске: логотипы, фото и фирменная символика для подарков, мероприятий и бизнеса.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service",
+      "FAQPage"
+    ]
+  },
+  {
+    "route": "/services/stands",
+    "width": 1920,
+    "status": 200,
+    "title": "Изготовление стендов в Невинномысске | CredoMir",
+    "h1": [
+      "Изготовление информационных стендов"
+    ],
+    "canonical": "http://localhost:3000/services/stands",
+    "description": "Изготовление информационных стендов для помещений и улицы: ПВХ, композит, карманы и монтаж в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/outdoor-advertising",
+    "width": 1920,
+    "status": 200,
+    "title": "Наружная реклама в Невинномысске | CredoMir",
+    "h1": [
+      "Наружная реклама для фасадов, входных групп и коммерческих объектов"
+    ],
+    "canonical": "http://localhost:3000/outdoor-advertising",
+    "description": "Изготовление наружной рекламы под ключ: вывески, световые короба, объёмные буквы и монтаж в Невинномысске, Ставропольском крае и по ЮФО.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/advertising-signs",
+    "width": 1920,
+    "status": 200,
+    "title": "Вывески в Невинномысске - изготовление и монтаж | CredoMir",
+    "h1": [
+      "Изготовление вывесок в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/advertising-signs",
+    "description": "Изготавливаем рекламные вывески для магазинов, офисов и ТЦ в Невинномысске: проект, производство и монтаж под объект.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/banner-printing",
+    "width": 1920,
+    "status": 200,
+    "title": "Печать баннеров в Невинномысске | CredoMir",
+    "h1": [
+      "Печать баннеров в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/banner-printing",
+    "description": "Печать баннеров для фасадов, акций и навигации в Невинномысске: подбор материала, люверсы, проклейка и подготовка к монтажу.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/lightboxes",
+    "width": 1920,
+    "status": 200,
+    "title": "Световые короба в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Световые короба в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/lightboxes",
+    "description": "Производство световых коробов для фасадов и входных групп в Невинномысске: расчёт, макет, изготовление и монтаж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/volume-letters",
+    "width": 1920,
+    "status": 200,
+    "title": "Объёмные буквы в Невинномысске - изготовление | CredoMir",
+    "h1": [
+      "Объёмные буквы в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/volume-letters",
+    "description": "Изготавливаем объёмные буквы с подсветкой и без для фасадов и интерьеров в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/print",
+    "width": 1920,
+    "status": 200,
+    "title": "Оперативная полиграфия в Невинномысске | CredoMir",
+    "h1": [
+      "Офсетные визитки для бизнеса"
+    ],
+    "canonical": "http://localhost:3000/print",
+    "description": "Печать полиграфии для бизнеса: визитки, флаеры и тиражные материалы с понятными сроками в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/business-cards",
+    "width": 1920,
+    "status": 200,
+    "title": "Печать визиток в Невинномысске - офсет и цифра | CredoMir",
+    "h1": [
+      "Печать визиток в Невинномысске"
+    ],
+    "canonical": "http://localhost:3000/business-cards",
+    "description": "Печать визиток для компаний и частных клиентов в Невинномысске: помощь с макетом, выбор бумаги и аккуратный тираж.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/production",
+    "width": 1920,
+    "status": 200,
+    "title": "Производство рекламы в Невинномысске | CredoMir",
+    "h1": [
+      "Собственное производство рекламы"
+    ],
+    "canonical": "http://localhost:3000/production",
+    "description": "Собственное производство CredoMir: фрезеровка, широкоформатная печать, плоттерная резка и сборка рекламных конструкций.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite",
+      "BreadcrumbList",
+      "Service"
+    ]
+  },
+  {
+    "route": "/portfolio",
+    "width": 1920,
+    "status": 200,
+    "title": "Портфолио наружной рекламы и печати | CredoMir",
+    "h1": [
+      "Портфолио"
+    ],
+    "canonical": "http://localhost:3000/portfolio",
+    "description": "Портфолио CredoMir: вывески, световые короба, объёмные буквы, печать и фрезеровка для проектов в Невинномысске и Ставропольском крае.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/reviews",
+    "width": 1920,
+    "status": 200,
+    "title": "Отзывы о CredoMir - Невинномысск",
+    "h1": [
+      "Отзывы реальных клиентов"
+    ],
+    "canonical": "http://localhost:3000/reviews",
+    "description": "Отзывы клиентов о работе CredoMir: сроки, качество изготовления и сопровождение рекламных проектов в Невинномысске.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/contacts",
+    "width": 1920,
+    "status": 200,
+    "title": "Контакты CredoMir (Кредомир) в Невинномысске",
+    "h1": [
+      "Контакты"
+    ],
+    "canonical": "http://localhost:3000/contacts",
+    "description": "Адрес, телефон, мессенджеры и график работы CredoMir в Невинномысске. Консультация по наружной рекламе, печати и производству.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  },
+  {
+    "route": "/privacy",
+    "width": 1920,
+    "status": 200,
+    "title": "Политика конфиденциальности | CredoMir",
+    "h1": [
+      "Политика обработки персональных данных"
+    ],
+    "canonical": "http://localhost:3000/privacy",
+    "description": "Политика обработки персональных данных для заявок на услуги CredoMir: наружная реклама, печать и производство.",
+    "overflow": false,
+    "clippedHeadings": [],
+    "hiddenContentHeadings": [],
+    "brokenImages": [],
+    "errors": [],
+    "failed": [],
+    "violations": [],
+    "structuredDataTypes": [
+      "LocalBusiness",
+      "WebSite"
+    ]
+  }
+]

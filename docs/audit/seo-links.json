@@ -1,0 +1,34 @@
+{
+  "checkedUrls": 59,
+  "failures": [],
+  "orphans": [],
+  "duplicates": {
+    "titles": [],
+    "descriptions": []
+  },
+  "special": {
+    "/robots.txt": {
+      "status": 200
+    },
+    "/sitemap.xml": {
+      "status": 200
+    },
+    "/blog": {
+      "status": 308,
+      "location": "/reviews"
+    },
+    "/admin/login": {
+      "status": 200
+    },
+    "/audit-nonexistent-page": {
+      "status": 404
+    },
+    "/contacts/": {
+      "status": 308,
+      "location": "/contacts"
+    },
+    "/contacts?utm_source=audit": {
+      "status": 200
+    }
+  }
+}

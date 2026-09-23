@@ -1,0 +1,203 @@
+{
+  "date": "2026-09-22",
+  "baseline": "f72d8b6",
+  "scope": "Local production build; no production deploy; no real outbound submissions",
+  "registry": {
+    "P0": {
+      "found": 1,
+      "fixed": 1,
+      "open": 0
+    },
+    "P1": {
+      "found": 10,
+      "fixed": 7,
+      "open": 3
+    },
+    "P2": {
+      "found": 13,
+      "fixed": 12,
+      "open": 1
+    },
+    "P3": {
+      "found": 2,
+      "fixed": 1,
+      "open": 1
+    }
+  },
+  "checks": {
+    "build": "pass; database-disabled fallbacks expected",
+    "typecheck": "pass",
+    "lint": "pass; zero warnings",
+    "tests": {
+      "files": 59,
+      "passed": 222
+    },
+    "npmAudit": {
+      "before": {
+        "info": 0,
+        "low": 1,
+        "moderate": 6,
+        "high": 7,
+        "critical": 1,
+        "total": 15
+      },
+      "after": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
+    }
+  },
+  "browser": {
+    "routes": 21,
+    "widths": [
+      375,
+      430,
+      768,
+      1440,
+      1920
+    ],
+    "pageChecks": 105,
+    "failedPageChecks": [],
+    "axeLightScans": 42,
+    "axeDarkScans": 42,
+    "failedDarkChecks": [],
+    "scenarios": 16,
+    "additionalDialogAxeScans": 14,
+    "additionalMugStates": 4,
+    "method": "Full repeated crawl, then targeted rechecks of baget and mugs after final state/contrast fixes. No other page content changed in the follow-up."
+  },
+  "seo": {
+    "checkedUrls": 59,
+    "failures": [],
+    "orphans": [],
+    "duplicates": {
+      "titles": [],
+      "descriptions": []
+    },
+    "special": {
+      "/robots.txt": {
+        "status": 200
+      },
+      "/sitemap.xml": {
+        "status": 200
+      },
+      "/blog": {
+        "status": 308,
+        "location": "/reviews"
+      },
+      "/admin/login": {
+        "status": 200
+      },
+      "/audit-nonexistent-page": {
+        "status": 404
+      },
+      "/contacts/": {
+        "status": 308,
+        "location": "/contacts"
+      },
+      "/contacts?utm_source=audit": {
+        "status": 200
+      }
+    }
+  },
+  "lighthouse": {
+    "before": [
+      {
+        "route": "/",
+        "version": "13.5.0",
+        "fetchedAt": "2026-09-21T16:46:50.666Z",
+        "scores": {
+          "performance": 79,
+          "accessibility": 96,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "lcpMs": 4904.906499999999,
+        "cls": 0,
+        "tbtMs": 53
+      },
+      {
+        "route": "/wide-format-printing",
+        "version": "13.5.0",
+        "fetchedAt": "2026-09-21T16:47:02.057Z",
+        "scores": {
+          "performance": 86,
+          "accessibility": 86,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "lcpMs": 4034.6265000000003,
+        "cls": 0,
+        "tbtMs": 49
+      },
+      {
+        "route": "/contacts",
+        "version": "13.5.0",
+        "fetchedAt": "2026-09-21T16:47:09.665Z",
+        "scores": {
+          "performance": 95,
+          "accessibility": 96,
+          "best-practices": 77,
+          "seo": 100
+        },
+        "lcpMs": 2809.5601,
+        "cls": 0,
+        "tbtMs": 52.999999999999545
+      }
+    ],
+    "after": [
+      {
+        "route": "/",
+        "version": "13.5.0",
+        "fetchedAt": "2026-09-22T11:55:27.063Z",
+        "scores": {
+          "performance": 88,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "lcpMs": 3585.8061500000003,
+        "cls": 0.007181135314531507,
+        "tbtMs": 155
+      },
+      {
+        "route": "/wide-format-printing",
+        "version": "13.5.0",
+        "fetchedAt": "2026-09-22T11:55:35.069Z",
+        "scores": {
+          "performance": 92,
+          "accessibility": 99,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "lcpMs": 3162.1242,
+        "cls": 0.003288859874452316,
+        "tbtMs": 40
+      },
+      {
+        "route": "/contacts",
+        "version": "13.5.0",
+        "fetchedAt": "2026-09-22T11:55:41.956Z",
+        "scores": {
+          "performance": 91,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100
+        },
+        "lcpMs": 3427.739799999999,
+        "cls": 0,
+        "tbtMs": 39
+      }
+    ]
+  },
+  "limitations": [
+    "Local lab metrics, not field CWV/INP",
+    "No live PostgreSQL/Contentful/SMTP/Telegram/payment integration credentials",
+    "Docker daemon unavailable; standalone Node runtime checked",
+    "Private durable attachments and Vercel upload transport remain release risks"
+  ]
+}

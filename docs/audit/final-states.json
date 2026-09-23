@@ -1,0 +1,22 @@
+[
+  {
+    "theme": "light",
+    "state": "design info expanded",
+    "axe": []
+  },
+  {
+    "theme": "light",
+    "state": "mug designer open",
+    "axe": []
+  },
+  {
+    "theme": "dark",
+    "state": "design info expanded",
+    "axe": []
+  },
+  {
+    "theme": "dark",
+    "state": "mug designer open",
+    "axe": []
+  }
+]
