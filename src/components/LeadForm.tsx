@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { trackEvent } from '@/lib/analytics';
-import { postJSON } from '@/lib/fetcher';
+import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
 import type { SiteMessages } from '@/lib/messages';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles } from '@/lib/public-form-styles';
@@ -98,6 +98,9 @@ export default function LeadForm({
   includePageUrl = false,
 }: LeadFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const fieldId = useId();
+  const idempotency = useSubmissionIdempotency('lead');
 
   const resolvedService = useMemo(() => (initialService?.trim() ? initialService.trim() : DEFAULT_SERVICE), [initialService]);
 
@@ -105,7 +108,7 @@ export default function LeadForm({
     register,
     control,
     handleSubmit,
-    formState: { errors, isSubmitSuccessful, isSubmitting },
+    formState: { errors, isSubmitting },
     reset,
     getValues,
   } = useForm<FormData>({
@@ -134,7 +137,7 @@ export default function LeadForm({
         data.message?.trim(),
       ].filter(Boolean);
 
-      const res = await postJSON<{ ok: true }>(`/api/leads`, {
+      const payload = {
         source,
         name: data.name,
         phone: phoneDigits || undefined,
@@ -146,8 +149,20 @@ export default function LeadForm({
           consent: data.consent,
         },
         company: data.website,
+      };
+      const key = idempotency.getKey(payload);
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(20000),
       });
+      idempotency.settle(key, response.status);
+      const res = await response.json();
+      if (!response.ok || res.ok !== true) throw new Error('Lead submission failed');
       if (res.ok) {
+        idempotency.complete(key);
+        setSubmitted(true);
         trackEvent('lead_form_submitted', { service: data.service });
         reachGoal(source === 'main' ? YANDEX_GOALS.mainLeadSubmitSuccess : YANDEX_GOALS.contactFormSubmitSuccess, { source, service: data.service });
         reset({ ...DEFAULT_VALUES, service: resolvedService, message: initialMessage ?? '', consent: false });
@@ -157,13 +172,13 @@ export default function LeadForm({
     }
   };
 
-  if (isSubmitSuccessful) {
-    return <p className="t-body text-green-700 dark:text-green-400">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>;
+  if (submitted) {
+    return <p role="status" className="t-body text-green-700 dark:text-green-400">Заявка отправлена. Менеджер свяжется с вами в ближайшее время.</p>;
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={publicFormStyles.fieldsStack}>
-      {submitError && <p className="t-small text-red-500">{submitError}</p>}
+      {submitError && <p role="alert" className="t-small text-red-700 dark:text-red-400">{submitError}</p>}
 
       <input type="hidden" {...register('service')} />
       {!showMessageField && <input type="hidden" {...register('message')} />}
@@ -177,21 +192,30 @@ export default function LeadForm({
       />
 
       <div>
+        <label htmlFor={`${fieldId}-name`} className="mb-1 block text-sm">Имя</label>
         <input
+          id={`${fieldId}-name`}
+          autoComplete="name"
+          aria-invalid={Boolean(errors.name)}
+          aria-describedby={errors.name ? `${fieldId}-name-error` : undefined}
           className={publicFormStyles.inputBase}
           placeholder="Имя"
           {...register('name')}
         />
-        {errors.name && <p className="mt-1 t-small text-red-500">{errors.name.message}</p>}
+        {errors.name && <p id={`${fieldId}-name-error`} role="alert" className="mt-1 t-small text-red-700 dark:text-red-400">{errors.name.message}</p>}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="w-full">
+          <label htmlFor={`${fieldId}-phone`} className="mb-1 block text-sm">Телефон</label>
           <Controller
             name="phone"
             control={control}
             render={({ field }) => (
               <PhoneInput
+                id={`${fieldId}-phone`}
+                aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? `${fieldId}-phone-error` : undefined}
                 value={field.value ?? ''}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
@@ -200,21 +224,29 @@ export default function LeadForm({
               />
             )}
           />
-          {errors.phone && <p className="mt-1 t-small text-red-500">{errors.phone.message}</p>}
+          {errors.phone && <p id={`${fieldId}-phone-error`} role="alert" className="mt-1 t-small text-red-700 dark:text-red-400">{errors.phone.message}</p>}
         </div>
         <div className="w-full">
+          <label htmlFor={`${fieldId}-email`} className="mb-1 block text-sm">E-mail</label>
           <input
+            id={`${fieldId}-email`}
+            type="email"
+            autoComplete="email"
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? `${fieldId}-email-error` : undefined}
             className={publicFormStyles.inputBase}
             placeholder="E-mail"
             {...register('email')}
           />
-          {errors.email && <p className="mt-1 t-small text-red-500">{errors.email.message}</p>}
+          {errors.email && <p id={`${fieldId}-email-error`} role="alert" className="mt-1 t-small text-red-700 dark:text-red-400">{errors.email.message}</p>}
         </div>
       </div>
 
       {showMessageField ? (
         <div>
+          <label htmlFor={`${fieldId}-message`} className="mb-1 block text-sm">Комментарий</label>
           <textarea
+            id={`${fieldId}-message`}
             className={`${publicFormStyles.inputBase} min-h-[120px] py-3`}
             placeholder="Комментарий"
             {...register('message')}

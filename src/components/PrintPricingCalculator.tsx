@@ -46,7 +46,7 @@ export default function PrintPricingCalculator() {
           <div className="card min-w-0 space-y-4 rounded-2xl border-neutral-200/80 p-3.5 shadow-sm md:p-6">
             <h2 className="break-words text-lg font-semibold">Тарифы на визитки (офсет)</h2>
             <p className="break-words text-sm text-neutral-600 dark:text-neutral-300">Фиксированные параметры: формат 90×50 мм, мелованный картон 300 г/м².</p>
-            <div className="w-full max-w-full overflow-x-auto rounded-xl border border-neutral-200 [-webkit-overflow-scrolling:touch] dark:border-neutral-700">
+            <div tabIndex={0} role="region" aria-label="Таблица стоимости печати" className="w-full max-w-full overflow-x-auto rounded-xl border border-neutral-200 [-webkit-overflow-scrolling:touch] dark:border-neutral-700">
               <table className="w-full min-w-[320px] text-sm sm:min-w-[360px]">
                 <thead className="bg-neutral-100/90 dark:bg-neutral-800/80">
                   <tr className="border-b border-neutral-200 dark:border-neutral-700">
@@ -85,8 +85,8 @@ export default function PrintPricingCalculator() {
                     onClick={() => setQuantity(value)}
                     className={`min-h-10 rounded-xl border px-3 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/45 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-950 sm:px-4 ${
                       quantity === value
-                        ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/12 text-[var(--brand-red)] shadow-sm'
-                        : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700'
+                        ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/12 text-[var(--brand-red-text)] shadow-sm'
+                        : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red-text)] dark:border-neutral-700'
                     }`}
                   >
                     {value.toLocaleString('ru-RU')}
@@ -190,8 +190,8 @@ function ToggleButton({ active, onClick, children }: { active: boolean; onClick:
       onClick={onClick}
       className={`rounded-xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/45 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-950 ${
         active
-          ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red)]'
-          : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700'
+          ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red-text)]'
+          : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red-text)] dark:border-neutral-700'
       }`}
     >
       {children}

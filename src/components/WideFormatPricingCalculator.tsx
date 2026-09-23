@@ -327,9 +327,9 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-stretch">
       <section className="card flex h-full flex-col space-y-5 border-neutral-200/85 bg-white/90 p-4 shadow-sm shadow-neutral-200/50 md:space-y-6 md:p-6">
         <header className="space-y-2 border-b border-neutral-200/75 pb-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Конфигурация</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red-text)]">Конфигурация</p>
           <h2 className="text-xl font-semibold tracking-tight">Параметры заказа</h2>
-          <p className="text-sm leading-6 text-neutral-600">Выберите материал и характеристики, чтобы получить стоимость с учётом доп. операций.</p>
+          <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300">Выберите материал и характеристики, чтобы получить стоимость с учётом доп. операций.</p>
         </header>
 
         {visibleCategoryOptions.length === 0 ? (
@@ -421,7 +421,7 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
 
         {isExtrasAllowed && (
           <div className="space-y-2.5 border-t border-neutral-200/80 pt-4">
-            <p className="text-sm font-medium text-neutral-800">Дополнительные услуги</p>
+            <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">Дополнительные услуги</p>
             {isBanner && <CheckboxRow label="Проклейка края (+50 ₽ за пог. метр)" checked={edgeGluing} onChange={setEdgeGluing} />}
             {isBanner && <CheckboxRow label={`Люверсы (${pricingConfig.grommetPrice} ₽/шт${quote.grommetsCount > 0 ? `, ~${quote.grommetsCount} шт` : ""})`} checked={grommets} onChange={setGrommets} />}
             {isBanner && canShowWelding && (
@@ -478,9 +478,9 @@ export default function WideFormatPricingCalculator({ pricingConfig }: WideForma
 
         <aside className="card flex h-full flex-col space-y-4 border-neutral-200/85 bg-white/90 p-4 shadow-sm shadow-neutral-200/50 md:space-y-5 md:p-6">
         <header className="space-y-2 border-b border-neutral-200/75 pb-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Стоимость</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red-text)]">Стоимость</p>
           <h2 className="text-xl font-semibold tracking-tight">Расчёт</h2>
-          <p className="text-sm leading-6 text-neutral-600">Структура цены обновляется автоматически по выбранным параметрам.</p>
+          <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300">Структура цены обновляется автоматически по выбранным параметрам.</p>
         </header>
         <div className="space-y-2.5 text-sm">
           {quote.extrasCost > 0 && (

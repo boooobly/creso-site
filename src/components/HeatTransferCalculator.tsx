@@ -433,6 +433,7 @@ ${calcSummary}`,
               Загрузить файлы
               <input
                 type="file"
+                aria-label="Загрузить макет для печати"
                 multiple
                 accept={ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(',')}
                 className="hidden"
@@ -451,20 +452,20 @@ ${calcSummary}`,
             )}
           </div>
           {fileWarning && <p className="text-sm text-amber-700 dark:text-amber-300">{fileWarning}</p>}
-          {fileError && <p className="text-sm text-red-600">{fileError}</p>}
+          {fileError && <p className="text-sm text-red-600 dark:text-red-400">{fileError}</p>}
         </div>
 
         <div className="card space-y-3 p-4 md:p-6">
           <h3 className="text-lg font-semibold">Контакты</h3>
 
           <InputField label="Имя" value={name} onChange={setName} onBlur={() => setTouched((prev) => ({ ...prev, name: true }))} />
-          {nameError && <p className="-mt-2 text-sm text-red-600">{nameError}</p>}
+          {nameError && <p className="-mt-2 text-sm text-red-600 dark:text-red-400">{nameError}</p>}
 
           <label className="space-y-2 text-sm font-medium">
             <span>Телефон</span>
             <PhoneInput value={phone} onChange={setPhone} onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))} />
           </label>
-          {phoneError && <p className="-mt-2 text-sm text-red-600">{phoneError}</p>}
+          {phoneError && <p className="-mt-2 text-sm text-red-600 dark:text-red-400">{phoneError}</p>}
 
           <InputField label="Email" value={email} onChange={setEmail} type="email" />
 
@@ -490,7 +491,7 @@ ${calcSummary}`,
               Согласен с <Link href="/privacy" className="underline hover:no-underline">политикой обработки персональных данных</Link>
             </span>
           </label>
-          {agreeError && <p className="-mt-2 text-sm text-red-600">{agreeError}</p>}
+          {agreeError && <p className="-mt-2 text-sm text-red-600 dark:text-red-400">{agreeError}</p>}
         </div>
       </section>
 
@@ -507,8 +508,8 @@ ${calcSummary}`,
           </div>
 
           <div className="mt-6 rounded-xl bg-[var(--brand-red)]/10 p-4 text-center">
-            <p className="text-xs uppercase tracking-wide text-[var(--brand-red)]">Итого</p>
-            <p className={`mt-1 text-3xl font-bold text-[var(--brand-red)] transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{Math.round(pricing.total).toLocaleString('ru-RU')} ₽</p>
+            <p className="text-xs uppercase tracking-wide text-[var(--brand-red-text)]">Итого</p>
+            <p className={`mt-1 text-3xl font-bold text-[var(--brand-red-text)] transition-transform duration-300 ${pricePulse ? 'scale-105' : 'scale-100'}`}>{Math.round(pricing.total).toLocaleString('ru-RU')} ₽</p>
             <p className="min-h-4 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">{isQuotePending ? 'Обновляем расчёт…' : ' '}</p>
           </div>
 
@@ -524,7 +525,7 @@ ${calcSummary}`,
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">Мы подтверждаем итоговую стоимость перед печатью.</p>
           <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Цена может измениться в зависимости от наличия бумаги.</p>
 
-          {submitError && <p className="mt-3 text-sm text-red-600">{submitError}</p>}
+          {submitError && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{submitError}</p>}
           {submitSuccess && <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
           <span className="sr-only" aria-live="polite">{isQuoteLoading ? 'loading' : quoteError}</span>
         </div>
@@ -540,8 +541,8 @@ function SegmentButton({ active, label, onClick }: { active: boolean; label: str
       onClick={onClick}
       className={`rounded-xl border px-4 py-3 text-sm font-medium transition ${
         active
-          ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red)]'
-          : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700'
+          ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red-text)]'
+          : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red-text)] dark:border-neutral-700'
       }`}
     >
       {label}
@@ -561,8 +562,8 @@ function QuantityPicker({ quantity, setQuantity }: { quantity: number; setQuanti
             onClick={() => setQuantity(value)}
             className={`rounded-xl border px-4 py-2 text-sm transition ${
               quantity === value
-                ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red)]'
-                : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red)] dark:border-neutral-700'
+                ? 'border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-[var(--brand-red-text)]'
+                : 'border-neutral-300 hover:border-[var(--brand-red)] hover:text-[var(--brand-red-text)] dark:border-neutral-700'
             }`}
           >
             {value}

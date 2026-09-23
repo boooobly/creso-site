@@ -26,7 +26,7 @@ export default function WideFormatTrustCards({ features }: WideFormatTrustCardsP
     <motion.div
       className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4"
       variants={staggerContainer(0.08)}
-      initial={shouldReduceMotion ? false : 'hidden'}
+      initial={false}
       whileInView={shouldReduceMotion ? undefined : 'show'}
       viewport={viewportOnce}
     >

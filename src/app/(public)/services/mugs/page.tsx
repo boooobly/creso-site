@@ -149,41 +149,9 @@ export default async function MugsServicePage() {
       <JsonLd data={buildServiceJsonLd('Печать на кружках в Невинномысске', 'Печать на кружках с логотипом и фото для подарков, промо и корпоративных заказов.', '/services/mugs')} />
       {faqPageJsonLd ? <JsonLd data={faqPageJsonLd} /> : null}
       <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
-        <PageHero className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:hidden lg:p-10">
+        <PageHero className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:p-10" mediaClassName="h-full" media={heroMedia}>
           <HeroEyebrow>Печать на кружках</HeroEyebrow>
           <HeroTitle className="hero-title-mobile-safe max-w-[20ch] lg:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
-          <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
-            Производим кружки для корпоративных подарков, мероприятий и розницы: от малых партий до крупных тиражей. На выходе — аккуратный брендированный продукт, готовый к выдаче и продажам.
-          </HeroLead>
-
-          <HeroChipList className="mt-6 gap-2.5">
-            {['Белая керамика AAA', 'Глянец или мат', 'Тираж от 1 шт', 'Логотипы и фото'].map((item) => (
-              <HeroChip key={item} className="min-h-11 gap-2 rounded-xl px-3 py-2 text-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
-                <span>{item}</span>
-              </HeroChip>
-            ))}
-          </HeroChipList>
-
-          <HeroActions className="mt-8">
-            <a href="#mugs-order" data-floating-cta-hide className="btn-primary no-underline">
-              Оставить заявку
-            </a>
-            <a href="#mugs-prices" className="btn-secondary no-underline">
-              Цены и условия
-            </a>
-          </HeroActions>
-        </PageHero>
-
-        <div className="mt-4 lg:hidden">
-          <div className="overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-[0_18px_44px_-28px_rgba(15,23,42,0.42)] dark:border-neutral-800/80 dark:bg-neutral-900/80 dark:shadow-[0_20px_44px_-28px_rgba(0,0,0,0.72)]">
-            <div className="relative min-h-[260px]">{heroMedia}</div>
-          </div>
-        </div>
-
-        <PageHero className="hidden p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:block lg:p-10" mediaClassName="h-full" media={heroMedia}>
-          <HeroEyebrow>Печать на кружках</HeroEyebrow>
-          <HeroTitle className="max-w-[20ch] text-4xl tracking-tight sm:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
           <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
             Производим кружки для корпоративных подарков, мероприятий и розницы: от малых партий до крупных тиражей. На выходе — аккуратный брендированный продукт, готовый к выдаче и продажам.
           </HeroLead>

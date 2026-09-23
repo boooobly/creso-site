@@ -136,7 +136,7 @@ export default async function ReviewsPage() {
           <div className="cta-shell card border-neutral-200/85 dark:border-neutral-800/90 dark:bg-neutral-900/85">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Следующий шаг</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red-text)]">Следующий шаг</p>
                 <h2 className="text-[1.65rem] font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-2xl">Готовы обсудить ваш проект?</h2>
                 <p className="max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
                   Расскажите о задаче — предложим формат, материалы и сроки под ваш бюджет и площадку.

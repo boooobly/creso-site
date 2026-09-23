@@ -23,7 +23,7 @@ const MUG_DESIGNER_ERROR_MESSAGE = 'Не удалось открыть конс�
 function MugDesignerLoadingFallback() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-950/70 p-4" role="status" aria-live="polite">
-      <div className="rounded-2xl bg-white px-5 py-4 text-sm font-medium text-neutral-800 shadow-2xl">
+      <div className="rounded-2xl bg-white px-5 py-4 text-sm font-medium text-neutral-800 shadow-2xl dark:bg-neutral-900">
         Загрузка конструктора…
       </div>
     </div>
@@ -240,8 +240,8 @@ export default function OrderMugsForm() {
   return (
     <div id="mug-order-form" className={`${publicFormStyles.shell} sm:p-8 md:p-9`}>
       <div className={publicFormStyles.heading}>
-        <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">Заявка на печать кружек</h2>
-        <p className="mt-2 text-sm text-neutral-600">Заполните поля формы для предварительного расчёта.</p>
+        <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-200">Заявка на печать кружек</h2>
+        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Заполните поля формы для предварительного расчёта.</p>
       </div>
 
       <form className={`${publicFormStyles.fieldsStack} mt-6`} onSubmit={handleSubmit} noValidate>
@@ -262,25 +262,26 @@ export default function OrderMugsForm() {
               className="mt-1 h-4 w-4 rounded border-neutral-300 text-red-600 focus:ring-red-500"
             />
             <span>
-              <span className="text-sm font-medium text-neutral-900">Нужен дизайн макета для кружки</span>
-              <span className="mt-1 block text-xs text-neutral-600">Отметьте, если нужен макет с нуля или доработка исходника.</span>
+              <span className="text-sm font-medium text-neutral-900 dark:text-neutral-200">Нужен дизайн макета для кружки</span>
+              <span className="mt-1 block text-xs text-neutral-600 dark:text-neutral-400">Отметьте, если нужен макет с нуля или доработка исходника.</span>
             </span>
           </label>
 
           <div
             id="mug-design-info"
+            hidden={!needsDesign}
             className={needsDesign
               ? 'mt-4 overflow-hidden transition-all duration-300 ease-out opacity-100 max-h-[2000px]'
               : 'mt-0 overflow-hidden transition-all duration-300 ease-out opacity-0 max-h-0 pointer-events-none'}
           >
-            <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4 sm:p-5">
+            <div className="space-y-5 rounded-xl border border-neutral-200 bg-white p-4 sm:p-5 dark:bg-neutral-900 dark:border-neutral-700">
               <h3 className="text-xl font-semibold">Дизайн</h3>
-              <p className="text-sm text-neutral-700">2 варианта макета входят в стоимость.</p>
-              <p className="text-sm text-neutral-700">Также включены 2 правки 1-й категории.</p>
+              <p className="text-sm text-neutral-700 dark:text-neutral-200">2 варианта макета входят в стоимость.</p>
+              <p className="text-sm text-neutral-700 dark:text-neutral-200">Также включены 2 правки 1-й категории.</p>
 
               <div>
                 <h4 className="text-lg font-medium">Категории сложности I/II/III</h4>
-                <ul className="mt-3 space-y-2 text-sm text-neutral-700">
+                <ul className="mt-3 space-y-2 text-sm text-neutral-700 dark:text-neutral-200">
                   {complexityLevels.map((level) => (
                     <li key={level.title}><span className="font-semibold">{level.title}:</span> {level.description}</li>
                   ))}
@@ -289,12 +290,12 @@ export default function OrderMugsForm() {
 
               <div>
                 <h4 className="text-lg font-medium">Чек-лист (+1 за каждый пункт)</h4>
-                <ul className="mt-3 grid gap-2 text-sm text-neutral-700 md:grid-cols-2">
+                <ul className="mt-3 grid gap-2 text-sm text-neutral-700 md:grid-cols-2 dark:text-neutral-200">
                   {checklist.map((item) => (
                     <li key={item}>• {item}</li>
                   ))}
                 </ul>
-                <p className="mt-4 text-sm text-neutral-700">Интерпретация: 0–2 → I, 3–5 → II, 6–8 → III.</p>
+                <p className="mt-4 text-sm text-neutral-700 dark:text-neutral-200">Интерпретация: 0–2 → I, 3–5 → II, 6–8 → III.</p>
               </div>
             </div>
           </div>
@@ -304,13 +305,13 @@ export default function OrderMugsForm() {
           <label className="space-y-2">
             <span className="text-sm font-medium">Имя *</span>
             <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-            {errors.name && <span className="mt-1 text-xs text-red-600">{errors.name}</span>}
+            {errors.name && <span className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.name}</span>}
           </label>
 
           <label className="space-y-2">
             <span className="text-sm font-medium">Телефон *</span>
             <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
-            {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
+            {errors.phone && <span className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.phone}</span>}
           </label>
         </div>
 
@@ -318,7 +319,7 @@ export default function OrderMugsForm() {
           <label className="space-y-2">
             <span className="text-sm font-medium">Количество *</span>
             <input type="number" min={1} className={inputClass('quantity')} value={values.quantity} onChange={(e) => setValues((prev) => ({ ...prev, quantity: e.target.value }))} />
-            {errors.quantity && <span className="mt-1 text-xs text-red-600">{errors.quantity}</span>}
+            {errors.quantity && <span className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.quantity}</span>}
           </label>
 
           <label className="space-y-2">
@@ -328,7 +329,7 @@ export default function OrderMugsForm() {
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
-            {errors.covering && <span className="mt-1 text-xs text-red-600">{errors.covering}</span>}
+            {errors.covering && <span className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.covering}</span>}
           </label>
         </div>
 
@@ -352,18 +353,19 @@ export default function OrderMugsForm() {
             helperTextClassName="mt-1 text-xs text-muted-foreground"
             icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
           />
-          {errors.file && <p className="mt-1 text-xs text-red-600">{errors.file}</p>}
+          {errors.file && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.file}</p>}
           <p className="text-xs text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
-          <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4">
+          <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4 dark:bg-neutral-900 dark:border-neutral-700">
             <button ref={designerButtonRef} type="button" onClick={openDesigner} className="rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
               Открыть конструктор макета
             </button>
-            <p className="mt-2 text-xs text-neutral-600">Соберите макет прямо на кружке: изображения, текст, масштаб и поворот.</p>
-            {designerError && <p className="mt-2 text-xs text-red-600">{designerError}</p>}
+            <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Соберите макет прямо на кружке: изображения, текст, масштаб и поворот.</p>
+            {designerError && <p className="mt-2 text-xs text-red-600 dark:text-red-400">{designerError}</p>}
           </div>
-          {mugDesign && <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white p-4 sm:flex-row sm:items-center">
-            <img src={mugDesign.previewDataUrl} alt="Превью макета кружки" className="h-24 w-40 rounded-lg border border-neutral-200 object-cover" />
-            <div><p className="text-sm font-semibold text-neutral-900">Макет из конструктора</p><div className="mt-2 flex flex-wrap gap-2"><button type="button" onClick={openDesigner} className="text-xs font-semibold text-red-700 hover:underline">Редактировать</button><button type="button" onClick={() => setMugDesign(null)} className="text-xs font-semibold text-neutral-600 hover:underline">Удалить макет</button></div></div>
+          {mugDesign && <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white p-4 sm:flex-row sm:items-center dark:bg-neutral-900 dark:border-neutral-700">
+            {/* eslint-disable-next-line @next/next/no-img-element -- Local object URL generated by the customer designer. */}
+            <img src={mugDesign.previewDataUrl} alt="Превью макета кружки" className="h-24 w-40 rounded-lg border border-neutral-200 object-cover dark:border-neutral-700" />
+            <div><p className="text-sm font-semibold text-neutral-900 dark:text-neutral-200">Макет из конструктора</p><div className="mt-2 flex flex-wrap gap-2"><button type="button" onClick={openDesigner} className="text-xs font-semibold text-red-700 hover:underline">Редактировать</button><button type="button" onClick={() => setMugDesign(null)} className="text-xs font-semibold text-neutral-600 hover:underline dark:text-neutral-400">Удалить макет</button></div></div>
           </div>}
         </div>
 
@@ -384,7 +386,7 @@ export default function OrderMugsForm() {
             .
           </span>
         </label>
-        {errors.consent && <p className="-mt-3 text-xs text-red-600">{errors.consent}</p>}
+        {errors.consent && <p className="-mt-3 text-xs text-red-600 dark:text-red-400">{errors.consent}</p>}
 
         <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-4 dark:border-neutral-700/80 dark:bg-neutral-950/65 dark:text-neutral-200 sm:p-5">
           <button
@@ -398,7 +400,7 @@ export default function OrderMugsForm() {
           <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400">После отправки формы пришлём расчёт и свяжемся удобным способом.</p>
         </div>
 
-        {formError && <p className="text-sm text-red-600">{formError}</p>}
+        {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
         {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
       </form>
       {designerOpen ? (

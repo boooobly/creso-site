@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -24,7 +25,9 @@ export default function ServiceCard({
     >
       <div className="mb-3 overflow-hidden rounded-xl border border-neutral-200/80 transition-colors duration-300 group-hover:border-neutral-300 dark:border-neutral-800 dark:group-hover:border-neutral-700 md:mb-4">
         <div className="relative aspect-[16/7] w-full overflow-hidden rounded-xl sm:aspect-[16/6] md:aspect-[16/5]">
-          {imageSrc ? (
+          {imageSrc?.startsWith('/') && !imageSrc.startsWith('//') ? (
+            <Image src={imageSrc} alt={title} fill sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw" className="object-cover" />
+          ) : imageSrc ? (
             // eslint-disable-next-line @next/next/no-img-element -- Service card images should bypass Next optimization for better mobile reliability.
             <img
               src={imageSrc}
@@ -40,12 +43,12 @@ export default function ServiceCard({
       </div>
 
       {featured && (
-        <span className="mb-3 inline-flex w-fit rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 t-eyebrow text-[var(--brand-red)]">
+        <span className="mb-3 inline-flex w-fit rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 t-eyebrow text-[var(--brand-red-text)]">
           Основное направление
         </span>
       )}
       <div className="card-title-stack">
-        <h3 className={`t-h3 text-[1.2rem] leading-snug transition-colors group-hover:text-[var(--brand-red)] md:text-[clamp(1.25rem,2.1vw,1.5rem)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
+        <h3 className={`t-h3 text-[1.2rem] leading-snug transition-colors group-hover:text-[var(--brand-red-text)] md:text-[clamp(1.25rem,2.1vw,1.5rem)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
         <p className="t-caption inline-flex items-center gap-2 uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">
           <span className="card-dot" />
           Услуга

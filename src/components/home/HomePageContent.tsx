@@ -112,7 +112,7 @@ export default function HomePageContent({
 }: HomePageContentProps) {
   const shouldReduceMotion = useReducedMotion();
   const splitCtaClassName =
-    'inline-flex min-h-11 items-center rounded-xl border border-neutral-300 bg-white px-4 py-2 t-button text-neutral-700 no-underline transition-colors hover:border-neutral-400 hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-600';
+    'inline-flex min-h-11 items-center rounded-xl border border-neutral-300 bg-white px-4 py-2 t-button text-neutral-700 no-underline transition-colors hover:border-neutral-400 hover:text-[var(--brand-red-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-600';
 
   return (
     <div className="relative">
@@ -122,7 +122,7 @@ export default function HomePageContent({
           className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-50/40 to-transparent dark:hidden"
         />
         <div className="relative z-10 grid items-center gap-7 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-          <motion.div variants={fadeUp(20)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-6 md:space-y-8">
+          <motion.div variants={fadeUp(20)} initial={false} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="space-y-6 md:space-y-8">
             <div className="space-y-4 md:space-y-5">
               <p className="hero-eyebrow">
                 {heroEyebrow}
@@ -144,7 +144,7 @@ export default function HomePageContent({
               </motion.div>
             </div>
 
-            <motion.ul className="hero-chip-list max-w-none gap-2 xl:grid-cols-4" initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+            <motion.ul className="hero-chip-list max-w-none gap-2 xl:grid-cols-4" initial={false} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
               {heroTrustBadges.map((badge, index) => (
                 <BadgeChip key={`${badge.label}-${index}`} label={badge.label} index={index} variants={heroChipVariants} />
               ))}
@@ -153,7 +153,7 @@ export default function HomePageContent({
 
           <motion.div
             className="relative mx-auto w-full max-w-[36rem] lg:mr-0 lg:max-w-[42rem]"
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+            initial={false}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
             viewport={viewportOnce}
           >
@@ -167,6 +167,7 @@ export default function HomePageContent({
                 alt={heroImageAlt}
                 width={980}
                 height={760}
+                sizes="(max-width: 1023px) 100vw, 50vw"
                 priority
                 className="h-auto w-full object-contain drop-shadow-[0_30px_38px_rgba(15,23,42,0.24)]"
               />
@@ -180,7 +181,7 @@ export default function HomePageContent({
           <p className="t-eyebrow">{trustSectionEyebrow}</p>
           <h2 className="t-h2">{trustSectionTitle}</h2>
         </div>
-        <motion.ul className="grid-cards md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.ul className="grid-cards md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={false} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {trustFeatureCards.map((item, index) => {
             const Icon = trustIcons[index % trustIcons.length];
 
@@ -207,7 +208,7 @@ export default function HomePageContent({
           <h2 className="t-h2">Комплексные решения для рекламы и печати</h2>
           <p className="t-body text-muted-foreground max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
-        <motion.div className="grid-cards grid-cols-1 items-stretch md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="grid-cards grid-cols-1 items-stretch md:grid-cols-2 xl:grid-cols-3" variants={staggerContainer(0.09)} initial={false} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {services.map((s) => (
             <motion.div key={s.id} variants={fadeUp(16)} className="h-full">
               <ServiceCard title={s.title} desc={s.description} href={s.href} imageSrc={s.imageSrc ?? serviceImageById[s.id]} />
@@ -225,7 +226,7 @@ export default function HomePageContent({
           </div>
           <Link href="/portfolio" className={splitCtaClassName}>{portfolioLinkLabel}</Link>
         </div>
-        <motion.div className="grid-cards items-stretch md:grid-cols-3" variants={staggerContainer(0.1)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div className="grid-cards items-stretch md:grid-cols-3" variants={staggerContainer(0.1)} initial={false} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {featuredPortfolioItems.map((item) => (
             <motion.div key={item.id} variants={fadeUp(18)} transition={{ duration: 0.2 }} className="h-full">
               <FeatureCard title={item.title} description={item.description} imageSrc={item.imageSrc} />
@@ -240,7 +241,7 @@ export default function HomePageContent({
           <h2 className="t-h2">{processTitle}</h2>
           <p className="t-body text-muted-foreground max-w-2xl">{processDescription}</p>
         </div>
-        <motion.ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" variants={staggerContainer(0.08)} initial={false} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           {processSteps.map((step, index) => {
             const Icon = processIcons[index % processIcons.length];
 
@@ -270,13 +271,13 @@ export default function HomePageContent({
           </div>
           <Link href="/contacts" className={splitCtaClassName}>{faqLinkLabel}</Link>
         </div>
-        <motion.div variants={fadeUp(14)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="card p-4 dark:border-neutral-700/90 dark:bg-gradient-to-b dark:from-neutral-900 dark:to-neutral-900/90 sm:p-5 md:p-6">
+        <motion.div variants={fadeUp(14)} initial={false} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce} className="card p-4 dark:border-neutral-700/90 dark:bg-gradient-to-b dark:from-neutral-900 dark:to-neutral-900/90 sm:p-5 md:p-6">
           <FAQ items={faq.slice(0, 5)} />
         </motion.div>
       </Section>
 
       <Section id="lead-form" spacing="tight">
-        <motion.div data-floating-cta-hide className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 dark:border-neutral-700/90 dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_26px_58px_-36px_rgba(0,0,0,0.72)] sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={shouldReduceMotion ? false : 'hidden'} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
+        <motion.div data-floating-cta-hide className="card relative grid items-center gap-6 overflow-hidden rounded-[28px] border-neutral-200/90 bg-gradient-to-br from-white via-white to-neutral-50/80 p-5 dark:border-neutral-700/90 dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_26px_58px_-36px_rgba(0,0,0,0.72)] sm:p-7 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8" variants={fadeUp(16)} initial={false} whileInView={shouldReduceMotion ? undefined : 'show'} viewport={viewportOnce}>
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-20 top-1/2 z-0 h-[19rem] w-[25rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(212,28,28,0.16)_0%,rgba(212,28,28,0.07)_34%,rgba(212,28,28,0.02)_58%,transparent_76%)] blur-3xl"
@@ -294,7 +295,7 @@ export default function HomePageContent({
             <ul className="space-y-2">
               {leadPoints.map((point, index) => (
                 <li key={`${point.label}-${index}`} className="t-body flex items-start gap-2.5 text-neutral-700 dark:text-neutral-300">
-                  <CheckCircle2 className="mt-0.5 size-4 text-[var(--brand-red)]" />
+                  <CheckCircle2 className="mt-0.5 size-4 text-[var(--brand-red-text)]" />
                   <span>{point.label}</span>
                 </li>
               ))}

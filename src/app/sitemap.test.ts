@@ -8,7 +8,7 @@ afterEach(() => {
     if (snapshot[key] === undefined) {
       delete process.env[key];
     } else {
-      process.env[key] = snapshot[key];
+      vi.stubEnv(key, snapshot[key]);
     }
   }
   vi.resetModules();
@@ -16,7 +16,7 @@ afterEach(() => {
 
 describe('sitemap/robots base url', () => {
   it('uses PUBLIC_BASE_URL in production runtime/deploy', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'production';
     process.env.PUBLIC_BASE_URL = 'https://credomir.com';
 
@@ -31,7 +31,7 @@ describe('sitemap/robots base url', () => {
   });
 
   it('includes only indexable public routes and excludes redirects/private routes in sitemap', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'production';
     process.env.PUBLIC_BASE_URL = 'https://credomir.com';
 
@@ -39,6 +39,7 @@ describe('sitemap/robots base url', () => {
 
     const map = sitemap();
     const urls = map.map((entry) => entry.url);
+    expect(map.every((entry) => entry.lastModified === undefined)).toBe(true);
 
     expect(urls).not.toContain('https://credomir.com/blog');
     expect(urls).not.toContain('https://credomir.com/admin');
@@ -53,7 +54,7 @@ describe('sitemap/robots base url', () => {
   });
 
   it('adds explicit robots disallow rules for private routes', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'production';
     process.env.PUBLIC_BASE_URL = 'https://credomir.com';
 
@@ -74,7 +75,7 @@ describe('sitemap/robots base url', () => {
   });
 
   it('falls back to localhost in non-production contexts when PUBLIC_BASE_URL is missing', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'preview';
     delete process.env.PUBLIC_BASE_URL;
 
@@ -85,11 +86,12 @@ describe('sitemap/robots base url', () => {
     const robotsConfig = robots();
 
     expect(map[0]?.url).toBe('http://localhost:3000');
-    expect(robotsConfig.sitemap).toBe('http://localhost:3000/sitemap.xml');
+    expect(robotsConfig.rules).toEqual({ userAgent: '*', disallow: '/' });
+    expect(robotsConfig.sitemap).toBeUndefined();
   });
 
   it('never emits example.com in generated sitemap/robots URLs', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'preview';
     delete process.env.PUBLIC_BASE_URL;
 

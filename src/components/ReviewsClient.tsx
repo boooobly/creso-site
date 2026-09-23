@@ -47,11 +47,11 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-5">
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-4">
             <div className="rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-4 dark:border-neutral-700 dark:bg-neutral-800/60">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500">Средняя оценка</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500 dark:text-neutral-400">Средняя оценка</p>
               <p className="mt-2 text-2xl font-bold text-neutral-900 dark:text-neutral-100">{averageRating ? averageRating.toFixed(1) : '—'}</p>
             </div>
             <div className="rounded-xl border border-neutral-200/80 bg-neutral-50/70 p-4 dark:border-neutral-700 dark:bg-neutral-800/60">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500">Опубликовано</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500 dark:text-neutral-400">Опубликовано</p>
               <p className="mt-2 text-2xl font-bold text-neutral-900 dark:text-neutral-100">{reviews.length}</p>
             </div>
             <div className="rounded-xl border border-red-100 bg-red-50/65 p-4 dark:border-red-500/30 dark:bg-red-500/10">

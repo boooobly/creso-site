@@ -56,7 +56,7 @@ export default async function PrintPage() {
           }
         >
           <div className="space-y-4">
-            <HeroEyebrow className="w-fit rounded-full border border-[var(--brand-red)]/55 px-3 py-1 text-[var(--brand-red)]">
+            <HeroEyebrow className="w-fit rounded-full border border-[var(--brand-red)]/55 px-3 py-1 text-[var(--brand-red-text)]">
               Визитки и флаеры
             </HeroEyebrow>
             <HeroTitle className="max-w-[16ch] text-[1.9rem] leading-[1.08] md:text-5xl">Офсетные визитки для бизнеса</HeroTitle>

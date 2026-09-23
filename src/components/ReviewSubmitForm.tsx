@@ -1,5 +1,7 @@
 'use client';
 
+import PublicDialog from '@/components/ui/PublicDialog';
+
 import { FormEvent, useMemo, useState } from 'react';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
@@ -99,7 +101,7 @@ export default function ReviewSubmitForm({ onSubmitted }: ReviewSubmitFormProps)
       </button>
 
       {isOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6">
+        <PublicDialog label="Оставить отзыв" onClose={() => closeModal()} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6">
           <div className="card max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl p-6 md:p-8">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
@@ -108,7 +110,7 @@ export default function ReviewSubmitForm({ onSubmitted }: ReviewSubmitFormProps)
                   Все новые отзывы проходят модерацию перед публикацией.
                 </p>
               </div>
-              <button type="button" onClick={closeModal} className="rounded-lg px-2 py-1 text-sm text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800" disabled={isSubmitting}>
+              <button type="button" onClick={closeModal} aria-label="Закрыть отзыв" className="rounded-lg px-2 py-1 text-sm text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800" disabled={isSubmitting}>
                 ✕
               </button>
             </div>
@@ -178,7 +180,7 @@ export default function ReviewSubmitForm({ onSubmitted }: ReviewSubmitFormProps)
               ) : null}
             </form>
           </div>
-        </div>
+        </PublicDialog>
       ) : null}
     </>
   );

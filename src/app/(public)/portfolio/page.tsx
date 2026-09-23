@@ -75,7 +75,7 @@ export default async function PortfolioPage() {
   const heroContextChips = [
     `Кейсы по ${uniqueCategoriesCount || 1} направлениям`,
     `${items.length} опубликованных работ в открытом доступе`,
-    featuredItem ? 'Вверху страницы — выделенный кейс из админки' : 'Показываем свежие опубликованные кейсы без ручной витрины',
+    'Откройте работу, чтобы рассмотреть детали',
   ];
 
   return (
@@ -133,7 +133,7 @@ export default async function PortfolioPage() {
                     ))
                   ) : (
                     <div className="col-span-2 flex items-center justify-center rounded-xl border border-dashed border-neutral-300/80 bg-white/60 p-5 text-center text-sm leading-6 text-neutral-500 dark:border-neutral-700/80 dark:bg-neutral-900/70 dark:text-neutral-400">
-                      После публикации работ в админке здесь появится превью портфолио.
+                      Примеры работ скоро появятся. Свяжитесь с нами, чтобы обсудить ваш проект.
                     </div>
                   )}
                 </div>
@@ -177,7 +177,7 @@ export default async function PortfolioPage() {
               </div>
 
               <div className="flex flex-col justify-center gap-4 p-5 md:p-7 lg:p-8">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Выделенный кейс</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red-text)]">Выделенный кейс</p>
                 <div className="space-y-2">
                   <span className="inline-flex w-fit items-center rounded-full border border-red-200/70 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-200">
                     {featuredItem.category}

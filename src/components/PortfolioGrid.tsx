@@ -1,5 +1,7 @@
 'use client';
 
+import PublicDialog from '@/components/ui/PublicDialog';
+
 import { useEffect, useMemo, useState } from 'react';
 import type { PortfolioItem } from '@/types';
 import ProtectedImage from '@/components/ui/ProtectedImage';
@@ -140,7 +142,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                     <p className="line-clamp-3 text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-[0.95rem]">
                       {description || 'Описание проекта добавляется. Откройте карточку, чтобы посмотреть детали и изображения.'}
                     </p>
-                    <div className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">
+                    <div className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-red-text)]">
                       Смотреть проект
                     </div>
                   </div>
@@ -156,14 +158,10 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
       )}
 
       {activeItem ? (
-        <div
+        <PublicDialog label={`Просмотр проекта ${activeItem.title}`} onClose={() => setActiveProjectId(null)}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-[2px]"
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Просмотр проекта ${activeItem.title}`}
-          onClick={() => setActiveProjectId(null)}
         >
-          <div className="relative w-full max-w-6xl overflow-hidden rounded-2xl border border-neutral-200/30 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-950" onClick={(event) => event.stopPropagation()}>
+          <div className="relative max-h-[90dvh] w-full max-w-6xl overflow-y-auto rounded-2xl border border-neutral-200/30 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-950" onClick={(event) => event.stopPropagation()}>
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
               <div className="relative bg-neutral-950">
                 <ProtectedImage
@@ -171,7 +169,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                   alt={activeItem.title}
                   width={1600}
                   height={1100}
-                  className="h-full max-h-[72vh] w-full object-contain"
+                  className="max-h-[42dvh] w-full object-contain lg:h-full lg:max-h-[72vh]"
                   priority
                 />
               </div>
@@ -232,7 +230,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
               </aside>
             </div>
           </div>
-        </div>
+        </PublicDialog>
       ) : null}
     </div>
   );

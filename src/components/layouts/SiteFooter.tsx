@@ -47,9 +47,9 @@ export default async function SiteFooter() {
             <div className="grid gap-2 sm:grid-cols-2">
               <a
                 href={`tel:${settings.phoneHref}`}
-                className="group min-h-11 rounded-xl border border-[color:var(--brand-red)]/35 bg-white px-3.5 py-2.5 text-sm font-semibold text-neutral-800 no-underline shadow-[0_8px_18px_-18px_rgba(212,28,28,0.9)] transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-[color:var(--brand-red)]/45 dark:bg-neutral-900 dark:text-neutral-100"
+                className="group min-h-11 rounded-xl border border-[color:var(--brand-red)]/35 bg-white px-3.5 py-2.5 text-sm font-semibold text-neutral-800 no-underline shadow-[0_8px_18px_-18px_rgba(212,28,28,0.9)] transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red-text)] dark:border-[color:var(--brand-red)]/45 dark:bg-neutral-900 dark:text-neutral-100"
               >
-                <span className="block text-[11px] uppercase tracking-[0.09em] text-[var(--brand-red)]/85 transition-colors group-hover:text-[var(--brand-red)] dark:text-[var(--brand-red)]/80">
+                <span className="block text-[11px] uppercase tracking-[0.09em] text-[var(--brand-red-text)]/85 transition-colors group-hover:text-[var(--brand-red-text)] dark:text-[var(--brand-red-text)]/80">
                   Телефон
                 </span>
                 <span className="text-wrap-safe mt-0.5 block">{settings.phone}</span>
@@ -58,9 +58,9 @@ export default async function SiteFooter() {
                 href={whatsappHref}
                 target="_blank"
                 rel="noreferrer"
-                className="group min-h-11 rounded-xl border border-[color:var(--brand-red)]/35 bg-white px-3.5 py-2.5 text-sm font-semibold text-neutral-800 no-underline shadow-[0_8px_18px_-18px_rgba(212,28,28,0.9)] transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red)] dark:border-[color:var(--brand-red)]/45 dark:bg-neutral-900 dark:text-neutral-100"
+                className="group min-h-11 rounded-xl border border-[color:var(--brand-red)]/35 bg-white px-3.5 py-2.5 text-sm font-semibold text-neutral-800 no-underline shadow-[0_8px_18px_-18px_rgba(212,28,28,0.9)] transition-colors hover:border-[color:var(--brand-red)] hover:text-[var(--brand-red-text)] dark:border-[color:var(--brand-red)]/45 dark:bg-neutral-900 dark:text-neutral-100"
               >
-                <span className="block text-[11px] uppercase tracking-[0.09em] text-[var(--brand-red)]/85 transition-colors group-hover:text-[var(--brand-red)] dark:text-[var(--brand-red)]/80">
+                <span className="block text-[11px] uppercase tracking-[0.09em] text-[var(--brand-red-text)]/85 transition-colors group-hover:text-[var(--brand-red-text)] dark:text-[var(--brand-red-text)]/80">
                   WhatsApp
                 </span>
                 <span className="text-wrap-safe mt-0.5 block">{settings.whatsapp}</span>
@@ -69,18 +69,18 @@ export default async function SiteFooter() {
                 href={telegramHref}
                 target="_blank"
                 rel="noreferrer"
-                className="group min-h-11 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-[color:var(--brand-red)]/60 hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
+                className="group min-h-11 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-[color:var(--brand-red)]/60 hover:text-[var(--brand-red-text)] dark:border-neutral-700 dark:bg-neutral-900"
               >
-                <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red)]/90 dark:text-neutral-400">
+                <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red-text)]/90 dark:text-neutral-400">
                   Telegram
                 </span>
                 <span className="text-wrap-safe mt-0.5 block">{settings.telegram}</span>
               </a>
               <a
                 href={`mailto:${settings.email}`}
-                className="group min-h-11 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-[color:var(--brand-red)]/60 hover:text-[var(--brand-red)] dark:border-neutral-700 dark:bg-neutral-900"
+                className="group min-h-11 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-[color:var(--brand-red)]/60 hover:text-[var(--brand-red-text)] dark:border-neutral-700 dark:bg-neutral-900"
               >
-                <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red)]/90 dark:text-neutral-400">
+                <span className="block text-[11px] uppercase tracking-[0.09em] text-neutral-500 transition-colors group-hover:text-[var(--brand-red-text)]/90 dark:text-neutral-400">
                   Email
                 </span>
                 <span className="text-wrap-safe mt-0.5 block">{settings.email}</span>
@@ -101,7 +101,7 @@ export default async function SiteFooter() {
               {settings.vkLink ? (
                 <p className="t-small text-neutral-600 dark:text-neutral-400">
                   VK:{' '}
-                  <a className="font-medium text-neutral-800 underline decoration-neutral-400/80 transition-colors hover:text-[var(--brand-red)] dark:text-neutral-200" href={settings.vkLink} target="_blank" rel="noreferrer">
+                  <a className="font-medium text-neutral-800 underline decoration-neutral-400/80 transition-colors hover:text-[var(--brand-red-text)] dark:text-neutral-200" href={settings.vkLink} target="_blank" rel="noreferrer">
                     Официальная страница
                   </a>
                 </p>
@@ -126,7 +126,7 @@ export default async function SiteFooter() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-wrap-safe min-h-11 rounded-md px-2 py-2 leading-5 no-underline transition-colors hover:bg-white hover:text-[var(--brand-red)] dark:hover:bg-neutral-900 dark:hover:text-red-300"
+                  className="text-wrap-safe min-h-11 rounded-md px-2 py-2 leading-5 no-underline transition-colors hover:bg-white hover:text-[var(--brand-red-text)] dark:hover:bg-neutral-900 dark:hover:text-red-300"
                 >
                   {item.label}
                 </Link>
@@ -137,7 +137,7 @@ export default async function SiteFooter() {
 
         <div className="mt-6 flex flex-col gap-2.5 border-t border-neutral-200/90 pt-4 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400 md:flex-row md:items-center md:justify-between">
           <p className="text-wrap-safe leading-5">{settings.footerText}</p>
-          <Link href="/privacy" className="w-fit font-medium no-underline transition-colors hover:text-[var(--brand-red)] dark:hover:text-red-300">
+          <Link href="/privacy" className="w-fit font-medium no-underline transition-colors hover:text-[var(--brand-red-text)] dark:hover:text-red-300">
             Политика конфиденциальности
           </Link>
         </div>

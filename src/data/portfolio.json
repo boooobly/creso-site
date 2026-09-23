@@ -1,20 +1,23 @@
 [
   {
-    "id": "p1",
-    "title": "Световой короб для кафе",
-    "image": "/og-image.png",
-    "category": "outdoor"
+    "id": "som",
+    "title": "Рекламная стела для СОМ",
+    "image": "/images/home_page/examples_of_work/som.png",
+    "category": "Наружная реклама",
+    "shortDescription": "Многоуровневая рекламная конструкция с яркими рекламными блоками для сети строительных материалов."
   },
   {
-    "id": "p2",
-    "title": "Баннер для акции",
-    "image": "/og-image.png",
-    "category": "print"
+    "id": "nevinnomyssk",
+    "title": "Въездная стела Невинномысск",
+    "image": "/images/home_page/examples_of_work/nevinnomyssk.png",
+    "category": "Наружная реклама",
+    "shortDescription": "Крупная городская конструкция с объемными элементами и чистой современной подачей."
   },
   {
-    "id": "p3",
-    "title": "Оформление картины в багет",
-    "image": "/og-image.png",
-    "category": "baget"
+    "id": "apple-time",
+    "title": "Световой лайтбокс Apple Time",
+    "image": "/images/home_page/examples_of_work/apple.png",
+    "category": "Световые короба",
+    "shortDescription": "Подвесной световой короб для торговой точки."
   }
 ]

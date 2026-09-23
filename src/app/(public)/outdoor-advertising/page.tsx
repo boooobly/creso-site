@@ -226,7 +226,7 @@ export default async function OutdoorAdvertisingPage() {
           }
         >
           <div className="space-y-4.5 md:space-y-5">
-            <HeroEyebrow className="w-fit rounded-full border border-[var(--brand-red)]/55 px-3 py-1 text-[var(--brand-red)]">
+            <HeroEyebrow className="w-fit rounded-full border border-[var(--brand-red)]/55 px-3 py-1 text-[var(--brand-red-text)]">
               Наружная реклама
             </HeroEyebrow>
             <HeroTitle className="max-w-[15ch] text-3xl leading-[1.06] md:text-5xl">{heroTitle}</HeroTitle>
@@ -345,7 +345,7 @@ export default async function OutdoorAdvertisingPage() {
           <ol className="grid-cards md:grid-cols-2">
             {fullCycleItems.map((item, index) => (
               <li key={item.title} className="card-info card-interactive list-none p-5 md:p-6">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Этап {index + 1}</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red-text)]">Этап {index + 1}</p>
                 <p className="t-h4 !text-base">{item.title}</p>
                 <p className="t-body mt-2">{item.description}</p>
               </li>
@@ -365,7 +365,7 @@ export default async function OutdoorAdvertisingPage() {
               {steps.map((step, index) => (
                 <RevealOnScroll key={step.title} className={stepRevealDelays[index]}>
                   <article className="card-info card-interactive h-full p-5 md:p-6">
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red)]">Шаг {index + 1}</p>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red-text)]">Шаг {index + 1}</p>
                     <p className="t-h4 !text-base">{step.title}</p>
                     <p className="t-body mt-2">{step.detail}</p>
                   </article>

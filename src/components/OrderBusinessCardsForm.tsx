@@ -198,7 +198,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
     <div id="business-cards-form" className={publicFormStyles.shell}>
       <div className={publicFormStyles.heading}>
         <h2 className="text-2xl font-bold">Отправить заявку</h2>
-        <p className="mt-1.5 text-sm leading-6 text-neutral-600">Оставьте контакты и макет — мы свяжемся для подтверждения заказа.</p>
+        <p className="mt-1.5 text-sm leading-6 text-neutral-600 dark:text-neutral-300">Оставьте контакты и макет — мы свяжемся для подтверждения заказа.</p>
       </div>
 
       <form className={`${publicFormStyles.fieldsStack} mt-5`} onSubmit={handleSubmit} noValidate>
@@ -304,7 +304,7 @@ export default function OrderBusinessCardsForm({ summary }: Props) {
             Я согласен с <Link href="/privacy" className="underline underline-offset-2">политикой обработки персональных данных</Link>.
           </span>
         </label>
-        {errors.consent && <p className="-mt-3 text-xs text-red-600">{errors.consent}</p>}
+        {errors.consent && <p className="-mt-3 text-xs text-red-600 dark:text-red-400">{errors.consent}</p>}
 
         <div className="pt-1 flex flex-col gap-3 md:flex-row md:items-center">
           <button

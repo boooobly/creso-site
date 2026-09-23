@@ -1,5 +1,7 @@
 'use client';
 
+import PublicDialog from '@/components/ui/PublicDialog';
+
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -147,26 +149,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       ignore = true;
     };
   }, []);
-  useEffect(() => {
-    if (!isRequirementsOpen) return;
-
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    closeButtonRef.current?.focus();
-
-    const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsRequirementsOpen(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleEsc);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', handleEsc);
-    };
-  }, [isRequirementsOpen]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -352,7 +334,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                     <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
                       <step.icon size={17} strokeWidth={1.9} aria-hidden="true" />
                     </span>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600 dark:text-neutral-400">Шаг {index + 1}</p>
                   </div>
                   <h3 className="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
@@ -372,7 +354,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
 
               <div className="mt-5 rounded-[1.75rem] border border-neutral-200/90 bg-neutral-50/70 p-2 dark:border-neutral-800 dark:bg-neutral-900/50">
-                <div className="flex items-center justify-between px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400 md:px-4">
+                <div className="flex items-center justify-between px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-600 dark:text-neutral-400 md:px-4">
                   <span>Услуга</span>
                   <span>Стоимость</span>
                 </div>
@@ -391,7 +373,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                       >
                         <div>
                           <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 md:text-[15px]">{item.label}</p>
-                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{isMinimum ? 'Порог для небольших заказов и пробных запусков.' : 'Ориентир для типовых задач; точную сумму подтверждаем после просмотра макета.'}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">{isMinimum ? 'Порог для небольших заказов и пробных запусков.' : 'Ориентир для типовых задач; точную сумму подтверждаем после просмотра макета.'}</p>
                         </div>
                         <span className={`rounded-full px-3 py-1.5 text-right text-sm font-semibold md:text-[15px] ${isMinimum ? 'bg-white text-red-700 dark:bg-neutral-950 dark:text-red-300' : 'bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100'}`}>{item.value}</span>
                       </div>
@@ -428,7 +410,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                     <h2 className="mt-3 text-2xl font-semibold">Что влияет на цену</h2>
                     <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-[15px]">Цена меняется от сложности реза и объёма ручной доработки. Вот что влияет на смету в первую очередь.</p>
                   </div>
-                  <p className="max-w-[220px] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">По этим пунктам можно заранее понять, почему одинаковая площадь может стоить по-разному.</p>
+                  <p className="max-w-[220px] text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">По этим пунктам можно заранее понять, почему одинаковая площадь может стоить по-разному.</p>
                 </div>
 
                 <ul className="mt-5 grid gap-3 md:grid-cols-2">
@@ -445,7 +427,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                         </span>
                         <div>
                           <p className="text-sm font-medium capitalize text-neutral-900 dark:text-neutral-100 md:text-[15px]">{factor.label}</p>
-                          <p className="mt-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{index % 2 === 0 ? 'Чем сложнее этот параметр, тем больше времени уходит на резку и подготовку.' : 'Этот параметр добавляет ручные операции, поэтому итоговая стоимость выше.'}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">{index % 2 === 0 ? 'Чем сложнее этот параметр, тем больше времени уходит на резку и подготовку.' : 'Этот параметр добавляет ручные операции, поэтому итоговая стоимость выше.'}</p>
                         </div>
                       </div>
                     </li>
@@ -508,7 +490,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   onChange={(event) => setName(event.target.value)}
                   className={`${publicFormStyles.inputBase} px-3.5`}
                 />
-                {nameError && <p className="text-sm text-red-600">{nameError}</p>}
+                {nameError && <p className="text-sm text-red-600 dark:text-red-400">{nameError}</p>}
               </div>
 
               <div className="space-y-1.5">
@@ -520,7 +502,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   onChange={setPhone}
                   placeholder="+7 (___) ___-__-__"
                 />
-                {phoneError && <p className="text-sm text-red-600">{phoneError}</p>}
+                {phoneError && <p className="text-sm text-red-600 dark:text-red-400">{phoneError}</p>}
               </div>
             </div>
 
@@ -585,7 +567,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   .
                 </span>
               </label>
-              {privacyConsentError && <p className="text-xs text-red-600">{privacyConsentError}</p>}
+              {privacyConsentError && <p className="text-xs text-red-600 dark:text-red-400">{privacyConsentError}</p>}
             </div>
 
             {files.length > 0 && (
@@ -602,23 +584,15 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                 {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
               </button>
             </div>
-            {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+            {submitError && <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>}
             {submitSuccess && <p className="text-sm text-emerald-600 dark:text-emerald-400">{submitSuccess}</p>}
           </form>
         </div>
       </Section>
 
-      <div
-        className={`fixed inset-0 z-50 flex items-center justify-center px-4 transition-all duration-200 motion-reduce:transition-none ${
-          isRequirementsOpen ? 'pointer-events-auto bg-black/50 opacity-100' : 'pointer-events-none bg-black/0 opacity-0'
-        }`}
-        onClick={() => setIsRequirementsOpen(false)}
-        aria-hidden={!isRequirementsOpen}
-      >
+      {isRequirementsOpen ? <PublicDialog label="Требования к макету" onClose={() => setIsRequirementsOpen(false)}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
         <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="plotter-requirements-title"
           className={`w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white p-6 transition-all duration-200 dark:border-neutral-800 dark:bg-neutral-900 motion-reduce:transition-none ${
             isRequirementsOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
           }`}
@@ -644,7 +618,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
             <li><span className="font-semibold">Вылеты:</span> заложите вылеты 2–3 мм и безопасную зону от линии реза не менее 2 мм.</li>
           </ul>
         </div>
-      </div>
+      </PublicDialog> : null}
     </div>
   );
 }

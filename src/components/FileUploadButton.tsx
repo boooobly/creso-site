@@ -30,8 +30,9 @@ export default function FileUploadButton({
         id={inputId}
         ref={inputRef}
         type="file"
+        aria-label="Прикрепить макет"
         accept={accept}
-        className="sr-only"
+        className="hidden"
         onChange={(event) => onChange(event.target.files?.[0] ?? null)}
       />
 

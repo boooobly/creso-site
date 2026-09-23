@@ -224,13 +224,13 @@ export default function OrderMillingForm() {
           <label className="space-y-2">
             <span className="text-sm font-medium">Имя *</span>
             <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-            {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+            {errors.name && <span className="text-xs text-red-600 dark:text-red-400">{errors.name}</span>}
           </label>
 
           <label className="space-y-2">
             <span className="text-sm font-medium">Телефон *</span>
             <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
-            {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
+            {errors.phone && <span className="text-xs text-red-600 dark:text-red-400">{errors.phone}</span>}
           </label>
         </div>
 
@@ -241,7 +241,7 @@ export default function OrderMillingForm() {
               <button
                 type="button"
                 onClick={handleViewPrices}
-                className="text-xs font-medium text-red-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+                className="text-xs font-medium text-red-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:text-red-400"
               >
                 Посмотреть цены
               </button>
@@ -251,7 +251,7 @@ export default function OrderMillingForm() {
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
-            {errors.material && <span className="text-xs text-red-600">{errors.material}</span>}
+            {errors.material && <span className="text-xs text-red-600 dark:text-red-400">{errors.material}</span>}
           </label>
 
           <label className="space-y-2">
@@ -262,7 +262,7 @@ export default function OrderMillingForm() {
                 <option key={option} value={option}>{option}</option>
               ))}
             </select>
-            {errors.thickness && <span className="text-xs text-red-600">{errors.thickness}</span>}
+            {errors.thickness && <span className="text-xs text-red-600 dark:text-red-400">{errors.thickness}</span>}
           </label>
         </div>
 
@@ -298,13 +298,13 @@ export default function OrderMillingForm() {
             helperTextClassName="mt-1 text-xs text-muted-foreground"
             icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
           />
-          {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
+          {errors.file && <p className="text-xs text-red-600 dark:text-red-400">{errors.file}</p>}
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <p className="text-neutral-500 dark:text-neutral-400">Макет не обязателен - можно отправить заявку без файла.</p>
             <button
               type="button"
               onClick={() => setIsRequirementsOpen(true)}
-              className="font-medium text-red-600 underline underline-offset-2 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+              className="font-medium text-red-600 underline underline-offset-2 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:text-red-400 dark:hover:text-red-300"
             >
               Требования к макету
             </button>
@@ -325,13 +325,13 @@ export default function OrderMillingForm() {
               Я согласен с{' '}
               <a
                 href="/privacy"
-                className="text-red-600 underline underline-offset-2 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+                className="text-red-600 underline underline-offset-2 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:text-red-400 dark:hover:text-red-300"
               >
                 политикой обработки персональных данных
               </a>
             </span>
           </label>
-          {errors.privacyConsent && <p className="mt-2 text-xs text-red-600">{errors.privacyConsent}</p>}
+          {errors.privacyConsent && <p className="mt-2 text-xs text-red-600 dark:text-red-400">{errors.privacyConsent}</p>}
         </div>
 
         <div className={publicFormStyles.actionRow}>
@@ -344,7 +344,7 @@ export default function OrderMillingForm() {
           </button>
 
           <div className="space-y-1">
-            {formError && <p className="text-sm text-red-600">{formError}</p>}
+            {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
             {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
           </div>
         </div>

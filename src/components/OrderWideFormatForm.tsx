@@ -226,9 +226,9 @@ export default function OrderWideFormatForm() {
   return (
     <div id="wide-format-form" data-floating-cta-hide className={`${publicFormStyles.shell} border-neutral-200/85 p-4 transition-all duration-300 sm:p-5 md:p-8 ${isScrollHighlighted ? 'highlight-on-scroll' : ''}`.trim()}>
       <div className={`${publicFormStyles.heading} space-y-2 border-b border-neutral-200/80 pb-5`}>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Заявка</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red-text)]">Заявка</p>
         <h2 id="wide-format-form-title" className="text-2xl font-semibold tracking-tight">Рассчитать стоимость</h2>
-        <p className="text-sm leading-6 text-neutral-600">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
+        <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300">Оставьте контактные данные и параметры макета — подготовим расчёт.</p>
       </div>
 
       <form className={`${publicFormStyles.fieldsStack} mt-5 md:mt-6`} onSubmit={handleSubmit} noValidate>
@@ -237,7 +237,7 @@ export default function OrderWideFormatForm() {
             <label className="space-y-2">
               <span className="text-sm font-medium">Имя *</span>
               <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-              {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+              {errors.name && <span className="text-xs text-red-600 dark:text-red-400">{errors.name}</span>}
             </label>
 
             <label className="space-y-2">
@@ -248,13 +248,13 @@ export default function OrderWideFormatForm() {
                 placeholder="+7 (___) ___-__-__"
                 className={inputClass('phone')}
               />
-              {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
+              {errors.phone && <span className="text-xs text-red-600 dark:text-red-400">{errors.phone}</span>}
             </label>
 
             <label className="space-y-2">
               <span className="text-sm font-medium">Email</span>
               <input className={inputClass('email')} type="email" value={values.email} onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))} />
-              {errors.email && <span className="text-xs text-red-600">{errors.email}</span>}
+              {errors.email && <span className="text-xs text-red-600 dark:text-red-400">{errors.email}</span>}
             </label>
           </div>
 
@@ -289,13 +289,13 @@ export default function OrderWideFormatForm() {
           <label className="space-y-2">
             <span className="text-sm font-medium">Ширина (мм)</span>
             <input className={inputClass('width')} inputMode="numeric" value={values.width} onChange={(e) => setValues((prev) => ({ ...prev, width: e.target.value }))} />
-            {errors.width && <span className="text-xs text-red-600">{errors.width}</span>}
+            {errors.width && <span className="text-xs text-red-600 dark:text-red-400">{errors.width}</span>}
           </label>
 
           <label className="space-y-2">
             <span className="text-sm font-medium">Высота (мм)</span>
             <input className={inputClass('height')} inputMode="numeric" value={values.height} onChange={(e) => setValues((prev) => ({ ...prev, height: e.target.value }))} />
-            {errors.height && <span className="text-xs text-red-600">{errors.height}</span>}
+            {errors.height && <span className="text-xs text-red-600 dark:text-red-400">{errors.height}</span>}
           </label>
 
           <label className="space-y-2">
@@ -337,7 +337,7 @@ export default function OrderWideFormatForm() {
             </Link>
           </span>
         </label>
-        {errors.privacyConsent && <p className="-mt-3 text-xs text-red-600">{errors.privacyConsent}</p>}
+        {errors.privacyConsent && <p className="-mt-3 text-xs text-red-600 dark:text-red-400">{errors.privacyConsent}</p>}
 
         <div className={publicFormStyles.actionRow}>
           <p className="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
@@ -352,7 +352,7 @@ export default function OrderWideFormatForm() {
           </button>
         </div>
 
-        {formError && <p className="text-sm text-red-600">{formError}</p>}
+        {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
         {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
       </form>
     </div>

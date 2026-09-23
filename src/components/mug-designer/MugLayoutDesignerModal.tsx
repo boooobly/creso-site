@@ -1,5 +1,7 @@
 'use client';
 
+import PublicDialog from '@/components/ui/PublicDialog';
+
 import { ChangeEvent, Component, useCallback, useEffect, useRef, useState } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import dynamic from 'next/dynamic';
@@ -139,14 +141,6 @@ export default function MugLayoutDesignerModal({ open, initialValue, onClose, on
     setBaseImageError(false);
   }, [open, initialValue]);
 
-  useEffect(() => {
-    if (!open) return;
-    const old = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = old;
-    };
-  }, [open]);
 
   const patch = useCallback(
     (id: string, value: Partial<MugDesignerLayer>) =>
@@ -221,10 +215,6 @@ export default function MugLayoutDesignerModal({ open, initialValue, onClose, on
     if (!open) return;
 
     const key = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-        return;
-      }
 
       if (!selected || isTypingTarget(event.target)) return;
 
@@ -358,7 +348,7 @@ export default function MugLayoutDesignerModal({ open, initialValue, onClose, on
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-neutral-950/70 p-2 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="mug-designer-title">
+    <PublicDialog label="Конструктор макета кружки" onClose={onClose} className="fixed inset-0 z-[100] overflow-y-auto bg-neutral-950/70 p-2 text-neutral-900 sm:p-4">
       <div className="mx-auto flex min-h-full max-w-[1600px] items-center">
         <div className="w-full rounded-3xl bg-neutral-50 p-3 shadow-2xl sm:p-5">
           <div className="flex items-start justify-between gap-4">
@@ -416,7 +406,7 @@ export default function MugLayoutDesignerModal({ open, initialValue, onClose, on
                     Показать направляющие
                   </label>
                 </div>
-                {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+                {error && <p className="mt-2 text-xs text-red-600 dark:text-red-400">{error}</p>}
               </section>
 
               <section className="rounded-2xl border border-neutral-200 bg-white p-3">
@@ -584,6 +574,6 @@ export default function MugLayoutDesignerModal({ open, initialValue, onClose, on
           </div>
         </div>
       </div>
-    </div>
+    </PublicDialog>
   );
 }

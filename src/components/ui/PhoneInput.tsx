@@ -1,8 +1,8 @@
 'use client';
 
-import { ChangeEvent } from 'react';
+import { ChangeEvent, type AriaAttributes } from 'react';
 
-type PhoneInputProps = {
+type PhoneInputProps = AriaAttributes & {
   value: string;
   onChange: (value: string) => void;
   name?: string;
@@ -56,6 +56,7 @@ export default function PhoneInput({
   className,
   disabled,
   onBlur,
+  ...ariaProps
 }: PhoneInputProps) {
   const digits = getPhoneDigits(value);
   const formattedValue = formatRuPhone(digits);
@@ -75,6 +76,7 @@ export default function PhoneInput({
   return (
     <div className="w-full space-y-1">
       <input
+        {...ariaProps}
         type="tel"
         inputMode="numeric"
         autoComplete="tel"

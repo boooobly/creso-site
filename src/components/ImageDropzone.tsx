@@ -94,8 +94,9 @@ export default function ImageDropzone({
       <input
         ref={fileInputRef}
         type="file"
+        aria-label={title}
         accept={accept}
-        className="sr-only"
+        className="hidden"
         onChange={(event) => validateAndSetFile(event.target.files?.[0] ?? null)}
       />
 
@@ -140,7 +141,7 @@ export default function ImageDropzone({
       )}
 
       <p className={`text-wrap-safe ${helperTextClassName}`.trim()}>{helperText}</p>
-      {error && <p className="text-wrap-safe mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="text-wrap-safe mt-2 text-xs text-red-600 dark:text-red-400">{error}</p>}
     </div>
   );
 }

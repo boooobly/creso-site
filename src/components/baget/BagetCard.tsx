@@ -1,5 +1,7 @@
 'use client';
 
+import PublicDialog from '@/components/ui/PublicDialog';
+
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { X, ZoomIn } from 'lucide-react';
 
@@ -50,24 +52,6 @@ function BagetCardBase({ item, selected, onSelect, eager = false }: BagetCardPro
     setPreviewImageIndex(0);
   }, [item.id, imageCandidates]);
 
-  useEffect(() => {
-    if (!isImagePreviewOpen) return;
-
-    const onEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsImagePreviewOpen(false);
-      }
-    };
-
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onEsc);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', onEsc);
-    };
-  }, [isImagePreviewOpen]);
 
   const thumbnailImage = imageCandidates[Math.min(thumbnailImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
   const previewImage = imageCandidates[Math.min(previewImageIndex, imageCandidates.length - 1)] ?? BAGET_PLACEHOLDER_IMAGE;
@@ -154,17 +138,8 @@ function BagetCardBase({ item, selected, onSelect, eager = false }: BagetCardPro
       </article>
 
       {isImagePreviewOpen ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]"
-          onClick={(event) => {
-            if (event.target === event.currentTarget) {
-              setIsImagePreviewOpen(false);
-            }
-          }}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Увеличенное изображение багета ${item.name}`}
-        >
+        <PublicDialog label={`Увеличенное изображение багета ${item.name}`} onClose={() => setIsImagePreviewOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
           <div className="relative w-full max-w-3xl rounded-2xl border border-neutral-200 bg-white p-3 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900 sm:p-4">
             <button
               type="button"
@@ -186,7 +161,7 @@ function BagetCardBase({ item, selected, onSelect, eager = false }: BagetCardPro
               />
             </div>
           </div>
-        </div>
+        </PublicDialog>
       ) : null}
     </>
   );

@@ -101,7 +101,7 @@ export default async function WideFormatPrintingPage() {
           <HeroMediaPanel className="hidden h-full flex-col border-neutral-200/90 bg-neutral-100/90 p-3.5 shadow-[0_10px_26px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm dark:border-neutral-800/90 dark:bg-neutral-900/90 dark:shadow-none md:p-5 lg:flex">
             <div className="flex items-start justify-between gap-3 border-b border-neutral-200/70 pb-3.5 dark:border-neutral-800/80">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Производственный профиль</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red-text)]">Производственный профиль</p>
               </div>
               <div className="public-icon-badge">
                 <Droplets size={18} strokeWidth={1.9} aria-hidden="true" />
@@ -155,7 +155,7 @@ export default async function WideFormatPrintingPage() {
                 Подскажем по материалам, постобработке и требованиям к файлу перед печатью.
               </p>
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400 dark:text-neutral-500">Подходит для</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-600 dark:text-neutral-400">Подходит для</p>
                 <span className="h-px flex-1 bg-neutral-200/80 dark:bg-neutral-800/80" aria-hidden="true" />
               </div>
               <HeroChipList className="max-w-[34rem] gap-1.5 sm:gap-2">
@@ -200,7 +200,7 @@ export default async function WideFormatPrintingPage() {
               Отправить параметры
             </Link>
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400 dark:text-neutral-500">Подходит для</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-600 dark:text-neutral-400">Подходит для</p>
               <span className="h-px flex-1 bg-neutral-200/80 dark:bg-neutral-800/80" aria-hidden="true" />
             </div>
             <HeroChipList className="max-w-none gap-1.5">
@@ -215,7 +215,7 @@ export default async function WideFormatPrintingPage() {
 
           <section className="rounded-2xl border border-neutral-200/80 bg-white/70 p-3.5 dark:border-neutral-800/85 dark:bg-neutral-900/65">
             <div className="mb-2.5 flex items-center justify-between gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--brand-red)]">Производственный профиль</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--brand-red-text)]">Производственный профиль</p>
               <span className="public-icon-badge-sm">
                 <Droplets size={14} strokeWidth={2} aria-hidden="true" />
               </span>
@@ -227,7 +227,7 @@ export default async function WideFormatPrintingPage() {
                 return (
                   <article key={item.title} className="rounded-xl border border-neutral-200/80 bg-white/80 p-2.5 dark:border-neutral-800/90 dark:bg-neutral-900/70">
                     <div className="mb-1.5 flex items-center gap-1.5">
-                      <Icon size={14} strokeWidth={2} className="text-[var(--brand-red)]" aria-hidden="true" />
+                      <Icon size={14} strokeWidth={2} className="text-[var(--brand-red-text)]" aria-hidden="true" />
                       <h3 className="text-[11px] font-semibold leading-4 text-neutral-900 dark:text-neutral-100">{item.title}</h3>
                     </div>
                     <p className="text-[10px] leading-4 text-neutral-600 dark:text-neutral-300">{item.description}</p>
@@ -265,7 +265,7 @@ export default async function WideFormatPrintingPage() {
           <div className="cta-shell card border-neutral-200/85">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="max-w-2xl space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">Связанная услуга</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red-text)]">Связанная услуга</p>
                 <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">{ctaTitle}</h2>
                 <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">{ctaDescription}</p>
                 <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
