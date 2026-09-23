@@ -7,7 +7,7 @@ import { WIDE_FORMAT_PRICING_FALLBACK_CONFIG } from '@/lib/wide-format/wideForma
 import { HEAT_TRANSFER_PRICING_FALLBACK_CONFIG } from '@/lib/heat-transfer/heatTransferPricing';
 import { PLOTTER_CUTTING_PRICING_FALLBACK_CONFIG } from '@/lib/plotter-cutting/plotterCuttingPricing';
 
-const sendMailMock = vi.fn(async () => ({}));
+const sendMailMock = vi.fn(async (_mail: { text: string }) => ({}));
 
 const { orderCreateMock, resetOrderSeq } = vi.hoisted(() => {
   let orderSeq = 1;

@@ -37,7 +37,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 0,
-      loadLatestBagetPageLoadDiagnostics: async () => null,
+      loadBagetCatalogSnapshotStatus: async () => null,
     });
 
     const database = health.items.find((item) => item.key === 'database');
@@ -64,7 +64,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 12,
-      loadLatestBagetPageLoadDiagnostics: async () => null,
+      loadBagetCatalogSnapshotStatus: async () => null,
     });
 
     expect(health.items.find((item) => item.key === 'smtp')?.status).toBe('ok');
@@ -81,7 +81,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 4,
-      loadLatestBagetPageLoadDiagnostics: async () => null,
+      loadBagetCatalogSnapshotStatus: async () => null,
     });
 
     expect(health.items.find((item) => item.key === 'admin_auth')?.status).toBe('error');
@@ -100,7 +100,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 1,
-      loadLatestBagetPageLoadDiagnostics: async () => null,
+      loadBagetCatalogSnapshotStatus: async () => null,
     });
 
     const combined = health.items.map((item) => `${item.summary} ${item.details}`).join(' ');
@@ -119,7 +119,7 @@ describe('getAdminSystemHealth', () => {
       }),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 0,
-      loadLatestBagetPageLoadDiagnostics: async () => null,
+      loadBagetCatalogSnapshotStatus: async () => null,
     });
 
     const database = health.items.find((item) => item.key === 'database');
@@ -136,17 +136,6 @@ describe('getAdminSystemHealth', () => {
       env: buildBaseEnv(),
       checkDbConnection: async () => true,
       loadPricingEntryCount: async () => 5,
-      loadLatestBagetPageLoadDiagnostics: async () => ({
-        totalDurationMs: 3400,
-        loadPublicBagetCatalogMs: 120,
-        getPageContentMapMs: 2800,
-        getBaguetteExtrasPricingConfigMs: 480,
-        catalogSource: 'snapshot',
-        bagetItemsCount: 77,
-        snapshotExists: true,
-        snapshotSyncedAt: '2026-04-16T10:00:00.000Z',
-        createdAt: '2026-04-16T10:05:00.000Z',
-      }),
       loadBagetCatalogSnapshotStatus: async () => ({
         sheetId: 'sheet-id',
         tab: 'baget_catalog',

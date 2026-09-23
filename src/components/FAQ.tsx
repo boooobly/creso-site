@@ -16,7 +16,7 @@ export default function FAQ({ items }: { items: FaqItem[] }) {
             </span>
             <ChevronDown
               aria-hidden="true"
-              className="mt-0.5 size-5 shrink-0 text-neutral-400 transition duration-300 ease-out group-open:rotate-180 group-open:text-[var(--brand-red)] dark:text-neutral-500 dark:group-open:text-red-400"
+              className="mt-0.5 size-5 shrink-0 text-neutral-400 transition duration-300 ease-out group-open:rotate-180 group-open:text-[var(--brand-red-text)] dark:text-neutral-500 dark:group-open:text-red-400"
               strokeWidth={2.3}
             />
           </summary>

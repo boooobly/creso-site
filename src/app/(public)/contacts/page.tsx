@@ -107,7 +107,7 @@ export default async function ContactsPage() {
 
             const cardContent = (
               <>
-                <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--brand-red)]/10 text-[var(--brand-red)]">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--brand-red)]/10 text-[var(--brand-red-text)]">
                   <Icon className="size-5" />
                 </div>
                 <p className="text-sm text-neutral-500 dark:text-neutral-300">{item.title}</p>
@@ -157,7 +157,7 @@ export default async function ContactsPage() {
               key={step.title}
               className="relative flex h-full flex-col rounded-2xl border border-neutral-200 bg-white/90 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:hover:border-neutral-700 dark:hover:shadow-none md:p-6"
             >
-              <span className="absolute right-5 top-5 text-xs font-semibold text-neutral-400">0{index + 1}</span>
+              <span className="absolute right-5 top-5 text-xs font-semibold text-neutral-600 dark:text-neutral-400">0{index + 1}</span>
               <div className="public-icon-badge mb-3">
                 <step.icon size={18} strokeWidth={1.9} aria-hidden="true" />
               </div>

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest, NextResponse } from 'next/server';
 
-const canonicalPostMock = vi.fn(async () => NextResponse.json({ ok: true }));
+const canonicalPostMock = vi.fn(async (_request: NextRequest) => NextResponse.json({ ok: true }));
 
 vi.mock('@/app/api/leads/route', () => ({
   POST: canonicalPostMock,

@@ -10,7 +10,7 @@ describe('PATCH /api/reviews/[id]/moderate', () => {
       body: JSON.stringify({ status: 'approved' }),
     });
 
-    const response = await PATCH(request, { params: { id: 'review-1' } });
+    const response = await PATCH();
     const json = await response.json();
 
     expect(response.status).toBe(410);

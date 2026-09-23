@@ -229,7 +229,7 @@ describe('critical customer/admin integration smoke flows', () => {
 
     canonicalLeadPostMock.mockResolvedValue(NextResponse.json({ ok: true }));
 
-    process.env.NODE_ENV = 'test';
+    vi.stubEnv('NODE_ENV', 'test');
     process.env.ADMIN_SESSION_SECRET = 'integration-admin-secret';
     process.env.ADMIN_SESSION_TTL_SECONDS = '86400';
     process.env.PUBLIC_BASE_URL = 'http://localhost:3000';
@@ -275,13 +275,13 @@ describe('critical customer/admin integration smoke flows', () => {
     const { GET: getOrder } = await import('@/app/api/orders/[number]/route');
     const forbiddenOrderResponse = await getOrder(
       new NextRequest(`http://localhost:3000/api/orders/${orderJson.orderNumber}?token=bad-token`),
-      { params: { number: orderJson.orderNumber } },
+      { params: Promise.resolve({ number: orderJson.orderNumber }) },
     );
     expect(forbiddenOrderResponse.status).toBe(403);
 
     const orderStatusResponse = await getOrder(
       new NextRequest(`http://localhost:3000/api/orders/${orderJson.orderNumber}?token=${encodeURIComponent(orderJson.accessToken)}`),
-      { params: { number: orderJson.orderNumber } },
+      { params: Promise.resolve({ number: orderJson.orderNumber }) },
     );
     const orderStatusJson = await orderStatusResponse.json();
 
@@ -295,11 +295,6 @@ describe('critical customer/admin integration smoke flows', () => {
 
     const { POST: createPayment } = await import('@/app/api/payments/create/route');
     const createPaymentResponse = await createPayment(
-      new NextRequest('http://localhost:3000/api/payments/create', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderNumber: orderJson.orderNumber, token: orderJson.accessToken }),
-      }),
     );
     const createPaymentJson = await createPaymentResponse.json();
     expect(createPaymentResponse.status).toBe(410);
@@ -307,16 +302,6 @@ describe('critical customer/admin integration smoke flows', () => {
 
     const { POST: completeMockPayment } = await import('@/app/api/payments/mock/complete/route');
     const completePaymentResponse = await completeMockPayment(
-      new NextRequest('http://localhost:3000/api/payments/mock/complete', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          orderNumber: orderJson.orderNumber,
-          paymentRef: 'pay_disabled',
-          status: 'paid',
-          token: orderJson.accessToken,
-        }),
-      }),
     );
     const completePaymentJson = await completePaymentResponse.json();
     expect(completePaymentResponse.status).toBe(410);
@@ -324,11 +309,6 @@ describe('critical customer/admin integration smoke flows', () => {
 
     const { POST: paymentWebhook } = await import('@/app/api/payments/webhook/route');
     const paymentWebhookResponse = await paymentWebhook(
-      new NextRequest('http://localhost:3000/api/payments/webhook', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderNumber: orderJson.orderNumber, status: 'paid', eventId: 'evt_1' }),
-      }),
     );
     const paymentWebhookJson = await paymentWebhookResponse.json();
     expect(paymentWebhookResponse.status).toBe(410);
@@ -363,7 +343,7 @@ describe('critical customer/admin integration smoke flows', () => {
         },
         body: JSON.stringify({ action: 'approve' }),
       }),
-      { params: { id: 'review-1' } },
+      { params: Promise.resolve({ id: 'review-1' }) },
     );
 
     expect(moderateResponse.status).toBe(200);
@@ -390,7 +370,7 @@ describe('critical customer/admin integration smoke flows', () => {
         },
         body: JSON.stringify({ value: '1200' }),
       }),
-      { params: { id: 'price-1' } },
+      { params: Promise.resolve({ id: 'price-1' }) },
     );
     expect(patchPricingResponse.status).toBe(200);
     expect(pricingUpdateMock).toHaveBeenCalledWith('price-1', { value: '1200' });
@@ -416,7 +396,7 @@ describe('critical customer/admin integration smoke flows', () => {
         },
         body: JSON.stringify({ value: 'Новый текст' }),
       }),
-      { params: { id: 'content-1' } },
+      { params: Promise.resolve({ id: 'content-1' }) },
     );
     expect(patchPageContentResponse.status).toBe(200);
     expect(pageContentUpdateMock).toHaveBeenCalledWith('content-1', { value: 'Новый текст' });
@@ -425,12 +405,6 @@ describe('critical customer/admin integration smoke flows', () => {
   it('covers legacy failures: deprecated moderation route and canonical lead wrapper headers', async () => {
     const { PATCH } = await import('@/app/api/reviews/[id]/moderate/route');
     const deprecatedResponse = await PATCH(
-      new NextRequest('http://localhost:3000/api/reviews/review-1/moderate', {
-        method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ status: 'approved' }),
-      }),
-      { params: { id: 'review-1' } },
     );
 
     expect(deprecatedResponse.status).toBe(410);

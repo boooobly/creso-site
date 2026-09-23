@@ -1,0 +1,338 @@
+[
+  {
+    "route": "/",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/services",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/baget",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/wide-format-printing",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/milling",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/plotter-cutting",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/heat-transfer",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/services/mugs",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/services/stands",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/outdoor-advertising",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/advertising-signs",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/banner-printing",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/lightboxes",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/volume-letters",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/print",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/business-cards",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/production",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/portfolio",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/reviews",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/contacts",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/privacy",
+    "width": 375,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/services",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/baget",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/wide-format-printing",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/milling",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/plotter-cutting",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/heat-transfer",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/services/mugs",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/services/stands",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/outdoor-advertising",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/advertising-signs",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/banner-printing",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/lightboxes",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/volume-letters",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/print",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/business-cards",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/production",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/portfolio",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/reviews",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/contacts",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  },
+  {
+    "route": "/privacy",
+    "width": 1440,
+    "dark": "dark",
+    "errors": [],
+    "hidden": [],
+    "violations": []
+  }
+]

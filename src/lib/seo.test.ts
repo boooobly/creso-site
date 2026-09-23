@@ -14,7 +14,7 @@ afterEach(() => {
     if (snapshot[key] === undefined) {
       delete process.env[key];
     } else {
-      process.env[key] = snapshot[key];
+      vi.stubEnv(key, snapshot[key]);
     }
   }
   vi.resetModules();
@@ -22,7 +22,7 @@ afterEach(() => {
 
 describe('buildPublicPageMetadata', () => {
   it('builds canonical/open graph/twitter URLs using PUBLIC_BASE_URL', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'production';
     process.env.PUBLIC_BASE_URL = 'https://credomir.com/';
 
@@ -37,7 +37,7 @@ describe('buildPublicPageMetadata', () => {
     expect(metadata.alternates?.canonical).toBe('https://credomir.com/services');
     expect(metadata.openGraph?.url).toBe('https://credomir.com/services');
     expect(metadata.openGraph?.locale).toBe('ru_RU');
-    expect(metadata.twitter?.card).toBe('summary_large_image');
+    expect(metadata.twitter).toMatchObject({ card: 'summary_large_image' });
     expect(metadata.robots).toEqual({ index: true, follow: true });
     expect(metadata.icons).toEqual({
       icon: [
@@ -48,13 +48,13 @@ describe('buildPublicPageMetadata', () => {
     });
 
     const firstImage = Array.isArray(metadata.openGraph?.images) ? metadata.openGraph.images[0] : undefined;
-    const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url;
+    const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage instanceof URL ? firstImage.href : firstImage?.url;
     expect(imageUrl).toBe('https://credomir.com/og/service.png');
     expect(metadata.twitter?.images).toEqual(['https://credomir.com/og/service.png']);
   });
 
   it('includes verification metadata only when env values are present', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'production';
     process.env.PUBLIC_BASE_URL = 'https://credomir.com';
     process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION = 'google-token';
@@ -74,7 +74,7 @@ describe('buildPublicPageMetadata', () => {
   });
 
   it('omits verification metadata when env values are empty', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'production';
     process.env.PUBLIC_BASE_URL = 'https://credomir.com';
     process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION = '   ';
@@ -93,7 +93,7 @@ describe('buildPublicPageMetadata', () => {
 
 describe('getDefaultMetadata', () => {
   it('includes default site icons', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.VERCEL_ENV = 'production';
     process.env.PUBLIC_BASE_URL = 'https://credomir.com';
 
@@ -188,6 +188,13 @@ describe('buildFaqPageJsonLd', () => {
 
 
 describe('organization and local business JSON-LD', () => {
+  it('uses the published contact settings and does not invent hours for an unrecognized schedule', async () => {
+    process.env.PUBLIC_BASE_URL = 'https://credomir.com';
+    const { buildLocalBusinessJsonLd } = await import('@/lib/seo');
+    const data = buildLocalBusinessJsonLd({ companyName: 'Test brand', phone: '+70000000000', email: 'test@example.invalid', address: 'Test address', workingHours: 'По предварительной записи' });
+    expect(data).toMatchObject({ name: 'Test brand', telephone: '+70000000000', email: 'test@example.invalid', address: { streetAddress: 'Test address' }, '@id': 'https://credomir.com/#business' });
+    expect(data.openingHoursSpecification).toBeUndefined();
+  });
   it('includes alternate names for Cyrillic brand variants', async () => {
     const { buildOrganizationJsonLd, buildLocalBusinessJsonLd } = await import('@/lib/seo');
 

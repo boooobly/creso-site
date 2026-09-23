@@ -1,18 +1,24 @@
-import { createClient } from 'contentful';
+import { createClient, type EntryFieldTypes } from 'contentful';
+
+type ServiceEntry = { contentTypeId: 'service'; fields: { title: EntryFieldTypes.Symbol; description: EntryFieldTypes.Text; slug: EntryFieldTypes.Symbol } };
+type FaqEntry = { contentTypeId: 'faqItem'; fields: { q: EntryFieldTypes.Symbol; a: EntryFieldTypes.Text } };
 
 const space = process.env.CONTENTFUL_SPACE_ID?.trim();
 const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN?.trim();
 
-export const client: any = space && accessToken
+const client = space && accessToken
   ? createClient({
       space,
       accessToken,
+      timeout: 3000,
+      retryLimit: 1,
     })
   : null;
 
 export async function getServices() {
-  const res = await client.getEntries({ content_type: 'service', order: ['fields.title'], limit: 1000 });
-  return res.items.map((item: any) => ({
+  if (!client) return null;
+  const res = await client.getEntries<ServiceEntry>({ content_type: 'service', order: ['fields.title'], limit: 1000 });
+  return res.items.map((item) => ({
     id: item.sys.id,
     title: item.fields.title,
     description: item.fields.description,
@@ -20,31 +26,8 @@ export async function getServices() {
   }));
 }
 
-export async function getPortfolio() {
-  const res = await client.getEntries({ content_type: 'portfolioItem', order: ['fields.title'], limit: 1000 });
-  return res.items.map((item: any) => ({
-    id: item.sys.id,
-    title: item.fields.title,
-    image: item.fields.image?.fields?.file?.url
-      ? 'https:' + item.fields.image.fields.file.url
-      : '/og-image.png',
-    category: item.fields.category || 'print',
-  }));
-}
-
 export async function getFaq() {
-  const res = await client.getEntries({ content_type: 'faqItem', order: ['fields.q'], limit: 1000 });
-  return res.items.map((item: any) => ({ q: item.fields.q, a: item.fields.a }));
-}
-
-export async function getPosts() {
   if (!client) return null;
-
-  const res = await client.getEntries({ content_type: 'post', order: ['-fields.date'], limit: 1000 });
-  return res.items.map((item: any) => ({
-    id: item.sys.id,
-    title: item.fields.title,
-    excerpt: item.fields.excerpt,
-    date: item.fields.date,
-  }));
+  const res = await client.getEntries<FaqEntry>({ content_type: 'faqItem', order: ['fields.q'], limit: 1000 });
+  return res.items.map((item) => ({ q: item.fields.q, a: item.fields.a }));
 }

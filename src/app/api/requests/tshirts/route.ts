@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
@@ -10,19 +11,20 @@ import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram/sendDoc
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
-  MUGS_MAX_UPLOAD_SIZE_MB,
+  TSHIRTS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
 import { buildEmailHtmlFromText } from '@/lib/utils/email';
 import { normalizePhone } from '@/lib/utils/phone';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
+import { customerUploadErrorResponse, readCustomerFormData } from '@/lib/customer-uploads/server';
 
 export const runtime = 'nodejs';
 
 const allowedExtensionsSet = new Set<string>(MUGS_ALLOWED_EXTENSIONS);
 const allowedMimeTypesSet = new Set<string>(MUGS_ALLOWED_MIME_TYPES);
-const TSHIRTS_MAX_UPLOAD_BYTES = MUGS_MAX_UPLOAD_SIZE_MB * 1024 * 1024;
+const TSHIRTS_MAX_UPLOAD_BYTES = TSHIRTS_MAX_UPLOAD_SIZE_MB * 1024 * 1024;
 const TSHIRTS_MAX_CONTENT_LENGTH_BYTES = TSHIRTS_MAX_UPLOAD_BYTES + (512 * 1024);
 
 const tshirtsRequestSchema = z.object({
@@ -129,10 +131,10 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const formData = await request.formData();
+    const { formData, refs: uploadRefs } = await readCustomerFormData(request, TSHIRTS_MAX_CONTENT_LENGTH_BYTES, 'tshirts');
     const fileValue = formData.get('file');
 
-    const blockedResponse = enforcePublicRequestGuard(request, {
+    const blockedResponse = await enforcePublicRequestGuard(request, {
       route: '/api/requests/tshirts',
       payload: {
         name: toText(formData.get('name')),
@@ -202,6 +204,7 @@ export async function POST(request: NextRequest) {
         customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment || null },
         fields: { ...parsed.data, phone: normalizedPhone, website: undefined },
         file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+        uploadRefs,
         referer,
       },
       ...readRequestIdempotency(request.headers, {
@@ -248,6 +251,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const uploadError = customerUploadErrorResponse(error);
+    if (uploadError) return uploadError;
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';

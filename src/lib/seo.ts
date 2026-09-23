@@ -110,9 +110,7 @@ export function buildServiceJsonLd(name: string, description: string, path: stri
     description,
     areaServed: BRAND.city,
     provider: {
-      '@type': 'Organization',
-      name: BRAND.name,
-      url: getBaseUrl(),
+      '@id': toAbsoluteUrl('/#business'),
     },
     serviceType: name,
     url: serviceUrl,
@@ -141,27 +139,27 @@ export function buildOrganizationJsonLd() {
   };
 }
 
-export function buildLocalBusinessJsonLd() {
+export function buildLocalBusinessJsonLd(settings?: { companyName: string; phone: string; email: string; address: string; workingHours: string }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: BRAND.name,
+    '@id': toAbsoluteUrl('/#business'),
+    name: settings?.companyName ?? BRAND.name,
     alternateName: [...BRAND.aliases, BRAND.name],
     image: toAbsoluteUrl('/og-image.png'),
-    telephone: BRAND.phone,
-    email: BRAND.email,
-    priceRange: '₽₽',
-    openingHoursSpecification: [
+    telephone: settings?.phone ?? BRAND.phone,
+    email: settings?.email ?? BRAND.email,
+    openingHoursSpecification: !settings || settings.workingHours === 'Пн–Пт: 9:00–17:30' ? [
       {
         '@type': 'OpeningHoursSpecification',
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         opens: '09:00',
         closes: '17:30',
       },
-    ],
+    ] : undefined,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: BRAND.address,
+      streetAddress: settings?.address ?? BRAND.address,
       addressLocality: 'Невинномысск',
       addressCountry: 'RU',
     },

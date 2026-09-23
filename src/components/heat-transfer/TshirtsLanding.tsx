@@ -406,7 +406,7 @@ export default function TshirtsLanding({
                   <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
                     <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                   </div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">Шаг {index + 1}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600 dark:text-neutral-400">Шаг {index + 1}</p>
                   <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
                 </AnimatedCard>

@@ -195,7 +195,7 @@ export default function OutdoorLeadForm() {
           checked={form.agreed}
           onBlur={() => onBlurField('agreed')}
           onChange={(e) => setForm((prev) => ({ ...prev, agreed: e.target.checked }))}
-          className="mt-1 size-4 rounded border-neutral-300 text-[var(--brand-red)] focus:ring-[var(--brand-red)] dark:border-neutral-700"
+          className="mt-1 size-4 rounded border-neutral-300 text-[var(--brand-red-text)] focus:ring-[var(--brand-red)] dark:border-neutral-700"
         />
         <span>Согласен с политикой обработки персональных данных</span>
       </label>

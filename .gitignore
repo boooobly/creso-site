@@ -21,3 +21,7 @@ Thumbs.db
 .idea/
 .vscode/
 *.tsbuildinfo
+
+# Local semantic index and audit tooling
+.serena/
+scripts/audit-results/

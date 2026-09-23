@@ -10,6 +10,12 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
+model PublicUploadQuota {
+  id        String   @id
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 model Order {
   // Internal immutable identifier (UUID) to avoid coupling storage identity to public order numbers
   id               String               @id @default(uuid())

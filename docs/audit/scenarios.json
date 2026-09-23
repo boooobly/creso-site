@@ -1,0 +1,29 @@
+{
+  "results": [
+    {
+      "name": "Mobile menu: focus stays inside; Escape restores trigger",
+      "ok": true
+    },
+    {
+      "name": "Lead failure stays editable; retry reuses idempotency and shows success",
+      "ok": true
+    },
+    {
+      "name": "Portfolio: mobile image viewer fits viewport and closes",
+      "ok": true
+    },
+    {
+      "name": "Review modal supports Escape and has an accessible name",
+      "ok": true
+    },
+    {
+      "name": "Desktop closed service menu is absent from keyboard navigation",
+      "ok": true
+    },
+    {
+      "name": "Unknown route returns HTTP 404; admin and order endpoints reject anonymous requests",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

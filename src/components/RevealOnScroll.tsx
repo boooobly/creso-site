@@ -4,11 +4,15 @@ import { PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 export default function RevealOnScroll({ children, className = '' }: PropsWithChildren<{ className?: string }>) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    // Enhance only content below the viewport; SSR and above-the-fold copy stay visible.
+    if (element.getBoundingClientRect().top < window.innerHeight) return;
+    setVisible(false);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -17,7 +21,7 @@ export default function RevealOnScroll({ children, className = '' }: PropsWithCh
           observer.disconnect();
         }
       },
-      { threshold: 0.18 },
+      { threshold: 0 },
     );
 
     observer.observe(element);

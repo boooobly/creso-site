@@ -6,6 +6,13 @@ function normalizeBaseUrl(url: string): string {
   const trimmed = url.trim();
   const parsed = new URL(trimmed);
 
+  if (!['https:', 'http:'].includes(parsed.protocol) || parsed.username || parsed.password) {
+    throw new Error('[env] PUBLIC_BASE_URL must be an HTTP(S) origin without credentials.');
+  }
+  parsed.pathname = '/';
+  parsed.search = '';
+  parsed.hash = '';
+
   if (parsed.hostname === 'www.credomir.com') {
     parsed.hostname = 'credomir.com';
   }
@@ -21,7 +28,7 @@ export function getBaseUrl(): string {
   }
 
   const isNonProductionNodeEnv = env.NODE_ENV !== 'production';
-  const isNonProductionVercelEnv = env.VERCEL_ENV !== 'production';
+  const isNonProductionVercelEnv = env.VERCEL_ENV === 'preview' || env.VERCEL_ENV === 'development';
 
   if (isNonProductionNodeEnv || isNonProductionVercelEnv) {
     return LOCALHOST_BASE_URL;

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Wide-format calculator transfers dimensions and material to a successful mocked request",
+    "ok": true
+  },
+  {
+    "name": "Print calculator updates the total for lamination",
+    "ok": true
+  },
+  {
+    "name": "Mug designer adds text and returns an exported preview to the form",
+    "ok": true
+  },
+  {
+    "name": "Mug order can be submitted without an optional attachment (mocked API)",
+    "ok": true
+  },
+  {
+    "name": "Outdoor gallery loads a full-size photo and closes with its visible button",
+    "ok": true
+  },
+  {
+    "name": "Baget dimensions and optional materials remain editable on mobile",
+    "ok": true
+  }
+]

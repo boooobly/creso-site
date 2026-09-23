@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
@@ -13,6 +14,7 @@ import { getServerEnv } from '@/lib/env';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
+import { customerUploadErrorResponse, readCustomerFormData } from '@/lib/customer-uploads/server';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const formData = await request.formData();
+    const { formData, refs: uploadRefs } = await readCustomerFormData(request, MAX_CONTENT_LENGTH_BYTES, 'wide-format', { maxMaterializeBytes: MAX_TELEGRAM_FILE_SIZE_BYTES });
     const name = toStringValue(formData.get('name'));
     const phoneRaw = toStringValue(formData.get('phone')).replace(/\D/g, '');
     const email = toStringValue(formData.get('email'));
@@ -124,8 +126,9 @@ export async function POST(request: NextRequest) {
     const privacyConsent = toBooleanValue(formData.get('privacyConsent'));
     const pageUrl = toStringValue(formData.get('pageUrl'));
     const fileRaw = formData.get('file');
+    const uploadedFileRef = uploadRefs.find((ref) => ref.field === 'file');
 
-    const blockedResponse = enforcePublicRequestGuard(request, {
+    const blockedResponse = await enforcePublicRequestGuard(request, {
       route: '/api/wide-format-order',
       payload: {
         name,
@@ -215,6 +218,10 @@ export async function POST(request: NextRequest) {
       : '• Нет';
 
     const file = fileRaw instanceof File ? fileRaw : undefined;
+    const fileMetadata = file ?? uploadedFileRef;
+    if (uploadRefs.length > 1 || (uploadedFileRef && file && uploadedFileRef.size !== file.size)) {
+      return NextResponse.json({ ok: false, error: 'Некорректный файл заявки.' }, { status: 400 });
+    }
     const filesValidation = validateMultipartFiles(file ? [file] : [], {
       maxFiles: 1,
       maxFileBytes: MAX_UPLOAD_SIZE_BYTES,
@@ -224,9 +231,9 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(filesValidation);
     }
 
-    if (file) {
+    if (fileMetadata) {
       const fileValidation = validateUploadedFile({
-        file,
+        file: fileMetadata as File,
         allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
         allowedExtensions: ALLOWED_UPLOAD_EXTENSIONS,
         maxBytes: MAX_UPLOAD_SIZE_BYTES,
@@ -242,12 +249,12 @@ export async function POST(request: NextRequest) {
       source: 'wide-format',
       customer: { name, phone, email, comment },
       total: Math.round(calculated.totalCost),
-      payloadJson: { service: 'wide-format', customer: { name, phone, email: email || null, comment: comment || null }, fields: { material: materialIdRaw, widthMm: parsedWidthMm, heightMm: parsedHeightMm, quantity: parsedQuantity, edgeGluing, imageWelding, grommets, grommetsCount: calculated.grommetsCount, cutByPositioningMarks, plotterCutByRegistrationMarks, pageUrl }, file: file ? { name: file.name, size: file.size, type: file.type || null } : null, calculated, referer },
+      payloadJson: { service: 'wide-format', customer: { name, phone, email: email || null, comment: comment || null }, fields: { material: materialIdRaw, widthMm: parsedWidthMm, heightMm: parsedHeightMm, quantity: parsedQuantity, edgeGluing, imageWelding, grommets, grommetsCount: calculated.grommetsCount, cutByPositioningMarks, plotterCutByRegistrationMarks, pageUrl }, file: fileMetadata ? { name: fileMetadata.name, size: fileMetadata.size, type: fileMetadata.type || null } : null, uploadRefs, calculated, referer },
       quoteJson: { kind: 'service-request', service: 'wide-format', total: Math.round(calculated.totalCost), pricingStatus: 'calculated', calculated },
       ...readRequestIdempotency(request.headers, {
         customer: { name, phone, email: email || null, comment: comment || null },
         fields: { material: materialIdRaw, widthMm: parsedWidthMm, heightMm: parsedHeightMm, quantity: parsedQuantity, edgeGluing, imageWelding, grommets, cutByPositioningMarks, plotterCutByRegistrationMarks },
-        file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+        file: fileMetadata ? { name: fileMetadata.name, size: fileMetadata.size, type: fileMetadata.type || null } : null,
       }),
     });
 
@@ -274,14 +281,14 @@ export async function POST(request: NextRequest) {
       `Телефон: ${phone}`,
       `Email: ${email || '—'}`,
       `Комментарий: ${comment || '—'}`,
-      `Файл: ${file?.name ? `${file.name} (${Math.round(file.size / 1024)} КБ)` : '—'}`,
+      `Файл: ${fileMetadata?.name ? `${fileMetadata.name} (${Math.round(fileMetadata.size / 1024)} КБ)` : '—'}`,
       `Страница: ${referer || '—'}`,
     ].join('\n');
 
     const botToken = env.TELEGRAM_BOT_TOKEN;
     const chatId = env.TELEGRAM_CHAT_ID;
     const telegramCanSendFile = Boolean(botToken && chatId && file && file.size <= MAX_TELEGRAM_FILE_SIZE_BYTES);
-    const isFileTooLarge = Boolean(file && file.size > MAX_TELEGRAM_FILE_SIZE_BYTES);
+    const isFileTooLarge = Boolean(fileMetadata && fileMetadata.size > MAX_TELEGRAM_FILE_SIZE_BYTES);
 
     const telegramText = isFileTooLarge
       ? `${message}\n\n⚠️ Файл превышает 5 МБ для отправки ботом в Telegram. Менеджер получит заявку без вложения.`
@@ -315,6 +322,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, fileSent: telegramCanSendFile ? true : undefined });
   } catch (error) {
+    const uploadError = customerUploadErrorResponse(error);
+    if (uploadError) return uploadError;
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';

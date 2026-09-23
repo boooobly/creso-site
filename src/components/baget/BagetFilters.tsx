@@ -431,7 +431,7 @@ export default function BagetFilters({
           </label>
 
           <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Подвес</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-300">Подвес</p>
             <label className="flex items-center gap-2">
               <input
                 type="radio"
@@ -482,7 +482,7 @@ export default function BagetFilters({
               />
             </span>
           </label>
-          {!standAllowed && <p className="text-xs text-amber-700">Ножка доступна только для работ до 30x30 см</p>}
+          {!standAllowed && <p className="text-xs text-amber-700 dark:text-amber-300">Ножка доступна только для работ до 30x30 см</p>}
         </div>
       </div>
       ) : null}

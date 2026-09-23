@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { AdminPageSection } from '@/components/admin/AdminPageSection';
 import { prisma } from '@/lib/db/prisma';
 import { getPersistedBagetOrderSummary } from '@/lib/orders/bagetOrderSummary';
+import { getOrderCustomerUploadRefs } from '@/lib/customer-uploads/server';
 import {
   formatAdminDateTime,
   formatJsonForAdmin,
@@ -54,6 +55,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Ord
   const success = resolvedSearchParams?.success === 'saved';
   const error = resolvedSearchParams?.error === 'validation';
   const bagetSummary = getPersistedBagetOrderSummary(order.payloadJson, order.quoteJson);
+  const customerUploads = getOrderCustomerUploadRefs(order.payloadJson);
 
   return (
     <div className="space-y-6">
@@ -167,7 +169,9 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Ord
                   <p className="text-slate-600">MIME: {bagetSummary.uploadedImage.mimeType || '—'}</p>
                   <p className="text-slate-600">Размер: {bagetSummary.uploadedImage.sizeBytes ? `${Math.round(bagetSummary.uploadedImage.sizeBytes / 1024)} КБ` : '—'}</p>
                   <Link
-                    href={bagetSummary.uploadedImage.url}
+                    href={bagetSummary.uploadedImage.url.includes('.private.blob.vercel-storage.com')
+                      ? `/api/admin/orders/${encodeURIComponent(order.id)}/customer-image`
+                      : bagetSummary.uploadedImage.url}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex text-sm font-medium text-blue-700 underline underline-offset-2 hover:text-blue-900"
@@ -222,6 +226,20 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Ord
           </div>
         </AdminPageSection>
       </div>
+
+      {customerUploads.length > 0 ? (
+        <AdminPageSection title="Файлы клиента" description="Исходники хранятся в приватном хранилище и доступны только администраторам.">
+          <ul className="space-y-2">
+            {customerUploads.map((ref, index) => (
+              <li key={ref.url}>
+                <a href={`/api/admin/orders/${encodeURIComponent(order.id)}/uploads/${index}`} className="text-sm font-medium text-blue-700 underline underline-offset-2 hover:text-blue-900">
+                  {ref.name} ({Math.round(ref.size / 1024)} КБ)
+                </a>
+              </li>
+            ))}
+          </ul>
+        </AdminPageSection>
+      ) : null}
 
       <AdminPageSection title="payloadJson" description="Входные данные заявки в читаемом формате.">
         <pre className="overflow-x-auto rounded-md border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-700">{formatJsonForAdmin(order.payloadJson)}</pre>

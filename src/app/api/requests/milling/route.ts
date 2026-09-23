@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { enforcePublicRequestGuard, getClientIp } from '@/lib/anti-spam';
@@ -19,6 +20,7 @@ import { FIVE_MB_IN_BYTES } from '@/lib/file-validation';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
+import { customerUploadErrorResponse, readCustomerFormData } from '@/lib/customer-uploads/server';
 
 export const runtime = 'nodejs';
 
@@ -173,10 +175,10 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const formData = await request.formData();
+    const { formData, refs: uploadRefs } = await readCustomerFormData(request, MILLING_MAX_CONTENT_LENGTH_BYTES, 'milling');
     const fileValue = formData.get('file');
 
-    const blockedResponse = enforcePublicRequestGuard(request, {
+    const blockedResponse = await enforcePublicRequestGuard(request, {
       route: '/api/requests/milling',
       payload: {
         name: toText(formData.get('name')),
@@ -258,6 +260,7 @@ export async function POST(request: NextRequest) {
         customer: { name: parsed.data.name, phone: normalizedPhone, comment: parsed.data.comment || null },
         fields: { ...parsed.data, phone: normalizedPhone, website: undefined },
         file: file ? { name: file.name, size: file.size, type: file.type || null } : null,
+        uploadRefs,
         referer,
         ip,
       },
@@ -310,6 +313,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const uploadError = customerUploadErrorResponse(error);
+    if (uploadError) return uploadError;
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';

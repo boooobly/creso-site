@@ -1,5 +1,7 @@
 'use client';
 
+import PublicDialog from '@/components/ui/PublicDialog';
+
 import {
   ChangeEvent,
   ReactNode,
@@ -220,47 +222,7 @@ export default function BagetConfigurator({
     }
   }, [isPreviewOpen]);
 
-  useEffect(() => {
-    if (!isPreviewOpen) return;
-    const previewTrigger = previewTriggerRef.current;
 
-    const onEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsPreviewOpen(false);
-      }
-    };
-
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onEsc);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', onEsc);
-      previewTrigger?.focus();
-    };
-  }, [isPreviewOpen]);
-
-  useEffect(() => {
-    if (!isMobileSelectorOpen) return;
-    const selectorTrigger = mobileSelectorTriggerRef.current;
-
-    const onEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsMobileSelectorOpen(false);
-      }
-    };
-
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onEsc);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', onEsc);
-      selectorTrigger?.focus();
-    };
-  }, [isMobileSelectorOpen]);
 
   useEffect(() => {
     if (!isMobileSelectorOpen) return;
@@ -351,7 +313,7 @@ export default function BagetConfigurator({
         key: 'pvc',
         label: 'ПВХ:',
         value: Number(calcMeta.pvcCost ?? 0),
-        note: autoAdditions?.pvcType !== 'none' ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : undefined,
+        note: autoAdditions?.pvcType !== 'none' ? <span className="ml-2 text-xs text-neutral-600">Добавлено автоматически</span> : undefined,
       },
       {
         key: 'orabond',
@@ -365,7 +327,7 @@ export default function BagetConfigurator({
           </span>
         ),
         value: Number(calcMeta.orabondCost ?? 0),
-        note: autoAdditions?.addOrabond ? <span className="ml-2 text-xs text-neutral-500">Добавлено автоматически</span> : undefined,
+        note: autoAdditions?.addOrabond ? <span className="ml-2 text-xs text-neutral-600">Добавлено автоматически</span> : undefined,
       },
       {
         key: 'hanging',
@@ -387,7 +349,7 @@ export default function BagetConfigurator({
         label: 'Подрамник:',
         value: Number(calcMeta.stretcherCost ?? 0),
         note: materials.workType === 'stretchedCanvas'
-          ? <span className="ml-2 text-xs text-neutral-500">{materials.stretcherType === 'narrow' ? 'Узкий (2 см)' : 'Широкий (4 см)'}</span>
+          ? <span className="ml-2 text-xs text-neutral-600">{materials.stretcherType === 'narrow' ? 'Узкий (2 см)' : 'Широкий (4 см)'}</span>
           : undefined,
       },
       {
@@ -395,7 +357,7 @@ export default function BagetConfigurator({
         label: 'Натяжка:',
         value: Number(calcMeta.stretchingCost ?? 0),
         note: calcMeta.stretchingRequired
-          ? <span className="ml-2 text-xs text-neutral-500">Рассчитано автоматически</span>
+          ? <span className="ml-2 text-xs text-neutral-600">Рассчитано автоматически</span>
           : undefined,
       },
     ];
@@ -817,7 +779,7 @@ export default function BagetConfigurator({
           <p className="text-green-600 dark:text-green-400">Файл загружен</p>
         </div>
       ) : (
-        <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-300">Поддерживаются изображения JPG, PNG, WEBP.</p>
+        <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Поддерживаются изображения JPG, PNG, WEBP.</p>
       )}
     </div>
   );
@@ -828,7 +790,7 @@ export default function BagetConfigurator({
     <>
       <div className="space-y-3 pb-32 lg:hidden">
         <div className="rounded-2xl border border-neutral-200/80 bg-white/70 px-4 py-3 shadow-sm dark:border-neutral-700/70 dark:bg-neutral-900/60">
-          <h1 className="text-lg font-semibold">Конфигуратор багета</h1>
+          <h2 className="text-lg font-semibold">Параметры оформления</h2>
           <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">Заполните параметры и подтвердите заказ.</p>
         </div>
 
@@ -843,7 +805,7 @@ export default function BagetConfigurator({
                   min={50}
                   value={widthInput}
                   onChange={(e) => setWidthInput(e.target.value)}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-600"
                 />
               </label>
               <label className="block space-y-1 text-sm">
@@ -853,13 +815,13 @@ export default function BagetConfigurator({
                   min={50}
                   value={heightInput}
                   onChange={(e) => setHeightInput(e.target.value)}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-600"
                 />
               </label>
             </div>
-            {!validSize && <p className="text-xs text-red-600">Введите корректные значения не менее 50 мм.</p>}
+            {!validSize && <p className="text-xs text-red-600 dark:text-red-400">Введите корректные значения не менее 50 мм.</p>}
             <div className="space-y-2 rounded-xl border border-neutral-200 p-3 text-sm dark:border-neutral-700">
-              <p className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Тип работы</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-300">Тип работы</p>
             <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvas'} onChange={() => setMaterials({ ...materials, workType: 'canvas' })} />Картина на основе <InfoTooltip ariaLabel="О типе работы Картина на основе" text="У вас есть готовая картина, которую нужно оформить в багет." /></label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'stretchedCanvas'} onChange={() => setMaterials({ ...materials, workType: 'stretchedCanvas' })} />Холст</label>
               <label className="flex items-center gap-2"><input type="radio" name="mobileWorkType" checked={materials.workType === 'canvasOnStretcher'} onChange={() => setMaterials({ ...materials, workType: 'canvasOnStretcher' })} />Холст на подрамнике</label>
@@ -882,9 +844,9 @@ export default function BagetConfigurator({
           >
             <div>
               <h2 className="text-base font-semibold">2. Дополнительные опции</h2>
-              <p className="text-xs text-neutral-500 dark:text-neutral-300">{isMobileSecondaryOpen ? 'Свернуть блок' : 'Развернуть и изменить материалы'}</p>
+              <p className="text-xs text-neutral-600 dark:text-neutral-300">{isMobileSecondaryOpen ? 'Свернуть блок' : 'Развернуть и изменить материалы'}</p>
             </div>
-            <span className="text-sm text-neutral-500 dark:text-neutral-300">{isMobileSecondaryOpen ? '▲' : '▼'}</span>
+            <span className="text-sm text-neutral-600 dark:text-neutral-300">{isMobileSecondaryOpen ? '▲' : '▼'}</span>
           </button>
           {!isMobileSecondaryOpen ? (
             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -956,8 +918,8 @@ export default function BagetConfigurator({
                   />
                   <div className="min-w-0 flex-1 text-sm">
                     <p className="truncate font-medium">{selectedBagetForQuote.name}</p>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-300">Артикул: {selectedBagetForQuote.article}</p>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-300">{selectedBagetForQuote.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote.width_mm} мм) · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-300">Артикул: {selectedBagetForQuote.article}</p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-300">{selectedBagetForQuote.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote.width_mm} мм) · {selectedBagetForQuote.price_per_meter.toLocaleString('ru-RU')} ₽ / м</p>
                   </div>
                 </div>
               ) : (
@@ -988,7 +950,7 @@ export default function BagetConfigurator({
           {selectedBagetForQuote || !requiresDecorativeBaget ? (
             <>
               <div className="mt-3 rounded-xl bg-red-50 p-3 dark:bg-red-900/20">
-                <p className="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Итого</p>
+                <p className="text-xs uppercase tracking-wide text-neutral-600 dark:text-neutral-300">Итого</p>
                 <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{quote.total.toLocaleString('ru-RU')} ₽</p>
               </div>
               <button
@@ -1004,10 +966,10 @@ export default function BagetConfigurator({
                   {requiresDecorativeBaget ? (
                     <>
                       <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                        <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
+                        <span className="text-neutral-600 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
                       </li>
                       <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                        <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote?.width_mm} мм)
+                        <span className="text-neutral-600 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote?.width_mm} мм)
                       </li>
                     </>
                   ) : (
@@ -1016,38 +978,38 @@ export default function BagetConfigurator({
                     </li>
                   )}
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500 dark:text-neutral-300">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
+                    <span className="text-neutral-600 dark:text-neutral-300">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
                   </li>
                   {materials.passepartout ? (
                     <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                      <span className="text-neutral-500 dark:text-neutral-300">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
+                      <span className="text-neutral-600 dark:text-neutral-300">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
                     </li>
                   ) : null}
                   {requiresDecorativeBaget ? (
                     <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                      <span className="text-neutral-500 dark:text-neutral-300">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
+                      <span className="text-neutral-600 dark:text-neutral-300">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
                     </li>
                   ) : null}
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500 dark:text-neutral-300">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
+                    <span className="text-neutral-600 dark:text-neutral-300">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
                   </li>
                   {requiresDecorativeBaget ? (
                     <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                      <span className="text-neutral-500 dark:text-neutral-300">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
+                      <span className="text-neutral-600 dark:text-neutral-300">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
                       {selectedBagetForQuote?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
                     </li>
                   ) : null}
                   {summaryCostRows.map((row) => (
                     <li key={row.key} className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                      <span className="text-neutral-500 dark:text-neutral-300">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
+                      <span className="text-neutral-600 dark:text-neutral-300">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
                       {row.note ?? null}
                     </li>
                   ))}
                   {autoAdditions?.forceCardboard ? (
-                    <li className="text-xs text-neutral-500 dark:text-neutral-300">Картон (задник): Добавлено автоматически</li>
+                    <li className="text-xs text-neutral-600 dark:text-neutral-300">Картон (задник): Добавлено автоматически</li>
                   ) : null}
                   {autoAdditions?.stretchingRequired ? (
-                    <li className="text-xs text-neutral-500 dark:text-neutral-300">Требуется натяжка: Добавлено автоматически</li>
+                    <li className="text-xs text-neutral-600 dark:text-neutral-300">Требуется натяжка: Добавлено автоматически</li>
                   ) : null}
                 </ul>
               ) : null}
@@ -1059,7 +1021,7 @@ export default function BagetConfigurator({
 
         <div className="card rounded-2xl p-4 shadow-md">
           <h2 className="text-base font-semibold">5. Завершение</h2>
-          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-300">Проверьте итог и отправьте заявку — менеджер подтвердит детали.</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">Проверьте итог и отправьте заявку — менеджер подтвердит детали.</p>
           <button
             type="button"
             onClick={() => setIsOrderModalOpen(true)}
@@ -1074,7 +1036,7 @@ export default function BagetConfigurator({
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200/80 bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 shadow-[0_-6px_24px_rgba(0,0,0,0.08)] backdrop-blur lg:hidden dark:border-neutral-800 dark:bg-neutral-950/95">
         <div className="mx-auto flex w-full max-w-xl items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] uppercase tracking-wide text-neutral-500 dark:text-neutral-300">Итого</p>
+            <p className="text-[11px] uppercase tracking-wide text-neutral-600 dark:text-neutral-300">Итого</p>
             <p className="truncate text-lg font-bold text-neutral-900 dark:text-neutral-100">
               {(selectedBagetForQuote || !requiresDecorativeBaget) ? `${quote.total.toLocaleString('ru-RU')} ₽` : 'Выберите багет'}
             </p>
@@ -1102,7 +1064,7 @@ export default function BagetConfigurator({
                   min={50}
                   value={widthInput}
                   onChange={(e) => setWidthInput(e.target.value)}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-600"
                 />
               </label>
               <label className="block space-y-1 text-sm">
@@ -1112,10 +1074,10 @@ export default function BagetConfigurator({
                   min={50}
                   value={heightInput}
                   onChange={(e) => setHeightInput(e.target.value)}
-                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                  className="w-full rounded-xl border border-neutral-300 bg-white p-2 text-neutral-900 placeholder:text-neutral-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-600"
                 />
               </label>
-              {!validSize && <p className="text-xs text-red-600">Введите корректные значения не менее 50 мм.</p>}
+              {!validSize && <p className="text-xs text-red-600 dark:text-red-400">Введите корректные значения не менее 50 мм.</p>}
             </div>
           </div>
           <BagetFilters
@@ -1183,10 +1145,10 @@ export default function BagetConfigurator({
                 {requiresDecorativeBaget ? (
                   <>
                     <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                      <span className="text-neutral-500 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
+                      <span className="text-neutral-600 dark:text-neutral-300">Артикул:</span> {selectedBagetForQuote?.article}
                     </li>
                     <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                      <span className="text-neutral-500 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote?.width_mm} мм)
+                      <span className="text-neutral-600 dark:text-neutral-300">Ширина профиля:</span> {selectedBagetForQuote?.width_with_quarter_mm} мм (без четверти {selectedBagetForQuote?.width_mm} мм)
                     </li>
                   </>
                 ) : (
@@ -1195,38 +1157,38 @@ export default function BagetConfigurator({
                   </li>
                 )}
                 <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500 dark:text-neutral-300">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
+                  <span className="text-neutral-600 dark:text-neutral-300">Размер работы:</span> {Math.round(widthMm)} × {Math.round(heightMm)} мм
                 </li>
                 {materials.passepartout ? (
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500 dark:text-neutral-300">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
+                    <span className="text-neutral-600 dark:text-neutral-300">Размер с паспарту:</span> {Math.round(effectiveWidthMm)} × {Math.round(effectiveHeightMm)} мм
                   </li>
                 ) : null}
                 {requiresDecorativeBaget ? (
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500 dark:text-neutral-300">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
+                    <span className="text-neutral-600 dark:text-neutral-300">Габарит с рамкой:</span> {Math.round(Number(calcMeta.framedWidthMm ?? 0))} × {Math.round(Number(calcMeta.framedHeightMm ?? 0))} мм
                   </li>
                 ) : null}
                 <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                  <span className="text-neutral-500 dark:text-neutral-300">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
+                  <span className="text-neutral-600 dark:text-neutral-300">Площадь:</span> {Number(calcMeta.areaM2 ?? 0).toFixed(3)} м²
                 </li>
                 {requiresDecorativeBaget ? (
                   <li className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500 dark:text-neutral-300">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
+                    <span className="text-neutral-600 dark:text-neutral-300">Багет:</span> {Number(calcMeta.bagetMeters ?? 0).toFixed(2)} м ×{' '}
                     {selectedBagetForQuote?.price_per_meter.toLocaleString('ru-RU')} ₽ = {Math.round(Number(calcMeta.bagetCost ?? 0)).toLocaleString('ru-RU')} ₽
                   </li>
                 ) : null}
                 {summaryCostRows.map((row) => (
                   <li key={row.key} className="border-b border-neutral-200/70 pb-2 dark:border-neutral-700/70">
-                    <span className="text-neutral-500 dark:text-neutral-300">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
+                    <span className="text-neutral-600 dark:text-neutral-300">{row.label}</span> {Math.round(row.value).toLocaleString('ru-RU')} ₽
                     {row.note ?? null}
                   </li>
                 ))}
                 {autoAdditions?.forceCardboard ? (
-                  <li className="text-xs text-neutral-500 dark:text-neutral-300">Картон (задник): Добавлено автоматически</li>
+                  <li className="text-xs text-neutral-600 dark:text-neutral-300">Картон (задник): Добавлено автоматически</li>
                 ) : null}
                 {autoAdditions?.stretchingRequired ? (
-                  <li className="text-xs text-neutral-500 dark:text-neutral-300">Требуется натяжка: Добавлено автоматически</li>
+                  <li className="text-xs text-neutral-600 dark:text-neutral-300">Требуется натяжка: Добавлено автоматически</li>
                 ) : null}
                 <li className="mt-1 border-t border-neutral-300 pt-3 text-xl font-bold text-neutral-900 dark:border-neutral-600 dark:text-neutral-100">
                   Итого: {quote.total.toLocaleString('ru-RU')} ₽
@@ -1249,17 +1211,14 @@ export default function BagetConfigurator({
       </div>
 
       {isMobileSelectorOpen && requiresDecorativeBaget ? (
-        <div
-          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-white dark:bg-neutral-950 lg:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Мобильный выбор багета"
+        <PublicDialog label="Мобильный выбор багета" onClose={() => setIsMobileSelectorOpen(false)}
+          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-white p-0 dark:bg-neutral-950 lg:hidden"
         >
           <div className="sticky top-0 z-10 border-b border-neutral-200/80 bg-white/95 px-4 py-3 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
             <div className="mx-auto flex w-full max-w-xl items-center justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="text-base font-semibold">Выбор багета</h2>
-                <p className="truncate text-xs text-neutral-500 dark:text-neutral-300">{filteredItems.length} вариантов</p>
+                <p className="truncate text-xs text-neutral-600 dark:text-neutral-300">{filteredItems.length} вариантов</p>
               </div>
               <button
                 type="button"
@@ -1331,13 +1290,13 @@ export default function BagetConfigurator({
               <div className="min-w-0 flex-1">
                 {mobileDraftBaget ? (
                   <>
-                    <p className="truncate text-xs text-neutral-500 dark:text-neutral-300">
+                    <p className="truncate text-xs text-neutral-600 dark:text-neutral-300">
                       {mobileDraftBaget.article} · {mobileDraftBaget.width_with_quarter_mm} мм
                     </p>
                     <p className="truncate text-sm font-medium">{mobileDraftBaget.name}</p>
                   </>
                 ) : (
-                  <p className="text-sm text-neutral-500 dark:text-neutral-300">Выберите багет, чтобы применить выбор.</p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-300">Выберите багет, чтобы применить выбор.</p>
                 )}
               </div>
               <button
@@ -1354,27 +1313,18 @@ export default function BagetConfigurator({
               </button>
             </div>
           </div>
-        </div>
+        </PublicDialog>
       ) : null}
 
         {isPreviewOpen ? (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]"
-            onClick={(event) => {
-              if (event.target === event.currentTarget) {
-                setIsPreviewOpen(false);
-              }
-            }}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Увеличенное превью багета"
-          >
+          <PublicDialog label="Увеличенное превью багета" onClose={() => setIsPreviewOpen(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
             <div className="relative w-[96vw] max-w-[1200px] max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900 sm:p-5">
               <button
                 type="button"
                 onClick={() => setIsPreviewOpen(false)}
                 aria-label="Закрыть увеличенное превью"
-                className="absolute right-3 top-3 z-10 rounded-lg p-2 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+                className="absolute right-3 top-3 z-10 rounded-lg p-2 text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
               >
                 ✕
               </button>
@@ -1403,7 +1353,7 @@ export default function BagetConfigurator({
                 }}
               >
                 {hoverZoomEnabled ? (
-                  <p className="mb-2 text-right text-xs text-neutral-500 dark:text-neutral-400">Наведите курсор для увеличения</p>
+                  <p className="mb-2 text-right text-xs text-neutral-600 dark:text-neutral-400">Наведите курсор для увеличения</p>
                 ) : null}
                 <div
                   style={{
@@ -1421,7 +1371,7 @@ export default function BagetConfigurator({
                 </div>
               </div>
             </div>
-          </div>
+          </PublicDialog>
         ) : null}
 
         <BagetOrderModal

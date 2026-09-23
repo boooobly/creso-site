@@ -1,5 +1,7 @@
 'use client';
 
+import PublicDialog from '@/components/ui/PublicDialog';
+
 import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { BagetQuoteResult } from '@/lib/calculations/bagetQuote';
@@ -9,6 +11,7 @@ import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import BagetPreview, { type BagetPreviewProps } from './BagetPreview';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 type SizeMm = {
   wMm: number;
@@ -147,21 +150,6 @@ export default function BagetOrderModal({
       return;
     }
 
-    const scrollY = window.scrollY;
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const originalLeft = document.body.style.left;
-    const originalRight = document.body.style.right;
-    const originalWidth = document.body.style.width;
-
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-
     const timer = window.setTimeout(() => {
       modalRef.current?.focus();
       setAnimateIn(true);
@@ -169,27 +157,9 @@ export default function BagetOrderModal({
 
     return () => {
       window.clearTimeout(timer);
-      document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.left = originalLeft;
-      document.body.style.right = originalRight;
-      document.body.style.width = originalWidth;
-      window.scrollTo({ top: scrollY });
-      setAnimateIn(false);
     };
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-
-    const onEsc = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-
-    window.addEventListener('keydown', onEsc as EventListener);
-    return () => window.removeEventListener('keydown', onEsc as EventListener);
-  }, [onClose, open]);
 
   const canSubmit = useMemo(() => {
     return !sending && !!consent;
@@ -256,10 +226,11 @@ export default function BagetOrderModal({
       });
 
       const requestInit: RequestInit = uploadedImageFile
-        ? (() => {
+        ? await (async () => {
             const formData = new FormData();
             formData.set('payload', JSON.stringify(requestPayload));
             formData.set('customerImage', uploadedImageFile, uploadedImageFile.name);
+            await uploadCustomerFiles(formData, 'baget', idempotencyKey);
             return { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: formData };
           })()
         : {
@@ -293,16 +264,10 @@ export default function BagetOrderModal({
   if (!open) return null;
 
   return (
-    <div
+    <PublicDialog label="Оформление заказа багета" onClose={onClose}
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-200 ease-out ${
         animateIn ? 'bg-black/40 backdrop-blur-[2px]' : 'bg-black/0 backdrop-blur-0'
       }`}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="baget-order-title"
     >
       <div
         ref={modalRef}
@@ -369,7 +334,7 @@ export default function BagetOrderModal({
 
                 <dl className="grid grid-cols-1 gap-1">
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Размер работы</dt>
+                    <dt className="text-sm text-neutral-600 dark:text-neutral-400">Размер работы</dt>
                     <dd className="rounded-lg bg-neutral-100 px-2 py-1 text-right text-sm font-medium text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                       {orderSummary.workSizeMm.wMm} × {orderSummary.workSizeMm.hMm} мм
                     </dd>
@@ -377,7 +342,7 @@ export default function BagetOrderModal({
 
                   {orderSummary.passepartout?.enabled ? (
                     <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                      <dt className="text-sm text-neutral-500 dark:text-neutral-400">Размер с паспарту</dt>
+                      <dt className="text-sm text-neutral-600 dark:text-neutral-400">Размер с паспарту</dt>
                       <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                         {effectiveSize.wMm} × {effectiveSize.hMm} мм
                       </dd>
@@ -386,7 +351,7 @@ export default function BagetOrderModal({
 
                   {outerSize ? (
                     <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                      <dt className="text-sm text-neutral-500 dark:text-neutral-400">Габарит с рамкой</dt>
+                      <dt className="text-sm text-neutral-600 dark:text-neutral-400">Габарит с рамкой</dt>
                       <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                         {outerSize.wMm} × {outerSize.hMm} мм
                       </dd>
@@ -394,7 +359,7 @@ export default function BagetOrderModal({
                   ) : null}
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Багет</dt>
+                    <dt className="text-sm text-neutral-600 dark:text-neutral-400">Багет</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.selectedBaget
                         ? `${orderSummary.selectedBaget.title || 'Выбран'} (${orderSummary.selectedBaget.article || 'без артикула'})`
@@ -407,7 +372,7 @@ export default function BagetOrderModal({
                   </div>
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Паспарту</dt>
+                    <dt className="text-sm text-neutral-600 dark:text-neutral-400">Паспарту</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.passepartout?.enabled
                         ? `${orderSummary.passepartout.color}, верх/бок ${orderSummary.passepartout.topMm} мм, низ ${orderSummary.passepartout.bottomMm} мм`
@@ -416,24 +381,24 @@ export default function BagetOrderModal({
                   </div>
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Остекление</dt>
+                    <dt className="text-sm text-neutral-600 dark:text-neutral-400">Остекление</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.glazing}</dd>
                   </div>
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Материалы</dt>
+                    <dt className="text-sm text-neutral-600 dark:text-neutral-400">Материалы</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.materials.join(', ') || '—'}
                     </dd>
                   </div>
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Тип работы</dt>
+                    <dt className="text-sm text-neutral-600 dark:text-neutral-400">Тип работы</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.workType}</dd>
                   </div>
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Подвес</dt>
+                    <dt className="text-sm text-neutral-600 dark:text-neutral-400">Подвес</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                       {orderSummary.hanging.label} × {orderSummary.hanging.quantity}
                     </dd>
@@ -442,12 +407,12 @@ export default function BagetOrderModal({
                   {orderSummary.printRequirement.requiresPrint ? (
                     <>
                       <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                        <dt className="text-sm text-neutral-500 dark:text-neutral-400">Требуется печать</dt>
+                        <dt className="text-sm text-neutral-600 dark:text-neutral-400">Требуется печать</dt>
                         <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">Да</dd>
                       </div>
 
                       <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                        <dt className="text-sm text-neutral-500 dark:text-neutral-400">Материал печати</dt>
+                        <dt className="text-sm text-neutral-600 dark:text-neutral-400">Материал печати</dt>
                         <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
                           {orderSummary.printRequirement.printMaterial === 'paper' ? 'Бумага' : 'Холст'}
                         </dd>
@@ -456,7 +421,7 @@ export default function BagetOrderModal({
                   ) : null}
 
                   <div className="grid grid-cols-[1fr_auto] items-start gap-3 rounded-lg px-2 py-1 odd:bg-neutral-100/60 dark:odd:bg-neutral-700/20">
-                    <dt className="text-sm text-neutral-500 dark:text-neutral-400">Ножка-подставка</dt>
+                    <dt className="text-sm text-neutral-600 dark:text-neutral-400">Ножка-подставка</dt>
                     <dd className="text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderSummary.stand ? 'Да' : 'Нет'}</dd>
                   </div>
                 </dl>
@@ -488,7 +453,7 @@ export default function BagetOrderModal({
                       className="h-11 w-full rounded-xl border border-neutral-300 bg-neutral-50 px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
                       placeholder="Введите имя"
                     />
-                    {errors.name ? <p className="text-xs text-red-600">{errors.name}</p> : null}
+                    {errors.name ? <p className="text-xs text-red-600 dark:text-red-400">{errors.name}</p> : null}
                   </label>
 
                   <label className="block space-y-1 text-sm">
@@ -499,7 +464,7 @@ export default function BagetOrderModal({
                       className="bg-neutral-50 dark:bg-neutral-800"
                     />
                     <p className="text-xs text-neutral-500 dark:text-neutral-400">Мы свяжемся для уточнения деталей</p>
-                    {errors.phone ? <p className="text-xs text-red-600">{errors.phone}</p> : null}
+                    {errors.phone ? <p className="text-xs text-red-600 dark:text-red-400">{errors.phone}</p> : null}
                   </label>
 
                   <label className="block space-y-1 text-sm">
@@ -511,7 +476,7 @@ export default function BagetOrderModal({
                       className="h-11 w-full rounded-xl border border-neutral-300 bg-neutral-50 px-4 text-sm text-neutral-900 shadow-sm transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
                       placeholder="name@example.com"
                     />
-                    {errors.email ? <p className="text-xs text-red-600">{errors.email}</p> : null}
+                    {errors.email ? <p className="text-xs text-red-600 dark:text-red-400">{errors.email}</p> : null}
                   </label>
 
                   <label className="block space-y-1 text-sm">
@@ -523,7 +488,7 @@ export default function BagetOrderModal({
                       className="w-full rounded-xl border border-neutral-300 bg-neutral-50 px-4 py-2 text-sm text-neutral-900 shadow-sm transition-all duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
                       placeholder="Уточнения по заказу"
                     />
-                    {errors.comment ? <p className="text-xs text-red-600">{errors.comment}</p> : null}
+                    {errors.comment ? <p className="text-xs text-red-600 dark:text-red-400">{errors.comment}</p> : null}
                   </label>
 
                   <div className={`rounded-xl border p-3 transition-colors ${errors.consent ? 'border-red-300 bg-red-50/60 dark:border-red-700/70 dark:bg-red-900/15' : 'border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/60'}`}>
@@ -542,10 +507,10 @@ export default function BagetOrderModal({
                         .
                       </span>
                     </label>
-                    {errors.consent ? <p className="mt-2 text-xs text-red-600">{errors.consent}</p> : null}
+                    {errors.consent ? <p className="mt-2 text-xs text-red-600 dark:text-red-400">{errors.consent}</p> : null}
                   </div>
 
-                  {errors.submit ? <p className="text-sm text-red-600">{errors.submit}</p> : null}
+                  {errors.submit ? <p className="text-sm text-red-600 dark:text-red-400">{errors.submit}</p> : null}
 
                   <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                     <button
@@ -569,6 +534,6 @@ export default function BagetOrderModal({
           )}
         </div>
       </div>
-    </div>
+    </PublicDialog>
   );
 }

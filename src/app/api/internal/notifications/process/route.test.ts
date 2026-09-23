@@ -14,6 +14,10 @@ vi.mock('@/lib/notifications/outbox', () => ({
   processNotificationJobs: processNotificationJobsMock,
 }));
 
+vi.mock('@/lib/distributed-rate-limit', () => ({
+  pruneExpiredPublicQuotas: vi.fn(async () => undefined),
+}));
+
 function request(secret?: string): NextRequest {
   return new NextRequest('http://localhost:3000/api/internal/notifications/process', {
     headers: secret ? { authorization: `Bearer ${secret}` } : undefined,

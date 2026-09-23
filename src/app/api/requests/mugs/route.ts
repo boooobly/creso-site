@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
@@ -13,6 +14,7 @@ import { MUGS_ALLOWED_EXTENSIONS, MUGS_ALLOWED_MIME_TYPES, MUGS_COVERING_OPTIONS
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
+import { customerUploadErrorResponse, readCustomerFormData } from '@/lib/customer-uploads/server';
 
 export const runtime = 'nodejs';
 const allowedExtensionsSet = new Set<string>(MUGS_ALLOWED_EXTENSIONS);
@@ -63,14 +65,18 @@ export async function POST(request: NextRequest) {
     getServerEnv();
     const contentLengthValidation = validateMultipartContentLength(request, { maxContentLengthBytes: MUGS_MAX_CONTENT_LENGTH_BYTES });
     if (!contentLengthValidation.ok) return multipartErrorResponse(contentLengthValidation);
-    const formData = await request.formData();
+    const { formData, refs: uploadRefs } = await readCustomerFormData(request, MUGS_MAX_CONTENT_LENGTH_BYTES, 'mugs');
     const fileValue = formData.get('file'); const file = fileValue instanceof File ? fileValue : null;
     const rawImageDataUrl = toText(formData.get('rawImageDataUrl')) || null;
     const mugDesignPreviewDataUrl = toText(formData.get('mugDesignPreviewDataUrl')) || null;
     const mugPrintLayoutDataUrl = toText(formData.get('mugPrintLayoutDataUrl')) || null;
     const mugDesignJson = toText(formData.get('mugDesignJson')) || null;
     const designerSourceFiles = formData.getAll('designerSourceFiles[]').filter((value): value is File => value instanceof File);
-    const blockedResponse = enforcePublicRequestGuard(request, { route: '/api/requests/mugs', payload: { name: toText(formData.get('name')), phone: toText(formData.get('phone')), quantity: toText(formData.get('quantity')), covering: toText(formData.get('covering')), consent: toText(formData.get('consent')), comment: toText(formData.get('comment')), website: toText(formData.get('website')) }, requirePayload: true });
+    const previewFileValue = formData.get('mugDesignPreviewFile');
+    const printFileValue = formData.get('mugPrintLayoutFile');
+    const previewFile = previewFileValue instanceof File ? previewFileValue : null;
+    const printFile = printFileValue instanceof File ? printFileValue : null;
+    const blockedResponse = await enforcePublicRequestGuard(request, { route: '/api/requests/mugs', payload: { name: toText(formData.get('name')), phone: toText(formData.get('phone')), quantity: toText(formData.get('quantity')), covering: toText(formData.get('covering')), consent: toText(formData.get('consent')), comment: toText(formData.get('comment')), website: toText(formData.get('website')) }, requirePayload: true });
     if (blockedResponse) return blockedResponse;
     const needsDesign = toBoolean(formData.get('needsDesign'));
     const parsed = mugsRequestSchema.safeParse({ name: toText(formData.get('name')), phone: toText(formData.get('phone')), quantity: toText(formData.get('quantity')), covering: toText(formData.get('covering')), consent: toBoolean(formData.get('consent')), comment: toText(formData.get('comment')), website: toText(formData.get('website')), rawImageDataUrl, mugDesignPreviewDataUrl, mugPrintLayoutDataUrl, mugDesignJson });
@@ -83,8 +89,9 @@ export async function POST(request: NextRequest) {
     if (file) { const validation = validateUploadedFile({ file, allowedMimeTypes: allowedMimeTypesSet, allowedExtensions: allowedExtensionsSet, maxBytes: FIVE_MB_IN_BYTES }); if (!validation.ok) return NextResponse.json({ ok: false, error: validation.error }, { status: 400 }); }
     for (const sourceFile of designerSourceFiles) { const validation = await validateUploadedImageFile({ file: sourceFile, allowedMimeTypes: designerMimeTypes, allowedExtensions: designerExtensions, maxBytes: FIVE_MB_IN_BYTES }); if (!validation.ok) return NextResponse.json({ ok: false, error: 'Исходники конструктора должны быть изображениями PNG или JPEG до 5 МБ.' }, { status: 400 }); }
     if (rawImageDataUrl && !parseDataUrl(rawImageDataUrl, allowedMimeTypesSet, FIVE_MB_IN_BYTES)) return NextResponse.json({ ok: false, error: 'Некорректный исходник клиента.' }, { status: 400 });
-    const preview = mugDesignPreviewDataUrl ? parseDataUrl(mugDesignPreviewDataUrl, designerMimeTypes, DESIGN_EXPORT_MAX_BYTES) : null;
-    const printLayout = mugPrintLayoutDataUrl ? parseDataUrl(mugPrintLayoutDataUrl, designerMimeTypes, DESIGN_EXPORT_MAX_BYTES) : null;
+    const preview = previewFile ? { buffer: Buffer.from(await previewFile.arrayBuffer()), mime: previewFile.type } : mugDesignPreviewDataUrl ? parseDataUrl(mugDesignPreviewDataUrl, designerMimeTypes, DESIGN_EXPORT_MAX_BYTES) : null;
+    const printLayout = printFile ? { buffer: Buffer.from(await printFile.arrayBuffer()), mime: printFile.type } : mugPrintLayoutDataUrl ? parseDataUrl(mugPrintLayoutDataUrl, designerMimeTypes, DESIGN_EXPORT_MAX_BYTES) : null;
+    if ((previewFile && (previewFile.size > DESIGN_EXPORT_MAX_BYTES || !designerMimeTypes.has(previewFile.type))) || (printFile && (printFile.size > DESIGN_EXPORT_MAX_BYTES || !designerMimeTypes.has(printFile.type)))) return NextResponse.json({ ok: false, error: 'Некорректный экспорт конструктора.' }, { status: 400 });
     if ((mugDesignPreviewDataUrl && (!preview || !hasSupportedImageSignature(preview))) || (mugPrintLayoutDataUrl && (!printLayout || !hasSupportedImageSignature(printLayout)))) return NextResponse.json({ ok: false, error: 'Экспорт конструктора должен быть изображением PNG или JPEG допустимого размера.' }, { status: 400 });
     if (Boolean(preview) !== Boolean(printLayout)) return NextResponse.json({ ok: false, error: 'Приложите оба экспорта конструктора.' }, { status: 400 });
     if (mugDesignJson) { try { JSON.parse(mugDesignJson); } catch { return NextResponse.json({ ok: false, error: 'Некорректные данные макета конструктора.' }, { status: 400 }); } }
@@ -103,6 +110,7 @@ export async function POST(request: NextRequest) {
         fields: { ...parsed.data, phone: normalizedPhone, website: undefined, rawImageDataUrl: undefined, mugDesignPreviewDataUrl: undefined, mugPrintLayoutDataUrl: undefined },
         options: { needsDesign, coveringLabel: getCoveringLabel(parsed.data.covering) },
         files: { original: file ? { name: file.name, size: file.size, type: file.type || null } : null, rawImageDataUrl: Boolean(rawImageDataUrl), preview: Boolean(preview), printLayout: Boolean(printLayout), designerSourceFiles: designerSourceFiles.map((item) => ({ name: item.name, size: item.size, type: item.type || null })) },
+        uploadRefs,
         referer,
       },
       ...readRequestIdempotency(request.headers, {
@@ -123,5 +131,7 @@ export async function POST(request: NextRequest) {
     const [telegramSent, emailSent] = await Promise.all([sendMugsTelegramNotification({ text, file, rawImageDataUrl, preview, printLayout }), sendEmailLead({ subject: 'Новая заявка — Печать на кружках', html: buildEmailHtmlFromText(text), attachments }).then(() => true).catch((error) => { logger.error('mugs.email.failed', { error }); return false; })]);
     if (!telegramSent && !emailSent) return NextResponse.json({ ok: false, error: 'Не удалось отправить уведомления в Telegram и Email.' }, { status: 502 });
     return NextResponse.json({ ok: true });
-  } catch (error) { const idempotencyResponse = idempotencyErrorResponse(error); if (idempotencyResponse) return idempotencyResponse; const message = error instanceof Error ? error.message : 'Unknown server error.'; if (message.startsWith('[env]')) return NextResponse.json({ ok: false, error: message }, { status: 500 }); logger.error('mugs.request.failed', { error }); return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 }); }
+  } catch (error) {
+    const uploadError = customerUploadErrorResponse(error); if (uploadError) return uploadError;
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status }); const idempotencyResponse = idempotencyErrorResponse(error); if (idempotencyResponse) return idempotencyResponse; const message = error instanceof Error ? error.message : 'Unknown server error.'; if (message.startsWith('[env]')) return NextResponse.json({ ok: false, error: message }, { status: 500 }); logger.error('mugs.request.failed', { error }); return NextResponse.json({ ok: false, error: 'Ошибка обработки заявки.' }, { status: 500 }); }
 }

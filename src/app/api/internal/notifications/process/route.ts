@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { processNotificationJobs } from '@/lib/notifications/outbox';
+import { pruneExpiredPublicQuotas } from '@/lib/distributed-rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,6 +38,7 @@ async function handleProcessRequest(request: NextRequest): Promise<NextResponse>
 
   try {
     const result = await processNotificationJobs({ limit: 20 });
+    await pruneExpiredPublicQuotas().catch((error) => logger.error('public_quota.cleanup_failed', { error }));
     return NextResponse.json(
       { ok: true, ...result },
       { headers: { 'Cache-Control': 'no-store' } },

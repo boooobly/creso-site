@@ -320,7 +320,7 @@ export default function BagetPreview({
                     unoptimized
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-neutral-100 text-sm text-neutral-500">Загрузите изображение для превью</div>
+                  <div className="flex h-full w-full items-center justify-center bg-neutral-100 text-sm text-neutral-600">Загрузите изображение для превью</div>
                 )}
               </div>
               {passepartoutEnabled ? (
@@ -336,7 +336,7 @@ export default function BagetPreview({
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-neutral-500">
+      <p className="mt-3 text-xs text-neutral-600 dark:text-neutral-400">
         {stretchedCanvas
           ? 'Превью показывает холст на подрамнике без рамки.'
           : `Толщина рамки масштабируется по реальным размерам (${previewGeometry.scale > 0 ? `${previewGeometry.framePx.toFixed(1)}px` : '...'}).`}

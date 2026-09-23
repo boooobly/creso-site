@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import PublicDialog from '@/components/ui/PublicDialog';
+
+import { useState } from 'react';
 import ProtectedImage from '@/components/ui/ProtectedImage';
 
 type PortfolioImage = {
@@ -58,24 +60,6 @@ function PortfolioCard({ image, onOpen }: { image: PortfolioImage; onOpen: (imag
 export default function OutdoorPortfolioGallery({ projects }: OutdoorPortfolioGalleryProps) {
   const [activeImage, setActiveImage] = useState<PortfolioImage | null>(null);
 
-  useEffect(() => {
-    if (!activeImage) {
-      return;
-    }
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setActiveImage(null);
-      }
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [activeImage]);
-
   return (
     <>
       <div className="space-y-7">
@@ -91,13 +75,14 @@ export default function OutdoorPortfolioGallery({ projects }: OutdoorPortfolioGa
       </div>
 
       {activeImage ? (
-        <div
+        <PublicDialog label="Просмотр работы" onClose={() => setActiveImage(null)}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setActiveImage(null)}
         >
           <div className="relative w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>
+            <button type="button" onClick={() => setActiveImage(null)}
+              className="absolute right-2 top-2 z-10 min-h-11 rounded-lg bg-neutral-950 px-4 text-sm font-medium text-white">
+              Закрыть просмотр
+            </button>
             <ProtectedImage
               src={activeImage.src}
               alt={activeImage.alt}
@@ -107,7 +92,7 @@ export default function OutdoorPortfolioGallery({ projects }: OutdoorPortfolioGa
               priority
             />
           </div>
-        </div>
+        </PublicDialog>
       ) : null}
     </>
   );

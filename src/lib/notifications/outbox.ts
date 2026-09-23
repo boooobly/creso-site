@@ -1,6 +1,8 @@
 import type { NotificationOutbox, Prisma } from '@prisma/client';
 import { z } from 'zod';
+import { get } from '@vercel/blob';
 import { prisma } from '@/lib/db/prisma';
+import { isPrivateCustomerBlobUrl, privateBlobToken } from '@/lib/customer-uploads/server';
 import { getServerEnv } from '@/lib/env';
 import { sanitizeUploadFileName } from '@/lib/file-validation';
 import { logger } from '@/lib/logger';
@@ -79,10 +81,11 @@ export function buildTelegramDocumentUrlJob(params: {
   filename: string;
   mime?: string | null;
   caption?: string;
+  dedupeSuffix?: string;
 }): PendingNotificationJob {
   return {
     kind: TELEGRAM_DOCUMENT_URL_KIND,
-    dedupeSuffix: 'manager-telegram-document',
+    dedupeSuffix: params.dedupeSuffix ?? 'manager-telegram-document',
     payloadJson: jsonPayload({
       url: params.url,
       filename: params.filename,
@@ -108,28 +111,30 @@ function assertAllowedBlobUrl(rawUrl: string): URL {
 }
 
 async function downloadNotificationDocument(rawUrl: string): Promise<{ bytes: Buffer; mime?: string }> {
-  const url = assertAllowedBlobUrl(rawUrl);
+  const isPrivate = isPrivateCustomerBlobUrl(rawUrl);
+  const url = isPrivate ? new URL(rawUrl) : assertAllowedBlobUrl(rawUrl);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DOCUMENT_FETCH_TIMEOUT_MS);
 
   try {
-    const response = await fetch(url, {
+    const privateResponse = isPrivate ? await get(rawUrl, { access: 'private', token: privateBlobToken(), abortSignal: controller.signal }) : null;
+    const publicResponse = isPrivate ? null : await fetch(url, {
       signal: controller.signal,
       redirect: 'error',
       headers: { Accept: 'application/octet-stream,image/*' },
     });
-    if (!response.ok || !response.body) {
-      throw new Error(`Notification document fetch failed with status ${response.status}.`);
-    }
-
-    assertAllowedBlobUrl(response.url);
-    const contentLength = Number(response.headers.get('content-length') || 0);
+    if (publicResponse && (!publicResponse.ok || !publicResponse.body)) throw new Error(`Notification document fetch failed with status ${publicResponse.status}.`);
+    if (publicResponse) assertAllowedBlobUrl(publicResponse.url);
+    const body = privateResponse?.stream ?? publicResponse?.body;
+    if (!body) throw new Error('Notification document is unavailable.');
+    const headers = privateResponse?.headers ?? publicResponse?.headers;
+    const contentLength = Number(headers?.get('content-length') || 0);
     if (contentLength > MAX_DOCUMENT_BYTES) {
       throw new Error('Notification document exceeds the 10 MB limit.');
     }
 
     const chunks: Uint8Array[] = [];
-    const reader = response.body.getReader();
+    const reader = body.getReader();
     let totalBytes = 0;
 
     while (true) {
@@ -146,7 +151,7 @@ async function downloadNotificationDocument(rawUrl: string): Promise<{ bytes: Bu
 
     return {
       bytes: Buffer.concat(chunks.map((chunk) => Buffer.from(chunk))),
-      mime: response.headers.get('content-type')?.slice(0, 255) || undefined,
+      mime: headers?.get('content-type')?.slice(0, 255) || undefined,
     };
   } finally {
     clearTimeout(timeout);

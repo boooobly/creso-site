@@ -1,0 +1,66 @@
+[
+  {
+    "url": "http://credomir.com/",
+    "status": 308,
+    "location": "https://credomir.com/",
+    "server": "Vercel"
+  },
+  {
+    "url": "https://www.credomir.com/",
+    "status": 308,
+    "location": "https://credomir.com/",
+    "server": "Vercel"
+  },
+  {
+    "url": "https://credomir.com/",
+    "status": 200,
+    "location": null,
+    "server": "Vercel",
+    "canonical": "<link rel=\"canonical\" href=\"https://credomir.com\"/>",
+    "robots": "<meta name=\"robots\" content=\"index, follow\"/>"
+  },
+  {
+    "url": "https://credomir.com/robots.txt",
+    "status": 200,
+    "location": null,
+    "server": "Vercel",
+    "body": "User-Agent: *\nAllow: /\nDisallow: /admin\nDisallow: /admin/\nDisallow: /api\nDisallow: /api/\nDisallow: /pay/mock\nDisallow: /order/\n\nSitemap: https://credomir.com/sitemap.xml\n"
+  },
+  {
+    "url": "https://credomir.com/sitemap.xml",
+    "status": 200,
+    "location": null,
+    "server": "Vercel",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n<url>\n<loc>https://credomir.com</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>1</priority>\n</url>\n<url>\n<loc>https://credomir.com/services</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.95</priority>\n</url>\n<url>\n<loc>https://credomir.com/baget</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://credomir.com/wide-format-printing</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://credomir.com/milling</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://credomir.com/plotter-cutting</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://credomir.com/heat-transfer</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://credomir.com/services/mugs</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.88</priority>\n</url>\n<url>\n<loc>https://credomir.com/services/stands</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.88</priority>\n</url>\n<url>\n<loc>https://credomir.com/outdoor-advertising</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.92</priority>\n</url>\n<url>\n<loc>https://credomir.com/advertising-signs</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://credomir.com/banner-printing</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://credomir.com/lightboxes</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.88</priority>\n</url>\n<url>\n<loc>https://credomir.com/volume-letters</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.88</priority>\n</url>\n<url>\n<loc>https://credomir.com/print</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.88</priority>\n</url>\n<url>\n<loc>https://credomir.com/business-cards</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.88</priority>\n</url>\n<url>\n<loc>https://credomir.com/production</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://credomir.com/portfolio</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.85</priority>\n</url>\n<url>\n<loc>https://credomir.com/reviews</loc>\n<lastmod>2026-07-18T00:16:58.847Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.75</priority>\n</url>\n<url>\n<loc>https://credomir.com/contacts</loc>\n<lastmod>2026-07-18T00:16:58.848Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://credomir.com/privacy</loc>\n<lastmod>2026-07-18T00:16:58.848Z</lastmod>\n<changefreq>yearly</changefreq>\n<priority>0.3</priority>\n</url>\n</urlset>\n"
+  },
+  {
+    "url": "https://credomir.com/blog",
+    "status": 307,
+    "location": "/reviews",
+    "server": "Vercel",
+    "canonical": "<link rel=\"canonical\" href=\"https://credomir.com\"/>",
+    "robots": "<meta name=\"robots\" content=\"index, follow\"/>"
+  },
+  {
+    "url": "https://credomir.com/contacts/",
+    "status": 308,
+    "location": "/contacts",
+    "server": "Vercel"
+  },
+  {
+    "url": "https://credomir.com/contacts?utm_source=audit",
+    "status": 200,
+    "location": null,
+    "server": "Vercel",
+    "canonical": "<link rel=\"canonical\" href=\"https://credomir.com/contacts\"/>",
+    "robots": "<meta name=\"robots\" content=\"index, follow\"/>"
+  },
+  {
+    "url": "https://credomir.com/audit-nonexistent-page",
+    "status": 404,
+    "location": null,
+    "server": "Vercel",
+    "canonical": "<link rel=\"canonical\" href=\"https://credomir.com\"/>",
+    "robots": "<meta name=\"robots\" content=\"noindex\"/>"
+  }
+]

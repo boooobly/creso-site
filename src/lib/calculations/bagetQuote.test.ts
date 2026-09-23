@@ -9,6 +9,7 @@ const selectedBaget = {
   color: 'black',
   style: 'modern',
   width_mm: 30,
+  width_with_quarter_mm: 30,
   price_per_meter: 1000,
   image: '/x.jpg',
 };

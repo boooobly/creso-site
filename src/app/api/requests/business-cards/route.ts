@@ -1,3 +1,4 @@
+import { readFormDataLimited, RequestBodyError } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { enforcePublicRequestGuard } from '@/lib/anti-spam';
@@ -10,6 +11,7 @@ import { calculateTotal, getUnitPrice } from '@/lib/pricing-config/business-card
 
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 import { idempotencyErrorResponse, readRequestIdempotency } from '@/lib/orders/idempotency';
+import { customerUploadErrorResponse, readCustomerFormData } from '@/lib/customer-uploads/server';
 export const runtime = 'nodejs';
 
 const MAX_TELEGRAM_FILE_SIZE_BYTES = FIVE_MB_IN_BYTES;
@@ -103,7 +105,7 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(contentLengthValidation);
     }
 
-    const formData = await request.formData();
+    const { formData, refs: uploadRefs } = await readCustomerFormData(request, MAX_CONTENT_LENGTH_BYTES, 'business-cards');
     const name = toStringValue(formData.get('name'));
     const phoneRaw = toStringValue(formData.get('phone')).replace(/\D/g, '');
     const email = toStringValue(formData.get('email'));
@@ -119,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     const fileRaw = formData.get('file');
 
-    const blockedResponse = enforcePublicRequestGuard(request, {
+    const blockedResponse = await enforcePublicRequestGuard(request, {
       route: '/api/requests/business-cards',
       payload: {
         name,
@@ -203,7 +205,7 @@ export async function POST(request: NextRequest) {
       source: 'business-cards',
       customer: { name, phone, email, comment },
       total: totalPrice,
-      payloadJson: { service: 'business-cards', customer: { name, phone, email: email || null, comment: comment || null }, fields: { product, quantity, printSide, lamination, needDesign, unitPrice, totalPrice, turnaround, size, stock, printType, notes, flyersRequested, consent }, file: file ? { name: file.name, size: file.size, type: file.type || null } : null, referer },
+      payloadJson: { service: 'business-cards', customer: { name, phone, email: email || null, comment: comment || null }, fields: { product, quantity, printSide, lamination, needDesign, unitPrice, totalPrice, turnaround, size, stock, printType, notes, flyersRequested, consent }, file: file ? { name: file.name, size: file.size, type: file.type || null } : null, uploadRefs, referer },
       quoteJson: { kind: 'service-request', service: 'business-cards', total: totalPrice, pricingStatus: 'calculated', pricingSource: 'server', unitPrice, totalPrice },
       ...readRequestIdempotency(request.headers, {
         customer: { name, phone, email: email || null, comment: comment || null },
@@ -277,6 +279,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, fileSent: telegramCanSendFile ? true : undefined });
   } catch (error) {
+    const uploadError = customerUploadErrorResponse(error);
+    if (uploadError) return uploadError;
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     const message = error instanceof Error ? error.message : 'Unknown server error.';

@@ -1,0 +1,72 @@
+[
+  {
+    "route": "/",
+    "theme": "light",
+    "violations": []
+  },
+  {
+    "route": "/services/mugs",
+    "theme": "light",
+    "violations": []
+  },
+  {
+    "route": "/plotter-cutting",
+    "theme": "light",
+    "violations": []
+  },
+  {
+    "route": "/baget",
+    "theme": "light",
+    "violations": []
+  },
+  {
+    "route": "/baget",
+    "theme": "light",
+    "violations": []
+  },
+  {
+    "route": "/reviews",
+    "theme": "light",
+    "violations": []
+  },
+  {
+    "route": "/portfolio",
+    "theme": "light",
+    "violations": []
+  },
+  {
+    "route": "/",
+    "theme": "dark",
+    "violations": []
+  },
+  {
+    "route": "/services/mugs",
+    "theme": "dark",
+    "violations": []
+  },
+  {
+    "route": "/plotter-cutting",
+    "theme": "dark",
+    "violations": []
+  },
+  {
+    "route": "/baget",
+    "theme": "dark",
+    "violations": []
+  },
+  {
+    "route": "/baget",
+    "theme": "dark",
+    "violations": []
+  },
+  {
+    "route": "/reviews",
+    "theme": "dark",
+    "violations": []
+  },
+  {
+    "route": "/portfolio",
+    "theme": "dark",
+    "violations": []
+  }
+]

@@ -30,4 +30,5 @@ export const MUGS_ALLOWED_MIME_TYPES = [
   ...MUGS_ALLOWED_VECTOR_MIME_TYPES,
 ] as const;
 
-export const MUGS_MAX_UPLOAD_SIZE_MB = 20;
+export const MUGS_MAX_UPLOAD_SIZE_MB = 5;
+export const TSHIRTS_MAX_UPLOAD_SIZE_MB = 20;

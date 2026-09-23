@@ -23,7 +23,7 @@
       ]
     },
     "types": [
-      "leaflet"
+      "node"
     ],
     "incremental": true,
     "isolatedModules": true,

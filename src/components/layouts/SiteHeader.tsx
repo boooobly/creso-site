@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import PublicDialog from '@/components/ui/PublicDialog';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Menu, Moon, Sun, X } from 'lucide-react';
 import { messages } from '@/lib/messages';
@@ -93,23 +94,11 @@ export default function SiteHeader() {
   }, [pathname]);
 
   useEffect(() => {
-    if (!isMobileMenuOpen) return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isMobileMenuOpen]);
+    const query = window.matchMedia('(min-width: 768px)');
+    const closeOnDesktop = () => { if (query.matches) setIsMobileMenuOpen(false); };
+    query.addEventListener('change', closeOnDesktop);
+    return () => query.removeEventListener('change', closeOnDesktop);
+  }, []);
 
   useEffect(() => {
     if (previousMobileMenuState.current && !isMobileMenuOpen) {
@@ -120,11 +109,10 @@ export default function SiteHeader() {
   }, [isMobileMenuOpen]);
 
   const mobileMenuOverlay = (
-    <div
+    <PublicDialog label="Навигация по сайту" onClose={() => setIsMobileMenuOpen(false)}
       className={`fixed inset-0 z-[60] md:hidden ${
         isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'
       }`}
-      aria-hidden={!isMobileMenuOpen}
     >
       <button
         type="button"
@@ -139,8 +127,6 @@ export default function SiteHeader() {
         className={`absolute right-0 top-0 flex h-dvh w-[min(22rem,calc(100%_-_0.75rem_-_env(safe-area-inset-right,0px)))] max-w-full flex-col border-l border-neutral-200 bg-white pb-[env(safe-area-inset-bottom,0px)] pr-[env(safe-area-inset-right,0px)] pt-[env(safe-area-inset-top,0px)] shadow-2xl transition-transform duration-200 dark:border-neutral-800 dark:bg-neutral-950 ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        role="dialog"
-        aria-modal="true"
         aria-label="Навигация по сайту"
       >
         <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
@@ -166,8 +152,8 @@ export default function SiteHeader() {
                         href={item.href}
                         className={`flex min-h-11 flex-1 items-center rounded-lg px-3 text-sm font-medium no-underline transition-colors ${
                           isServicesActive
-                            ? 'text-[var(--brand-red)]'
-                            : 'text-neutral-700 hover:text-[var(--brand-red)] dark:text-neutral-300'
+                            ? 'text-[var(--brand-red-text)]'
+                            : 'text-neutral-700 hover:text-[var(--brand-red-text)] dark:text-neutral-300'
                         }`}
                       >
                         {item.label}
@@ -193,8 +179,8 @@ export default function SiteHeader() {
                                 href={service.href}
                                 className={`flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm no-underline transition-colors ${
                                   isServiceActive
-                                    ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
-                                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-300 dark:hover:bg-neutral-800'
+                                    ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red-text)] dark:bg-[color:var(--brand-red)]/15'
+                                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red-text)] dark:text-neutral-300 dark:hover:bg-neutral-800'
                                 }`}
                               >
                                 <span className="text-wrap-safe">{service.label}</span>
@@ -215,8 +201,8 @@ export default function SiteHeader() {
                     href={item.href}
                     className={`flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm font-medium no-underline transition-colors ${
                       isActive
-                        ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
-                        : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-300 dark:hover:bg-neutral-800'
+                        ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red-text)] dark:bg-[color:var(--brand-red)]/15'
+                        : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red-text)] dark:text-neutral-300 dark:hover:bg-neutral-800'
                     }`}
                   >
                     <span className="text-wrap-safe">{item.label}</span>
@@ -231,7 +217,7 @@ export default function SiteHeader() {
           <ThemeToggle className="h-11 w-11" />
         </div>
       </aside>
-    </div>
+    </PublicDialog>
   );
 
   return (
@@ -269,6 +255,7 @@ export default function SiteHeader() {
                   <li
                     key={n.href}
                     className="group relative"
+                    onKeyDown={(event) => { if (event.key === 'Escape') { event.currentTarget.querySelector('a')?.focus(); setIsServicesMenuOpen(false); } }}
                     onMouseEnter={() => setIsServicesMenuOpen(true)}
                     onMouseLeave={() => setIsServicesMenuOpen(false)}
                     onFocus={() => setIsServicesMenuOpen(true)}
@@ -282,10 +269,10 @@ export default function SiteHeader() {
                       href={n.href}
                       onClick={() => setIsServicesMenuOpen(false)}
                       className={
-                        'inline-flex items-center gap-1 no-underline text-sm font-medium transition-colors hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:text-[var(--brand-red)] ' +
-                        (isServicesActive ? 'text-[var(--brand-red)]' : 'text-neutral-700 dark:text-neutral-300')
+                        'inline-flex items-center gap-1 no-underline text-sm font-medium transition-colors hover:text-[var(--brand-red-text)] focus-visible:outline-none focus-visible:text-[var(--brand-red-text)] ' +
+                        (isServicesActive ? 'text-[var(--brand-red-text)]' : 'text-neutral-700 dark:text-neutral-300')
                       }
-                      aria-haspopup="menu"
+                      aria-controls="desktop-services-list"
                       aria-expanded={isServicesMenuOpen}
                     >
                       <span>{n.label}</span>
@@ -296,28 +283,27 @@ export default function SiteHeader() {
                     </Link>
                     <div
                       className={`absolute left-1/2 top-full z-50 w-[320px] -translate-x-1/2 pt-2 transition duration-150 ${
-                        isServicesMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+                        isServicesMenuOpen ? 'pointer-events-auto opacity-100' : 'invisible pointer-events-none opacity-0'
                       }`}
                     >
                       <ul
                         className="rounded-xl border border-neutral-200/80 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur dark:border-neutral-800/90 dark:bg-neutral-900/95 dark:shadow-black/40"
-                        role="menu"
+                        id="desktop-services-list"
                         aria-label="Услуги"
                       >
                         {serviceDropdownItems.map((item) => {
                           const active = pathname === item.href;
 
                           return (
-                            <li key={item.href} role="none">
+                            <li key={item.href}>
                               <Link
                                 href={item.href}
                                 onClick={() => setIsServicesMenuOpen(false)}
-                                role="menuitem"
                                 className={
                                   'block rounded-lg px-3 py-2 text-sm no-underline transition-colors focus-visible:outline-none ' +
                                   (active
-                                    ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red)] dark:bg-[color:var(--brand-red)]/15'
-                                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red)] dark:text-neutral-200 dark:hover:bg-neutral-800/90')
+                                    ? 'bg-[color:var(--brand-red)]/10 text-[var(--brand-red-text)] dark:bg-[color:var(--brand-red)]/15'
+                                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-[var(--brand-red-text)] dark:text-neutral-200 dark:hover:bg-neutral-800/90')
                                 }
                               >
                                 {item.label}
@@ -337,8 +323,8 @@ export default function SiteHeader() {
                   <Link
                     href={n.href}
                     className={
-                      'no-underline text-sm font-medium hover:text-[var(--brand-red)] ' +
-                      (active ? 'text-[var(--brand-red)]' : 'text-neutral-700 dark:text-neutral-300')
+                      'no-underline text-sm font-medium hover:text-[var(--brand-red-text)] ' +
+                      (active ? 'text-[var(--brand-red-text)]' : 'text-neutral-700 dark:text-neutral-300')
                     }
                   >
                     <span>{n.label}</span>
@@ -365,7 +351,7 @@ export default function SiteHeader() {
           </div>
         </div>
       </div>
-      {isClientMounted ? createPortal(mobileMenuOverlay, document.body) : null}
+      {isClientMounted && isMobileMenuOpen ? createPortal(mobileMenuOverlay, document.body) : null}
     </header>
   );
 }

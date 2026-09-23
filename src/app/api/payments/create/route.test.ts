@@ -11,7 +11,7 @@ describe('POST /api/payments/create', () => {
       headers: { 'content-type': 'application/json' },
     });
 
-    const response = await POST(request);
+    const response = await POST();
     const json = await response.json();
 
     expect(response.status).toBe(410);

@@ -1,0 +1,22 @@
+[
+  {
+    "route": "/services/mugs",
+    "label": "Конструктор макета кружки",
+    "ok": true
+  },
+  {
+    "route": "/plotter-cutting",
+    "label": "Требования к макету",
+    "ok": true
+  },
+  {
+    "route": "/baget",
+    "label": "Оформление заказа багета",
+    "ok": true
+  },
+  {
+    "route": "/baget",
+    "label": "Мобильный выбор багета",
+    "ok": true
+  }
+]

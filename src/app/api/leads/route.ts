@@ -1,18 +1,19 @@
+import { readFormDataLimited, RequestBodyError, readJsonLimited } from '@/lib/request-body';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { buildLeadNotificationText, type LeadNotificationFile } from '@/lib/notifications/leadNotificationUtils';
-import { sendTelegramDocumentBuffer } from '@/lib/notifications/telegram';
 import { normalizePhone } from '@/lib/utils/phone';
 import { enforcePublicRequestGuard, getClientIp } from '@/lib/anti-spam';
 import { sourceTitle } from '@/lib/utils/sourceTitle';
-import { getServerEnv } from '@/lib/env';
+import { readCustomerUploadRefs, storeLegacyCustomerFile } from '@/lib/customer-uploads/server';
+import type { CustomerUploadRef } from '@/lib/customer-uploads/shared';
 
 import { logger } from '@/lib/logger';
 import { multipartErrorResponse, validateMultipartContentLength, validateMultipartFiles } from '@/lib/upload-safety';
 import { createServiceRequestOrder } from '@/lib/orders/createServiceRequestOrder';
 import { createRequestFingerprint, idempotencyErrorResponse, readIdempotencyKey } from '@/lib/orders/idempotency';
-import { buildManagerNotificationJobs, processNotificationJobsBestEffort } from '@/lib/notifications/outbox';
+import { buildManagerNotificationJobs, buildTelegramDocumentUrlJob, processNotificationJobsBestEffort } from '@/lib/notifications/outbox';
 export const runtime = 'nodejs';
 
 const optionalTrimmedString = z.preprocess(
@@ -69,6 +70,7 @@ const leadSchema = z.object({
 type ParsedLeadRequest = {
   payload: unknown;
   files: File[];
+  formData?: FormData;
 };
 
 const LEADS_MAX_FILES = 5;
@@ -80,7 +82,7 @@ async function parseLeadRequest(request: NextRequest): Promise<ParsedLeadRequest
   const contentType = request.headers.get('content-type') || '';
 
   if (contentType.includes('multipart/form-data')) {
-    const formData = await request.formData();
+    const formData = await readFormDataLimited(request, LEADS_MAX_CONTENT_LENGTH_BYTES);
     const extrasRaw = formData.get('extras');
     let extras: Record<string, unknown> | undefined;
 
@@ -113,40 +115,14 @@ async function parseLeadRequest(request: NextRequest): Promise<ParsedLeadRequest
         extras,
       },
       files,
+      formData,
     };
   }
 
   return {
-    payload: await request.json().catch(() => null),
+    payload: await readJsonLimited(request),
     files: [],
   };
-}
-
-async function sendLeadTelegramFiles(params: { files: LeadNotificationFile[] }): Promise<void> {
-  if (params.files.length === 0) return;
-
-  const env = getServerEnv();
-  const token = env.TELEGRAM_BOT_TOKEN;
-  const chatId = env.TELEGRAM_CHAT_ID;
-
-  if (!token || !chatId) return;
-
-  for (const file of params.files) {
-    if (!file.bytes) continue;
-
-    try {
-      await sendTelegramDocumentBuffer({
-        chatId,
-        token,
-        caption: `Файл: ${file.name}`,
-        bytes: file.bytes,
-        filename: file.name,
-        mime: file.type || 'application/octet-stream',
-      });
-    } catch (error) {
-      logger.error('leads.telegram.document_failed', { error, fileName: file.name, fileSize: file.size });
-    }
-  }
 }
 
 export async function POST(request: NextRequest) {
@@ -162,7 +138,7 @@ export async function POST(request: NextRequest) {
     }
 
     const ip = getClientIp(request);
-    const { payload, files } = await parseLeadRequest(request);
+    const { payload, files, formData } = await parseLeadRequest(request);
     const filesValidation = validateMultipartFiles(files, {
       maxFiles: LEADS_MAX_FILES,
       maxFileBytes: LEADS_MAX_FILE_SIZE_BYTES,
@@ -172,7 +148,7 @@ export async function POST(request: NextRequest) {
       return multipartErrorResponse(filesValidation);
     }
 
-    const blockedResponse = enforcePublicRequestGuard(request, {
+    const blockedResponse = await enforcePublicRequestGuard(request, {
       route: '/api/leads',
       payload,
       requirePayload: true,
@@ -196,33 +172,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Укажите телефон в формате +7XXXXXXXXXX.' }, { status: 400 });
     }
 
-    const notificationFiles: LeadNotificationFile[] = await Promise.all(
-      files.map(async (file) => ({
-        name: file.name || 'upload.bin',
-        size: file.size,
-        type: file.type || 'application/octet-stream',
-        bytes: Buffer.from(await file.arrayBuffer()),
-      })),
-    );
-
     const referer = request.headers.get('referer') || request.headers.get('origin') || '';
     const idempotencyKey = readIdempotencyKey(request.headers);
+    const uploadedRefs = formData ? await readCustomerUploadRefs(formData, 'lead', idempotencyKey) : [];
+    if (files.length + uploadedRefs.length > LEADS_MAX_FILES || uploadedRefs.reduce((sum, ref) => sum + ref.size, 0) + files.reduce((sum, file) => sum + file.size, 0) > LEADS_MAX_TOTAL_SIZE_BYTES || uploadedRefs.some((ref) => ref.size > LEADS_MAX_FILE_SIZE_BYTES || ref.field !== 'files')) {
+      return NextResponse.json({ ok: false, error: 'Превышен лимит вложений.' }, { status: 413 });
+    }
+    const legacyRefs = await Promise.all(files.map((file) => storeLegacyCustomerFile(file, 'lead', idempotencyKey)));
+    const allRefs: CustomerUploadRef[] = [...uploadedRefs, ...legacyRefs];
+    const notificationFiles: LeadNotificationFile[] = allRefs.map((ref) => ({ name: ref.name, size: ref.size, type: ref.type }));
     const requestHash = idempotencyKey
       ? createRequestFingerprint({
         ...parsed.data,
         phone: normalizedPhone ?? null,
         company: null,
-        files: notificationFiles.map(({ bytes, ...file }) => ({
-          ...file,
-          digest: bytes ? createHash('sha256').update(bytes).digest('hex') : null,
-        })),
+        files: notificationFiles,
       })
       : undefined;
     const createdOrder = await createServiceRequestOrder({
       source: 'lead',
       customer: { name: parsed.data.name, phone: normalizedPhone, email: parsed.data.email, comment: parsed.data.comment },
       total: 0,
-      payloadJson: JSON.parse(JSON.stringify({ service: 'lead', source: parsed.data.source, customer: { name: parsed.data.name, phone: normalizedPhone || null, email: parsed.data.email || null, comment: parsed.data.comment || null }, fields: { ...parsed.data, phone: normalizedPhone ?? null, company: null }, files: notificationFiles.map(({ bytes, ...file }) => file), referer, ip })),
+      payloadJson: JSON.parse(JSON.stringify({ service: 'lead', source: parsed.data.source, customer: { name: parsed.data.name, phone: normalizedPhone || null, email: parsed.data.email || null, comment: parsed.data.comment || null }, fields: { ...parsed.data, phone: normalizedPhone ?? null, company: null }, files: allRefs, referer, ip })),
       idempotencyKey,
       requestHash,
       buildNotificationJobs: (orderNumber) => {
@@ -233,23 +204,27 @@ export async function POST(request: NextRequest) {
           files: notificationFiles,
         })].join('\n');
 
-        return buildManagerNotificationJobs({
+        return [...buildManagerNotificationJobs({
           subject: `Новая заявка: ${sourceTitle(parsed.data.source)}`,
           text,
-        });
+        }), ...allRefs.map((ref, index) => buildTelegramDocumentUrlJob({
+          url: ref.url,
+          filename: ref.name,
+          mime: ref.type,
+          caption: `Файл к заявке #${orderNumber}: ${ref.name}`,
+          dedupeSuffix: `manager-document-${index}`,
+        }))];
       },
     });
 
     await processNotificationJobsBestEffort((createdOrder.notificationJobs ?? []).map((job) => job.id));
-    if (!createdOrder.reused) {
-      await sendLeadTelegramFiles({ files: notificationFiles });
-    }
 
     return NextResponse.json(
       { ok: true },
       { headers: createdOrder.reused ? { 'X-Idempotent-Replay': 'true' } : undefined },
     );
   } catch (error) {
+    if (error instanceof RequestBodyError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     const idempotencyResponse = idempotencyErrorResponse(error);
     if (idempotencyResponse) return idempotencyResponse;
     logger.error('api.request.failed', { error });

@@ -10,9 +10,10 @@ import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import {
   MUGS_ALLOWED_EXTENSIONS,
   MUGS_ALLOWED_MIME_TYPES,
-  MUGS_MAX_UPLOAD_SIZE_MB,
+  TSHIRTS_MAX_UPLOAD_SIZE_MB,
 } from '@/lib/pricing-config/mugs';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
+import { uploadCustomerFiles } from '@/lib/customer-uploads/client';
 
 type FormValues = {
   name: string;
@@ -44,7 +45,7 @@ export default function OrderTshirtsForm() {
   const inputClass = (name: keyof FormValues) => publicInputClass(Boolean(errors[name]));
 
   const helperText = useMemo(
-    () => `PNG, JPG, JPEG, WEBP, PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${MUGS_MAX_UPLOAD_SIZE_MB} МБ.`,
+    () => `PNG, JPG, JPEG, WEBP, PDF, CDR, AI, EPS, DXF, SVG. 1 файл, до ${TSHIRTS_MAX_UPLOAD_SIZE_MB} МБ.`,
     [],
   );
 
@@ -92,6 +93,8 @@ export default function OrderTshirtsForm() {
         file: file ? { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified } : null,
       });
 
+      await uploadCustomerFiles(formData, 'tshirts', idempotencyKey);
+
       const response = await fetch('/api/requests/tshirts', {
         method: 'POST',
         headers: { 'Idempotency-Key': idempotencyKey },
@@ -133,13 +136,13 @@ export default function OrderTshirtsForm() {
             <label className="space-y-2">
               <span className="text-sm font-semibold">Имя *</span>
               <input className={inputClass('name')} value={values.name} onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))} />
-              {errors.name && <span className="text-xs text-red-600">{errors.name}</span>}
+              {errors.name && <span className="text-xs text-red-600 dark:text-red-400">{errors.name}</span>}
             </label>
 
             <label className="space-y-2">
               <span className="text-sm font-semibold">Телефон *</span>
               <PhoneInput value={values.phone} onChange={(phone) => setValues((prev) => ({ ...prev, phone }))} className={inputClass('phone')} />
-              {errors.phone && <span className="text-xs text-red-600">{errors.phone}</span>}
+              {errors.phone && <span className="text-xs text-red-600 dark:text-red-400">{errors.phone}</span>}
             </label>
           </div>
 
@@ -158,12 +161,12 @@ export default function OrderTshirtsForm() {
               allowedMimeTypes={[...MUGS_ALLOWED_MIME_TYPES]}
               allowedExtensions={[...MUGS_ALLOWED_EXTENSIONS]}
               invalidTypeMessage="Разрешены только png, jpg, jpeg, webp, pdf, cdr, ai, eps, dxf, svg."
-              maxSizeMb={MUGS_MAX_UPLOAD_SIZE_MB}
+              maxSizeMb={TSHIRTS_MAX_UPLOAD_SIZE_MB}
               className={publicFormStyles.uploadZone}
               helperTextClassName="mt-1 text-xs text-muted-foreground"
               icon={<Upload className="h-5 w-5 text-muted-foreground" aria-hidden="true" />}
             />
-            {errors.file && <p className="text-xs text-red-600">{errors.file}</p>}
+            {errors.file && <p className="text-xs text-red-600 dark:text-red-400">{errors.file}</p>}
             <p className="text-xs text-neutral-500 dark:text-neutral-400">Файл не обязателен: задачу можно описать в комментарии.</p>
           </div>
 
@@ -184,13 +187,13 @@ export default function OrderTshirtsForm() {
               .
             </span>
           </label>
-          {errors.consent && <p className="text-xs text-red-600">{errors.consent}</p>}
+          {errors.consent && <p className="text-xs text-red-600 dark:text-red-400">{errors.consent}</p>}
 
           <button type="submit" disabled={isSending} className={`${publicFormStyles.submitButton} hover:scale-[1.02]`}>
             {isSending ? 'Отправка…' : 'Отправить заявку'}
           </button>
 
-          {formError && <p className="text-sm text-red-600">{formError}</p>}
+          {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
           {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
 
           <div className="rounded-xl border border-neutral-200/80 bg-neutral-50 px-4 py-3 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/70 dark:text-neutral-300">

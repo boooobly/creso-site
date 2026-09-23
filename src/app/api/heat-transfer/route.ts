@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     getServerEnv();
     const payload = (await req.json()) as HeatTransferPayload;
 
-    const blockedResponse = enforcePublicRequestGuard(req, {
+    const blockedResponse = await enforcePublicRequestGuard(req, {
       route: '/api/heat-transfer',
       payload,
       requirePayload: true,

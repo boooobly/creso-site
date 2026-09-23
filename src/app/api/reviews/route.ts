@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Некорректный JSON в запросе.' }, { status: 400 });
     }
 
-    const blockedResponse = enforcePublicRequestGuard(request, {
+    const blockedResponse = await enforcePublicRequestGuard(request, {
       route: '/api/reviews',
       payload,
       honeypotFields: ['website'],

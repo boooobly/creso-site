@@ -10,7 +10,7 @@ describe('buildCustomerImagePath', () => {
       id: 'abc-123',
     });
 
-    expect(pathname).toBe('uploads/orders/baget/123456789-abc-123.jpg');
+    expect(pathname).toBe('uploads/customers/baget/legacy/123456789-abc-123.jpg');
     expect(pathname).not.toContain('evil');
     expect(pathname).not.toContain('..');
     expect(pathname).not.toContain('\\');

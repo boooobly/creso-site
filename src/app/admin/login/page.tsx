@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import AdminLoginForm from '@/components/admin/AdminLoginForm';
 
 export const metadata: Metadata = {
-  title: 'Вход в админ-панель'
+  title: 'Вход в админ-панель',
+  robots: { index: false, follow: false },
+  alternates: { canonical: null },
 };
 
 type AdminLoginPageProps = {

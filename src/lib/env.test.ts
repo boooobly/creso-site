@@ -13,7 +13,7 @@ function restoreEnv(snapshot: EnvSnapshot): void {
     if (snapshot[key] === undefined) {
       delete process.env[key];
     } else {
-      process.env[key] = snapshot[key];
+      vi.stubEnv(key, snapshot[key]);
     }
   }
 }
@@ -35,7 +35,7 @@ describe('env database validation', () => {
   });
 
   it('getServerEnv requires DATABASE_URL_UNPOOLED in production when database is enabled', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.ENABLE_DATABASE = 'true';
     process.env.DATABASE_URL = 'postgresql://user:pass@runtime-host:5432/app?sslmode=require';
     delete process.env.DATABASE_URL_UNPOOLED;

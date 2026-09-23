@@ -22,7 +22,7 @@ export function getNextMobileBagetImageIndex(currentIndex: number, candidatesLen
 }
 
 export default function BagetMobileSelectorCard({ item, selected, onSelect }: BagetMobileSelectorCardProps) {
-  const imageCandidates = useMemo(() => getMobileBagetImageCandidates(item), [item.cardImage, item.fallbackImage]);
+  const imageCandidates = useMemo(() => getMobileBagetImageCandidates(item), [item]);
   const [imageIndex, setImageIndex] = useState(0);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 

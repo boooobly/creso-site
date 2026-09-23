@@ -20,7 +20,7 @@ describe('GET /api/baget/catalog-debug', () => {
   });
 
   it('rejects unauthenticated preview access', async () => {
-    process.env.NODE_ENV = 'test';
+    vi.stubEnv('NODE_ENV', 'test');
     const { GET } = await import('@/app/api/baget/catalog-debug/route');
     const request = new NextRequest('http://localhost:3000/api/baget/catalog-debug');
 
@@ -31,7 +31,7 @@ describe('GET /api/baget/catalog-debug', () => {
   });
 
   it('allows request with valid debug token in non-production', async () => {
-    process.env.NODE_ENV = 'test';
+    vi.stubEnv('NODE_ENV', 'test');
     process.env.BAGET_CATALOG_DEBUG_TOKEN = 'debug-token';
     loadBagetCatalogMock.mockResolvedValue({
       source: 'sheet',
@@ -49,7 +49,7 @@ describe('GET /api/baget/catalog-debug', () => {
   });
 
   it('keeps production blocked', async () => {
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.BAGET_CATALOG_DEBUG_TOKEN = 'debug-token';
     const { GET } = await import('@/app/api/baget/catalog-debug/route');
     const request = new NextRequest('http://localhost:3000/api/baget/catalog-debug?debugToken=debug-token');
