@@ -81,7 +81,7 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
         <section className="space-y-5 md:space-y-6">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-2xl">Отзывы клиентов</h2>
-            <p className="hidden text-sm text-neutral-500 md:block">Сначала новые</p>
+            <p className="hidden text-sm text-neutral-500 dark:text-neutral-400 md:block">Сначала новые</p>
           </div>
 
           <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 md:gap-5">

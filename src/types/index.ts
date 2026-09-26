@@ -10,11 +10,12 @@ export type PortfolioItem = {
   slug: string;
   title: string;
   image: string;
+  imageAlt?: string;
   category: string;
   shortDescription: string;
   featured?: boolean;
   sortOrder?: number;
-  galleryImages?: string[];
+  galleryImages?: Array<{ url: string; alt?: string }>;
 };
 
 export type FaqItem = { q: string; a: string };

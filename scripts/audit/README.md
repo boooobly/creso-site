@@ -10,8 +10,9 @@ npm run theme
 npm run scenarios
 npm run seo
 npm run lighthouse
+node portfolio-check.mjs
 ```
 
-`pages` covers 21 routes at 375/430/768/1440/1920 pixels with reduced motion and axe at 375/1440. `theme` covers dark mode with motion at 375/1440. Scenario submissions use mocked responses; they do not verify delivery to a database, email or Telegram. SEO checks reuse the page crawl. Results and screenshots go to the ignored `scripts/audit-results/after` directory. Lighthouse runs separately to avoid competing browser workloads. Set `CHROME_PATH` only if automatic Chrome discovery fails.
+`pages` covers 21 routes at 390/768/1440/1920 pixels with reduced motion and axe at 390/1440. `theme` covers the same routes and widths in dark mode, with axe at 390/1440. `portfolio-check.mjs` exercises the populated portfolio grid, pagination, category filtering, dialog, and gallery; it requires a database-enabled local server with curated data. Scenario submissions use mocked responses; they do not verify delivery to a database, email or Telegram. SEO checks reuse the page crawl. Results and screenshots go to the ignored `scripts/audit-results/after` directory. Lighthouse runs separately to avoid competing browser workloads. Set `CHROME_PATH` only if automatic Chrome discovery fails.
 
 Use the reports alongside manual screenshot and keyboard review. Axe does not establish full WCAG compliance; Lighthouse is a lab measurement, not field Core Web Vitals or INP.

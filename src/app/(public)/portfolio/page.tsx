@@ -21,16 +21,17 @@ function normalizeItem(item: any, index: number): PortfolioItem {
     ? item.galleryImages
         .map((entry: unknown) => {
           if (typeof entry === 'string') {
-            return entry.trim();
+            return { url: entry.trim(), alt: '' };
           }
 
           if (!entry || typeof entry !== 'object') {
-            return '';
+            return { url: '', alt: '' };
           }
 
-          return String((entry as { url?: unknown }).url ?? '').trim();
+          const image = entry as { url?: unknown; alt?: unknown };
+          return { url: String(image.url ?? '').trim(), alt: String(image.alt ?? '').trim() };
         })
-        .filter(Boolean)
+        .filter((entry: { url: string }) => Boolean(entry.url))
     : [];
 
   return {
@@ -40,6 +41,7 @@ function normalizeItem(item: any, index: number): PortfolioItem {
     category,
     shortDescription,
     image,
+    imageAlt: String(item?.imageAlt ?? item?.title ?? 'Проект'),
     featured: Boolean(item?.featured),
     sortOrder: typeof item?.sortOrder === 'number' ? item.sortOrder : index,
     galleryImages,
@@ -91,7 +93,7 @@ export default async function PortfolioPage() {
                 <div className="relative min-h-[220px] flex-1 overflow-hidden rounded-2xl sm:min-h-[250px] md:min-h-[300px]">
                   <ProtectedImage
                     src={featuredItem.image}
-                    alt={featuredItem.title}
+                    alt={featuredItem.imageAlt || featuredItem.title}
                     fill
                     sizes="(max-width: 1024px) 100vw, 42vw"
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
@@ -120,7 +122,7 @@ export default async function PortfolioPage() {
                       >
                         <ProtectedImage
                           src={item.image}
-                          alt={item.title}
+                          alt={item.imageAlt || item.title}
                           fill
                           sizes="(max-width: 1024px) 100vw, 28vw"
                           className="h-full w-full object-cover"
@@ -160,38 +162,6 @@ export default async function PortfolioPage() {
           </div>
         </PageHero>
       </Section>
-
-      {featuredItem ? (
-        <Section spacing="tight">
-          <article className="card-visual overflow-hidden border-neutral-200/85 bg-white/90 shadow-[0_20px_45px_-38px_rgba(15,23,42,0.45)] dark:border-neutral-800/90 dark:bg-neutral-900/90 dark:shadow-none">
-            <div className="grid gap-0 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-              <div className="relative min-h-[240px] md:min-h-[320px]">
-                <ProtectedImage
-                  src={featuredItem.image}
-                  alt={featuredItem.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 52vw"
-                  className="h-full w-full object-cover"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
-              </div>
-
-              <div className="flex flex-col justify-center gap-4 p-5 md:p-7 lg:p-8">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-red-text)]">Выделенный кейс</p>
-                <div className="space-y-2">
-                  <span className="inline-flex w-fit items-center rounded-full border border-red-200/70 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-200">
-                    {featuredItem.category}
-                  </span>
-                  <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-[1.9rem]">{featuredItem.title}</h2>
-                  <p className="text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
-                    {featuredItem.shortDescription || 'Описание проекта пока добавляется в админ-панели.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </article>
-        </Section>
-      ) : null}
 
       <Section spacing="tight">
         <PortfolioGrid items={items} />

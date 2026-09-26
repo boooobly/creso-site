@@ -8,9 +8,10 @@ export type PublicPortfolioItem = {
   category: string;
   shortDescription: string;
   image: string;
+  imageAlt: string;
   featured: boolean;
   sortOrder: number;
-  galleryImages: string[];
+  galleryImages: Array<{ url: string; alt: string }>;
 };
 
 const PORTFOLIO_PLACEHOLDER_IMAGE = '/og-image.png';
@@ -18,7 +19,7 @@ const UNCATEGORIZED_LABEL = 'Без категории';
 
 function resolvePortfolioImage(item: {
   coverImage: string | null;
-  coverImageAsset: { url: string } | null;
+  coverImageAsset: { url: string; altText: string | null } | null;
 }) {
   return item.coverImageAsset?.url ?? item.coverImage ?? PORTFOLIO_PLACEHOLDER_IMAGE;
 }
@@ -28,7 +29,7 @@ function normalizeCategory(category: string | null) {
   return normalized || UNCATEGORIZED_LABEL;
 }
 
-function parseGalleryImages(value: Prisma.JsonValue): string[] {
+function parseGalleryImages(value: Prisma.JsonValue): Array<{ url: string; alt: string }> {
   if (!Array.isArray(value)) {
     return [];
   }
@@ -36,16 +37,17 @@ function parseGalleryImages(value: Prisma.JsonValue): string[] {
   return value
     .map((entry) => {
       if (typeof entry === 'string') {
-        return entry.trim();
+        return { url: entry.trim(), alt: '' };
       }
 
       if (!entry || typeof entry !== 'object') {
-        return '';
+        return { url: '', alt: '' };
       }
 
-      return String((entry as { url?: unknown }).url ?? '').trim();
+      const image = entry as { url?: unknown; alt?: unknown };
+      return { url: String(image.url ?? '').trim(), alt: String(image.alt ?? '').trim() };
     })
-    .filter((entry) => Boolean(entry));
+    .filter((entry) => Boolean(entry.url));
 }
 
 function mapPublicPortfolioItem(item: {
@@ -58,7 +60,7 @@ function mapPublicPortfolioItem(item: {
   sortOrder: number;
   coverImage: string | null;
   galleryImages: Prisma.JsonValue;
-  coverImageAsset: { url: string } | null;
+  coverImageAsset: { url: string; altText: string | null } | null;
 }): PublicPortfolioItem {
   return {
     id: item.id,
@@ -67,6 +69,7 @@ function mapPublicPortfolioItem(item: {
     category: normalizeCategory(item.category),
     shortDescription: item.shortDescription ?? '',
     image: resolvePortfolioImage(item),
+    imageAlt: item.coverImageAsset?.altText?.trim() || item.title,
     featured: item.featured,
     sortOrder: item.sortOrder,
     galleryImages: parseGalleryImages(item.galleryImages),
@@ -81,6 +84,7 @@ export async function getPublicPortfolioItems() {
       coverImageAsset: {
         select: {
           url: true,
+          altText: true,
         },
       },
     },
@@ -98,6 +102,7 @@ export async function getFeaturedPortfolioItems(limit = 3) {
       coverImageAsset: {
         select: {
           url: true,
+          altText: true,
         },
       },
     },

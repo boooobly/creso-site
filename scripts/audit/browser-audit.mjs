@@ -7,7 +7,7 @@ await fs.mkdir(out, { recursive: true });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const routes = ['/', '/services', '/baget', '/wide-format-printing', '/milling', '/plotter-cutting', '/heat-transfer', '/services/mugs', '/services/stands', '/outdoor-advertising', '/advertising-signs', '/banner-printing', '/lightboxes', '/volume-letters', '/print', '/business-cards', '/production', '/portfolio', '/reviews', '/contacts', '/privacy'];
 const results = [];
-for (const width of [375, 430, 768, 1440, 1920]) {
+for (const width of [390, 768, 1440, 1920]) {
   const context = await browser.newContext({ viewport: { width, height: 950 }, reducedMotion: 'reduce' });
   const page = await context.newPage();
   for (const route of routes) {
@@ -34,7 +34,7 @@ for (const width of [375, 430, 768, 1440, 1920]) {
         jsonLd: [...document.querySelectorAll('script[type="application/ld+json"]')].map(e=>JSON.parse(e.textContent)),
       }));
       let violations = [];
-      if(width === 375 || width === 1440) violations = (await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>({ id:v.id, impact:v.impact, nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary})).slice(0,8) }));
+      if(width === 390 || width === 1440) violations = (await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>({ id:v.id, impact:v.impact, nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary})).slice(0,8) }));
       await page.screenshot({ path: new URL(`${route.replaceAll('/','_') || 'home'}-${width}.png`,out).pathname.replace(/^\/(\w:)/,'$1'), fullPage: true });
       results.push({ route, width, status:response.status(), ...dom, errors, failed, violations });
       console.log(JSON.stringify({ route,width,status:response.status(),overflow:dom.overflow,broken:dom.brokenImages.length,errors:errors.length,axe:violations.map(v=>v.id) }));

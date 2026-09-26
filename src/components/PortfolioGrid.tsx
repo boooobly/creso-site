@@ -8,6 +8,7 @@ import ProtectedImage from '@/components/ui/ProtectedImage';
 
 const ALL_FILTER = 'Все';
 const UNCATEGORIZED_LABEL = 'Без категории';
+const PAGE_SIZE = 12;
 
 const cn = (...classes: Array<string | false | undefined>) => classes.filter(Boolean).join(' ');
 
@@ -22,9 +23,8 @@ function getItemDescription(item: PortfolioItem) {
 
 function buildGallery(item: PortfolioItem) {
   const rawGallery = Array.isArray(item.galleryImages) ? item.galleryImages : [];
-  const all = [item.image, ...rawGallery].map((entry) => String(entry ?? '').trim()).filter(Boolean);
-
-  return Array.from(new Set(all));
+  const all = [{ url: item.image, alt: item.imageAlt || item.title }, ...rawGallery];
+  return all.filter((entry, index) => entry.url && all.findIndex((other) => other.url === entry.url) === index);
 }
 
 export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
@@ -36,11 +36,13 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
   const [activeCategory, setActiveCategory] = useState(ALL_FILTER);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const filteredItems = useMemo(
     () => items.filter((item) => activeCategory === ALL_FILTER || getItemCategory(item) === activeCategory),
     [activeCategory, items]
   );
+  const visibleItems = filteredItems.slice(0, visibleCount);
 
   const activeItem = useMemo(
     () => items.find((item) => item.id === activeProjectId) ?? null,
@@ -92,7 +94,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
             <button
               key={category}
               type="button"
-              onClick={() => setActiveCategory(category)}
+              onClick={() => { setActiveCategory(category); setVisibleCount(PAGE_SIZE); }}
               className={cn(
                 'inline-flex min-h-10 items-center rounded-xl border px-3 py-2 text-xs font-semibold transition-all duration-200 sm:px-3.5 md:text-sm',
                 isActive
@@ -109,7 +111,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
 
       {filteredItems.length > 0 ? (
         <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredItems.map((item) => {
+          {visibleItems.map((item) => {
             const description = getItemDescription(item);
 
             return (
@@ -126,7 +128,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                   <div className="relative h-52 overflow-hidden md:h-56">
                     <ProtectedImage
                       src={item.image}
-                      alt={item.title}
+                      alt={item.imageAlt || item.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                       className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
@@ -157,6 +159,14 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
         </div>
       )}
 
+      {visibleCount < filteredItems.length ? (
+        <div className="flex justify-center pt-2">
+          <button type="button" className="btn-secondary" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}>
+            Показать ещё {Math.min(PAGE_SIZE, filteredItems.length - visibleCount)} из {filteredItems.length}
+          </button>
+        </div>
+      ) : null}
+
       {activeItem ? (
         <PublicDialog label={`Просмотр проекта ${activeItem.title}`} onClose={() => setActiveProjectId(null)}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-[2px]"
@@ -165,8 +175,8 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
               <div className="relative bg-neutral-950">
                 <ProtectedImage
-                  src={activeGallery[activeImageIndex] ?? activeItem.image}
-                  alt={activeItem.title}
+                  src={activeGallery[activeImageIndex]?.url ?? activeItem.image}
+                  alt={activeGallery[activeImageIndex]?.alt || activeItem.imageAlt || activeItem.title}
                   width={1600}
                   height={1100}
                   className="max-h-[42dvh] w-full object-contain lg:h-full lg:max-h-[72vh]"
@@ -194,7 +204,7 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
 
                         return (
                           <button
-                            key={`${activeItem.id}-${image}`}
+                            key={`${activeItem.id}-${image.url}`}
                             type="button"
                             onClick={() => setActiveImageIndex(index)}
                             className={cn(
@@ -207,8 +217,8 @@ export default function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
                             aria-pressed={isCurrent}
                           >
                             <ProtectedImage
-                              src={image}
-                              alt={`${activeItem.title} ${index + 1}`}
+                              src={image.url}
+                              alt={image.alt || `${activeItem.title}, фото ${index + 1}`}
                               width={240}
                               height={160}
                               className="h-16 w-full object-cover"

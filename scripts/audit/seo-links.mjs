@@ -1,5 +1,5 @@
 import {chromium} from 'playwright';import fs from 'node:fs/promises';
-const data=JSON.parse(await fs.readFile('../audit-results/after/results.json','utf8')).filter(r=>r.width===375);
+const data=JSON.parse(await fs.readFile('../audit-results/after/results.json','utf8')).filter(r=>r.width===390);
 const browser=await chromium.launch({channel:'chrome',headless:true});const context=await browser.newContext();const page=await context.newPage();
 const base='http://127.0.0.1:3000';const failures=[];const incoming=new Map(data.map(r=>[r.route,[]]));const urls=new Set();
 for(const row of data){for(const href of row.links){if(!href?.startsWith('/') && !href?.startsWith('#'))continue;const url=new URL(href,base+row.route);urls.add(url.href);if(url.pathname!==row.route&&incoming.has(url.pathname))incoming.get(url.pathname).push(row.route);}}

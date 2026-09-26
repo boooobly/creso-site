@@ -34,7 +34,8 @@ export const portfolioItemSchema = z.object({
     .array(
       z.object({
         url: z.string().trim().url('Изображение галереи должно быть валидным URL.'),
-        assetId: optionalTrimmedString
+        assetId: optionalTrimmedString,
+        alt: z.string().trim().max(300).optional()
       })
     )
     .max(30)

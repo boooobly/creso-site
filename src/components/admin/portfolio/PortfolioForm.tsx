@@ -7,6 +7,7 @@ import { AdminAlert, AdminButton } from '@/components/admin/ui';
 type GalleryImageValue = {
   url: string;
   assetId?: string;
+  alt?: string;
 };
 
 type PortfolioFormValues = {
@@ -41,6 +42,7 @@ type GalleryImage = {
   id: string;
   url: string;
   assetId?: string;
+  alt?: string;
 };
 
 function makeId() {
@@ -56,8 +58,13 @@ function normalizeInitialGallery(values: PortfolioFormValues): GalleryImage[] {
 
   for (const image of values.galleryImages) {
     const url = String(image?.url ?? '').trim();
-    if (!url || normalized.some((entry) => entry.url === url)) continue;
-    normalized.push({ id: makeId(), url, assetId: image.assetId?.trim() || undefined });
+    if (!url) continue;
+    const existing = normalized.find((entry) => entry.url === url);
+    if (existing) {
+      existing.alt = image.alt?.trim() || existing.alt;
+      continue;
+    }
+    normalized.push({ id: makeId(), url, assetId: image.assetId?.trim() || undefined, alt: image.alt?.trim() || '' });
   }
 
   return normalized;
@@ -100,7 +107,8 @@ export default function PortfolioForm({ heading, description, initialValues, sub
       JSON.stringify(
         gallery.map((image) => ({
           url: image.url,
-          ...(image.assetId ? { assetId: image.assetId } : {})
+          ...(image.assetId ? { assetId: image.assetId } : {}),
+          alt: image.alt || ''
         }))
       ),
     [gallery]
@@ -298,6 +306,17 @@ export default function PortfolioForm({ heading, description, initialValues, sub
 
                           <div className="min-w-0 flex-1 space-y-2">
                             <p className="truncate text-xs text-slate-500">{image.url}</p>
+                            <label className="block text-xs text-slate-600">
+                              Описание изображения для доступности
+                              <input
+                                type="text"
+                                value={image.alt || ''}
+                                maxLength={300}
+                                onChange={(event) => setGallery((prev) => prev.map((entry) => entry.id === image.id ? { ...entry, alt: event.target.value } : entry))}
+                                className="mt-1 w-full rounded-md border border-slate-200 px-2.5 py-2 text-sm"
+                                placeholder="Что изображено на фотографии"
+                              />
+                            </label>
 
                             <div className="flex flex-wrap gap-2">
                               <button
