@@ -3,9 +3,8 @@ import type { LucideIcon } from 'lucide-react';
 import { BadgeCheck, Building2, Clock3, Construction, FileCheck2, ShieldCheck, Truck, Users } from 'lucide-react';
 import Section from '@/components/Section';
 import LeadForm from '@/components/LeadForm';
-import RevealOnScroll from '@/components/RevealOnScroll';
 import ProductionTrustBlock from '@/components/ProductionTrustBlock';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import OutdoorPortfolioGallery from '@/components/OutdoorPortfolioGallery';
 import ProtectedImage from '@/components/ui/ProtectedImage';
@@ -100,7 +99,6 @@ const steps = [
   { title: 'Принимаете результат', detail: 'После монтажа передаём объект и закрывающие документы.' },
 ] as const;
 
-const stepRevealDelays = ['', 'delay-75', 'delay-150', 'delay-200'] as const;
 
 const cities = ['Краснодаре', 'Ростове-на-Дону', 'Ставрополе', 'Пятигорске', 'Минеральных Водах', 'Черкесске', 'Кисловодске'];
 
@@ -226,9 +224,6 @@ export default async function OutdoorAdvertisingPage() {
           }
         >
           <div className="space-y-4.5 md:space-y-5">
-            <HeroEyebrow className="w-fit rounded-full border border-[var(--brand-red)]/55 px-3 py-1 text-[var(--brand-red-text)]">
-              Наружная реклама
-            </HeroEyebrow>
             <HeroTitle className="max-w-[15ch] text-3xl leading-[1.06] md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[35rem] pt-1 text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
           </div>
@@ -257,23 +252,21 @@ export default async function OutdoorAdvertisingPage() {
       </Section>
 
       <Section className="pt-0" id="outdoor-portfolio" background="muted" fullBleed>
-        <RevealOnScroll>
+        <div>
           <div className="section-header-split">
             <div className="space-y-2">
-              <p className="t-eyebrow">ПОРТФОЛИО</p>
               <h2 className={sectionTitleClassName}>Реализованные проекты</h2>
               <p className={sectionIntroClassName}>Реальные объекты, которые уже установлены и работают на точках наших клиентов.</p>
             </div>
             <p className="t-small text-muted-foreground max-w-xs text-right">До/после, крупные планы и ночной режим подсветки</p>
           </div>
           <OutdoorPortfolioGallery projects={resolvedPortfolioProjects} />
-        </RevealOnScroll>
+        </div>
       </Section>
 
       <Section className="pt-0" background="default">
-        <RevealOnScroll>
+        <div>
           <div className="section-header">
-            <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>
             <h2 className={sectionTitleClassName}>Что изготавливаем</h2>
             <p className={sectionIntroClassName}>Форматы наружной рекламы, которые мы производим для коммерческих объектов.</p>
             <div className="flex flex-wrap gap-2 pt-2">
@@ -303,13 +296,12 @@ export default async function OutdoorAdvertisingPage() {
               </article>
             ))}
           </div>
-        </RevealOnScroll>
+        </div>
       </Section>
 
       <Section className="pt-0" background="muted" fullBleed>
-        <RevealOnScroll>
+        <div>
           <div className="section-header">
-            <p className="t-eyebrow">ПРЕИМУЩЕСТВА</p>
             <h2 className={sectionTitleClassName}>Почему выбирают нас</h2>
             <p className={sectionIntroClassName}>Параметры работы, по которым клиенту проще контролировать сроки, качество и результат.</p>
           </div>
@@ -331,13 +323,12 @@ export default async function OutdoorAdvertisingPage() {
               );
             })}
           </div>
-        </RevealOnScroll>
+        </div>
       </Section>
 
       <Section className="pt-0" background="default">
-        <RevealOnScroll>
+        <div>
           <div className="section-header">
-            <p className="t-eyebrow">ПОЛНЫЙ ЦИКЛ</p>
             <h2 className={sectionTitleClassName}>Полный цикл работ</h2>
             <p className={sectionIntroClassName}>Что мы закрываем внутри проекта: от технической подготовки до запуска конструкции на объекте.</p>
           </div>
@@ -351,29 +342,28 @@ export default async function OutdoorAdvertisingPage() {
               </li>
             ))}
           </ol>
-        </RevealOnScroll>
+        </div>
       </Section>
 
       <Section className="pt-0" background="muted" fullBleed>
-        <RevealOnScroll>
+        <div>
           <div className="card p-6 md:p-7">
             <div className="section-header-tight">
-              <p className="t-eyebrow">ПРОЦЕСС</p>
               <h2 className={sectionTitleClassName}>Как мы работаем</h2>
             </div>
             <div className="grid-cards md:grid-cols-2 lg:grid-cols-4">
               {steps.map((step, index) => (
-                <RevealOnScroll key={step.title} className={stepRevealDelays[index]}>
+                <div key={step.title}>
                   <article className="card-info card-interactive h-full p-5 md:p-6">
                     <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--brand-red-text)]">Шаг {index + 1}</p>
                     <p className="t-h4 !text-base">{step.title}</p>
                     <p className="t-body mt-2">{step.detail}</p>
                   </article>
-                </RevealOnScroll>
+                </div>
               ))}
             </div>
           </div>
-        </RevealOnScroll>
+        </div>
       </Section>
 
       <ProductionTrustBlock />
@@ -381,7 +371,6 @@ export default async function OutdoorAdvertisingPage() {
       <Section className="pt-0" background="muted" fullBleed>
         <div className="card overflow-hidden p-6 md:p-8">
           <div className="section-header-tight">
-            <p className="t-eyebrow">ГЕОГРАФИЯ РАБОТ</p>
             <h2 className={sectionTitleClassName}>Работаем по всему ЮФО</h2>
             <p className={sectionIntroClassName}>Работаем по городам ЮФО и заранее обозначаем, как логистика влияет на сроки монтажа.</p>
           </div>
@@ -411,10 +400,9 @@ export default async function OutdoorAdvertisingPage() {
       </Section>
 
       <Section className="pt-0" id="outdoor-form-section" background="default">
-        <RevealOnScroll>
+        <div>
           <div data-floating-cta-hide className="form-shell card">
             <div className="section-header-tight">
-              <p className="t-eyebrow">ЗАЯВКА НА РАСЧЁТ</p>
               <h2 className={sectionTitleClassName}>Получить бесплатный расчет наружной рекламы</h2>
               <p className={sectionIntroClassName}>Укажите адрес, размеры и фото места монтажа — в ответ пришлём расчёт, сроки и план следующих шагов.</p>
             </div>
@@ -430,7 +418,7 @@ export default async function OutdoorAdvertisingPage() {
               />
             </div>
           </div>
-        </RevealOnScroll>
+        </div>
       </Section>
     </div>
   );

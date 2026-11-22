@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { MessageSquareQuote, Send, Star } from 'lucide-react';
-import RevealOnScroll from '@/components/RevealOnScroll';
 import ReviewSubmitForm from '@/components/ReviewSubmitForm';
 
 export type PublicReviewItem = {
@@ -86,7 +85,7 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
 
           <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 md:gap-5">
             {visibleReviews.map((review) => (
-              <RevealOnScroll key={review.id}>
+              <div key={review.id}>
                 <article className="premium-card h-full rounded-2xl border-neutral-200/90 bg-white p-4 dark:border-neutral-800/95 dark:bg-neutral-900 sm:p-5 md:p-6">
                   <div className="mb-3 flex items-start justify-between gap-3 border-b border-neutral-100 pb-3 dark:border-neutral-800/90">
                     <div>
@@ -106,7 +105,7 @@ export default function ReviewsClient({ reviews }: ReviewsClientProps) {
 
                   <p className="text-sm leading-6 text-neutral-700 dark:text-neutral-200/95">{review.text}</p>
                 </article>
-              </RevealOnScroll>
+              </div>
             ))}
           </div>
 

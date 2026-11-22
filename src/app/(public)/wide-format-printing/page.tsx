@@ -4,7 +4,7 @@ import JsonLd from '@/components/seo/JsonLd';
 import Section from '@/components/Section';
 import WideFormatPricingCalculator from '@/components/WideFormatPricingCalculator';
 import OrderWideFormatForm from '@/components/OrderWideFormatForm';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import WideFormatTrustCards from '@/components/wide-format/WideFormatTrustCards';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { buildBreadcrumbJsonLd, buildServiceJsonLd } from '@/lib/seo';
@@ -133,7 +133,6 @@ export default async function WideFormatPrintingPage() {
           </HeroMediaPanel>
         }>
           <div className="space-y-3 md:space-y-4">
-            <HeroEyebrow>Экосольвентная печать</HeroEyebrow>
             <HeroTitle className="hero-title-mobile-safe max-w-3xl sm:text-[1.9rem] md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[41rem] text-[13px] leading-5 text-neutral-600 dark:text-neutral-300 sm:text-sm sm:leading-6 md:text-[1.05rem] md:leading-7">
               {heroDescription} Поможем согласовать материал, формат и постобработку под вашу задачу.
@@ -243,7 +242,6 @@ export default async function WideFormatPrintingPage() {
         <div className="space-y-8 md:space-y-10">
           <div id="wide-format-calculator" className="scroll-mt-24">
             <div className="mb-4 space-y-3 md:mb-5">
-              <p className="t-eyebrow">Калькулятор</p>
               <h2 className="t-h2">Технический расчёт стоимости</h2>
               <p className="max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
                 Укажите материал, размеры и тираж, чтобы получить предварительную стоимость и сразу передать параметры в форму заявки.
@@ -280,7 +278,6 @@ export default async function WideFormatPrintingPage() {
 
           <section className="card p-5 md:p-8">
             <div className="space-y-2">
-              <p className="t-eyebrow">Преимущества</p>
               <h3 className="text-xl font-semibold tracking-tight md:text-2xl">Почему выбирают нас</h3>
             </div>
             <WideFormatTrustCards features={features} />

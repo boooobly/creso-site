@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import Section from '@/components/Section';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import JsonLd from '@/components/seo/JsonLd';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 
@@ -19,7 +19,6 @@ export default function BusinessCardsPage() {
 
       <Section spacing="compact">
         <PageHero className="border border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50 to-red-50/20 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717]">
-          <HeroEyebrow>Полиграфия</HeroEyebrow>
           <HeroTitle>Печать визиток в Невинномысске</HeroTitle>
           <HeroLead>Делаем визитки для компаний, специалистов и частных заказчиков. Помогаем подготовить макет и выбрать формат тиража под практические задачи бизнеса.</HeroLead>
           <HeroChipList>

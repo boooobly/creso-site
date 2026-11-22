@@ -127,8 +127,7 @@ export default function OrderTshirtsForm() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-red-50/40 via-transparent to-transparent dark:from-red-950/20" aria-hidden="true" />
 
       <div className="relative">
-        <p className="t-eyebrow">Заявка на печать</p>
-        <h2 className="mt-2 text-2xl font-bold md:text-3xl">Оставьте заявку</h2>
+        <h2 className="text-2xl font-semibold md:text-3xl">Заявка на печать</h2>
         <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Уточним детали, согласуем стоимость и сроки перед запуском.</p>
 
         <form className={`mt-6 space-y-5 ${publicFormStyles.fieldsStack}`} onSubmit={handleSubmit} noValidate>

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import ProtectedImage from '@/components/ui/ProtectedImage';
 import PrintPricingCalculator from '@/components/PrintPricingCalculator';
 import Section from '@/components/Section';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { getSiteImage } from '@/lib/site-images';
 import type { Metadata } from 'next';
 import { buildBreadcrumbJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
@@ -56,9 +56,6 @@ export default async function PrintPage() {
           }
         >
           <div className="space-y-4">
-            <HeroEyebrow className="w-fit rounded-full border border-[var(--brand-red)]/55 px-3 py-1 text-[var(--brand-red-text)]">
-              Визитки и флаеры
-            </HeroEyebrow>
             <HeroTitle className="max-w-[16ch] text-[1.9rem] leading-[1.08] md:text-5xl">Офсетные визитки для бизнеса</HeroTitle>
             <HeroLead className="max-w-[34rem] text-sm leading-6 md:text-[1.05rem] md:leading-relaxed">
               Быстрый расчёт для стандартных тиражей: выберите параметры, получите итоговую стоимость и отправьте заявку в одном потоке.
@@ -99,7 +96,6 @@ export default async function PrintPage() {
       <Section spacing="tight" className="pt-0">
         <div id="print-calculator" className="min-w-0 scroll-mt-24 space-y-4 md:space-y-5">
           <div className="min-w-0 space-y-2">
-            <p className="t-eyebrow">Калькулятор и тарифы</p>
             <h2 className="t-h2">Рассчитайте стоимость и сразу передайте параметры в заявку</h2>
             <p className="max-w-3xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
               Используйте тарифную таблицу как ориентир, затем настройте заказ в конфигураторе.

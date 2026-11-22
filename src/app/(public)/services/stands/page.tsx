@@ -3,8 +3,7 @@ import { Building2, CheckCircle2, ClipboardList, PackageCheck, Ruler, School, Sh
 import LeadForm from '@/components/LeadForm';
 import Section from '@/components/Section';
 import StandPreviewCard from '@/components/services/StandPreviewCard';
-import RevealOnScroll from '@/components/RevealOnScroll';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import ProtectedImage from '@/components/ui/ProtectedImage';
 import { messages } from '@/lib/messages';
 import { getSiteImages } from '@/lib/site-images';
@@ -51,20 +50,6 @@ const advantages = [
 ] as const;
 
 
-const revealDelayClasses = [
-  '',
-  'delay-75',
-  'delay-150',
-  'delay-200',
-  'delay-300',
-  'delay-[360ms]',
-  'delay-[420ms]',
-  'delay-[480ms]',
-] as const;
-
-const getRevealDelayClass = (index: number) => revealDelayClasses[index] ?? revealDelayClasses[revealDelayClasses.length - 1];
-
-
 export const metadata: Metadata = buildPublicPageMetadata({
   title: 'Изготовление стендов в Невинномысске | CredoMir',
   description: 'Изготовление информационных стендов для помещений и улицы: ПВХ, композит, карманы и монтаж в Невинномысске и Ставропольском крае.',
@@ -99,7 +84,6 @@ export default async function StandsServicePage() {
           className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-950 dark:to-neutral-900/80"
           media={heroMedia}
         >
-          <HeroEyebrow>Изготовление стендов</HeroEyebrow>
           <HeroTitle className="hero-title-mobile-safe max-w-2xl">Изготовление информационных стендов</HeroTitle>
           <HeroLead>
             Делаем стенды для навигации, инструкций и обязательной информации. В результате вы получаете готовую к установке конструкцию
@@ -175,7 +159,7 @@ export default async function StandsServicePage() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {materials.map((item) => (
-            <RevealOnScroll key={item.title} className="h-full">
+            <div key={item.title} className="h-full">
               <article className="group h-full rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.75)] dark:hover:border-neutral-700 dark:hover:shadow-[0_18px_36px_-24px_rgba(220,38,38,0.35)]">
                 <span className="public-icon-badge-sm">
                   <item.icon className="size-4" aria-hidden="true" />
@@ -183,7 +167,7 @@ export default async function StandsServicePage() {
                 <h3 className="mt-3 text-base font-semibold dark:text-neutral-100">{item.title}</h3>
                 <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{item.description}</p>
               </article>
-            </RevealOnScroll>
+            </div>
           ))}
         </div>
       </Section>
@@ -216,7 +200,7 @@ export default async function StandsServicePage() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {advantages.map((item, index) => (
-            <RevealOnScroll key={item} className={getRevealDelayClass(index)}>
+            <div key={item}>
               <article className="group flex h-full min-h-[88px] items-center rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900/85 dark:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.75)] dark:hover:border-neutral-700 dark:hover:shadow-[0_18px_36px_-24px_rgba(220,38,38,0.35)]">
                 <div className="flex items-center gap-3">
                   <span className="public-icon-badge-sm shrink-0">
@@ -225,7 +209,7 @@ export default async function StandsServicePage() {
                   <p className="text-sm font-semibold leading-relaxed text-neutral-800 dark:text-neutral-100">{item}</p>
                 </div>
               </article>
-            </RevealOnScroll>
+            </div>
           ))}
         </div>
       </Section>

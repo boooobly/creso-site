@@ -3,25 +3,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { BadgeCheck, ChevronDown, ClipboardCheck, FileImage, FileUp, Layers, Palette, ShieldCheck, Shirt, Timer, Truck } from 'lucide-react';
-import { CSSProperties, ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import OrderTshirtsForm from '@/components/OrderTshirtsForm';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import Section from '@/components/layout/Section';
-import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import { tshirtsFaqItems } from '@/lib/heat-transfer/tshirtsFaqItems';
 import type { SiteImageRecord } from '@/lib/site-images';
 
-type SectionRenderState = {
-  isVisible: boolean;
-  prefersReducedMotion: boolean;
-};
-
 type SectionBlockProps = {
   id?: string;
-  eyebrow?: string;
   title: string;
   subtitle?: string;
-  children: (state: SectionRenderState) => ReactNode;
+  children: ReactNode;
 };
 
 const kpiChips = ['От 1 изделия', 'Для бизнеса и команд', 'Аккуратный принт', 'Согласование до запуска'] as const;
@@ -109,35 +102,14 @@ const advantages = [
   { text: 'Поддержка менеджера до передачи готового заказа', icon: ClipboardCheck },
 ] as const;
 
-function revealClass(isVisible: boolean, reduceMotion: boolean): string {
-  if (reduceMotion) return 'opacity-100 translate-y-0';
-  return isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6';
-}
-
-function delayStyle(index: number, reduceMotion: boolean): CSSProperties {
-  return reduceMotion ? {} : { transitionDelay: `${index * 70}ms` };
-}
-
-function SectionBlock({ id, eyebrow, title, subtitle, children }: SectionBlockProps) {
-  const reveal = useRevealOnScroll<HTMLDivElement>();
-
+function SectionBlock({ id, title, subtitle, children }: SectionBlockProps) {
   return (
     <Section id={id} spacing="tight" className="scroll-mt-24">
-      <div
-        ref={reveal.ref}
-        className={`transition-all duration-700 ease-out motion-reduce:transition-none ${revealClass(reveal.isVisible, reveal.prefersReducedMotion)}`}
-      >
-        <div className="section-header">
-          {eyebrow && <p className="t-eyebrow">{eyebrow}</p>}
-          <h2 className="t-h2">{title}</h2>
-          {subtitle && (
-            <p className={`t-body ${id === 'examples' ? 'max-w-5xl lg:whitespace-nowrap' : 'max-w-3xl'}`}>
-              {subtitle}
-            </p>
-          )}
-        </div>
-        {children({ isVisible: reveal.isVisible, prefersReducedMotion: reveal.prefersReducedMotion })}
+      <div className="section-header">
+        <h2 className="t-h2">{title}</h2>
+        {subtitle && <p className="t-body max-w-3xl">{subtitle}</p>}
       </div>
+      {children}
     </Section>
   );
 }
@@ -177,17 +149,6 @@ function FaqAccordion() {
   );
 }
 
-function AnimatedCard({ index, reveal, className, children }: { index: number; reveal: SectionRenderState; className: string; children: ReactNode }) {
-  return (
-    <article
-      style={delayStyle(index, reveal.prefersReducedMotion)}
-      className={`${className} transition-all duration-500 motion-reduce:transition-none ${revealClass(reveal.isVisible, reveal.prefersReducedMotion)}`}
-    >
-      {children}
-    </article>
-  );
-}
-
 function ExampleMockup({ title, description, imageSrc }: { title: string; description: string; imageSrc: string }) {
   return (
     <div className="relative aspect-[16/10] overflow-hidden">
@@ -218,15 +179,13 @@ export default function TshirtsLanding({
   heroSecondaryButtonText = 'Смотреть примеры',
   galleryImages = {},
 }: TshirtsLandingProps) {
-  const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.12 });
 
   return (
     <div className="bg-white pb-14 dark:bg-neutral-950 md:pb-16">
       <Section id="tshirts-hero" spacing="hero" className="relative overflow-hidden">
         <div className="relative">
           <div
-            ref={heroReveal.ref}
-            className={`transition-all duration-700 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+            className={`transition-all duration-700`}
           >
             <PageHero
               className="border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50 to-red-50/15 p-5 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:bg-neutral-900 md:p-7 lg:p-9"
@@ -248,8 +207,7 @@ export default function TshirtsLanding({
                 </HeroMediaPanel>
               }
             >
-              <HeroEyebrow className="text-xs tracking-[0.18em]">Брендированная одежда</HeroEyebrow>
-              <HeroTitle className="mt-3 max-w-[15ch] text-[1.9rem] font-extrabold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">{heroTitle}</HeroTitle>
+              <HeroTitle className="mt-3 max-w-[15ch] text-[1.9rem] font-semibold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">{heroTitle}</HeroTitle>
               <HeroLead className="mt-3 max-w-2xl text-sm leading-6 dark:text-neutral-300 md:text-[1.03rem] md:leading-7">
                 {heroDescription}
               </HeroLead>
@@ -258,11 +216,10 @@ export default function TshirtsLanding({
                   Работаем с тиражами от 1 изделия: подойдёт для мерча, формы и корпоративных запусков.
                 </p>
                 <HeroChipList className="mt-3 gap-1.5 sm:grid-cols-2 sm:gap-2">
-                  {kpiChips.map((chip, index) => (
+                  {kpiChips.map((chip) => (
                     <HeroChip
                       key={chip}
-                      style={delayStyle(index, heroReveal.prefersReducedMotion)}
-                      className={`rounded-xl border border-neutral-200 bg-white px-2.5 py-1.5 dark:border-neutral-800 dark:bg-neutral-900 sm:px-3 sm:py-2 ${revealClass(heroReveal.isVisible, heroReveal.prefersReducedMotion)}`}
+                      className={`rounded-xl border border-neutral-200 bg-white px-2.5 py-1.5 dark:border-neutral-800 dark:bg-neutral-900 sm:px-3 sm:py-2`}
                     >
                       <p className="flex items-center gap-2 text-[11px] font-semibold leading-tight text-neutral-900 dark:text-neutral-100 sm:text-xs">
                         <span className="size-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
@@ -293,17 +250,13 @@ export default function TshirtsLanding({
       </Section>
 
       <SectionBlock
-        eyebrow="Технологии"
         title="Технологии печати"
         subtitle="Подбираем технологию под ткань, задачу и тип макета."
       >
-        {(reveal) => (
           <div className="grid gap-5 lg:grid-cols-2">
-            {printTechnologyCards.map((card, index) => (
-              <AnimatedCard
+            {printTechnologyCards.map((card) => (
+              <article
                 key={card.title}
-                index={index}
-                reveal={reveal}
                 className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_14px_30px_rgba(15,23,42,0.08)] dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700"
               >
                 <span className="inline-flex rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
@@ -324,24 +277,19 @@ export default function TshirtsLanding({
                 <p className="mt-5 border-t border-neutral-200 pt-4 text-xs font-medium leading-relaxed text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
                   {card.bestFor}
                 </p>
-              </AnimatedCard>
+              </article>
             ))}
           </div>
-        )}
       </SectionBlock>
 
       <SectionBlock
-        eyebrow="Ориентиры по цене"
         title="Стоимость"
         subtitle="Прозрачные условия без скрытых доплат. Для нестандартных задач менеджер подтвердит расчёт перед печатью."
       >
-        {(reveal) => (
           <div className="grid gap-4 md:grid-cols-3">
-            {pricingCards.map((card, index) => (
-              <AnimatedCard
+            {pricingCards.map((card) => (
+              <article
                 key={card.title}
-                index={index}
-                reveal={reveal}
                 className={`card-info card-interactive h-full rounded-2xl border bg-white/95 p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:bg-neutral-900 ${
                   card.featured
                     ? 'border-red-300 ring-1 ring-red-200/70 dark:border-red-900 dark:ring-red-900/40'
@@ -363,87 +311,74 @@ export default function TshirtsLanding({
                     </li>
                   ))}
                 </ul>
-              </AnimatedCard>
+              </article>
             ))}
           </div>
-        )}
       </SectionBlock>
 
-      <SectionBlock id="examples" eyebrow="Портфолио" title="Примеры работ" subtitle="Нанесение для команды, промо и корпоративного мерча — с акцентом на аккуратный вид и стойкость принта.">
-        {(reveal) => (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {galleryCards.map((card, index) => (
-              <AnimatedCard
-                key={card.title}
-                index={index}
-                reveal={reveal}
-                className="premium-card group h-full overflow-hidden"
+      <SectionBlock id="examples" title="Примеры работ">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {galleryCards.map((card) => (
+            <article
+              key={card.title}
+              className="premium-card group h-full overflow-hidden"
+            >
+              <ExampleMockup
+                title={card.title}
+                description={card.description}
+                imageSrc={galleryImages[card.slotKey]?.url ?? card.imageSrc}
+              />
+            </article>
+          ))}
+        </div>
+      </SectionBlock>
+
+      <SectionBlock title="Как это работает">
+        <div className="grid gap-4 md:grid-cols-3">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+
+            return (
+              <article
+                key={step.title}
+                className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900"
               >
-                <ExampleMockup
-                  title={card.title}
-                  description={card.description}
-                  imageSrc={galleryImages[card.slotKey]?.url ?? card.imageSrc}
-                />
-              </AnimatedCard>
-            ))}
-          </div>
-        )}
-      </SectionBlock>
-
-      <SectionBlock eyebrow="Процесс" title="Как это работает">
-        {(reveal) => (
-          <div className="grid gap-4 md:grid-cols-3">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-
-              return (
-                <AnimatedCard
-                  key={step.title}
-                  index={index}
-                  reveal={reveal}
-                  className="h-full rounded-2xl border border-neutral-200 bg-white/90 p-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_12px_30px_rgba(220,38,38,0.10)] dark:border-neutral-800 dark:bg-neutral-900"
-                >
-                  <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
-                    <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
-                  </div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600 dark:text-neutral-400">Шаг {index + 1}</p>
-                  <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
-                </AnimatedCard>
-              );
-            })}
-          </div>
-        )}
-      </SectionBlock>
-
-      <SectionBlock eyebrow="Преимущества" title="Почему выбирают нас">
-        {(reveal) => (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {advantages.map((item, index) => {
-              const Icon = item.icon;
-
-              return (
-              <AnimatedCard
-                key={item.text}
-                index={index}
-                reveal={reveal}
-                className="card-info card-interactive rounded-2xl border border-neutral-200/90 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-950/30 dark:text-red-300">
-                    <Icon className="size-4" aria-hidden="true" />
-                  </span>
-                  <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{item.text}</p>
+                <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
+                  <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
                 </div>
-              </AnimatedCard>
-              );
-            })}
-          </div>
-        )}
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-600 dark:text-neutral-400">Шаг {index + 1}</p>
+                <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{step.description}</p>
+              </article>
+            );
+          })}
+        </div>
       </SectionBlock>
 
-      <SectionBlock eyebrow="FAQ" title="Частые вопросы" subtitle="Короткие ответы по срокам, файлам и условиям заказа.">
-        {() => <FaqAccordion />}
+      <SectionBlock title="Почему выбирают нас">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {advantages.map((item) => {
+            const Icon = item.icon;
+
+            return (
+            <article
+              key={item.text}
+              className="card-info card-interactive rounded-2xl border border-neutral-200/90 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"
+            >
+              <div className="flex items-center gap-3">
+                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-950/30 dark:text-red-300">
+                  <Icon className="size-4" aria-hidden="true" />
+                </span>
+                <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{item.text}</p>
+              </div>
+            </article>
+            );
+          })}
+        </div>
+      </SectionBlock>
+
+      <SectionBlock title="Частые вопросы">
+        <FaqAccordion />
       </SectionBlock>
 
       <Section id="tshirts-order" spacing="tight" className="scroll-mt-24">

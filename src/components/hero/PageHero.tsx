@@ -8,11 +8,6 @@ type PageHeroProps = {
   children: ReactNode;
 };
 
-type HeroEyebrowProps = {
-  children: ReactNode;
-  className?: string;
-};
-
 type HeroTitleProps = {
   as?: 'h1' | 'h2';
   children: ReactNode;
@@ -45,10 +40,6 @@ export function PageHero({ className, contentClassName, mediaClassName, media, c
       </div>
     </div>
   );
-}
-
-export function HeroEyebrow({ children, className }: HeroEyebrowProps) {
-  return <p className={cn('hero-eyebrow', className)}>{children}</p>;
 }
 
 export function HeroTitle({ as: Tag = 'h1', children, className }: HeroTitleProps) {

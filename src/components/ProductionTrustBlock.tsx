@@ -1,4 +1,3 @@
-import RevealOnScroll from '@/components/RevealOnScroll';
 import ProtectedImage from '@/components/ui/ProtectedImage';
 
 const productionFeatures = ['ЧПУ 2×4 м', 'Печать 3.2 м', 'Сварка и покраска', 'Монтажная бригада'];
@@ -22,53 +21,50 @@ const productionPlaceholders = [
     imageAlt: 'Монтаж наружной рекламы',
   },
 ] as const;
-const guaranteeRevealDelays = ['', 'delay-75', 'delay-150', 'delay-200'] as const;
-const productionImageRevealDelays = ['', 'delay-150'] as const;
-const featureRevealDelays = ['', 'delay-75', 'delay-150', 'delay-200'] as const;
 
 export default function ProductionTrustBlock() {
   return (
     <section className="relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] bg-neutral-50/70 py-12 dark:bg-neutral-900/50 md:py-20">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <RevealOnScroll className="card p-6 md:p-8">
+        <div className="card p-6 md:p-8">
           <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-8">
             <div className="space-y-6">
-              <RevealOnScroll>
+              <div>
                 <h2 className="t-h2">Производим сами. От проекта до монтажа.</h2>
                 <p className="t-lead mt-3">Этот блок — подтверждение, что ключевые этапы выполняем своей командой.</p>
-              </RevealOnScroll>
+              </div>
 
-              <RevealOnScroll className="delay-75">
+              <div>
                 <div className="grid max-w-sm grid-cols-2 gap-2.5">
                   {productionFeatures.map((feature, index) => (
-                    <RevealOnScroll key={feature} className={featureRevealDelays[index]}>
+                    <div key={feature}>
                       <span
                         className="t-small inline-flex min-h-9 w-full items-center justify-center rounded-full border border-[var(--brand-red)]/40 bg-white/85 px-3 py-1.5 text-center font-medium text-neutral-700 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-[var(--brand-red)]/55 hover:bg-red-50/35 dark:bg-neutral-900/85 dark:text-neutral-200 dark:hover:bg-red-500/10"
                       >
                         {feature}
                       </span>
-                    </RevealOnScroll>
+                    </div>
                   ))}
                 </div>
-              </RevealOnScroll>
+              </div>
 
               <div className="grid gap-3">
                 {guaranteeItems.map((item, index) => (
-                  <RevealOnScroll key={item} className={guaranteeRevealDelays[index]}>
+                  <div key={item}>
                     <article className="card-structured card-interactive rounded-xl p-3.5">
                       <p className="t-body flex items-start gap-2.5 text-neutral-700 dark:text-neutral-300">
                         <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--brand-red)]" aria-hidden="true" />
                         <span>{item}</span>
                       </p>
                     </article>
-                  </RevealOnScroll>
+                  </div>
                 ))}
               </div>
             </div>
 
             <div className="grid gap-4 self-center sm:grid-cols-2 lg:grid-cols-1">
               {productionPlaceholders.map((item, index) => (
-                <RevealOnScroll key={item.title} className={productionImageRevealDelays[index]}>
+                <div key={item.title}>
                   <article className="card-visual card-interactive group relative isolate min-h-[250px] overflow-hidden bg-neutral-900 select-none">
                     <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
                       <ProtectedImage
@@ -84,13 +80,13 @@ export default function ProductionTrustBlock() {
                       <h3 className="t-h4 !text-base !text-white">{item.title}</h3>
                     </div>
                   </article>
-                </RevealOnScroll>
+                </div>
               ))}
             </div>
           </div>
 
           <p className="t-small mt-6 border-t border-neutral-200 pt-4 font-medium text-neutral-700 dark:border-neutral-800 dark:text-neutral-300">Работаем по договору. Гарантия 5 лет.</p>
-        </RevealOnScroll>
+        </div>
       </div>
     </section>
   );
