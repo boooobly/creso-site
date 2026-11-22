@@ -13,7 +13,7 @@ import { publicFormStyles } from '@/lib/public-form-styles';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 
 const optionalEmailSchema = z.preprocess(
-  (value) => {
+  (value: string | undefined) => {
     if (typeof value !== 'string') return value;
     const trimmed = value.trim();
     return trimmed === '' ? undefined : trimmed;
@@ -22,7 +22,7 @@ const optionalEmailSchema = z.preprocess(
 );
 
 const optionalPhoneSchema = z.preprocess(
-  (value) => {
+  (value: string | undefined) => {
     if (typeof value !== 'string') return value;
     const trimmed = value.trim();
     return trimmed === '' ? undefined : trimmed;

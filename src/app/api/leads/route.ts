@@ -55,7 +55,7 @@ const leadSchema = z.object({
   heightMm: optionalPositiveNumber,
   comment: optionalTrimmedString,
   pageUrl: optionalTrimmedString,
-  extras: z.record(z.unknown()).optional(),
+  extras: z.record(z.string(), z.unknown()).optional(),
   company: optionalTrimmedString,
 }).superRefine((value, ctx) => {
   if (!value.phone && !value.email) {
