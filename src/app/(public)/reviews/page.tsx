@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { ComponentType } from 'react';
-import { ArrowUpRight, BadgeCheck, Building2, Clock3, MessagesSquare, ShieldCheck, Sparkles } from 'lucide-react';
-import RevealOnScroll from '@/components/RevealOnScroll';
+import { ArrowUpRight, BadgeCheck, Building2, Clock3, ShieldCheck, Sparkles } from 'lucide-react';
 import ReviewsClient, { type PublicReviewItem } from '@/components/ReviewsClient';
 import { prisma } from '@/lib/db/prisma';
 import type { Metadata } from 'next';
@@ -73,40 +72,29 @@ export default async function ReviewsPage() {
   const reviews = await loadApprovedReviews();
   return (
     <div className="space-y-6 md:space-y-8">
-      <section className="card rounded-3xl border-neutral-200/85 bg-gradient-to-br from-white via-neutral-50/80 to-red-50/[0.18] p-5 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:p-8">
-        <RevealOnScroll>
+      <section className="card rounded-3xl border-neutral-200/85 p-5 dark:border-neutral-800/90 md:p-8">
+        <div>
           <div className="space-y-2.5 text-center md:space-y-4">
-            <p className="t-eyebrow mx-auto">Социальное доказательство</p>
-            <h1 className="text-[1.9rem] font-bold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-4xl">Отзывы реальных клиентов</h1>
-            <p className="mx-auto max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
-              Собрали живую обратную связь о качестве, сроках и коммуникации — чтобы вы могли оценить наш подход до старта проекта.
-            </p>
+            <h1 className="text-[1.9rem] font-bold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-4xl">Отзывы клиентов</h1>
           </div>
-        </RevealOnScroll>
+        </div>
       </section>
       <ReviewsClient reviews={reviews} />
       <section className="card relative z-10 rounded-2xl p-5 md:p-8">
-        <RevealOnScroll>
+        <div>
           <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-7">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
-                <MessagesSquare className="h-3.5 w-3.5" aria-hidden="true" />
-                Отзывы на Яндекс Картах
-              </div>
-              <h2 className="text-xl font-semibold tracking-tight dark:text-neutral-100 md:text-2xl">Смотрите отзывы на внешней площадке</h2>
-              <p className="max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">
-                Для дополнительной проверки можно открыть карточку компании в Яндекс Картах и посмотреть полный список оценок.
-              </p>
+              <h2 className="text-xl font-semibold tracking-tight dark:text-neutral-100 md:text-2xl">Отзывы на Яндекс Картах</h2>
             </div>
             <a href={yandexReviewsUrl} target="_blank" rel="noreferrer" className="btn-primary inline-flex min-h-11 w-full items-center justify-center gap-2 no-underline sm:w-auto md:justify-self-end">
-              Открыть Яндекс Карты
+              Читать отзывы
               <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
-        </RevealOnScroll>
+        </div>
       </section>
       <section className="card relative z-10 rounded-2xl p-5 md:p-8">
-        <RevealOnScroll>
+        <div>
           <div className="mb-4 flex items-center gap-2.5 md:mb-5">
             <span className="public-icon-badge">
               <BadgeCheck className="h-4 w-4" aria-hidden="true" />
@@ -129,10 +117,10 @@ export default async function ReviewsPage() {
               );
             })}
           </ul>
-        </RevealOnScroll>
+        </div>
       </section>
       <section className="relative z-10 pb-2">
-        <RevealOnScroll>
+        <div>
           <div className="cta-shell card border-neutral-200/85 dark:border-neutral-800/90 dark:bg-neutral-900/85">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6">
               <div className="space-y-2">
@@ -150,7 +138,7 @@ export default async function ReviewsPage() {
               </div>
             </div>
           </div>
-        </RevealOnScroll>
+        </div>
       </section>
     </div>
   );

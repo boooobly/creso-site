@@ -5,11 +5,10 @@ import PublicDialog from '@/components/ui/PublicDialog';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { AlarmClock, ArrowRight, CheckCircle2, ClipboardCheck, Clock3, FileCheck2, Ruler, Scissors, ScanSearch, Shapes, Spline, Sticker } from 'lucide-react';
+import { AlarmClock, CheckCircle2, ClipboardCheck, Clock3, FileCheck2, Ruler, Scissors, ScanSearch, Shapes, Spline, Sticker } from 'lucide-react';
 import Section from '@/components/Section';
 import PhoneInput, { getPhoneDigits } from '@/components/ui/PhoneInput';
 import { publicFormStyles } from '@/lib/public-form-styles';
-import { useRevealOnScroll } from '@/lib/hooks/useRevealOnScroll';
 import type { SiteImageRecord } from '@/lib/site-images';
 import { reachGoal, YANDEX_GOALS } from '@/lib/analytics/yandexMetrica';
 import { useSubmissionIdempotency } from '@/lib/orders/useSubmissionIdempotency';
@@ -78,9 +77,6 @@ const allowedExtensions = ['cdr', 'ai', 'eps', 'pdf', 'svg', 'dxf', 'png', 'jpg'
 
 type ServiceType = 'обычная' | 'по меткам';
 
-const revealBase =
-  'data-[reveal=out]:translate-y-5 data-[reveal=out]:opacity-0 data-[reveal=in]:translate-y-0 data-[reveal=in]:opacity-100 transition-all duration-700 ease-out motion-reduce:transition-none motion-reduce:transform-none';
-
 type PlotterCuttingPageProps = {
   siteImages: Record<string, SiteImageRecord | null>;
 };
@@ -92,11 +88,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const heroReveal = useRevealOnScroll<HTMLDivElement>({ threshold: 0.1 });
-  const specsReveal = useRevealOnScroll<HTMLDivElement>();
-  const pricingReveal = useRevealOnScroll<HTMLDivElement>();
-  const factorsReveal = useRevealOnScroll<HTMLDivElement>();
-  const examplesReveal = useRevealOnScroll<HTMLDivElement>();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -220,21 +211,19 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
   return (
     <div className="pb-20 md:pb-24">
       <Section className="pb-0 pt-12 md:pt-16">
-        <div ref={heroReveal.ref} {...heroReveal.revealProps} className={`card overflow-hidden border border-neutral-200/80 bg-gradient-to-br from-white via-neutral-50 to-red-50/35 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-10 ${revealBase}`}>
+        <div className={`card overflow-hidden border border-neutral-200/80 bg-white dark:bg-neutral-900 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:shadow-none md:p-10`}>
           <div className="grid gap-7 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
               <p className="inline-flex items-center rounded-full border border-red-200/90 bg-red-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Фигурная резка плёнок</p>
-              <h1 className="mt-3 max-w-4xl text-3xl font-extrabold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
+              <h1 className="mt-3 max-w-4xl text-3xl font-semibold leading-tight tracking-tight md:text-5xl md:leading-[1.04]">Плоттерная резка самоклеящейся пленки и оракала</h1>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-700 dark:text-neutral-300 md:text-[1.05rem] md:leading-7">Услуга плоттерной резки для самоклеящихся плёнок: от простых надписей до сложных контуров для наклеек, витрин и навигации.</p>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">Вы получаете комплект в нужном виде для монтажа: ровный рез, чистая выборка и удобная передача без лишней доработки.</p>
 
               <div className="mt-6 grid max-w-[30rem] grid-cols-2 gap-2">
-                {heroBadges.map((badge, index) => (
+                {heroBadges.map((badge) => (
                   <span
                     key={badge}
-                    style={heroReveal.getStaggerStyle(index * 90)}
-                    className={`inline-flex min-h-10 items-center gap-2 rounded-full border border-neutral-200 bg-white/90 px-4 py-2 text-xs font-semibold leading-none text-neutral-700 backdrop-blur-sm shadow-none transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300 ${revealBase}`}
-                    data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}
+                    className={`inline-flex min-h-10 items-center gap-2 rounded-full border border-neutral-200 bg-white/90 px-4 py-2 text-xs font-semibold leading-none text-neutral-700 backdrop-blur-sm shadow-none transition-colors hover:border-red-200 hover:text-red-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-100 dark:hover:border-red-400/40 dark:hover:text-red-300`}
                   >
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />
                     {badge}
@@ -262,7 +251,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
             </div>
 
-            <div className={revealBase} data-reveal={heroReveal.isVisible || heroReveal.prefersReducedMotion ? 'in' : 'out'}>
+            <div>
               <div className="relative min-h-[260px] overflow-hidden rounded-2xl sm:min-h-[330px] lg:min-h-[420px]">
                 <Image
                   src={heroImage?.url ?? '/images/plotter/plotter_hero.png'}
@@ -282,19 +271,16 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       </Section>
 
       <Section className="pt-0">
-        <div id="plotter-examples" ref={examplesReveal.ref} {...examplesReveal.revealProps} className={revealBase}>
+        <div id="plotter-examples">
           <div className="section-header-tight mb-5">
-            <p className="t-eyebrow">Применение</p>
             <h2 className="t-h3">Где чаще всего используют плоттерную резку</h2>
             <p className="t-body text-muted-foreground max-w-3xl">Типовые сценарии, в которых важны аккуратный контур, чистая выборка и стабильная повторяемость в тираже.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {exampleCards.map((item, index) => (
+            {exampleCards.map((item) => (
               <article
                 key={item.title}
-                style={examplesReveal.getStaggerStyle(index * 100)}
-                data-reveal={examplesReveal.isVisible || examplesReveal.prefersReducedMotion ? 'in' : 'out'}
-                className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700 ${revealBase}`}
+                className={`group overflow-hidden rounded-2xl border border-neutral-200 transition-all duration-300 hover:-translate-y-0.5 md:hover:-translate-y-[2px] hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700`}
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
                   {/* eslint-disable-next-line @next/next/no-img-element -- CMS-provided URLs can be external and this fallback behavior relies on direct <img> error handling. */}
@@ -320,18 +306,15 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
 
       <Section className="pt-0">
         <div className="space-y-6">
-          <div ref={specsReveal.ref} {...specsReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
+          <div className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8`}>
             <div className="section-header-tight mb-5">
-              <p className="t-eyebrow">Процесс</p>
               <h2 className="t-h3">Как проходит работа</h2>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {processSteps.map((step, index) => (
                 <article
                   key={step.title}
-                  style={specsReveal.getStaggerStyle(index * 100)}
-                  data-reveal={specsReveal.isVisible || specsReveal.prefersReducedMotion ? 'in' : 'out'}
-                  className={`card-info card-interactive h-full p-5 ${revealBase}`}
+                  className={`card-info card-interactive h-full p-5`}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-200/70 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
@@ -347,7 +330,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <div ref={pricingReveal.ref} {...pricingReveal.revealProps} className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8 ${revealBase}`}>
+            <div className={`card border border-neutral-200/90 bg-white/95 p-7 shadow-sm shadow-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:p-8`}>
               <div className="flex flex-col gap-4 border-b border-neutral-200/80 pb-5 dark:border-neutral-800/90 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl">
                   <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">Ориентиры по стоимости</span>
@@ -386,18 +369,16 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
               </div>
             </div>
 
-            <div ref={factorsReveal.ref} {...factorsReveal.revealProps} className={`space-y-6 ${revealBase}`}>
-              <div className="card border border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50/90 to-red-50/30 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-none md:p-8">
+            <div className={`space-y-6`}>
+              <div className="card border border-neutral-200/90 bg-gradient-to-br from-white via-neutral-50/90 to-red-50/30 p-7 shadow-sm shadow-neutral-200/60 dark:border-neutral-800 dark:shadow-none md:p-8">
                 <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">Технические пределы</span>
                 <h2 className="mt-3 text-2xl font-semibold">Технические возможности</h2>
                 <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Измеримые ограничения по ширине, длине и допускам для запуска в работу.</p>
                 <div className="mt-5 grid grid-cols-2 gap-3">
-                  {technicalStats.map((item, index) => (
+                  {technicalStats.map((item) => (
                     <article
                       key={item.label}
-                      style={factorsReveal.getStaggerStyle(index * 80)}
-                      data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
-                      className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5 ${revealBase}`}
+                      className={`rounded-xl border border-neutral-200 bg-neutral-50/85 p-3.5 transition-colors duration-300 hover:border-red-200 hover:bg-red-50/40 dark:border-neutral-700 dark:bg-neutral-900/80 dark:hover:border-red-500/30 dark:hover:bg-red-500/5`}
                     >
                       <p className="text-[1.4rem] font-bold leading-none text-neutral-900 dark:text-neutral-100">{item.key}</p>
                       <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">{item.label}</p>
@@ -420,9 +401,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
                   {priceFactors.map((factor, index) => (
                     <li
                       key={factor.label}
-                      style={factorsReveal.getStaggerStyle((index + 4) * 80)}
-                      data-reveal={factorsReveal.isVisible || factorsReveal.prefersReducedMotion ? 'in' : 'out'}
-                      className={`rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:shadow-none ${revealBase}`}
+                      className={`rounded-2xl border border-neutral-200/90 bg-neutral-50/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:shadow-none`}
                     >
                       <div className="flex items-start gap-3">
                         <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
@@ -462,7 +441,7 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       </Section>
 
       <Section className="pt-0">
-        <div className="card flex flex-col gap-4 border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 p-6 dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 md:flex-row md:items-center md:justify-between md:p-8">
+        <div className="card flex flex-col gap-4 border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-red-50/25 p-6 dark:border-neutral-800 md:flex-row md:items-center md:justify-between md:p-8">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-red-700 dark:text-red-300">Смежная услуга</p>
             <h2 className="mt-1 text-2xl font-semibold">Нужна печать перед резкой?</h2>
@@ -470,7 +449,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
           </div>
           <Link href="/wide-format-printing" className="btn-primary inline-flex w-full items-center justify-center gap-2 text-center no-underline md:w-auto">
             Перейти к широкоформатной печати
-            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </Section>
@@ -478,7 +456,6 @@ export default function PlotterCuttingPage({ siteImages }: PlotterCuttingPagePro
       <Section className="pt-0">
         <div id="plotter-request" data-floating-cta-hide className={`${publicFormStyles.shell} border-neutral-200/90 dark:border-neutral-700/85`}>
           <div className="section-header-tight mb-6">
-            <p className="t-eyebrow">Заявка</p>
             <h2 className="t-h3">Отправьте заявку на плоттерную резку</h2>
             <p className="t-body text-muted-foreground max-w-3xl">Оставьте параметры заказа — вернёмся с понятным расчётом и сроками.</p>
           </div>

@@ -30,7 +30,7 @@ const sendCustomerEmailsSchema = z.preprocess((value) => {
     if (normalized === 'false') return false;
   }
   return value;
-}, z.boolean({ invalid_type_error: 'SEND_CUSTOMER_EMAILS must be a boolean (true/false).' }));
+}, z.boolean({ error: 'SEND_CUSTOMER_EMAILS must be a boolean (true/false).' }));
 
 const enableDatabaseSchema = z.preprocess((value) => {
   if (value === undefined || value === null || value === '') return false;
@@ -41,7 +41,7 @@ const enableDatabaseSchema = z.preprocess((value) => {
     if (normalized === 'false') return false;
   }
   return value;
-}, z.boolean({ invalid_type_error: 'ENABLE_DATABASE must be a boolean (true/false).' }));
+}, z.boolean({ error: 'ENABLE_DATABASE must be a boolean (true/false).' }));
 
 const publicEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

@@ -181,7 +181,7 @@ a { @apply underline-offset-4; }
 }
 
 .card-interactive {
-  @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_18px_38px_-26px_rgba(15,23,42,0.42)] dark:hover:border-neutral-700 dark:hover:shadow-[0_20px_40px_-28px_rgba(0,0,0,0.5)];
+  @apply transition-[border-color,box-shadow] duration-150 ease-out hover:border-neutral-300 hover:shadow-[0_18px_38px_-26px_rgba(15,23,42,0.42)] dark:hover:border-neutral-700 dark:hover:shadow-[0_20px_40px_-28px_rgba(0,0,0,0.5)];
 }
 
 .card-info {
@@ -205,28 +205,10 @@ a { @apply underline-offset-4; }
 }
 
 .premium-card {
-  @apply relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_8px_24px_-22px_rgba(15,23,42,0.45)] transition-all duration-300 dark:border-neutral-800/90 dark:bg-neutral-900 dark:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.45)];
-}
-.premium-card::before {
-  content: '';
-  position: absolute;
-  left: 14px;
-  right: 14px;
-  top: 0;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(212, 28, 28, 0.6), rgba(212, 28, 28, 0.15));
-  transform: scaleX(0.2);
-  opacity: 0;
-  transform-origin: left;
-  transition: transform 260ms ease, opacity 260ms ease;
+  @apply relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_8px_24px_-22px_rgba(15,23,42,0.45)] transition-[border-color,box-shadow] duration-150 dark:border-neutral-800/90 dark:bg-neutral-900 dark:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.45)];
 }
 .premium-card:hover {
-  @apply -translate-y-1 border-neutral-300 shadow-[0_14px_34px_-24px_rgba(15,23,42,0.45)] dark:border-neutral-700 dark:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.55)];
-}
-.premium-card:hover::before {
-  opacity: 1;
-  transform: scaleX(1);
+  @apply border-neutral-300 shadow-[0_14px_34px_-24px_rgba(15,23,42,0.45)] dark:border-neutral-700 dark:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.55)];
 }
 
 .card-dot {

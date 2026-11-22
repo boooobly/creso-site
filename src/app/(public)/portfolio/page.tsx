@@ -1,7 +1,7 @@
 import Section from '@/components/Section';
 import PortfolioGrid from '@/components/PortfolioGrid';
 import ProtectedImage from '@/components/ui/ProtectedImage';
-import { HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import localItems from '@/data/portfolio.json';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getPublicPortfolioItems } from '@/lib/public-portfolio';
@@ -144,7 +144,6 @@ export default async function PortfolioPage() {
           }
         >
           <div className="space-y-4">
-            <HeroEyebrow>Портфолио реализованных проектов</HeroEyebrow>
             <HeroTitle className="max-w-3xl text-[2rem] leading-[1.07] md:text-[3rem]">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[41rem] text-sm leading-6 md:text-base md:leading-7">{heroDescription}</HeroLead>
           </div>

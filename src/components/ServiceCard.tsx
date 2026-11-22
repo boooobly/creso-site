@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ServiceCard({
@@ -42,22 +41,8 @@ export default function ServiceCard({
         </div>
       </div>
 
-      {featured && (
-        <span className="mb-3 inline-flex w-fit rounded-full border border-[var(--brand-red)]/25 bg-[var(--brand-red)]/10 px-3 py-1 t-eyebrow text-[var(--brand-red-text)]">
-          Основное направление
-        </span>
-      )}
-      <div className="card-title-stack">
-        <h3 className={`t-h3 text-[1.2rem] leading-snug transition-colors group-hover:text-[var(--brand-red-text)] md:text-[clamp(1.25rem,2.1vw,1.5rem)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
-        <p className="t-caption inline-flex items-center gap-2 uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">
-          <span className="card-dot" />
-          Услуга
-        </p>
-      </div>
+      <h3 className={`t-h3 text-[1.2rem] leading-snug transition-colors group-hover:text-[var(--brand-red-text)] md:text-[clamp(1.25rem,2.1vw,1.5rem)] ${featured ? 'md:text-[1.6rem]' : ''}`}>{title}</h3>
       <p className="t-body text-muted-foreground mt-2.5 line-clamp-4 md:mt-3 md:line-clamp-3">{desc}</p>
-      <div className="t-link mt-auto pt-4 md:pt-5">
-        Подробнее <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
-      </div>
     </Link>
   );
 }

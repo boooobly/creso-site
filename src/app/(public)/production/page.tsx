@@ -1,8 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import RevealOnScroll from '@/components/RevealOnScroll';
 import Section from '@/components/layout/Section';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { ClipboardCheck, Cog, Factory, FileText, Frame, Lightbulb, PanelsTopLeft, PencilRuler, Printer, Ruler, ShieldCheck, Sparkles, Type, Wrench } from 'lucide-react';
 import { getPageContentMap, getPageContentValue } from '@/lib/page-content';
 import { getSiteImage, getSiteImages } from '@/lib/site-images';
@@ -171,7 +170,6 @@ export default async function ProductionPage() {
             </HeroMediaPanel>
           }
         >
-          <HeroEyebrow>ПРОИЗВОДСТВЕННАЯ БАЗА</HeroEyebrow>
           <div className="space-y-4">
             <HeroTitle className="max-w-[15ch] text-[2rem] leading-[1.06] md:text-5xl">{heroTitle}</HeroTitle>
             <HeroLead className="max-w-[33rem] text-base md:text-[1.05rem] md:leading-relaxed">{heroDescription}</HeroLead>
@@ -204,7 +202,6 @@ export default async function ProductionPage() {
       <Section id="production-equipment" className="pt-0 scroll-mt-24">
         <div className="space-y-6">
           <div className="section-header">
-            <p className="t-eyebrow">ОБОРУДОВАНИЕ</p>
             <h2 className={sectionTitleClassName}>Наше оборудование</h2>
             <p className={sectionIntroClassName}>Собственная производственная база для стабильных сроков и точного результата по каждому проекту.</p>
           </div>
@@ -213,7 +210,7 @@ export default async function ProductionPage() {
               const itemImage = equipmentImages[item.slotKey]?.url ?? item.image;
 
               return (
-              <RevealOnScroll key={item.title}>
+              <div key={item.title}>
                 <article className="card-visual card-interactive group relative isolate min-h-[248px] bg-neutral-900">
                   <div className="absolute -inset-px overflow-hidden rounded-[inherit]">
                     <div className="relative h-full w-full rounded-[inherit]">
@@ -230,7 +227,7 @@ export default async function ProductionPage() {
                     </span>
                   </div>
                 </article>
-              </RevealOnScroll>
+              </div>
               );
             })}
           </div>
@@ -240,7 +237,6 @@ export default async function ProductionPage() {
       <Section className="pt-0">
         <div className="space-y-6">
           <div className="section-header">
-            <p className="t-eyebrow">ПРОДУКЦИЯ</p>
             <h2 className={sectionTitleClassName}>Что мы производим</h2>
             <p className={sectionIntroClassName}>Выпускаем рекламные конструкции и печатные изделия под задачи фасада, интерьера и торговой точки.</p>
           </div>
@@ -249,9 +245,8 @@ export default async function ProductionPage() {
               const Icon = item.icon;
 
               return (
-                <RevealOnScroll key={item.title}>
+                <div key={item.title}>
                   <article
-                    style={{ transitionDelay: `${index * 55}ms` }}
                     className="card-info card-interactive flex h-full min-h-[196px] flex-col p-5 md:p-6"
                   >
                     <span className={infoIconClassName}>
@@ -260,7 +255,7 @@ export default async function ProductionPage() {
                     <h3 className="mt-4 min-h-12 text-lg font-semibold leading-6 tracking-tight text-neutral-900 dark:text-neutral-100">{item.title}</h3>
                     <p className="mt-2.5 text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">{item.text}</p>
                   </article>
-                </RevealOnScroll>
+                </div>
               );
             })}
           </div>
@@ -270,7 +265,6 @@ export default async function ProductionPage() {
       <Section id="production-gallery" className="pt-0">
         <div className="space-y-7">
           <div className="section-header">
-            <p className="t-eyebrow">ПРОЦЕСС И РЕЗУЛЬТАТ</p>
             <h2 className={sectionTitleClassName}>Как проект проходит через производство</h2>
             <p className={sectionIntroClassName}>Показываем ключевые этапы: цех, сборка, монтаж и готовые рекламные конструкции на объекте.</p>
           </div>
@@ -321,7 +315,6 @@ export default async function ProductionPage() {
       <Section className="pt-0">
         <div className="space-y-6">
           <div className="section-header">
-            <p className="t-eyebrow">ПРОЦЕСС</p>
             <h2 className={sectionTitleClassName}>Как проходит работа</h2>
             <p className={sectionIntroClassName}>Синхронизируем этапы с задачей объекта, чтобы выдержать сроки и сохранить качество исполнения.</p>
           </div>
@@ -330,9 +323,8 @@ export default async function ProductionPage() {
               const Icon = step.icon;
 
               return (
-                <RevealOnScroll key={step.title}>
+                <div key={step.title}>
                   <article
-                    style={{ transitionDelay: `${index * 70}ms` }}
                     className="card-info card-interactive flex h-full min-h-[208px] flex-col p-5 md:p-6"
                   >
                     <span className={`${infoIconClassName} h-9 w-9 rounded-lg`}>
@@ -341,7 +333,7 @@ export default async function ProductionPage() {
                     <h3 className="mt-4 text-lg font-semibold leading-6 tracking-tight text-neutral-900 dark:text-neutral-100">{step.title}</h3>
                     <p className="mt-2.5 text-sm leading-6 text-neutral-600 dark:text-neutral-300 md:text-base">{step.text}</p>
                   </article>
-                </RevealOnScroll>
+                </div>
               );
             })}
           </div>
@@ -352,7 +344,6 @@ export default async function ProductionPage() {
         <div className="rounded-3xl border border-neutral-200/90 bg-neutral-50/70 p-6 dark:border-neutral-800/90 dark:bg-neutral-900/60 md:p-10">
           <div className="space-y-6">
             <div className="section-header-tight mb-0">
-              <p className="t-eyebrow">НАДЁЖНОСТЬ</p>
               <h2 className={sectionTitleClassName}>Почему нам доверяют</h2>
               <p className={sectionIntroClassName}>Работаем прозрачно по договору и сопровождаем проект от согласования до гарантийного обслуживания.</p>
             </div>
@@ -361,9 +352,8 @@ export default async function ProductionPage() {
                 const Icon = item.icon;
 
                 return (
-                  <RevealOnScroll key={item.title}>
+                  <div key={item.title}>
                     <article
-                      style={{ transitionDelay: `${index * 65}ms` }}
                       className={`card-info card-interactive flex min-h-[184px] flex-col bg-white p-6 dark:bg-neutral-900 md:p-7 ${index === 0 ? 'border-neutral-300 dark:border-neutral-700' : ''}`}
                     >
                       <span className={infoIconClassName}>
@@ -372,7 +362,7 @@ export default async function ProductionPage() {
                       <h3 className="t-h4 mt-5">{item.title}</h3>
                       <p className="t-body mt-3">{item.text}</p>
                     </article>
-                  </RevealOnScroll>
+                  </div>
                 );
               })}
             </div>
@@ -383,7 +373,6 @@ export default async function ProductionPage() {
       <Section className="pt-0 pb-0">
         <div className="card flex flex-col gap-6 border-neutral-200/90 bg-gradient-to-br from-white via-white to-red-50/20 p-7 dark:border-neutral-800/90 dark:from-neutral-900 dark:via-neutral-900 dark:to-[#241717] md:flex-row md:items-center md:justify-between md:gap-8 md:p-10">
           <div className="max-w-2xl space-y-3.5">
-            <p className="t-eyebrow">ЗАЯВКА НА ПРОЕКТ</p>
             <h2 className="t-h2">{ctaTitle}</h2>
             <p className="t-body md:text-lg">{ctaDescription}</p>
           </div>

@@ -61,9 +61,7 @@ export default async function ServicesPage() {
       <JsonLd data={buildBreadcrumbJsonLd([{ name: 'Главная', path: '/' }, { name: 'Услуги', path: '/services' }])} />
       <Section spacing="compact" background="muted" fullBleed className="border-y border-neutral-200/70">
         <div className="section-header">
-          <p className="t-eyebrow">НАПРАВЛЕНИЯ</p>
-          <h1 className="t-h2">Выберите нужную услугу</h1>
-          <p className="t-body text-muted-foreground max-w-2xl">Каждая карточка ведёт на профильную страницу услуги с подробностями, примерами и формой заявки.</p>
+          <h1 className="t-h2">Услуги</h1>
         </div>
         <div className="grid-cards md:grid-cols-2 lg:grid-cols-3">
           {services.map((s: any) => {
@@ -77,7 +75,6 @@ export default async function ServicesPage() {
 
       <Section spacing="tight">
         <div className="mb-5 space-y-2 md:mb-6">
-          <p className="t-eyebrow">ЛОКАЛЬНЫЕ ЗАПРОСЫ</p>
           <h2 className="t-h3">Популярные услуги в Невинномысске</h2>
           <div className="flex flex-wrap gap-2.5">
             <Link href="/advertising-signs" className="btn-secondary no-underline">Изготовление вывесок</Link>
@@ -90,8 +87,7 @@ export default async function ServicesPage() {
         <div className="cta-shell dark:border-neutral-700/80 dark:bg-gradient-to-br dark:from-[#141419] dark:via-[#191920] dark:to-[#261717] dark:shadow-[0_22px_44px_-34px_rgba(0,0,0,0.7)]">
           <div className="section-header-split mb-0">
             <div className="space-y-2">
-              <p className="t-eyebrow">НЕ ЗНАЕТЕ, С ЧЕГО НАЧАТЬ</p>
-              <h2 className="t-h3">Поможем подобрать оптимальный формат под вашу задачу</h2>
+              <h2 className="t-h3">Поможем выбрать услугу</h2>
               <p className="t-body text-muted-foreground max-w-2xl">Подскажем материалы, технологию производства и сроки, чтобы вы быстро перешли от идеи к готовому результату.</p>
             </div>
             <Link href="/contacts" className="btn-secondary w-full justify-center no-underline sm:w-auto">Связаться с менеджером</Link>

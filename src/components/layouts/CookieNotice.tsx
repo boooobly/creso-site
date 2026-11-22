@@ -59,7 +59,7 @@ export default function CookieNotice() {
             href="/privacy"
             className="text-sm font-medium text-red-600 no-underline transition-colors hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:text-red-400 dark:hover:text-red-300"
           >
-            Подробнее
+            Политика конфиденциальности
           </Link>
 
           <button

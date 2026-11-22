@@ -204,7 +204,6 @@ export default function HomePageContent({
 
       <Section spacing="tight">
         <div className="section-header">
-          <p className="t-eyebrow">УСЛУГИ</p>
           <h2 className="t-h2">Комплексные решения для рекламы и печати</h2>
           <p className="t-body text-muted-foreground max-w-2xl">Берём на себя весь цикл: от идеи и расчёта до производства, монтажа и сопровождения.</p>
         </div>
@@ -220,7 +219,6 @@ export default function HomePageContent({
       <Section spacing="tight" background="muted" className="border-y border-neutral-200/60 dark:border-neutral-800/70" fullBleed>
         <div className="section-header-split">
           <div className="space-y-2">
-            <p className="t-eyebrow">ПОРТФОЛИО</p>
             <h2 className="t-h2">{portfolioBlockTitle}</h2>
             <p className="t-body text-muted-foreground max-w-2xl">{portfolioBlockDescription}</p>
           </div>

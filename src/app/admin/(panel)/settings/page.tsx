@@ -99,7 +99,6 @@ export default async function AdminSettingsPage({ searchParams }: AdminSettingsP
             className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
           >
             <div className="mb-4 border-b border-slate-200 pb-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Раздел {sectionIndex + 1}</p>
               <h2 className="mt-1 text-lg font-semibold text-slate-900">{section.title}</h2>
               <p className="mt-1 text-sm text-slate-600">{section.description}</p>
             </div>

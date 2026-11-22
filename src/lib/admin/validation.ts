@@ -14,7 +14,7 @@ const jsonValueSchema: z.ZodType<Prisma.InputJsonValue> = z.lazy(() =>
     z.boolean(),
     z.null(),
     z.array(jsonValueSchema),
-    z.record(jsonValueSchema)
+    z.record(z.string(), jsonValueSchema)
   ])
 ) as z.ZodType<Prisma.InputJsonValue>;
 

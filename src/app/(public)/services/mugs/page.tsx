@@ -14,7 +14,7 @@ import Section from '@/components/Section';
 import OrderMugsForm from '@/components/OrderMugsForm';
 import JsonLd from '@/components/seo/JsonLd';
 import ProtectedImage from '@/components/ui/ProtectedImage';
-import { HeroActions, HeroChip, HeroChipList, HeroEyebrow, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
+import { HeroActions, HeroChip, HeroChipList, HeroLead, HeroMediaPanel, HeroTitle, PageHero } from '@/components/hero/PageHero';
 import { buildBreadcrumbJsonLd, buildFaqPageJsonLd, buildPublicPageMetadata, buildServiceJsonLd } from '@/lib/seo';
 import { getSiteImages } from '@/lib/site-images';
 
@@ -150,7 +150,6 @@ export default async function MugsServicePage() {
       {faqPageJsonLd ? <JsonLd data={faqPageJsonLd} /> : null}
       <Section className="pb-5 pt-8 sm:pt-10 lg:pb-6 lg:pt-12">
         <PageHero className="p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.55)] sm:p-8 lg:p-10" mediaClassName="h-full" media={heroMedia}>
-          <HeroEyebrow>Печать на кружках</HeroEyebrow>
           <HeroTitle className="hero-title-mobile-safe max-w-[20ch] lg:text-5xl">Брендированные кружки с печатью по кругу</HeroTitle>
           <HeroLead className="mt-4 max-w-[52ch] text-sm leading-relaxed sm:text-base">
             Производим кружки для корпоративных подарков, мероприятий и розницы: от малых партий до крупных тиражей. На выходе — аккуратный брендированный продукт, готовый к выдаче и продажам.
@@ -194,7 +193,6 @@ export default async function MugsServicePage() {
       </Section>
 
       <Section id="mugs-prices" className="pb-8 pt-4 sm:pb-10 sm:pt-5 lg:pb-12">
-        <p className="t-eyebrow">Цены и условия</p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Понятная стоимость без скрытых доплат</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">Стоимость формируется без скрытых пунктов: вы заранее понимаете цену, сроки и что именно входит в заказ.</p>
 
@@ -230,7 +228,6 @@ export default async function MugsServicePage() {
       <Section className="py-8 sm:py-10 lg:py-12">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700/80 dark:bg-neutral-900/90 dark:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.78)] sm:p-8">
-            <p className="t-eyebrow">Что вы получаете</p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">Кружка как готовый коммерческий продукт</h2>
             <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
               Мы делаем не просто “нанесение на сувенир”, а готовое изделие для продаж, подарков и бренд-коммуникации. Важно, чтобы тираж выглядел единообразно и профессионально.
@@ -268,7 +265,6 @@ export default async function MugsServicePage() {
         <div data-floating-cta-hide className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-gradient-to-br dark:from-[#141418] dark:via-[#18181d] dark:to-[#231717] dark:shadow-[0_18px_38px_-30px_rgba(0,0,0,0.7)] sm:p-7">
           <div className="mb-5 flex flex-col gap-4 border-b border-neutral-200 pb-5 dark:border-neutral-800/90 sm:mb-6 sm:pb-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-2xl">
-              <p className="t-eyebrow">Оформление заказа</p>
               <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Отправьте заявку за 1 минуту</h2>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Укажите основные параметры заказа, чтобы быстро получить расчёт и план запуска по вашему тиражу.</p>
             </div>
